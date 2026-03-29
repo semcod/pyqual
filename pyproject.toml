@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyqual"
-version = "0.1.4"
+version = "0.1.5"
 description = "Declarative quality gate loops for AI-assisted development"
 readme = "README.md"
 license = "Apache-2.0"
@@ -30,6 +30,9 @@ all = ["code2llm", "vallm", "redup", "costs"]
 
 [project.scripts]
 pyqual = "pyqual.cli:app"
+
+[tool.setuptools]
+packages = ["pyqual"]
 
 [tool.costs]
 model = "openrouter/qwen/qwen3-coder-next"

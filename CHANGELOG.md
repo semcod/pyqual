@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-03-29
+
+### Other
+- Update pyqual/__init__.py
+- Update pyqual/cli.py
+- Update pyqual/config.py
+- Update pyqual/gates.py
+- Update pyqual/pipeline.py
+
 ## [0.1.4] - 2026-03-29
 
 ## [0.1.3] - 2026-03-29
