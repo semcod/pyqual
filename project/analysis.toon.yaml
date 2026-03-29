@@ -1,4 +1,4 @@
-# code2llm | 8f 1860L | python:7,shell:1 | 2026-03-29
+# code2llm | 9f 1863L | python:8,shell:1 | 2026-03-29
 # CC̄=5.9 | critical:2/70 | dups:0 | cycles:0
 
 HEALTH[2]:
@@ -9,26 +9,27 @@ REFACTOR[1]:
   1. split 2 high-CC methods  (CC>15)
 
 PIPELINES[58]:
-  [1] Src [from_dict]: from_dict
+  [1] Src [init]: init
       PURITY: 100% pure
-  [2] Src [load]: load → _load_env_file
+  [2] Src [run]: run
       PURITY: 100% pure
-  [3] Src [_parse]: _parse
+  [3] Src [gates]: gates
       PURITY: 100% pure
-  [4] Src [__init__]: __init__ → get_llm_model → _ensure_dotenv_loaded
+  [4] Src [status]: status
       PURITY: 100% pure
-  [5] Src [complete]: complete
+  [5] Src [plugin]: plugin → get_available_plugins
       PURITY: 100% pure
 
 LAYERS:
   pyqual/                         CC̄=5.9    ←in:0  →out:0
-  │ !! gates                      575L  3C   29m  CC=16     ←0
+  │ !! gates                      577L  3C   29m  CC=16     ←0
   │ plugins                    454L  10C   16m  CC=14     ←1
   │ !! cli                        362L  0C    6m  CC=46     ←0
   │ pipeline                   152L  4C    7m  CC=6      ←0
   │ config                     137L  4C    5m  CC=5      ←1
   │ llm                        117L  2C    7m  CC=6      ←0
   │ __init__                    39L  0C    0m  CC=0.0    ←0
+  │ __init__                     1L  0C    0m  CC=0.0    ←0
   │
   ./                              CC̄=0.0    ←in:0  →out:0
   │ project.sh                  24L  0C    0m  CC=0.0    ←0

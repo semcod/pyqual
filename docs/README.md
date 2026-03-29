@@ -1,7 +1,7 @@
 <!-- code2docs:start --># pyqual
 
 ![version](https://img.shields.io/badge/version-0.1.0-blue) ![python](https://img.shields.io/badge/python-%3E%3D3.9-blue) ![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey) ![functions](https://img.shields.io/badge/functions-70-green)
-> **70** functions | **23** classes | **12** files | CC̄ = 5.9
+> **70** functions | **23** classes | **13** files | CC̄ = 5.9
 
 > Auto-generated project documentation from source code analysis.
 
@@ -148,18 +148,22 @@ Content outside the markers is preserved when regenerating. Enable this with `sy
 
 ```
 pyqual/
-    ├── cli    ├── config├── pyqual/    ├── llm        ├── dynamic_thresholds        ├── minimal        ├── check_gates        ├── run_pipeline├── project    ├── plugins    ├── pipeline    ├── gates```
+    ├── cli    ├── llm├── pyqual/    ├── config    ├── integrations/        ├── dynamic_thresholds        ├── minimal    ├── pipeline        ├── check_gates├── project        ├── run_pipeline    ├── plugins    ├── gates```
 
 ## API Overview
 
 ### Classes
 
+- **`LLMResponse`** — Response from LLM call.
+- **`LLM`** — LiteLLM wrapper with .env configuration.
 - **`StageConfig`** — Single pipeline stage.
 - **`GateConfig`** — Single quality gate threshold.
 - **`LoopConfig`** — Loop iteration settings.
 - **`PyqualConfig`** — Full pyqual.yaml configuration.
-- **`LLMResponse`** — Response from LLM call.
-- **`LLM`** — LiteLLM wrapper with .env configuration.
+- **`StageResult`** — Result of running a single stage.
+- **`IterationResult`** — Result of one full pipeline iteration.
+- **`PipelineResult`** — Result of the complete pipeline run (all iterations).
+- **`Pipeline`** — Execute pipeline stages in a loop until quality gates pass.
 - **`PluginMetadata`** — Metadata for a pyqual plugin.
 - **`MetricCollector`** — Base class for metric collector plugins.
 - **`PluginRegistry`** — Registry for metric collector plugins.
@@ -170,10 +174,6 @@ pyqual/
 - **`A11yCollector`** — Accessibility (a11y) compliance metrics.
 - **`RepoMetricsCollector`** — Advanced repository health metrics (bus factor, diversity).
 - **`SecurityCollector`** — Security scanning metrics from trufflehog, gitleaks, safety.
-- **`StageResult`** — Result of running a single stage.
-- **`IterationResult`** — Result of one full pipeline iteration.
-- **`PipelineResult`** — Result of the complete pipeline run (all iterations).
-- **`Pipeline`** — Execute pipeline stages in a loop until quality gates pass.
 - **`GateResult`** — Result of a single gate check.
 - **`Gate`** — Single quality gate with metric extraction.
 - **`GateSet`** — Collection of quality gates with metric collection.
@@ -204,6 +204,7 @@ pyqual/
 📄 `pyqual.cli` (6 functions)
 📄 `pyqual.config` (5 functions, 4 classes)
 📄 `pyqual.gates` (30 functions, 3 classes)
+📦 `pyqual.integrations`
 📄 `pyqual.llm` (7 functions, 2 classes)
 📄 `pyqual.pipeline` (7 functions, 4 classes)
 📄 `pyqual.plugins` (16 functions, 10 classes)

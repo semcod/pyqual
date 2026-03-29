@@ -1,7 +1,7 @@
-# vallm batch | 49f | 22✓ 2⚠ 0✗ | 2026-03-29
+# vallm batch | 54f | 25✓ 2⚠ 0✗ | 2026-03-29
 
 SUMMARY:
-  scanned: 49  passed: 22 (44.9%)  warnings: 2  errors: 0  unsupported: 27
+  scanned: 54  passed: 25 (46.3%)  warnings: 2  errors: 0  unsupported: 29
 
 WARNINGS[2]{path,score}:
   pyqual/cli.py,0.93
@@ -11,12 +11,12 @@ WARNINGS[2]{path,score}:
       complexity.lizard_length,warning,plugin: 136 lines exceeds limit 100,136
   pyqual/gates.py,0.96
     issues[3]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,_from_pylint has cyclomatic complexity 16 (max: 15),509
+      complexity.cyclomatic,warning,_from_pylint has cyclomatic complexity 16 (max: 15),511
       complexity.maintainability,warning,Low maintainability index: 0.0 (threshold: 20),
-      complexity.lizard_cc,warning,_from_pylint: CC=16 exceeds limit 15,509
+      complexity.lizard_cc,warning,_from_pylint: CC=16 exceeds limit 15,511
 
 UNSUPPORTED[4]{bucket,count}:
-  *.md,18
+  *.md,20
   *.txt,1
   *.yml,1
   other,7

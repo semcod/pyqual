@@ -251,3 +251,42 @@ sprints:
     model_hints:
       planning: balanced
       implementation: balanced
+  - id: ticket-ad12a7fe
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/integrations/llx_mcp_service.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/integrations/llx_mcp_service.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a596efee
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in pyqual/integrations/llx_mcp_service.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/integrations/llx_mcp_service.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2ced7dac
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in pyqual/integrations/llx_mcp_service.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/integrations/llx_mcp_service.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced

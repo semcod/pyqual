@@ -2,8 +2,8 @@
 
 NEXT[3] (ranked by impact):
   [1] !! SPLIT           pyqual/gates.py
-      WHY: 575L, 3 classes, max CC=16
-      EFFORT: ~4h  IMPACT: 9200
+      WHY: 577L, 3 classes, max CC=16
+      EFFORT: ~4h  IMPACT: 9232
 
   [2] !! SPLIT-FUNC      plugin  CC=46  fan=33
       WHY: CC=46 exceeds 15
@@ -49,4 +49,4 @@ PATTERNS (language parser shared logic):
     - Standardized FunctionInfo/ClassInfo models
 
 HISTORY:
-  prev CC̄=6.3 → now CC̄=5.9
+  prev CC̄=5.9 → now CC̄=5.9

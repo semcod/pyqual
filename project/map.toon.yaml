@@ -1,15 +1,16 @@
-# pyqual | 8f 1860L | python:7,shell:1 | 2026-03-29
-# stats: 70 func | 0 cls | 8 mod | CC̄=5.9 | critical:2 | cycles:0
-# alerts[5]: CC plugin=46; fan-out plugin=33; fan-out GateSet._collect_metrics=18; CC GateSet._from_pylint=16; fan-out gates=13
-# hotspots[5]: plugin fan=33; GateSet._collect_metrics fan=18; gates fan=13; SecurityCollector.collect fan=11; GateSet._from_sbom fan=11
-# evolution: CC̄ 6.3→5.9 (improved -0.4)
+# pyqual | 9f 1863L | python:8,shell:1 | 2026-03-29
+# stats: 70 func | 0 cls | 9 mod | CC̄=5.9 | critical:2 | cycles:0
+# alerts[5]: CC plugin=46; fan-out plugin=33; fan-out GateSet._collect_metrics=20; CC GateSet._from_pylint=16; fan-out gates=13
+# hotspots[5]: plugin fan=33; GateSet._collect_metrics fan=20; gates fan=13; SecurityCollector.collect fan=11; GateSet._from_sbom fan=11
+# evolution: CC̄ 5.9→5.9 (flat 0.0)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[8]:
+M[9]:
   project.sh,24
   pyqual/__init__.py,39
   pyqual/cli.py,362
   pyqual/config.py,137
-  pyqual/gates.py,575
+  pyqual/gates.py,577
+  pyqual/integrations/__init__.py,1
   pyqual/llm.py,117
   pyqual/pipeline.py,152
   pyqual/plugins.py,454
@@ -65,4 +66,5 @@ Subclasses should ...
     PyqualConfig: load(1),_parse(1),default_yaml(-1)  # Full pyqual.yaml configuration...
     _load_env_file()
   pyqual/__init__.py:
+  pyqual/integrations/__init__.py:
   project.sh:

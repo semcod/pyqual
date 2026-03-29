@@ -4,11 +4,11 @@
 
 - **Project**: /home/tom/github/semcod/pyqual
 - **Primary Language**: python
-- **Languages**: python: 11, shell: 1
+- **Languages**: python: 12, shell: 1
 - **Analysis Mode**: static
 - **Total Functions**: 70
 - **Total Classes**: 23
-- **Modules**: 12
+- **Modules**: 13
 - **Entry Points**: 64
 
 ## Architecture by Module
@@ -137,6 +137,10 @@ Main execution flows into the system:
 > Create pyqual.yaml with sensible defaults.
 - **Calls**: app.command, typer.Argument, target.exists, target.write_text, None.mkdir, console.print, console.print, Path
 
+### pyqual.pipeline.Pipeline._run_iteration
+> Run one iteration of all stages + gate check.
+- **Calls**: time.monotonic, IterationResult, self.gate_set.all_passed, self.gate_set.check_all, all, self._should_run_stage, self._execute_stage, iteration.stages.append
+
 ### pyqual.gates.GateSet._from_vallm
 > Extract vallm pass rate from validation_toon.yaml or errors.json.
 - **Calls**: errors_path.exists, p.read_text, re.search, p.exists, float, json.loads, isinstance, pass_match.group
@@ -145,20 +149,16 @@ Main execution flows into the system:
 > Extract secrets scan metrics from secrets.json.
 - **Calls**: sec_path.exists, json.loads, isinstance, sec_path.read_text, float, float, None.lower, max
 
-### pyqual.pipeline.Pipeline._run_iteration
-> Run one iteration of all stages + gate check.
-- **Calls**: time.monotonic, IterationResult, self.gate_set.all_passed, self.gate_set.check_all, all, self._should_run_stage, self._execute_stage, iteration.stages.append
-
 ### pyqual.plugins.SBOMCollector.collect
 - **Calls**: sbom_path.exists, json.loads, data.get, len, sum, data.get, float, sbom_path.read_text
-
-### pyqual.gates.GateSet._from_mypy
-> Extract mypy type error count from JSON output.
-- **Calls**: p.exists, json.loads, isinstance, float, p.read_text, len, isinstance, len
 
 ### pyqual.pipeline.Pipeline._execute_stage
 > Execute a single stage command.
 - **Calls**: time.monotonic, StageResult, subprocess.run, StageResult, StageResult, StageResult, time.monotonic, str
+
+### pyqual.gates.GateSet._from_mypy
+> Extract mypy type error count from JSON output.
+- **Calls**: p.exists, json.loads, isinstance, float, p.read_text, len, isinstance, len
 
 ## Process Flows
 
@@ -301,16 +301,6 @@ Subclasses should implement collect() to extract metrics f
 - **Key Methods**: pyqual.plugins.SecurityCollector.collect
 - **Inherits**: MetricCollector
 
-### pyqual.gates.GateResult
-> Result of a single gate check.
-- **Methods**: 1
-- **Key Methods**: pyqual.gates.GateResult.__str__
-
-### pyqual.gates.Gate
-> Single quality gate with metric extraction.
-- **Methods**: 1
-- **Key Methods**: pyqual.gates.Gate.check
-
 ### pyqual.pipeline.StageResult
 > Result of running a single stage.
 - **Methods**: 1
@@ -320,6 +310,16 @@ Subclasses should implement collect() to extract metrics f
 > Result of the complete pipeline run (all iterations).
 - **Methods**: 1
 - **Key Methods**: pyqual.pipeline.PipelineResult.iteration_count
+
+### pyqual.gates.GateResult
+> Result of a single gate check.
+- **Methods**: 1
+- **Key Methods**: pyqual.gates.GateResult.__str__
+
+### pyqual.gates.Gate
+> Single quality gate with metric extraction.
+- **Methods**: 1
+- **Key Methods**: pyqual.gates.Gate.check
 
 ### pyqual.config.StageConfig
 > Single pipeline stage.
