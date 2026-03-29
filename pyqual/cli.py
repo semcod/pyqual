@@ -21,9 +21,14 @@ from pyqual.plugins import (
     get_available_plugins,
     install_plugin_config,
 )
+from pyqual.tickets import sync_all_tickets
+from pyqual.tickets import sync_github_tickets
+from pyqual.tickets import sync_todo_tickets
 
 app = typer.Typer(help="Declarative quality gate loops for AI-assisted development.")
 console = Console()
+tickets_app = typer.Typer(help="Control planfile-backed tickets from TODO.md and GitHub.")
+app.add_typer(tickets_app, name="tickets")
 
 
 @app.command()
@@ -72,7 +77,12 @@ def run(
     if not result.final_passed:
         console.print(f"\n[bold red]Gates not met after {result.iteration_count} iterations.[/bold red]")
         if cfg.loop.on_fail == "create_ticket":
-            console.print("[yellow]Creating planfile tickets for failures...[/yellow]")
+            console.print("[yellow]Creating planfile tickets from TODO.md...[/yellow]")
+            try:
+                sync_todo_tickets(workdir=workdir, dry_run=False, direction="from")
+            except RuntimeError as exc:
+                console.print(f"[red]{exc}[/red]")
+                raise typer.Exit(1)
         raise typer.Exit(1)
 
     console.print(f"\nTotal time: {result.total_duration:.1f}s")
@@ -203,6 +213,48 @@ def mcp_service(
     """Run the persistent llx MCP service with health and metrics endpoints."""
     try:
         run_llx_mcp_service(host=host, port=port)
+    except RuntimeError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(1)
+
+
+@tickets_app.command("todo")
+def tickets_todo(
+    workdir: Path = typer.Option(Path("."), "--workdir", "-w", help="Repository root containing TODO.md and .planfile/.") ,
+    dry_run: bool = typer.Option(False, "--dry-run", help="Show what would be synced without changing files."),
+    direction: str = typer.Option("both", "--direction", help="Sync direction: from, to, or both."),
+) -> None:
+    """Sync TODO.md tickets using planfile's markdown backend."""
+    try:
+        sync_todo_tickets(workdir=workdir, dry_run=dry_run, direction=direction)
+    except RuntimeError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(1)
+
+
+@tickets_app.command("github")
+def tickets_github(
+    workdir: Path = typer.Option(Path("."), "--workdir", "-w", help="Repository root containing .planfile/ and GitHub sync config."),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Show what would be synced without changing files."),
+    direction: str = typer.Option("both", "--direction", help="Sync direction: from, to, or both."),
+) -> None:
+    """Sync GitHub Issues using planfile's GitHub backend."""
+    try:
+        sync_github_tickets(workdir=workdir, dry_run=dry_run, direction=direction)
+    except RuntimeError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(1)
+
+
+@tickets_app.command("all")
+def tickets_all(
+    workdir: Path = typer.Option(Path("."), "--workdir", "-w", help="Repository root containing TODO.md and .planfile/."),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Show what would be synced without changing files."),
+    direction: str = typer.Option("both", "--direction", help="Sync direction: from, to, or both."),
+) -> None:
+    """Sync TODO.md and GitHub tickets using planfile."""
+    try:
+        sync_all_tickets(workdir=workdir, dry_run=dry_run, direction=direction)
     except RuntimeError as exc:
         console.print(f"[red]{exc}[/red]")
         raise typer.Exit(1)

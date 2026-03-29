@@ -248,18 +248,22 @@ def build_fix_prompt(
     )
 
 
-def _resolve_issue_source(workdir: Path, issues_path: Path) -> Path:
-    """Resolve the issue source, falling back from the default JSON file to TODO.md."""
+def _resolve_issue_source(
+    workdir: Path,
+    issues_path: Path,
+) -> tuple[Path, dict[str, Any] | list[dict[str, Any]] | list[Any]]:
+    """Resolve issues, falling back from the default JSON file to TODO.md when empty."""
     resolved = issues_path if issues_path.is_absolute() else (workdir / issues_path).resolve()
-    if resolved.exists():
-        return resolved
+    issues = _load_issue_source(resolved)
 
-    if resolved.name == Path(DEFAULT_ISSUES_PATH).name:
+    if resolved.name == Path(DEFAULT_ISSUES_PATH).name and not issues:
         todo_path = (workdir / "TODO.md").resolve()
         if todo_path.exists():
-            return todo_path
+            todo_issues = _load_todo_markdown(todo_path)
+            if todo_issues:
+                return todo_path, todo_issues
 
-    return resolved
+    return resolved, issues
 
 
 async def run_llx_fix_workflow(
@@ -276,8 +280,7 @@ async def run_llx_fix_workflow(
 ) -> LlxMcpRunResult:
     """Run the analysis + fix workflow and save a JSON report."""
     client = LlxMcpClient(endpoint_url=endpoint_url)
-    resolved_issues_path = _resolve_issue_source(workdir, issues_path)
-    issues = _load_issue_source(resolved_issues_path)
+    resolved_issues_path, issues = _resolve_issue_source(workdir, issues_path)
 
     try:
         analysis_response = await client.analyze(project_path, task=task)

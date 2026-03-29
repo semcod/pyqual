@@ -2,7 +2,7 @@
 
 ## AI Cost Tracking
 
-![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.25-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.26-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
 ![AI Cost](https://img.shields.io/badge/AI%20Cost-$1.05-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-5.0h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
 
 - 🤖 **LLM usage:** $1.0500 (7 commits)
@@ -100,6 +100,9 @@ pyqual status            # show current metrics
 pyqual doctor            # check tool availability
 pyqual mcp-fix           # run the llx-backed MCP fix workflow
 pyqual mcp-service       # start the persistent llx MCP service
+pyqual tickets todo      # sync TODO.md through planfile
+pyqual tickets github    # sync GitHub issues through planfile
+pyqual tickets all       # sync TODO.md and GitHub tickets
 
 # Plugin management
 pyqual plugin list                   # list all plugins
@@ -232,7 +235,7 @@ pyqual is intentionally small (~800 lines). It orchestrates, not implements:
 - **code2llm** does analysis → pyqual reads the `.toon` output
 - **vallm** does validation → pyqual reads pass rates
 - **llx** does LLM routing → pyqual calls it as a stage
-- **planfile** manages tickets → pyqual creates tickets on gate failure
+- **planfile** manages tickets → pyqual syncs TODO.md and GitHub tickets through planfile
 - **costs** tracks spending → pyqual can gate on budget
 - **algitex** can import pyqual as a dependency for its `go` command
 

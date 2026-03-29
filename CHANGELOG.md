@@ -49,6 +49,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.26] - 2026-03-29
+
+### Docs
+- Update README.md
+- Update TODO.md
+- Update code2llm_output/README.md
+- Update code2llm_output/context.md
+
+### Test
+- Update tests/test_tickets.py
+
+### Other
+- Update .pyqual/coverage.json
+- Update .pyqual/validation.txt
+- Update code2llm_output/analysis.toon.yaml
+- Update code2llm_output/evolution.toon.yaml
+- Update pyqual.yaml
+- Update pyqual/cli.py
+- Update pyqual/integrations/llx_mcp.py
+- Update pyqual/tickets.py
+
 ## [0.1.25] - 2026-03-29
 
 ### Test

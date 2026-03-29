@@ -1,0 +1,53 @@
+# code2llm/evolution | 118 func | 8f | 2026-03-29
+
+NEXT[3] (ranked by impact):
+  [1] !! SPLIT           pyqual/gates.py
+      WHY: 588L, 3 classes, max CC=16
+      EFFORT: ~4h  IMPACT: 9408
+
+  [2] !! SPLIT           pyqual/plugins.py
+      WHY: 575L, 11 classes, max CC=14
+      EFFORT: ~4h  IMPACT: 8050
+
+  [3] !  SPLIT-FUNC      GateSet._from_pylint  CC=16  fan=11
+      WHY: CC=16 exceeds 15
+      EFFORT: ~1h  IMPACT: 176
+
+
+RISKS[2]:
+  ⚠ Splitting pyqual/gates.py may break 29 import paths
+  ⚠ Splitting pyqual/plugins.py may break 24 import paths
+
+METRICS-TARGET:
+  CC̄:          4.9 → ≤3.4
+  max-CC:      16 → ≤8
+  god-modules: 2 → 0
+  high-CC(≥15): 2 → ≤1
+  hub-types:   0 → ≤0
+
+PATTERNS (language parser shared logic):
+  _extract_declarations() in base.py — unified extraction for:
+    - TypeScript: interfaces, types, classes, functions, arrow funcs
+    - PHP: namespaces, traits, classes, functions, includes
+    - Ruby: modules, classes, methods, requires
+    - C++: classes, structs, functions, #includes
+    - C#: classes, interfaces, methods, usings
+    - Java: classes, interfaces, methods, imports
+    - Go: packages, functions, structs
+    - Rust: modules, functions, traits, use statements
+
+  Shared regex patterns per language:
+    - import: language-specific import/require/using patterns
+    - class: class/struct/trait declarations with inheritance
+    - function: function/method signatures with visibility
+    - brace_tracking: for C-family languages ({ })
+    - end_keyword_tracking: for Ruby (module/class/def...end)
+
+  Benefits:
+    - Consistent extraction logic across all languages
+    - Reduced code duplication (~70% reduction in parser LOC)
+    - Easier maintenance: fix once, apply everywhere
+    - Standardized FunctionInfo/ClassInfo models
+
+HISTORY:
+  prev CC̄=4.9 → now CC̄=4.9

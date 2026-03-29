@@ -1,0 +1,50 @@
+# code2llm | 11f 2745L | python:10,shell:1 | 2026-03-29
+# CC̄=4.9 | critical:2/119 | dups:0 | cycles:0
+
+HEALTH[3]:
+  🔴 GOD   pyqual/plugins.py = 575L, 11 classes, 24m, max CC=14
+  🟡 CC    _issue_text CC=15 (limit:15)
+  🟡 CC    _from_pylint CC=16 (limit:15)
+
+REFACTOR[2]:
+  1. split pyqual/plugins.py  (god module)
+  2. split 2 high-CC methods  (CC>15)
+
+PIPELINES[85]:
+  [1] Src [init]: init
+      PURITY: 100% pure
+  [2] Src [run]: run
+      PURITY: 100% pure
+  [3] Src [gates]: gates
+      PURITY: 100% pure
+  [4] Src [status]: status
+      PURITY: 100% pure
+  [5] Src [mcp_fix]: mcp_fix → run_llx_fix_workflow → _resolve_issue_source
+      PURITY: 100% pure
+
+LAYERS:
+  pyqual/                         CC̄=4.9    ←in:0  →out:1
+  │ !! gates                      588L  3C   29m  CC=16     ←0
+  │ !! plugins                    575L  11C   24m  CC=14     ←2
+  │ cli                        457L  0C   15m  CC=12     ←0
+  │ !! llx_mcp                    391L  2C   15m  CC=15     ←1
+  │ llx_mcp_service            241L  1C   15m  CC=4      ←0
+  │ pipeline                   152L  4C    7m  CC=6      ←0
+  │ config                     150L  4C    6m  CC=6      ←1
+  │ llm                        117L  2C    7m  CC=6      ←0
+  │ __init__                    49L  0C    0m  CC=0.0    ←0
+  │ __init__                     1L  0C    0m  CC=0.0    ←0
+  │
+  ./                              CC̄=0.0    ←in:0  →out:0
+  │ project.sh                  24L  0C    0m  CC=0.0    ←0
+  │
+
+COUPLING:
+                                    pyqual  pyqual.integrations
+               pyqual                   ──                    1
+  pyqual.integrations                   ←1                   ──
+  CYCLES: none
+
+EXTERNAL:
+  validation: run `vallm batch .` → validation.toon
+  duplication: run `redup scan .` → duplication.toon

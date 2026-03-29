@@ -28,7 +28,7 @@ pipeline:
     #   run: trufflehog filesystem . --json > .pyqual/trufflehog.json 2>/dev/null || true
     
     - name: validate
-      run: vallm batch ./ --recursive --errors-json > .pyqual/errors.json
+      run: vallm batch ./ --recursive --output .pyqual/
     
     # LLX-powered code generation
     - name: fix
