@@ -138,11 +138,17 @@ def _load_llx_server() -> Any:
 
 def create_app(state: McpServiceState | None = None, llx_server: Any | None = None) -> Any:
     """Create an ASGI app that exposes the llx MCP server over SSE."""
-    from starlette.applications import Starlette
-    from starlette.responses import JSONResponse, PlainTextResponse, Response
-    from starlette.routing import Mount, Route
+    try:
+        from starlette.applications import Starlette
+        from starlette.responses import JSONResponse, PlainTextResponse, Response
+        from starlette.routing import Mount, Route
 
-    from mcp.server.sse import SseServerTransport
+        from mcp.server.sse import SseServerTransport
+    except ImportError as exc:  # pragma: no cover - dependency error
+        raise RuntimeError(
+            "pyqual mcp-service requires the MCP runtime dependencies. Reinstall with `pip install -e '.[mcp]'` "
+            "or `pip install mcp uvicorn starlette sse-starlette`."
+        ) from exc
 
     service_state = state or McpServiceState()
     mcp_server = llx_server or _load_llx_server()
@@ -196,7 +202,12 @@ def create_app(state: McpServiceState | None = None, llx_server: Any | None = No
 
 def run_server(host: str = "0.0.0.0", port: int = 8000, state: McpServiceState | None = None) -> None:
     """Run the persistent MCP service with uvicorn."""
-    import uvicorn
+    try:
+        import uvicorn
+    except ImportError as exc:  # pragma: no cover - dependency error
+        raise RuntimeError(
+            "pyqual mcp-service requires `uvicorn`. Reinstall with `pip install -e '.[mcp]'` or `pip install uvicorn`."
+        ) from exc
 
     uvicorn.run(create_app(state=state), host=host, port=port, log_level="info")
 

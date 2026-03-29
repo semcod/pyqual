@@ -511,6 +511,8 @@ env:
             aider = data.get("aider")
             if isinstance(aider, dict):
                 returncode = aider.get("returncode")
+                if returncode is None and aider.get("success") is not None:
+                    returncode = 0 if bool(aider.get("success")) else 1
                 if returncode is not None:
                     result["llx_fix_returncode"] = float(returncode)
                 method = aider.get("method")

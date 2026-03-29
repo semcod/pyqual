@@ -18,7 +18,7 @@ from pyqual.integrations.llx_mcp import (
     run_llx_fix_workflow,
 )
 
-__version__ = "0.1.21"
+__version__ = "0.1.22"
 
 __all__ = [
     "PyqualConfig",

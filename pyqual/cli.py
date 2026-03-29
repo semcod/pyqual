@@ -154,20 +154,24 @@ def mcp_fix(
     resolved_issues = issues if issues.is_absolute() else (workdir / issues).resolve()
     resolved_output = output if output.is_absolute() else (workdir / output).resolve()
 
-    result = asyncio.run(
-        run_llx_fix_workflow(
-            workdir=workdir,
-            project_path=resolved_project_path,
-            issues_path=resolved_issues,
-            output_path=resolved_output,
-            endpoint_url=endpoint,
-            model=model,
-            files=file,
-            use_docker=use_docker,
-            docker_args=docker_arg,
-            task=task,
+    try:
+        result = asyncio.run(
+            run_llx_fix_workflow(
+                workdir=workdir,
+                project_path=resolved_project_path,
+                issues_path=resolved_issues,
+                output_path=resolved_output,
+                endpoint_url=endpoint,
+                model=model,
+                files=file,
+                use_docker=use_docker,
+                docker_args=docker_arg,
+                task=task,
+            )
         )
-    )
+    except RuntimeError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(1)
 
     if json_output:
         console.print(json.dumps(result.to_dict(), indent=2, ensure_ascii=False))
@@ -197,7 +201,11 @@ def mcp_service(
     port: int = typer.Option(8000, "--port", help="Port to listen on."),
 ) -> None:
     """Run the persistent llx MCP service with health and metrics endpoints."""
-    run_llx_mcp_service(host=host, port=port)
+    try:
+        run_llx_mcp_service(host=host, port=port)
+    except RuntimeError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(1)
 
 
 @app.command()

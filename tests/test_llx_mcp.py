@@ -102,6 +102,19 @@ def test_mcp_fix_cli_invokes_workflow(tmp_path: Path, monkeypatch: pytest.Monkey
     assert '"tool_calls": 2' in result.output
 
 
+def test_mcp_service_cli_shows_friendly_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    def fake_run_llx_mcp_service(*_args: object, **_kwargs: object) -> None:
+        raise RuntimeError("pyqual mcp-service requires `uvicorn`")
+
+    monkeypatch.setattr(cli_module, "run_llx_mcp_service", fake_run_llx_mcp_service)
+
+    runner = CliRunner()
+    result = runner.invoke(app, ["mcp-service"])
+
+    assert result.exit_code == 1
+    assert "pyqual mcp-service requires `uvicorn`" in result.output
+
+
 @pytest.mark.asyncio
 async def test_persistent_mcp_service_exposes_health_and_metrics() -> None:
     class FakeServer:
