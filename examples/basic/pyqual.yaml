@@ -1,0 +1,14 @@
+pipeline:
+  name: example-quality
+
+  metrics:
+    # No gates for examples - just demonstrate API
+
+  stages:
+    - name: demo
+      run: echo "Example stage running..."
+      when: always
+
+  loop:
+    max_iterations: 1
+    on_fail: report

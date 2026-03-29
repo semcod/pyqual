@@ -1,0 +1,14 @@
+pipeline:
+  name: llm-fix-example
+
+  metrics:
+    # Example - adjust as needed
+
+  stages:
+    - name: lint
+      run: echo "Running linter..."
+      when: always
+
+  loop:
+    max_iterations: 1
+    on_fail: report

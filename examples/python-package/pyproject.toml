@@ -1,0 +1,129 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "my-project"
+version = "0.1.0"
+description = "Example project with pyqual configuration"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov",
+    "mypy",
+    "ruff",
+]
+security = [
+    "bandit",
+    "pip-audit",
+]
+quality = [
+    "pylint",
+    "flake8",
+    "radon",
+    "interrogate",
+    "vulture",
+]
+
+# Pyqual configuration in pyproject.toml
+[tool.pyqual]
+name = "quality-loop"
+
+[tool.pyqual.metrics]
+cc_max = 15
+vallm_pass_min = 90
+coverage_min = 80
+# Uncomment to enable additional checks:
+# vuln_high_max = 0
+# bandit_high_max = 0
+# secrets_found_max = 0
+# mypy_errors_max = 0
+# ruff_errors_max = 0
+# pylint_score_min = 8.0
+# flake8_errors_max = 0
+# docstring_coverage_min = 80
+# outdated_deps_max = 5
+
+[[tool.pyqual.stages]]
+name = "analyze"
+run = "code2llm ./ -f toon,evolution"
+
+[[tool.pyqual.stages]]
+name = "lint"
+run = "ruff check . --output-format=json > .pyqual/ruff.json 2>/dev/null || echo '[]' > .pyqual/ruff.json"
+
+[[tool.pyqual.stages]]
+name = "typecheck"
+run = "mypy . --show-error-codes --json > .pyqual/mypy.json 2>&1 || echo '[]' > .pyqual/mypy.json"
+
+[[tool.pyqual.stages]]
+name = "validate"
+run = "vallm batch ./ --recursive --errors-json > .pyqual/errors.json"
+
+[[tool.pyqual.stages]]
+name = "fix"
+run = "echo 'Connect your LLM fixer here'"
+when = "metrics_fail"
+
+[[tool.pyqual.stages]]
+name = "test"
+run = "pytest --cov --cov-report=json:.pyqual/coverage.json"
+when = "always"
+
+[tool.pyqual.loop]
+max_iterations = 3
+on_fail = "report"
+
+[tool.pyqual.env]
+LLM_MODEL = "openrouter/qwen/qwen3-coder-next"
+
+# Ruff configuration
+[tool.ruff]
+target-version = "py39"
+line-length = 100
+select = ["E", "F", "W", "I", "N", "D", "UP", "B", "C4", "SIM"]
+ignore = ["E501"]  # Line length handled by formatter
+
+[tool.ruff.pydocstyle]
+convention = "google"
+
+# Mypy configuration
+[tool.mypy]
+python_version = "3.9"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+
+# Pytest configuration
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["src"]
+omit = ["*/tests/*", "*/test_*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+]

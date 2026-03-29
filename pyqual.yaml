@@ -1,0 +1,48 @@
+pipeline:
+  name: quality-loop
+
+  # Quality gates — pipeline iterates until ALL pass
+  metrics:
+    cc_max: 15           # cyclomatic complexity per function
+    vallm_pass_min: 90   # vallm validation pass rate (%)
+    coverage_min: 80     # test coverage (%)
+    # Security gates (uncomment to enable):
+    # vuln_high_max: 0     # pip-audit high severity CVEs
+    # bandit_high_max: 0   # bandit high severity issues
+    # secrets_found_max: 0 # trufflehog/gitleaks secrets
+    # Quality gates (uncomment to enable):
+    # mypy_errors_max: 0   # mypy type checking errors
+    # outdated_deps_max: 5 # outdated pip dependencies
+
+  # Pipeline stages — executed in order
+  stages:
+    - name: analyze
+      run: code2llm ./ -f toon,evolution
+    
+    # Security scans (uncomment to enable):
+    # - name: audit
+    #   run: pip-audit --format=json -o .pyqual/pip_audit.json
+    # - name: bandit
+    #   run: bandit -r . -f json -o .pyqual/bandit.json || true
+    # - name: secrets
+    #   run: trufflehog filesystem . --json > .pyqual/trufflehog.json 2>/dev/null || true
+    
+    - name: validate
+      run: vallm batch ./ --recursive --errors-json > .pyqual/errors.json
+    
+    - name: fix
+      run: echo "LLM fix placeholder — connect llx or aider here"
+      when: metrics_fail
+    
+    - name: test
+      run: pytest --cov --cov-report=json:.pyqual/coverage.json
+      when: always
+
+  # Loop behavior
+  loop:
+    max_iterations: 3
+    on_fail: report      # report | create_ticket | block
+
+  # Environment (optional)
+  env:
+    LLM_MODEL: openrouter/qwen/qwen3-coder-next

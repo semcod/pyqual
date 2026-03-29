@@ -1,0 +1,108 @@
+name: Quality Gates
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache pip packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt', '**/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyqual pytest pytest-cov
+          # Install security tools (optional - enable as needed)
+          # pip install bandit pip-audit
+          # Install linters (optional - enable as needed)
+          # pip install ruff pylint flake8 mypy radon
+
+      - name: Run pyqual quality gates
+        run: |
+          pyqual run --config pyqual.yaml
+        env:
+          LLM_MODEL: openrouter/qwen/qwen3-coder-next
+          # Add your API keys for LLM integration
+          # OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+
+      - name: Upload quality reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-reports-py${{ matrix.python-version }}
+          path: .pyqual/
+          retention-days: 7
+
+  security:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyqual bandit pip-audit
+
+      - name: Run security checks
+        run: |
+          # Run with security-focused config
+          pyqual run --config examples/security/pyqual.security.yaml || true
+
+      - name: Comment PR with security results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = '.pyqual/pip_audit.json';
+            let body = '## 🔒 Security Scan Results\n\n';
+
+            if (fs.existsSync(path)) {
+              const audit = JSON.parse(fs.readFileSync(path, 'utf8'));
+              const vulns = audit.vulnerabilities || [];
+              if (vulns.length === 0) {
+                body += '✅ No vulnerabilities found!\n';
+              } else {
+                body += `⚠️ Found ${vulns.length} vulnerabilities:\n`;
+                vulns.slice(0, 10).forEach(v => {
+                  body += `- **${v.name}**: ${v.vulnerability_id}\n`;
+                });
+              }
+            } else {
+              body += '⚪ Security scan not configured\n';
+            }
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });

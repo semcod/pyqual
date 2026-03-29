@@ -64,11 +64,32 @@ class PyqualConfig:
 
     @classmethod
     def load(cls, path: str | Path = "pyqual.yaml") -> "PyqualConfig":
-        """Load configuration from YAML file."""
+        """Load configuration from YAML file or pyproject.toml."""
         _load_env_file()
         p = Path(path)
+        
+        # Try pyproject.toml if pyqual.yaml doesn't exist
+        if not p.exists() and p.name == "pyqual.yaml":
+            pyproject = Path("pyproject.toml")
+            if pyproject.exists():
+                try:
+                    import tomllib
+                    data = tomllib.loads(pyproject.read_text())
+                    if "tool" in data and "pyqual" in data["tool"]:
+                        return cls._parse(data["tool"]["pyqual"])
+                except ImportError:
+                    try:
+                        import tomli
+                        data = tomli.loads(pyproject.read_text())
+                        if "tool" in data and "pyqual" in data["tool"]:
+                            return cls._parse(data["tool"]["pyqual"])
+                    except ImportError:
+                        pass
+            raise FileNotFoundError(f"Config not found: {p} or [tool.pyqual] in pyproject.toml. Run 'pyqual init'.")
+        
         if not p.exists():
             raise FileNotFoundError(f"Config not found: {p}. Run 'pyqual init'.")
+        
         raw = yaml.safe_load(p.read_text())
         return cls._parse(raw)
 
@@ -109,11 +130,30 @@ pipeline:
     cc_max: 15           # cyclomatic complexity per function
     vallm_pass_min: 90   # vallm validation pass rate (%)
     coverage_min: 80     # test coverage (%)
+    # Security gates (uncomment to enable):
+    # vuln_high_max: 0     # pip-audit high severity CVEs
+    # bandit_high_max: 0   # bandit high severity issues
+    # secrets_found_max: 0 # trufflehog/gitleaks secrets
+    # Quality gates (uncomment to enable):
+    # mypy_errors_max: 0   # mypy type checking errors
+    # ruff_errors_max: 0   # ruff linter errors
+    # pylint_score_min: 8.0 # pylint score (0-10)
+    # flake8_errors_max: 0  # flake8 violations
+    # docstring_coverage_min: 80 # % documented functions
+    # outdated_deps_max: 5 # outdated pip dependencies
 
   # Pipeline stages — executed in order
   stages:
     - name: analyze
       run: code2llm ./ -f toon,evolution
+    
+    # Security scans (uncomment to enable):
+    # - name: audit
+    #   run: pip-audit --format=json -o .pyqual/pip_audit.json
+    # - name: bandit
+    #   run: bandit -r . -f json -o .pyqual/bandit.json || true
+    # - name: secrets
+    #   run: trufflehog filesystem . --json > .pyqual/trufflehog.json 2>/dev/null || true
     
     - name: validate
       run: vallm batch ./ --recursive --errors-json > .pyqual/errors.json

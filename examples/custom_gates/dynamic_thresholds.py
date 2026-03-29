@@ -27,7 +27,10 @@ gates = [
 
 print(f"Checking with coverage threshold: {coverage_threshold}%")
 gate_set = GateSet(gates)
-results = gate_set.check_all()
+
+# Example metrics (in real use, collect from actual sources)
+metrics = {"coverage": 75.0}  # Example: 75% coverage
+results = [g.check(metrics) for g in gate_set.gates]
 
 for r in results:
     print(f"{'✅' if r.passed else '❌'} {r.metric}: {r.value}% (threshold: {r.threshold}%)")

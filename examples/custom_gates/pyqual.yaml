@@ -1,0 +1,14 @@
+pipeline:
+  name: custom-gates-example
+
+  metrics:
+    coverage_min: 0  # Custom gates example
+
+  stages:
+    - name: test
+      run: echo "Running tests..."
+      when: always
+
+  loop:
+    max_iterations: 1
+    on_fail: report
