@@ -1,0 +1,39 @@
+# pyqual | 6f 585L | python:5,shell:1 | 2026-03-29
+# stats: 24 func | 0 cls | 6 mod | CC̄=3.5 | critical:0 | cycles:0
+# alerts[4]: fan-out gates=13; fan-out GateSet._from_vallm=10; fan-out init=10; fan-out status=10
+# hotspots[5]: gates fan=13; init fan=10; status fan=10; GateSet._from_vallm fan=10; run fan=9
+# evolution: baseline
+# Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
+M[6]:
+  project.sh,24
+  pyqual/__init__.py,22
+  pyqual/cli.py,129
+  pyqual/config.py,121
+  pyqual/gates.py,137
+  pyqual/pipeline.py,152
+D:
+  pyqual/cli.py:
+    e: init,run,gates,status
+    init(path)
+    run(config;dry_run;workdir)
+    gates(config;workdir)
+    status(config;workdir)
+  pyqual/gates.py:
+    e: GateResult,Gate,GateSet
+    GateResult: __str__(0)  # Result of a single gate check...
+    Gate: check(1)  # Single quality gate with metric extraction...
+    GateSet: __init__(1),check_all(1),all_passed(1),_collect_metrics(1),_from_toon(1),_from_vallm(1),_from_coverage(1)  # Collection of quality gates with metric collection...
+  pyqual/pipeline.py:
+    e: StageResult,IterationResult,PipelineResult,Pipeline
+    StageResult:  # Result of running a single stage...
+    IterationResult:  # Result of one full pipeline iteration...
+    PipelineResult:  # Result of the complete pipeline run (all iterations)...
+    Pipeline: __init__(2),run(1),check_gates(0),_run_iteration(2),_should_run_stage(2),_execute_stage(2),_ensure_pyqual_dir(0)  # Execute pipeline stages in a loop until quality gates pass...
+  pyqual/config.py:
+    e: StageConfig,GateConfig,LoopConfig,PyqualConfig
+    StageConfig:  # Single pipeline stage...
+    GateConfig: from_dict(2)  # Single quality gate threshold...
+    LoopConfig:  # Loop iteration settings...
+    PyqualConfig: load(1),_parse(1),default_yaml(-1)  # Full pyqual.yaml configuration...
+  pyqual/__init__.py:
+  project.sh:

@@ -1,0 +1,36 @@
+# code2llm | 6f 585L | python:5,shell:1 | 2026-03-29
+# CC̄=3.5 | critical:0/24 | dups:0 | cycles:0
+
+HEALTH[0]: ok
+
+REFACTOR[0]: none needed
+
+PIPELINES[22]:
+  [1] Src [init]: init
+      PURITY: 100% pure
+  [2] Src [run]: run
+      PURITY: 100% pure
+  [3] Src [gates]: gates
+      PURITY: 100% pure
+  [4] Src [status]: status
+      PURITY: 100% pure
+  [5] Src [__init__]: __init__
+      PURITY: 100% pure
+
+LAYERS:
+  pyqual/                         CC̄=3.5    ←in:0  →out:0
+  │ pipeline                   152L  4C    7m  CC=6      ←0
+  │ gates                      137L  3C    9m  CC=7      ←0
+  │ cli                        129L  0C    4m  CC=12     ←0
+  │ config                     121L  4C    4m  CC=4      ←1
+  │ __init__                    22L  0C    0m  CC=0.0    ←0
+  │
+  ./                              CC̄=0.0    ←in:0  →out:0
+  │ project.sh                  24L  0C    0m  CC=0.0    ←0
+  │
+
+COUPLING: no cross-package imports detected
+
+EXTERNAL:
+  validation: run `vallm batch .` → validation.toon
+  duplication: run `redup scan .` → duplication.toon

@@ -1,0 +1,175 @@
+name: Code Quality Improvement
+project_name: ''
+project_type: prefactoring
+domain: dev-tools
+goal: Improve code quality using prefact
+goals:
+- Fix all prefact-detected issues
+- Improve code maintainability
+- Ensure consistent code style
+quality_gates:
+- metric: Prefact Issues
+  threshold: '0'
+sprints:
+- id: sprint-1
+  name: Code Quality Improvements
+  duration: 2 weeks
+  objectives:
+  - Fix code quality issues
+  task_patterns:
+  - id: ticket-e76f259f
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/config.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/config.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-719da081
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in pyqual/config.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/config.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-5efe3250
+    name: Fix smart-return-type issues
+    description: Resolve 4 smart-return-type issues in pyqual/cli.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - pyqual/cli.py
+    rule_id: smart-return-type
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-69f8f9b6
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/cli.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/cli.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-239d8af0
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in pyqual/cli.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/cli.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-58495f6c
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in pyqual/cli.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/cli.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-429fb650
+    name: Fix unused-imports issues
+    description: Resolve 6 unused-imports issues in pyqual/gates.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - pyqual/gates.py
+    rule_id: unused-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-72bc26ad
+    name: Fix smart-return-type issues
+    description: Resolve 10 smart-return-type issues in test_pyqual.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - test_pyqual.py
+    rule_id: smart-return-type
+    count: 10
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e72bb5f4
+    name: Fix duplicate-imports issues
+    description: Resolve 1 duplicate-imports issues in test_pyqual.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - test_pyqual.py
+    rule_id: duplicate-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-fc5da382
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in pyqual/pipeline.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/pipeline.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f6b368af
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/pipeline.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/pipeline.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2f80b0ce
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in pyqual/pipeline.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/pipeline.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced

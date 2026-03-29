@@ -5,7 +5,45 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.10] - 2026-03-29
+
+### Fixed
+- Fix unused-imports issues (ticket-e76f259f, ticket-69f8f9b6, ticket-429fb650, ticket-f6b368af)
+- Fix magic-numbers issues (ticket-719da081, ticket-239d8af0, ticket-2f80b0ce)
+- Fix smart-return-type issues (ticket-5efe3250, ticket-72bc26ad)
+- Fix ai-boilerplate issues (ticket-58495f6c)
+- Fix duplicate-imports issues (ticket-e72bb5f4)
+- Fix string-concat issues (ticket-fc5da382)
+
 ## [Unreleased]
+
+## [0.1.6] - 2026-03-29
+
+### Docs
+- Update CHANGELOG.md
+- Update README.md
+- Update TODO.md
+- Update docs/README.md
+- Update docs/api.md
+- Update docs/configuration.md
+- Update docs/index.md
+- Update docs/integrations.md
+- Update docs/quickstart.md
+- Update project/README.md
+- ... and 1 more files
+
+### Other
+- Update planfile.yaml
+- Update prefact.yaml
+- Update project/analysis.toon.yaml
+- Update project/calls.mmd
+- Update project/calls.png
+- Update project/compact_flow.mmd
+- Update project/compact_flow.png
+- Update project/duplication.toon.yaml
+- Update project/evolution.toon.yaml
+- Update project/flow.mmd
+- ... and 6 more files
 
 ## [0.1.5] - 2026-03-29
 
