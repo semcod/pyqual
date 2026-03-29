@@ -173,3 +173,29 @@ sprints:
     model_hints:
       planning: balanced
       implementation: balanced
+  - id: ticket-306f5515
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/llm.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/llm.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b15f9d2a
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in pyqual/llm.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/llm.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced

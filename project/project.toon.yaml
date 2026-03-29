@@ -1,7 +1,7 @@
-# pyqual | 24 func | 4f | 748L | python | 2026-03-29
+# pyqual | 32 func | 5f | 885L | python | 2026-03-29
 
 HEALTH:
-  CC̄=3.5  critical=1 (limit:10)  dup=0  cycles=0
+  CC̄=3.2  critical=1 (limit:10)  dup=0  cycles=0
 
 ALERTS[4]:
   !   high_fan_out     gates = 13 (limit:10)
@@ -9,14 +9,15 @@ ALERTS[4]:
   !   high_fan_out     status = 10 (limit:10)
   !   high_fan_out     GateSet._from_vallm = 10 (limit:10)
 
-MODULES[6] (top by size):
+MODULES[7] (top by size):
   M[pyqual/pipeline.py] 152L C:4 F:7 CC↑6 D:0 (python)
   M[pyqual/gates.py] 137L C:3 F:9 CC↑7 D:0 (python)
+  M[pyqual/config.py] 137L C:4 F:5 CC↑5 D:0 (python)
   M[pyqual/cli.py] 129L C:0 F:4 CC↑12 D:0 (python)
-  M[pyqual/config.py] 121L C:4 F:4 CC↑4 D:0 (python)
+  M[pyqual/llm.py] 117L C:2 F:7 CC↑6 D:0 (python)
+  M[pyqual/__init__.py] 26L C:0 F:0 CC↑0 D:0 (python)
   M[project.sh] 24L C:0 F:0 CC↑0 D:0 (shell)
-  M[pyqual/__init__.py] 22L C:0 F:0 CC↑0 D:0 (python)
-  LANGS: python:5/shell:1
+  LANGS: python:6/shell:1
 
 HOTSPOTS[4]:
   ★ gates fan=13  // Check quality gates without running stages.
@@ -25,4 +26,4 @@ HOTSPOTS[4]:
   ★ GateSet._from_vallm fan=10  // Extract vallm pass rate from validation_toon.yaml or errors.json.
 
 EVOLUTION:
-  2026-03-29 CC̄=3.5 crit=1 748L // Automated analysis
+  2026-03-29 CC̄=3.2 crit=1 885L // Automated analysis

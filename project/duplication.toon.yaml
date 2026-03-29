@@ -1,9 +1,23 @@
-# redup/duplication | 0 groups | 5f 561L | 2026-03-29
+# redup/duplication | 1 groups | 6f 698L | 2026-03-29
 
 SUMMARY:
-  files_scanned: 5
-  total_lines:   561
-  dup_groups:    0
-  dup_fragments: 0
-  saved_lines:   0
-  scan_ms:       2751
+  files_scanned: 6
+  total_lines:   698
+  dup_groups:    1
+  dup_fragments: 2
+  saved_lines:   8
+  scan_ms:       2244
+
+DUPLICATES[1] (ranked by impact):
+  [cade98fabc7ef6c2]   STRU  _load_env_file  L=8 N=2 saved=8 sim=1.00
+      pyqual/config.py:0-7  (_load_env_file)
+      pyqual/llm.py:0-7  (_ensure_dotenv_loaded)
+
+REFACTOR[1] (ranked by priority):
+  [1] ○ extract_function   → pyqual/utils/_load_env_file.py
+      WHY: 2 occurrences of 8-line block across 2 files — saves 8 lines
+      FILES: pyqual/config.py, pyqual/llm.py
+
+METRICS-TARGET:
+  dup_groups:  1 → 0
+  saved_lines: 8 lines recoverable

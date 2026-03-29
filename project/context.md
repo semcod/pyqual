@@ -4,12 +4,12 @@
 
 - **Project**: /home/tom/github/semcod/pyqual
 - **Primary Language**: python
-- **Languages**: python: 5, shell: 1
+- **Languages**: python: 6, shell: 1
 - **Analysis Mode**: static
-- **Total Functions**: 24
-- **Total Classes**: 11
-- **Modules**: 6
-- **Entry Points**: 24
+- **Total Functions**: 32
+- **Total Classes**: 13
+- **Modules**: 7
+- **Entry Points**: 28
 
 ## Architecture by Module
 
@@ -18,19 +18,24 @@
 - **Classes**: 3
 - **File**: `gates.py`
 
+### pyqual.llm
+- **Functions**: 7
+- **Classes**: 2
+- **File**: `llm.py`
+
 ### pyqual.pipeline
 - **Functions**: 7
 - **Classes**: 4
 - **File**: `pipeline.py`
 
+### pyqual.config
+- **Functions**: 5
+- **Classes**: 4
+- **File**: `config.py`
+
 ### pyqual.cli
 - **Functions**: 4
 - **File**: `cli.py`
-
-### pyqual.config
-- **Functions**: 4
-- **Classes**: 4
-- **File**: `config.py`
 
 ## Key Entry Points
 
@@ -67,6 +72,10 @@ Main execution flows into the system:
 > Execute a single stage command.
 - **Calls**: time.monotonic, StageResult, subprocess.run, StageResult, StageResult, StageResult, time.monotonic, str
 
+### pyqual.llm.LLM.complete
+> Send completion request to LLM.
+- **Calls**: messages.append, os.environ.copy, completion, LLMResponse, messages.append, response.usage.dict, hasattr, response._hidden_params.get
+
 ### pyqual.gates.GateSet._from_toon
 > Extract CC̄ and critical count from analysis_toon.yaml or analysis.toon.
 - **Calls**: p.read_text, re.search, re.search, p.exists, float, float, cc_match.group, crit_match.group
@@ -74,6 +83,10 @@ Main execution flows into the system:
 ### pyqual.config.GateConfig.from_dict
 > Parse 'cc_max: 15' or 'coverage_min: 80' into GateConfig.
 - **Calls**: ops.items, cls, metric.endswith, cls, float, float, len
+
+### pyqual.config.PyqualConfig.load
+> Load configuration from YAML file.
+- **Calls**: pyqual.config._load_env_file, Path, yaml.safe_load, cls._parse, p.exists, FileNotFoundError, p.read_text
 
 ### pyqual.gates.GateSet._from_coverage
 > Extract test coverage from coverage.json.
@@ -83,13 +96,13 @@ Main execution flows into the system:
 > Run the full pipeline loop.
 - **Calls**: PipelineResult, time.monotonic, range, self._run_iteration, result.iterations.append, time.monotonic
 
-### pyqual.config.PyqualConfig.load
-> Load configuration from YAML file.
-- **Calls**: Path, yaml.safe_load, cls._parse, p.exists, FileNotFoundError, p.read_text
-
 ### pyqual.gates.GateSet._collect_metrics
 > Collect metrics from .pyqual/ artifacts and .toon files.
 - **Calls**: metrics.update, metrics.update, metrics.update, self._from_toon, self._from_vallm, self._from_coverage
+
+### pyqual.llm.LLM.fix_code
+> Generate code fix using LLM.
+- **Calls**: prompt_parts.append, None.join, self.complete, prompt_parts.append, prompt_parts.append
 
 ### pyqual.gates.Gate.check
 > Check this gate against collected metrics.
@@ -98,6 +111,9 @@ Main execution flows into the system:
 ### pyqual.pipeline.Pipeline.__init__
 - **Calls**: None.resolve, GateSet, self._ensure_pyqual_dir, Path
 
+### pyqual.llm.LLM.__init__
+- **Calls**: pyqual.llm.get_llm_model, pyqual.llm.get_api_key, ImportError
+
 ### pyqual.gates.GateSet.check_all
 > Collect metrics from known sources and check all gates.
 - **Calls**: Path, self._collect_metrics, g.check
@@ -105,6 +121,10 @@ Main execution flows into the system:
 ### pyqual.gates.GateSet.all_passed
 > Return True if all gates pass.
 - **Calls**: Path, all, self.check_all
+
+### pyqual.llm.get_llm
+> Get configured LLM instance.
+- **Calls**: LLM
 
 ### pyqual.pipeline.Pipeline.check_gates
 > Check quality gates without running stages.
@@ -170,14 +190,14 @@ _from_vallm [pyqual.gates.GateSet]
 _execute_stage [pyqual.pipeline.Pipeline]
 ```
 
-### Flow 9: _from_toon
+### Flow 9: complete
 ```
-_from_toon [pyqual.gates.GateSet]
+complete [pyqual.llm.LLM]
 ```
 
-### Flow 10: from_dict
+### Flow 10: _from_toon
 ```
-from_dict [pyqual.config.GateConfig]
+_from_toon [pyqual.gates.GateSet]
 ```
 
 ## Key Classes
@@ -194,8 +214,13 @@ from_dict [pyqual.config.GateConfig]
 
 ### pyqual.config.PyqualConfig
 > Full pyqual.yaml configuration.
+- **Methods**: 4
+- **Key Methods**: pyqual.config.PyqualConfig.load, pyqual.config.PyqualConfig.llm_model, pyqual.config.PyqualConfig._parse, pyqual.config.PyqualConfig.default_yaml
+
+### pyqual.llm.LLM
+> LiteLLM wrapper with .env configuration.
 - **Methods**: 3
-- **Key Methods**: pyqual.config.PyqualConfig.load, pyqual.config.PyqualConfig._parse, pyqual.config.PyqualConfig.default_yaml
+- **Key Methods**: pyqual.llm.LLM.__init__, pyqual.llm.LLM.complete, pyqual.llm.LLM.fix_code
 
 ### pyqual.pipeline.StageResult
 > Result of running a single stage.
@@ -221,6 +246,10 @@ from_dict [pyqual.config.GateConfig]
 > Single quality gate with metric extraction.
 - **Methods**: 1
 - **Key Methods**: pyqual.gates.Gate.check
+
+### pyqual.llm.LLMResponse
+> Response from LLM call.
+- **Methods**: 0
 
 ### pyqual.pipeline.IterationResult
 > Result of one full pipeline iteration.
@@ -249,12 +278,17 @@ Functions exposed as public API (no underscore prefix):
 - `pyqual.cli.gates` - 20 calls
 - `pyqual.cli.run` - 18 calls
 - `pyqual.cli.init` - 11 calls
+- `pyqual.llm.LLM.complete` - 8 calls
 - `pyqual.config.GateConfig.from_dict` - 7 calls
+- `pyqual.config.PyqualConfig.load` - 7 calls
 - `pyqual.pipeline.Pipeline.run` - 6 calls
-- `pyqual.config.PyqualConfig.load` - 6 calls
+- `pyqual.llm.LLM.fix_code` - 5 calls
 - `pyqual.gates.Gate.check` - 5 calls
+- `pyqual.llm.get_llm_model` - 3 calls
 - `pyqual.gates.GateSet.check_all` - 3 calls
 - `pyqual.gates.GateSet.all_passed` - 3 calls
+- `pyqual.llm.get_api_key` - 2 calls
+- `pyqual.llm.get_llm` - 1 calls
 - `pyqual.pipeline.Pipeline.check_gates` - 1 calls
 - `pyqual.config.PyqualConfig.default_yaml` - 0 calls
 
