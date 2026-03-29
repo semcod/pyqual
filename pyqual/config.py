@@ -2,10 +2,20 @@
 
 from __future__ import annotations
 
-import yaml
+import os
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+
+import yaml
+from dotenv import load_dotenv
+
+
+def _load_env_file() -> None:
+    """Load .env file if exists."""
+    env_path = Path(".env")
+    if env_path.exists():
+        load_dotenv(env_path)
 
 
 @dataclass
@@ -55,11 +65,17 @@ class PyqualConfig:
     @classmethod
     def load(cls, path: str | Path = "pyqual.yaml") -> "PyqualConfig":
         """Load configuration from YAML file."""
+        _load_env_file()
         p = Path(path)
         if not p.exists():
             raise FileNotFoundError(f"Config not found: {p}. Run 'pyqual init'.")
         raw = yaml.safe_load(p.read_text())
         return cls._parse(raw)
+
+    @property
+    def llm_model(self) -> str:
+        """Get LLM model from env or config."""
+        return self.env.get("LLM_MODEL") or os.getenv("LLM_MODEL") or os.getenv("PFIX_MODEL", "openrouter/qwen/qwen3-coder-next")
 
     @classmethod
     def _parse(cls, raw: dict[str, Any]) -> "PyqualConfig":
@@ -69,7 +85,7 @@ class PyqualConfig:
         ]
         gates = [
             GateConfig.from_dict(k, v)
-            for k, v in pipeline.get("metrics", {}).items()
+            for k, v in (pipeline.get("metrics") or {}).items()
         ]
         loop_raw = pipeline.get("loop", {})
         loop = LoopConfig(**loop_raw) if loop_raw else LoopConfig()
