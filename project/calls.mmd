@@ -1,30 +1,38 @@
 flowchart LR
     subgraph pyqual__cli
-        pyqual__cli__init["init"]
         pyqual__cli__status["status"]
         pyqual__cli__run["run"]
+        pyqual__cli__init["init"]
         pyqual__cli__gates["gates"]
+        pyqual__cli__plugin["plugin"]
     end
     subgraph pyqual__config
-        pyqual__config__PyqualConfig___parse["_parse"]
         pyqual__config___load_env_file["_load_env_file"]
-        pyqual__config__GateConfig__from_dict["from_dict"]
-        pyqual__config__PyqualConfig__load["load"]
+        pyqual__config__PyqualConfig___parse["_parse"]
         pyqual__config__PyqualConfig__default_yaml["default_yaml"]
+        pyqual__config__PyqualConfig__load["load"]
+        pyqual__config__GateConfig__from_dict["from_dict"]
     end
     subgraph pyqual__llm
-        pyqual__llm__LLM____init__["__init__"]
-        pyqual__llm__get_llm_model["get_llm_model"]
-        pyqual__llm___ensure_dotenv_loaded["_ensure_dotenv_loaded"]
         pyqual__llm__get_api_key["get_api_key"]
+        pyqual__llm__LLM____init__["__init__"]
+        pyqual__llm___ensure_dotenv_loaded["_ensure_dotenv_loaded"]
+        pyqual__llm__get_llm_model["get_llm_model"]
+    end
+    subgraph pyqual__plugins
+        pyqual__plugins__install_plugin_config["install_plugin_config"]
+        pyqual__plugins__PluginRegistry__get["get"]
+        pyqual__plugins__get_available_plugins["get_available_plugins"]
     end
     pyqual__cli__init --> pyqual__config__PyqualConfig__default_yaml
     pyqual__cli__run --> pyqual__config__PyqualConfig__load
     pyqual__cli__gates --> pyqual__config__PyqualConfig__load
     pyqual__cli__status --> pyqual__config__PyqualConfig__load
+    pyqual__cli__plugin --> pyqual__plugins__get_available_plugins
     pyqual__llm__get_llm_model --> pyqual__llm___ensure_dotenv_loaded
     pyqual__llm__get_api_key --> pyqual__llm___ensure_dotenv_loaded
     pyqual__llm__LLM____init__ --> pyqual__llm__get_llm_model
     pyqual__llm__LLM____init__ --> pyqual__llm__get_api_key
     pyqual__config__PyqualConfig__load --> pyqual__config___load_env_file
     pyqual__config__PyqualConfig___parse --> pyqual__config__GateConfig__from_dict
+    pyqual__plugins__install_plugin_config --> pyqual__plugins__PluginRegistry__get

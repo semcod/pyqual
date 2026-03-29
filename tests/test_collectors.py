@@ -285,6 +285,126 @@ class TestLinterCollectors:
             assert metrics["docstring_total"] == 100.0
             assert metrics["docstring_missing"] == 15.0
 
+    def test_from_import_linter(self):
+        """Test parsing import-linter JSON output."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            workdir = Path(tmpdir)
+            pyqual_dir = workdir / ".pyqual"
+            pyqual_dir.mkdir()
+
+            import_linter_data = {
+                "contracts": [
+                    {"name": "layers", "kept": True, "violations": []},
+                    {"name": "forbidden", "kept": False, "violations": [
+                        {"file": "app.py", "line": 10},
+                        {"file": "utils.py", "line": 20}
+                    ]}
+                ]
+            }
+            (pyqual_dir / "import_linter.json").write_text(json.dumps(import_linter_data))
+
+            gate_set = GateSet([])
+            metrics = gate_set._from_import_linter(workdir)
+
+            assert metrics["import_violations"] == 2.0
+            assert metrics["broken_import_contracts"] == 1.0
+
+    def test_from_pydocstyle(self):
+        """Test parsing pydocstyle JSON output."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            workdir = Path(tmpdir)
+            pyqual_dir = workdir / ".pyqual"
+            pyqual_dir.mkdir()
+
+            pydocstyle_data = [
+                {"code": "D100", "message": "Missing docstring in public module", "file": "app.py"},
+                {"code": "D101", "message": "Missing docstring in public class", "file": "app.py"},
+                {"code": "D100", "message": "Missing docstring", "file": "utils.py"},
+            ]
+            (pyqual_dir / "pydocstyle.json").write_text(json.dumps(pydocstyle_data))
+
+            gate_set = GateSet([])
+            metrics = gate_set._from_pydocstyle(workdir)
+
+            assert metrics["pydocstyle_violations"] == 3.0
+            assert metrics["pydocstyle_d100"] == 2.0
+            assert metrics["pydocstyle_d101"] == 1.0
+
+    def test_from_black(self):
+        """Test parsing black check JSON output."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            workdir = Path(tmpdir)
+            pyqual_dir = workdir / ".pyqual"
+            pyqual_dir.mkdir()
+
+            black_data = [
+                {"path": "app.py", "unchanged": False},
+                {"path": "utils.py", "unchanged": False},
+                {"path": "test.py", "unchanged": True},
+            ]
+            (pyqual_dir / "black.json").write_text(json.dumps(black_data))
+
+            gate_set = GateSet([])
+            metrics = gate_set._from_black(workdir)
+
+            assert metrics["black_unformatted"] == 3.0
+
+    def test_from_isort(self):
+        """Test parsing isort check JSON output."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            workdir = Path(tmpdir)
+            pyqual_dir = workdir / ".pyqual"
+            pyqual_dir.mkdir()
+
+            isort_data = [
+                {"path": "app.py", "import_changes": 5},
+                {"path": "utils.py", "import_changes": 3},
+            ]
+            (pyqual_dir / "isort.json").write_text(json.dumps(isort_data))
+
+            gate_set = GateSet([])
+            metrics = gate_set._from_isort(workdir)
+
+            assert metrics["isort_unsorted"] == 2.0
+            assert metrics["isort_import_changes"] == 8.0
+
+    def test_from_sarif(self):
+        """Test parsing SARIF format security output."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            workdir = Path(tmpdir)
+            pyqual_dir = workdir / ".pyqual"
+            pyqual_dir.mkdir()
+
+            sarif_data = {
+                "version": "2.1.0",
+                "runs": [{
+                    "tool": {
+                        "driver": {
+                            "name": "bandit",
+                            "rules": [
+                                {"id": "B105", "defaultConfiguration": {"level": "error"}},
+                                {"id": "B301", "defaultConfiguration": {"level": "warning"}},
+                            ]
+                        }
+                    },
+                    "results": [
+                        {"ruleId": "B105", "level": "error", "message": {"text": "Hardcoded password"}},
+                        {"ruleId": "B301", "level": "warning", "message": {"text": "Pickle usage"}},
+                        {"ruleId": "B301", "level": "warning", "message": {"text": "Another pickle"}},
+                    ]
+                }]
+            }
+            (pyqual_dir / "bandit.sarif").write_text(json.dumps(sarif_data))
+
+            gate_set = GateSet([])
+            metrics = gate_set._from_sarif(workdir)
+
+            assert metrics["sarif_total"] == 3.0
+            assert metrics["sarif_high"] == 1.0  # error
+            assert metrics["sarif_medium"] == 2.0  # warning
+            assert metrics["sarif_B105"] == 1.0
+            assert metrics["sarif_B301"] == 2.0
+
 
 class TestGateOperations:
     """Test gate checking logic."""

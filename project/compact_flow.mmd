@@ -1,4 +1,6 @@
 flowchart TD
-    pyqual__cli["pyqual.cli<br/>4 funcs"]
+    pyqual__cli["pyqual.cli<br/>6 funcs"]
     pyqual__config["pyqual.config<br/>5 funcs"]
+    pyqual__plugins["pyqual.plugins<br/>16 funcs"]
+    pyqual__cli ==>|5| pyqual__plugins
     pyqual__cli ==>|4| pyqual__config

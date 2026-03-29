@@ -199,3 +199,55 @@ sprints:
     model_hints:
       planning: balanced
       implementation: balanced
+  - id: ticket-feb0d054
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in examples/custom_gates/dynamic_thresholds.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/custom_gates/dynamic_thresholds.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-af8b41e7
+    name: Fix string-concat issues
+    description: Resolve 6 string-concat issues in pyqual/gates.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - pyqual/gates.py
+    rule_id: string-concat
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-12bfb242
+    name: Fix unused-imports issues
+    description: Resolve 6 unused-imports issues in pyqual/plugins.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - pyqual/plugins.py
+    rule_id: unused-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-86118b68
+    name: Fix llm-generated-code issues
+    description: Resolve 4 llm-generated-code issues in pyqual/plugins.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - pyqual/plugins.py
+    rule_id: llm-generated-code
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced

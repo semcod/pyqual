@@ -93,6 +93,7 @@ class GateSet:
         metrics.update(self._from_pydocstyle(workdir))
         metrics.update(self._from_black(workdir))
         metrics.update(self._from_isort(workdir))
+        metrics.update(self._from_sarif(workdir))
         metrics.update(self._from_secrets(workdir))
         metrics.update(self._from_benchmark(workdir))
         metrics.update(self._from_memory_profile(workdir))
@@ -718,4 +719,204 @@ class GateSet:
                     result["docstring_missing"] = float(total - documented)
             except (json.JSONDecodeError, TypeError):
                 pass
+        return result
+
+    def _from_import_linter(self, workdir: Path) -> dict[str, float]:
+        """Extract import contract violations from import-linter JSON output."""
+        result: dict[str, float] = {}
+        p = workdir / ".pyqual" / "import_linter.json"
+        if p.exists():
+            try:
+                data = json.loads(p.read_text())
+                # Check if it's a newer JSON format with 'contracts' key
+                contracts = data.get("contracts", data.get("results", []))
+                if isinstance(contracts, list):
+                    violations = 0
+                    broken_contracts = 0
+                    for contract in contracts:
+                        if not contract.get("kept", contract.get("passed", True)):
+                            broken_contracts += 1
+                            violations += len(contract.get("violations", contract.get("errors", [])))
+                    result["import_violations"] = float(violations)
+                    result["broken_import_contracts"] = float(broken_contracts)
+                elif isinstance(data, dict):
+                    # Alternative format: direct violation count
+                    violations = data.get("violation_count") or data.get("violations")
+                    if violations is not None:
+                        result["import_violations"] = float(violations)
+            except (json.JSONDecodeError, TypeError):
+                pass
+        return result
+
+    def _from_pydocstyle(self, workdir: Path) -> dict[str, float]:
+        """Extract docstring style violations from pydocstyle JSON output."""
+        result: dict[str, float] = {}
+        p = workdir / ".pyqual" / "pydocstyle.json"
+        if p.exists():
+            try:
+                data = json.loads(p.read_text())
+                if isinstance(data, list):
+                    # Count violations by error code
+                    violations = len(data)
+                    errors_by_type: dict[str, int] = {}
+                    for v in data:
+                        code = v.get("code", "DXXX")
+                        errors_by_type[code] = errors_by_type.get(code, 0) + 1
+                    result["pydocstyle_violations"] = float(violations)
+                    # Add specific counts for common error types
+                    for code, count in errors_by_type.items():
+                        result[f"pydocstyle_{code.lower()}"] = float(count)
+                elif isinstance(data, dict):
+                    violations = len(data.get("violations", data.get("errors", [])))
+                    result["pydocstyle_violations"] = float(violations)
+            except (json.JSONDecodeError, TypeError):
+                pass
+        return result
+
+    def _from_black(self, workdir: Path) -> dict[str, float]:
+        """Extract code formatting violations from black check output."""
+        result: dict[str, float] = {}
+        p = workdir / ".pyqual" / "black.json"
+        if p.exists():
+            try:
+                data = json.loads(p.read_text())
+                if isinstance(data, list):
+                    # Files that would be reformatted
+                    unformatted = len(data)
+                    result["black_unformatted"] = float(unformatted)
+                elif isinstance(data, dict):
+                    unformatted = data.get("unformatted_count", data.get("needs_formatting", 0))
+                    if unformatted:
+                        result["black_unformatted"] = float(unformatted)
+                    # Check for black diff output stats
+                    changed = data.get("files_changed") or data.get("changed_files")
+                    if changed:
+                        result["black_files_changed"] = float(changed)
+                    lines_changed = data.get("lines_changed")
+                    if lines_changed:
+                        result["black_lines_changed"] = float(lines_changed)
+            except (json.JSONDecodeError, TypeError):
+                pass
+        return result
+
+    def _from_isort(self, workdir: Path) -> dict[str, float]:
+        """Extract import sorting violations from isort check output."""
+        result: dict[str, float] = {}
+        p = workdir / ".pyqual" / "isort.json"
+        if p.exists():
+            try:
+                data = json.loads(p.read_text())
+                if isinstance(data, list):
+                    # List of files with import sorting issues
+                    unsorted = len(data)
+                    result["isort_unsorted"] = float(unsorted)
+                    # Count total import changes
+                    import_changes = 0
+                    for item in data:
+                        if isinstance(item, dict):
+                            import_changes += item.get("import_changes", item.get("changes", 0))
+                    if import_changes:
+                        result["isort_import_changes"] = float(import_changes)
+                elif isinstance(data, dict):
+                    unsorted = data.get("unsorted_count", data.get("unorganized", 0))
+                    if unsorted:
+                        result["isort_unsorted"] = float(unsorted)
+                    files = data.get("files_count") or data.get("affected_files")
+                    if files:
+                        result["isort_files"] = float(files)
+            except (json.JSONDecodeError, TypeError):
+                pass
+        return result
+
+    def _from_sarif(self, workdir: Path) -> dict[str, float]:
+        """Extract security metrics from SARIF format output (bandit, codeql, semgrep, etc.)."""
+        result: dict[str, float] = {}
+        sarif_files = [
+            "bandit.sarif",
+            "codeql.sarif",
+            "semgrep.sarif",
+            "security.sarif",
+            "findings.sarif",
+        ]
+        
+        total_findings = 0
+        severity_counts = {"critical": 0, "high": 0, "medium": 0, "low": 0, "error": 0, "warning": 0, "note": 0}
+        rule_violations: dict[str, int] = {}
+        
+        for fname in sarif_files:
+            p = workdir / ".pyqual" / fname
+            if not p.exists():
+                continue
+            try:
+                data = json.loads(p.read_text())
+                # SARIF format structure
+                runs = data.get("runs", [])
+                for run in runs:
+                    results = run.get("results", [])
+                    total_findings += len(results)
+                    
+                    # Get rules for mapping ruleIds to severity
+                    rules = {}
+                    tool = run.get("tool", {})
+                    driver = tool.get("driver", {})
+                    rule_list = driver.get("rules", [])
+                    for rule in rule_list:
+                        rule_id = rule.get("id", "")
+                        default_config = rule.get("defaultConfiguration", {})
+                        level = default_config.get("level", "warning")
+                        rules[rule_id] = level
+                    
+                    # Process each finding
+                    for finding in results:
+                        level = finding.get("level", "")
+                        rule_id = finding.get("ruleId", "unknown")
+                        
+                        # Map SARIF level to severity
+                        if level == "error":
+                            severity_counts["error"] += 1
+                        elif level == "warning":
+                            severity_counts["warning"] += 1
+                        elif level == "note":
+                            severity_counts["note"] += 1
+                        else:
+                            # Try to get from rule configuration
+                            level_from_rule = rules.get(rule_id, "warning")
+                            if level_from_rule == "error":
+                                severity_counts["error"] += 1
+                            elif level_from_rule == "warning":
+                                severity_counts["warning"] += 1
+                            elif level_from_rule == "note":
+                                severity_counts["note"] += 1
+                        
+                        # Count rule violations
+                        rule_violations[rule_id] = rule_violations.get(rule_id, 0) + 1
+                        
+                        # Check for security severity in properties
+                        props = finding.get("properties", {})
+                        sec_severity = props.get("security-severity") or props.get("cvssScore")
+                        if sec_severity:
+                            score = float(sec_severity)
+                            if score >= 9.0:
+                                severity_counts["critical"] += 1
+                            elif score >= 7.0:
+                                severity_counts["high"] += 1
+                            elif score >= 4.0:
+                                severity_counts["medium"] += 1
+                            else:
+                                severity_counts["low"] += 1
+            except (json.JSONDecodeError, TypeError, KeyError):
+                pass
+        
+        if total_findings > 0:
+            result["sarif_total"] = float(total_findings)
+            result["sarif_critical"] = float(severity_counts["critical"])
+            result["sarif_high"] = float(severity_counts["high"] + severity_counts["error"])
+            result["sarif_medium"] = float(severity_counts["medium"] + severity_counts["warning"])
+            result["sarif_low"] = float(severity_counts["low"] + severity_counts["note"])
+            
+            # Add top violated rules
+            top_rules = sorted(rule_violations.items(), key=lambda x: x[1], reverse=True)[:3]
+            for rule_id, count in top_rules:
+                result[f"sarif_{rule_id}"] = float(count)
+        
         return result

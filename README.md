@@ -2,7 +2,7 @@
 
 ## AI Cost Tracking
 
-![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.12-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.13-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
 ![AI Cost](https://img.shields.io/badge/AI%20Cost-$1.05-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-5.0h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
 
 - 🤖 **LLM usage:** $1.0500 (7 commits)
@@ -210,7 +210,27 @@ pyqual automatically collects metrics from:
 | flake8 | `flake8_violations`, `flake8_errors`, `flake8_warnings`, `flake8_conventions` | `.pyqual/flake8.json` | `flake8 . --format=json` |
 | radon | `mi_avg`, `mi_min`, `cc_rank_avg` | `.pyqual/radon_mi.json` | `radon mi . -j` |
 | interrogate | `docstring_coverage`, `docstring_total`, `docstring_missing` | `.pyqual/interrogate.json` | `interrogate . -v --json` |
+| pydocstyle | `pydocstyle_violations`, `pydocstyle_D<xxx>` | `.pyqual/pydocstyle.json` | `pydocstyle . --format=json` |
 | pytest | `test_time`, `slow_tests` | `.pyqual/pytest_durations.json` | pytest with durations |
+
+**Code Formatting:**
+
+| Source | Metrics | File | Command |
+|--------|---------|------|---------|
+| black | `black_unformatted`, `black_files_changed` | `.pyqual/black.json` | `black --check --diff .` |
+| isort | `isort_unsorted`, `isort_import_changes` | `.pyqual/isort.json` | `isort --check-only --diff .` |
+
+**Import Structure:**
+
+| Source | Metrics | File | Command |
+|--------|---------|------|---------|
+| import-linter | `import_violations`, `broken_import_contracts` | `.pyqual/import_linter.json` | `lint-imports` |
+
+**SARIF Security:**
+
+| Source | Metrics | File | Tools |
+|--------|---------|------|-------|
+| SARIF | `sarif_total`, `sarif_critical`, `sarif_high`, `sarif_medium`, `sarif_low`, `sarif_<rule_id>` | `.pyqual/*.sarif` | bandit, codeql, semgrep, etc. |
 
 **Advanced Metrics:**
 

@@ -1,29 +1,44 @@
-# pyqual | 32 func | 5f | 885L | python | 2026-03-29
+# pyqual | 78 func | 6f | 2598L | python | 2026-03-29
 
 HEALTH:
-  CC̄=3.2  critical=1 (limit:10)  dup=0  cycles=0
+  CC̄=6.3  critical=20 (limit:10)  dup=0  cycles=0
 
-ALERTS[4]:
+ALERTS[20]:
+  !!! high_fan_out     GateSet._collect_metrics = 28 (limit:10)
+  !!  cc_exceeded      GateSet._from_llm_quality = 22 (limit:15)
+  !!  high_fan_out     plugin = 19 (limit:10)
+  !   cc_exceeded      GateSet._from_pylint = 16 (limit:15)
+  !   cc_exceeded      plugin = 15 (limit:15)
   !   high_fan_out     gates = 13 (limit:10)
-  !   high_fan_out     init = 10 (limit:10)
-  !   high_fan_out     status = 10 (limit:10)
-  !   high_fan_out     GateSet._from_vallm = 10 (limit:10)
+  !   high_fan_out     PyqualConfig.load = 11 (limit:10)
+  !   high_fan_out     SecurityCollector.collect = 11 (limit:10)
+  !   high_fan_out     GateSet._from_secrets = 11 (limit:10)
+  !   high_fan_out     GateSet._from_sbom = 11 (limit:10)
 
-MODULES[7] (top by size):
+MODULES[8] (top by size):
+  M[pyqual/gates.py] 828L C:3 F:37 CC↑22 D:0 (python)
+  M[pyqual/plugins.py] 454L C:10 F:16 CC↑14 D:1 (python)
+  M[pyqual/cli.py] 273L C:0 F:6 CC↑15 D:0 (python)
+  M[pyqual/config.py] 177L C:4 F:5 CC↑11 D:0 (python)
   M[pyqual/pipeline.py] 152L C:4 F:7 CC↑6 D:0 (python)
-  M[pyqual/gates.py] 137L C:3 F:9 CC↑7 D:0 (python)
-  M[pyqual/config.py] 137L C:4 F:5 CC↑5 D:0 (python)
-  M[pyqual/cli.py] 129L C:0 F:4 CC↑12 D:0 (python)
   M[pyqual/llm.py] 117L C:2 F:7 CC↑6 D:0 (python)
-  M[pyqual/__init__.py] 26L C:0 F:0 CC↑0 D:0 (python)
+  M[pyqual/__init__.py] 39L C:0 F:0 CC↑0 D:0 (python)
   M[project.sh] 24L C:0 F:0 CC↑0 D:0 (shell)
-  LANGS: python:6/shell:1
+  LANGS: python:7/shell:1
 
-HOTSPOTS[4]:
+HOTSPOTS[10]:
+  ★ GateSet._collect_metrics fan=28  // Collect metrics from .pyqual/ artifacts and .toon files.
+  ★ plugin fan=19  // Manage pyqual plugins - add new metric collectors.
   ★ gates fan=13  // Check quality gates without running stages.
-  ★ init fan=10  // Create pyqual.yaml with sensible defaults.
-  ★ status fan=10  // Show current metrics and pipeline config.
-  ★ GateSet._from_vallm fan=10  // Extract vallm pass rate from validation_toon.yaml or errors.json.
+  ★ PyqualConfig.load fan=11  // Load configuration from YAML file or pyproject.toml.
+  ★ SecurityCollector.collect fan=11  // Orchestrates 11 calls
+
+REFACTOR[6]:
+  [1] H/H Split god module pyqual/gates.py (828L, 3 classes)
+  [2] M/L Split plugin (CC=15 → target CC<10)
+  [3] M/L Split GateSet._from_llm_quality (CC=22 → target CC<10)
+  [4] M/L Split GateSet._from_pylint (CC=16 → target CC<10)
+  [5] M/M Reduce GateSet._collect_metrics fan-out (currently 28)
 
 EVOLUTION:
-  2026-03-29 CC̄=3.2 crit=1 885L // Automated analysis
+  2026-03-29 CC̄=6.3 crit=20 2598L // Automated analysis

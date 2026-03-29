@@ -8,25 +8,27 @@ flowchart TD
         pyqual__cli__run["run"]
         pyqual__cli__gates["gates"]
         pyqual__cli__status["status"]
+        pyqual__cli__plugin["plugin"]
+        pyqual__cli__doctor["doctor"]
     end
 
     subgraph Core
         pyqual__llm__LLM__complete["complete"]
         pyqual__llm__LLM__fix_code["fix_code"]
         pyqual__llm__get_llm["get_llm"]
-        pyqual__pipeline__Pipeline__run["run"]
-        pyqual__pipeline__Pipeline__check_gates["check_gates"]
-        pyqual__pipeline__Pipeline___run_iteration["_run_iteration"]
-        pyqual__pipeline__Pipeline___should_run_stage["_should_run_stage"]
-        pyqual__pipeline__Pipeline___execute_stage["_execute_stage"]
-        pyqual__pipeline__Pipeline___ensure_pyqual_dir["_ensure_pyqual_dir"]
         pyqual__config___load_env_file["_load_env_file"]
         pyqual__config__GateConfig__from_dict["from_dict"]
         pyqual__config__PyqualConfig__load["load"]
         pyqual__config__PyqualConfig___parse["_parse"]
         pyqual__config__PyqualConfig__default_yaml["default_yaml"]
-        pyqual__gates__GateResult____str__["__str__"]
-        ...["+7 more"]
+        pyqual__plugins__PluginMetadata____post_init__["__post_init__"]
+        pyqual__plugins__MetricCollector__collect["collect"]
+        pyqual__plugins__MetricCollector__get_config_example["get_config_example"]
+        pyqual__plugins__PluginRegistry__register["register"]
+        pyqual__plugins__PluginRegistry__get["get"]
+        pyqual__plugins__PluginRegistry__list_plugins["list_plugins"]
+        pyqual__plugins__PluginRegistry__create_instance["create_instance"]
+        ...["+49 more"]
     end
 
-    class pyqual__cli__init,pyqual__cli__run,pyqual__cli__gates,pyqual__cli__status,pyqual__llm__LLM__complete,pyqual__llm__LLM__fix_code,pyqual__llm__get_llm,pyqual__pipeline__Pipeline__run,pyqual__pipeline__Pipeline__check_gates,pyqual__pipeline__Pipeline___run_iteration entry
+    class pyqual__cli__init,pyqual__cli__run,pyqual__cli__gates,pyqual__cli__status,pyqual__cli__plugin,pyqual__cli__doctor,pyqual__llm__LLM__complete,pyqual__llm__LLM__fix_code,pyqual__llm__get_llm,pyqual__config__GateConfig__from_dict entry
