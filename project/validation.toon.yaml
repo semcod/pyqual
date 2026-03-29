@@ -1,9 +1,9 @@
-# vallm batch | 54f | 25✓ 2⚠ 0✗ | 2026-03-29
+# vallm batch | 63f | 28✓ 3⚠ 2✗ | 2026-03-29
 
 SUMMARY:
-  scanned: 54  passed: 25 (46.3%)  warnings: 2  errors: 0  unsupported: 29
+  scanned: 63  passed: 28 (44.4%)  warnings: 3  errors: 2  unsupported: 33
 
-WARNINGS[2]{path,score}:
+WARNINGS[3]{path,score}:
   pyqual/cli.py,0.93
     issues[3]{rule,severity,message,line}:
       complexity.cyclomatic,warning,plugin has cyclomatic complexity 46 (max: 15),136
@@ -11,12 +11,31 @@ WARNINGS[2]{path,score}:
       complexity.lizard_length,warning,plugin: 136 lines exceeds limit 100,136
   pyqual/gates.py,0.96
     issues[3]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,_from_pylint has cyclomatic complexity 16 (max: 15),511
+      complexity.cyclomatic,warning,_from_pylint has cyclomatic complexity 16 (max: 15),522
       complexity.maintainability,warning,Low maintainability index: 0.0 (threshold: 20),
-      complexity.lizard_cc,warning,_from_pylint: CC=16 exceeds limit 15,511
+      complexity.lizard_cc,warning,_from_pylint: CC=16 exceeds limit 15,522
+  pyqual/plugins.py,0.96
+    issues[3]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,collect has cyclomatic complexity 23 (max: 15),475
+      complexity.maintainability,warning,Low maintainability index: 16.1 (threshold: 20),
+      complexity.lizard_cc,warning,collect: CC=23 exceeds limit 15,475
 
-UNSUPPORTED[4]{bucket,count}:
-  *.md,20
+ERRORS[2]{path,score}:
+  pyqual/integrations/llx_mcp_service.py,0.79
+    issues[5]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'starlette.applications' not found,12
+      python.import.resolvable,error,Module 'starlette.responses' not found,13
+      python.import.resolvable,error,Module 'starlette.routing' not found,14
+      python.import.resolvable,error,Module 'mcp.server.sse' not found,17
+      python.import.resolvable,error,Module 'uvicorn' not found,51
+  pyqual/integrations/llx_mcp.py,0.92
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'mcp.client.session' not found,50
+      python.import.resolvable,error,Module 'mcp.client.sse' not found,51
+
+UNSUPPORTED[5]{bucket,count}:
+  *.md,22
+  Dockerfile*,1
   *.txt,1
-  *.yml,1
+  *.yml,2
   other,7

@@ -28,7 +28,7 @@ pipeline:
     #   run: trufflehog filesystem . --json > .pyqual/trufflehog.json 2>/dev/null || true
     
     - name: validate
-      run: vallm batch ./ --recursive --errors-json --output-file .pyqual/errors.json
+      run: vallm batch ./ --recursive --errors-json > .pyqual/errors.json
     
     # LLX-powered code generation
     - name: fix
@@ -41,7 +41,7 @@ pipeline:
     #   when: metrics_fail
     
     - name: test
-      run: pytest --cov --cov-report=json --cov-report=term
+      run: pytest --cov --cov-report=json:.pyqual/coverage.json
       when: always
 
   # Loop behavior

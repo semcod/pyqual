@@ -18,6 +18,19 @@ def _load_env_file() -> None:
         load_dotenv(env_path)
 
 
+def _normalize_env_values(env: dict[str, Any] | None) -> dict[str, str]:
+    """Convert YAML env values to strings suitable for subprocess environments."""
+    normalized: dict[str, str] = {}
+    for key, value in (env or {}).items():
+        if value is None:
+            continue
+        if isinstance(value, bool):
+            normalized[str(key)] = "true" if value else "false"
+        else:
+            normalized[str(key)] = str(value)
+    return normalized
+
+
 @dataclass
 class StageConfig:
     """Single pipeline stage."""
@@ -94,7 +107,7 @@ class PyqualConfig:
             stages=stages,
             gates=gates,
             loop=loop,
-            env=pipeline.get("env", {}),
+            env=_normalize_env_values(pipeline.get("env", {})),
         )
 
     @staticmethod

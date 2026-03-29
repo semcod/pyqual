@@ -450,7 +450,7 @@ metrics:
 
 stages:
   - name: llx_mcp_fix
-    run: python -m pyqual.integrations.llx_mcp --workdir . --issues .pyqual/errors.json --output .pyqual/llx_mcp.json
+    run: pyqual mcp-fix --workdir . --project-path /workspace/project --issues .pyqual/errors.json --output .pyqual/llx_mcp.json
     when: metrics_fail
     timeout: 900
 

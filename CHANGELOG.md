@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.10] - 2026-03-29
 
 ### Fixed
+- Fix unused-imports issues (ticket-6ca28800)
+- Fix ai-boilerplate issues (ticket-fb45b220)
+
+## [0.1.10] - 2026-03-29
+
+### Fixed
 - Fix unused-imports issues (ticket-ad12a7fe)
 - Fix magic-numbers issues (ticket-a596efee)
 - Fix ai-boilerplate issues (ticket-2ced7dac)
@@ -37,6 +43,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix string-concat issues (ticket-fc5da382)
 
 ## [Unreleased]
+
+## [0.1.20] - 2026-03-29
+
+### Docs
+- Update CHANGELOG.md
+- Update TODO.md
+- Update docs/README.md
+- Update examples/README.md
+
+### Test
+- Update tests/test_llx_mcp.py
+
+### Other
+- Update conftest.py
+- Update examples/llm_fix/Dockerfile
+- Update planfile.yaml
+- Update project/duplication.toon.yaml
+- Update project/validation.toon.yaml
+- Update pyqual.yaml
+- Update pyqual/cli.py
+- Update pyqual/config.py
+- Update pyqual/integrations/llx_mcp_service.py
+- Update pyqual/plugins.py
 
 ## [0.1.19] - 2026-03-29
 

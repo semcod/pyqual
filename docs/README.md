@@ -1,7 +1,7 @@
 <!-- code2docs:start --># pyqual
 
-![version](https://img.shields.io/badge/version-0.1.0-blue) ![python](https://img.shields.io/badge/python-%3E%3D3.9-blue) ![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey) ![functions](https://img.shields.io/badge/functions-70-green)
-> **70** functions | **23** classes | **13** files | CC̄ = 5.9
+![version](https://img.shields.io/badge/version-0.1.0-blue) ![python](https://img.shields.io/badge/python-%3E%3D3.9-blue) ![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey) ![functions](https://img.shields.io/badge/functions-91-green)
+> **91** functions | **26** classes | **16** files | CC̄ = 5.7
 
 > Auto-generated project documentation from source code analysis.
 
@@ -30,6 +30,7 @@ pip install -e .
 ```bash
 pip install pyqual[analysis]    # analysis features
 pip install pyqual[costs]    # costs features
+pip install pyqual[mcp]    # mcp features
 pip install pyqual[all]    # all optional features
 ```
 
@@ -148,7 +149,7 @@ Content outside the markers is preserved when regenerating. Enable this with `sy
 
 ```
 pyqual/
-    ├── cli    ├── llm├── pyqual/    ├── config    ├── integrations/        ├── dynamic_thresholds        ├── minimal    ├── pipeline        ├── check_gates├── project        ├── run_pipeline    ├── plugins    ├── gates```
+    ├── cli    ├── llm├── pyqual/    ├── pipeline        ├── llx_mcp_service    ├── integrations/    ├── gates        ├── dynamic_thresholds        ├── minimal        ├── check_gates        ├── run_pipeline├── project        ├── demo    ├── plugins    ├── config        ├── llx_mcp```
 
 ## API Overview
 
@@ -156,14 +157,13 @@ pyqual/
 
 - **`LLMResponse`** — Response from LLM call.
 - **`LLM`** — LiteLLM wrapper with .env configuration.
-- **`StageConfig`** — Single pipeline stage.
-- **`GateConfig`** — Single quality gate threshold.
-- **`LoopConfig`** — Loop iteration settings.
-- **`PyqualConfig`** — Full pyqual.yaml configuration.
 - **`StageResult`** — Result of running a single stage.
 - **`IterationResult`** — Result of one full pipeline iteration.
 - **`PipelineResult`** — Result of the complete pipeline run (all iterations).
 - **`Pipeline`** — Execute pipeline stages in a loop until quality gates pass.
+- **`GateResult`** — Result of a single gate check.
+- **`Gate`** — Single quality gate with metric extraction.
+- **`GateSet`** — Collection of quality gates with metric collection.
 - **`PluginMetadata`** — Metadata for a pyqual plugin.
 - **`MetricCollector`** — Base class for metric collector plugins.
 - **`PluginRegistry`** — Registry for metric collector plugins.
@@ -174,9 +174,13 @@ pyqual/
 - **`A11yCollector`** — Accessibility (a11y) compliance metrics.
 - **`RepoMetricsCollector`** — Advanced repository health metrics (bus factor, diversity).
 - **`SecurityCollector`** — Security scanning metrics from trufflehog, gitleaks, safety.
-- **`GateResult`** — Result of a single gate check.
-- **`Gate`** — Single quality gate with metric extraction.
-- **`GateSet`** — Collection of quality gates with metric collection.
+- **`LlxMcpFixCollector`** — Dockerized llx MCP fixer workflow results.
+- **`StageConfig`** — Single pipeline stage.
+- **`GateConfig`** — Single quality gate threshold.
+- **`LoopConfig`** — Loop iteration settings.
+- **`PyqualConfig`** — Full pyqual.yaml configuration.
+- **`LlxMcpRunResult`** — Result of an llx MCP fix workflow.
+- **`LlxMcpClient`** — Thin MCP client for the llx SSE service.
 
 ### Functions
 
@@ -189,8 +193,17 @@ pyqual/
 - `get_llm_model()` — Get LLM model from environment or default.
 - `get_api_key()` — Get OpenRouter API key from environment.
 - `get_llm(model)` — Get configured LLM instance.
+- `create_app()` — Create an ASGI app that exposes the llx MCP server over SSE.
+- `run_server(host, port)` — Run the SSE server with uvicorn.
+- `build_parser()` — Build the CLI parser for the MCP service.
+- `main(argv)` — CLI entry point for the llx MCP service.
+- `check_tool()` — —
 - `get_available_plugins()` — Get metadata for all available built-in plugins.
 - `install_plugin_config(name, workdir)` — Generate configuration snippet for a plugin.
+- `build_fix_prompt(project_path, issues, analysis, prompt_limit)` — Build a concise prompt for llx/aider from gate failures.
+- `run_llx_fix_workflow(workdir, project_path, issues_path, output_path)` — Run the analysis + fix workflow and save a JSON report.
+- `build_parser()` — Build the CLI parser for the llx MCP helper.
+- `main(argv)` — CLI entry point used by pyqual pipeline stages.
 
 
 ## Project Structure
@@ -199,15 +212,18 @@ pyqual/
 📄 `examples.basic.minimal`
 📄 `examples.basic.run_pipeline`
 📄 `examples.custom_gates.dynamic_thresholds`
+📄 `examples.llx.demo` (1 functions)
 📄 `project`
 📦 `pyqual`
 📄 `pyqual.cli` (6 functions)
 📄 `pyqual.config` (5 functions, 4 classes)
 📄 `pyqual.gates` (30 functions, 3 classes)
 📦 `pyqual.integrations`
+📄 `pyqual.integrations.llx_mcp` (13 functions, 2 classes)
+📄 `pyqual.integrations.llx_mcp_service` (4 functions)
 📄 `pyqual.llm` (7 functions, 2 classes)
 📄 `pyqual.pipeline` (7 functions, 4 classes)
-📄 `pyqual.plugins` (16 functions, 10 classes)
+📄 `pyqual.plugins` (19 functions, 11 classes)
 
 ## Requirements
 
