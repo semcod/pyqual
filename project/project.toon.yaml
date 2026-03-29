@@ -1,44 +1,44 @@
-# pyqual | 78 func | 6f | 2598L | python | 2026-03-29
+# pyqual | 70 func | 6f | 2023L | python | 2026-03-29
 
 HEALTH:
-  CC̄=6.3  critical=20 (limit:10)  dup=0  cycles=0
+  CC̄=5.9  critical=14 (limit:10)  dup=0  cycles=0
 
-ALERTS[20]:
-  !!! high_fan_out     GateSet._collect_metrics = 28 (limit:10)
-  !!  cc_exceeded      GateSet._from_llm_quality = 22 (limit:15)
-  !!  high_fan_out     plugin = 19 (limit:10)
+ALERTS[17]:
+  !!! cc_exceeded      plugin = 46 (limit:15)
+  !!! high_fan_out     plugin = 33 (limit:10)
+  !!  high_fan_out     GateSet._collect_metrics = 18 (limit:10)
   !   cc_exceeded      GateSet._from_pylint = 16 (limit:15)
-  !   cc_exceeded      plugin = 15 (limit:15)
   !   high_fan_out     gates = 13 (limit:10)
-  !   high_fan_out     PyqualConfig.load = 11 (limit:10)
   !   high_fan_out     SecurityCollector.collect = 11 (limit:10)
-  !   high_fan_out     GateSet._from_secrets = 11 (limit:10)
   !   high_fan_out     GateSet._from_sbom = 11 (limit:10)
+  !   high_fan_out     GateSet._from_ruff = 11 (limit:10)
+  !   high_fan_out     GateSet._from_pylint = 11 (limit:10)
+  !   high_fan_out     GateSet._from_flake8 = 11 (limit:10)
 
 MODULES[8] (top by size):
-  M[pyqual/gates.py] 828L C:3 F:37 CC↑22 D:0 (python)
+  M[pyqual/gates.py] 575L C:3 F:29 CC↑16 D:0 (python)
   M[pyqual/plugins.py] 454L C:10 F:16 CC↑14 D:1 (python)
-  M[pyqual/cli.py] 273L C:0 F:6 CC↑15 D:0 (python)
-  M[pyqual/config.py] 177L C:4 F:5 CC↑11 D:0 (python)
+  M[pyqual/cli.py] 362L C:0 F:6 CC↑46 D:0 (python)
   M[pyqual/pipeline.py] 152L C:4 F:7 CC↑6 D:0 (python)
+  M[pyqual/config.py] 137L C:4 F:5 CC↑5 D:0 (python)
   M[pyqual/llm.py] 117L C:2 F:7 CC↑6 D:0 (python)
   M[pyqual/__init__.py] 39L C:0 F:0 CC↑0 D:0 (python)
   M[project.sh] 24L C:0 F:0 CC↑0 D:0 (shell)
   LANGS: python:7/shell:1
 
 HOTSPOTS[10]:
-  ★ GateSet._collect_metrics fan=28  // Collect metrics from .pyqual/ artifacts and .toon files.
-  ★ plugin fan=19  // Manage pyqual plugins - add new metric collectors.
+  ★ plugin fan=33  // Manage pyqual plugins - add, remove, search metric collectors.
+  ★ GateSet._collect_metrics fan=18  // Collect metrics from .pyqual/ artifacts and .toon files.
   ★ gates fan=13  // Check quality gates without running stages.
-  ★ PyqualConfig.load fan=11  // Load configuration from YAML file or pyproject.toml.
   ★ SecurityCollector.collect fan=11  // Orchestrates 11 calls
+  ★ GateSet._from_sbom fan=11  // Extract SBOM compliance metrics from sbom.json.
 
-REFACTOR[6]:
-  [1] H/H Split god module pyqual/gates.py (828L, 3 classes)
-  [2] M/L Split plugin (CC=15 → target CC<10)
-  [3] M/L Split GateSet._from_llm_quality (CC=22 → target CC<10)
-  [4] M/L Split GateSet._from_pylint (CC=16 → target CC<10)
-  [5] M/M Reduce GateSet._collect_metrics fan-out (currently 28)
+REFACTOR[5]:
+  [1] H/L Split plugin (CC=46 → target CC<10)
+  [2] H/H Split god module pyqual/gates.py (575L, 3 classes)
+  [3] M/L Split GateSet._from_pylint (CC=16 → target CC<10)
+  [4] M/M Reduce plugin fan-out (currently 33)
+  [5] M/M Reduce GateSet._collect_metrics fan-out (currently 18)
 
 EVOLUTION:
-  2026-03-29 CC̄=6.3 crit=20 2598L // Automated analysis
+  2026-03-29 CC̄=5.9 crit=14 2023L // Automated analysis

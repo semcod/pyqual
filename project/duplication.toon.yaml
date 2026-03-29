@@ -1,12 +1,12 @@
-# redup/duplication | 1 groups | 6f 2030L | 2026-03-29
+# redup/duplication | 1 groups | 6f 1797L | 2026-03-29
 
 SUMMARY:
   files_scanned: 6
-  total_lines:   2030
+  total_lines:   1797
   dup_groups:    1
   dup_fragments: 2
   saved_lines:   8
-  scan_ms:       2687
+  scan_ms:       2865
 
 DUPLICATES[1] (ranked by impact):
   [cade98fabc7ef6c2]   STRU  _load_env_file  L=8 N=2 saved=8 sim=1.00

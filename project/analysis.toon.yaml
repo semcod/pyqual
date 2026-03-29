@@ -1,33 +1,32 @@
-# code2llm | 8f 2064L | python:7,shell:1 | 2026-03-29
-# CC̄=6.3 | critical:3/78 | dups:0 | cycles:0
+# code2llm | 8f 1860L | python:7,shell:1 | 2026-03-29
+# CC̄=5.9 | critical:2/70 | dups:0 | cycles:0
 
-HEALTH[3]:
-  🟡 CC    plugin CC=15 (limit:15)
-  🟡 CC    _from_llm_quality CC=22 (limit:15)
+HEALTH[2]:
+  🟡 CC    plugin CC=46 (limit:15)
   🟡 CC    _from_pylint CC=16 (limit:15)
 
 REFACTOR[1]:
-  1. split 3 high-CC methods  (CC>15)
+  1. split 2 high-CC methods  (CC>15)
 
-PIPELINES[66]:
-  [1] Src [init]: init
+PIPELINES[58]:
+  [1] Src [from_dict]: from_dict
       PURITY: 100% pure
-  [2] Src [run]: run
+  [2] Src [load]: load → _load_env_file
       PURITY: 100% pure
-  [3] Src [gates]: gates
+  [3] Src [_parse]: _parse
       PURITY: 100% pure
-  [4] Src [status]: status
+  [4] Src [__init__]: __init__ → get_llm_model → _ensure_dotenv_loaded
       PURITY: 100% pure
-  [5] Src [plugin]: plugin → get_available_plugins
+  [5] Src [complete]: complete
       PURITY: 100% pure
 
 LAYERS:
-  pyqual/                         CC̄=6.3    ←in:0  →out:0
-  │ !! gates                      828L  3C   37m  CC=22     ←0
+  pyqual/                         CC̄=5.9    ←in:0  →out:0
+  │ !! gates                      575L  3C   29m  CC=16     ←0
   │ plugins                    454L  10C   16m  CC=14     ←1
-  │ !! cli                        273L  0C    6m  CC=15     ←0
-  │ config                     177L  4C    5m  CC=11     ←1
+  │ !! cli                        362L  0C    6m  CC=46     ←0
   │ pipeline                   152L  4C    7m  CC=6      ←0
+  │ config                     137L  4C    5m  CC=5      ←1
   │ llm                        117L  2C    7m  CC=6      ←0
   │ __init__                    39L  0C    0m  CC=0.0    ←0
   │

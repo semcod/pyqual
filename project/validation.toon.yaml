@@ -1,36 +1,22 @@
-# vallm batch | 54f | 23✓ 2⚠ 3✗ | 2026-03-29
+# vallm batch | 49f | 22✓ 2⚠ 0✗ | 2026-03-29
 
 SUMMARY:
-  scanned: 54  passed: 23 (42.6%)  warnings: 2  errors: 3  unsupported: 28
+  scanned: 49  passed: 22 (44.9%)  warnings: 2  errors: 0  unsupported: 27
 
 WARNINGS[2]{path,score}:
-  pyqual/gates.py,0.90
-    issues[7]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,_from_llm_quality has cyclomatic complexity 22 (max: 15),459
-      complexity.cyclomatic,warning,_from_pylint has cyclomatic complexity 16 (max: 15),656
-      complexity.cyclomatic,warning,_from_sarif has cyclomatic complexity 20 (max: 15),831
+  pyqual/cli.py,0.93
+    issues[3]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,plugin has cyclomatic complexity 46 (max: 15),136
+      complexity.lizard_cc,warning,plugin: CC=46 exceeds limit 15,136
+      complexity.lizard_length,warning,plugin: 136 lines exceeds limit 100,136
+  pyqual/gates.py,0.96
+    issues[3]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,_from_pylint has cyclomatic complexity 16 (max: 15),509
       complexity.maintainability,warning,Low maintainability index: 0.0 (threshold: 20),
-      complexity.lizard_cc,warning,_from_llm_quality: CC=22 exceeds limit 15,459
-      complexity.lizard_cc,warning,_from_pylint: CC=16 exceeds limit 15,656
-      complexity.lizard_cc,warning,_from_sarif: CC=20 exceeds limit 15,831
-  pyqual/cli.py,0.97
-    issues[2]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,run has cyclomatic complexity 19 (max: 15),44
-      complexity.lizard_cc,warning,run: CC=19 exceeds limit 15,44
-
-ERRORS[3]{path,score}:
-  examples/linters/pyqual.linters.yaml,0.00
-    issues[1]{rule,severity,message,line}:
-      syntax.tree_sitter,error,tree-sitter found 1 parse error(s) in yaml,
-  tests/test_collectors.py,0.93
-    issues[1]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'pytest' not found,7
-  pyqual/config.py,0.95
-    issues[1]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'tomli' not found,82
+      complexity.lizard_cc,warning,_from_pylint: CC=16 exceeds limit 15,509
 
 UNSUPPORTED[4]{bucket,count}:
   *.md,18
   *.txt,1
-  *.yml,2
+  *.yml,1
   other,7

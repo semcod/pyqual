@@ -89,6 +89,10 @@ class GateSet:
         metrics.update(self._from_git_health(workdir))
         metrics.update(self._from_llm_quality(workdir))
         metrics.update(self._from_ai_cost(workdir))
+        metrics.update(self._from_ruff(workdir))
+        metrics.update(self._from_pylint(workdir))
+        metrics.update(self._from_flake8(workdir))
+        metrics.update(self._from_interrogate(workdir))
         return metrics
 
     def _from_toon(self, workdir: Path) -> dict[str, float]:
@@ -477,6 +481,95 @@ class GateSet:
                 cost = data.get("total_cost") or data.get("cost_usd")
                 if cost:
                     result["ai_cost"] = float(cost)
+            except (json.JSONDecodeError, TypeError):
+                pass
+        return result
+
+    def _from_ruff(self, workdir: Path) -> dict[str, float]:
+        """Extract ruff linter error counts from JSON output."""
+        result: dict[str, float] = {}
+        p = workdir / ".pyqual" / "ruff.json"
+        if p.exists():
+            try:
+                data = json.loads(p.read_text())
+                if isinstance(data, list):
+                    errors = len(data)
+                    fatal = sum(1 for e in data if e.get("severity") == "fatal" or str(e.get("code", "")).startswith("E"))
+                    warning = sum(1 for e in data if e.get("severity") == "warning" or str(e.get("code", "")).startswith("W"))
+                    result["ruff_errors"] = float(errors)
+                    result["ruff_fatal"] = float(fatal)
+                    result["ruff_warnings"] = float(warning)
+                elif isinstance(data, dict):
+                    errors = len(data.get("violations", data.get("messages", [])))
+                    result["ruff_errors"] = float(errors)
+            except (json.JSONDecodeError, TypeError):
+                pass
+        return result
+
+    def _from_pylint(self, workdir: Path) -> dict[str, float]:
+        """Extract pylint score and error counts from JSON output."""
+        result: dict[str, float] = {}
+        p = workdir / ".pyqual" / "pylint.json"
+        if p.exists():
+            try:
+                data = json.loads(p.read_text())
+                if isinstance(data, list):
+                    errors = len(data)
+                    fatal = sum(1 for m in data if m.get("type") == "fatal" or str(m.get("symbol", "")).startswith("F"))
+                    error = sum(1 for m in data if m.get("type") == "error" or str(m.get("symbol", "")).startswith("E"))
+                    warning = sum(1 for m in data if m.get("type") == "warning" or str(m.get("symbol", "")).startswith("W"))
+                    result["pylint_errors"] = float(errors)
+                    result["pylint_fatal"] = float(fatal)
+                    result["pylint_error"] = float(error)
+                    result["pylint_warnings"] = float(warning)
+                elif isinstance(data, dict):
+                    score = data.get("score") or data.get("rating")
+                    if score:
+                        result["pylint_score"] = float(score)
+                    messages = data.get("messages", [])
+                    result["pylint_errors"] = float(len(messages))
+            except (json.JSONDecodeError, TypeError):
+                pass
+        return result
+
+    def _from_flake8(self, workdir: Path) -> dict[str, float]:
+        """Extract flake8 violation count from JSON output."""
+        result: dict[str, float] = {}
+        p = workdir / ".pyqual" / "flake8.json"
+        if p.exists():
+            try:
+                data = json.loads(p.read_text())
+                if isinstance(data, list):
+                    violations = len(data)
+                    errors = sum(1 for v in data if str(v.get("code", "")).startswith(("E", "F")))
+                    warnings = sum(1 for v in data if str(v.get("code", "")).startswith(("W",)))
+                    conventions = sum(1 for v in data if str(v.get("code", "")).startswith(("C", "N")))
+                    result["flake8_violations"] = float(violations)
+                    result["flake8_errors"] = float(errors)
+                    result["flake8_warnings"] = float(warnings)
+                    result["flake8_conventions"] = float(conventions)
+                elif isinstance(data, dict):
+                    violations = data.get("violations", data.get("messages", []))
+                    result["flake8_violations"] = float(len(violations))
+            except (json.JSONDecodeError, TypeError):
+                pass
+        return result
+
+    def _from_interrogate(self, workdir: Path) -> dict[str, float]:
+        """Extract docstring coverage from interrogate JSON output."""
+        result: dict[str, float] = {}
+        p = workdir / ".pyqual" / "interrogate.json"
+        if p.exists():
+            try:
+                data = json.loads(p.read_text())
+                coverage = data.get("coverage") or data.get("percent_covered")
+                if coverage:
+                    result["docstring_coverage"] = float(coverage)
+                total = data.get("total") or data.get("total_objects")
+                documented = data.get("documented") or data.get("documented_objects")
+                if total and documented is not None:
+                    result["docstring_total"] = float(total)
+                    result["docstring_missing"] = float(total - documented)
             except (json.JSONDecodeError, TypeError):
                 pass
         return result

@@ -1,7 +1,7 @@
 <!-- code2docs:start --># pyqual
 
-![version](https://img.shields.io/badge/version-0.1.0-blue) ![python](https://img.shields.io/badge/python-%3E%3D3.9-blue) ![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey) ![functions](https://img.shields.io/badge/functions-78-green)
-> **78** functions | **23** classes | **12** files | CC̄ = 6.3
+![version](https://img.shields.io/badge/version-0.1.0-blue) ![python](https://img.shields.io/badge/python-%3E%3D3.9-blue) ![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey) ![functions](https://img.shields.io/badge/functions-70-green)
+> **70** functions | **23** classes | **12** files | CC̄ = 5.9
 
 > Auto-generated project documentation from source code analysis.
 
@@ -184,7 +184,7 @@ pyqual/
 - `run(config, dry_run, workdir)` — Execute pipeline loop until quality gates pass.
 - `gates(config, workdir)` — Check quality gates without running stages.
 - `status(config, workdir)` — Show current metrics and pipeline config.
-- `plugin(action, name, workdir)` — Manage pyqual plugins - add new metric collectors.
+- `plugin(action, name, workdir, tag)` — Manage pyqual plugins - add, remove, search metric collectors.
 - `doctor()` — Check availability of external tools used by pyqual collectors.
 - `get_llm_model()` — Get LLM model from environment or default.
 - `get_api_key()` — Get OpenRouter API key from environment.
@@ -203,7 +203,7 @@ pyqual/
 📦 `pyqual`
 📄 `pyqual.cli` (6 functions)
 📄 `pyqual.config` (5 functions, 4 classes)
-📄 `pyqual.gates` (37 functions, 3 classes)
+📄 `pyqual.gates` (30 functions, 3 classes)
 📄 `pyqual.llm` (7 functions, 2 classes)
 📄 `pyqual.pipeline` (7 functions, 4 classes)
 📄 `pyqual.plugins` (16 functions, 10 classes)

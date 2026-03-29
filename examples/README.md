@@ -19,6 +19,15 @@ Real-world usage patterns for different project types and CI/CD setups.
 | [github-actions](github-actions/) | GitHub Actions | PR checks, artifacts, coverage |
 | [gitlab-ci](gitlab-ci/) | GitLab CI | Coverage reports, caching |
 
+### Specialized Workflows
+
+| Example | Focus | Tools |
+|---------|-------|-------|
+| [linters](linters/) | Code quality gates | ruff, pylint, flake8, mypy, interrogate |
+| [security](security/) | Security scanning | bandit, pip-audit, trufflehog, sbom |
+| [llm_fix](llm_fix/) | AI auto-fixing | LLM integration |
+| [custom_gates](custom_gates/) | Custom metrics | Composite gates, custom collectors |
+
 ## Quick Reference
 
 ### Minimal Config

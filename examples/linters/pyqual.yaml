@@ -1,0 +1,47 @@
+pipeline:
+  name: python-linters
+
+  metrics:
+    # Ruff gates
+    ruff_errors_max: 10
+    ruff_fatal_max: 0
+    ruff_warnings_max: 20
+
+    # Pylint gates
+    pylint_score_min: 8.0
+    pylint_errors_max: 5
+    pylint_warnings_max: 10
+
+    # Flake8 gates
+    flake8_violations_max: 20
+    flake8_errors_max: 5
+
+    # Mypy gates
+    mypy_errors_max: 5
+
+    # Documentation gates
+    docstring_coverage_min: 90
+    docstring_missing_max: 10
+
+  stages:
+    - name: ruff
+      run: ruff check . --output-format=json > .pyqual/ruff.json 2>/dev/null || true
+
+    - name: pylint
+      run: pylint --output-format=json . > .pyqual/pylint.json 2>/dev/null || true
+
+    - name: flake8
+      run: flake8 --format=json . > .pyqual/flake8.json 2>/dev/null || true
+
+    - name: mypy
+      run: mypy --output=json . > .pyqual/mypy.json 2>/dev/null || true
+
+    - name: interrogate
+      run: interrogate --generate-badge=never --format=json . > .pyqual/interrogate.json
+
+    - name: check
+      run: pyqual gates
+
+  loop:
+    max_iterations: 1
+    on_fail: report

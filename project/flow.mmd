@@ -13,14 +13,14 @@ flowchart TD
     end
 
     subgraph Core
-        pyqual__llm__LLM__complete["complete"]
-        pyqual__llm__LLM__fix_code["fix_code"]
-        pyqual__llm__get_llm["get_llm"]
         pyqual__config___load_env_file["_load_env_file"]
         pyqual__config__GateConfig__from_dict["from_dict"]
         pyqual__config__PyqualConfig__load["load"]
         pyqual__config__PyqualConfig___parse["_parse"]
         pyqual__config__PyqualConfig__default_yaml["default_yaml"]
+        pyqual__llm__LLM__complete["complete"]
+        pyqual__llm__LLM__fix_code["fix_code"]
+        pyqual__llm__get_llm["get_llm"]
         pyqual__plugins__PluginMetadata____post_init__["__post_init__"]
         pyqual__plugins__MetricCollector__collect["collect"]
         pyqual__plugins__MetricCollector__get_config_example["get_config_example"]
@@ -28,7 +28,7 @@ flowchart TD
         pyqual__plugins__PluginRegistry__get["get"]
         pyqual__plugins__PluginRegistry__list_plugins["list_plugins"]
         pyqual__plugins__PluginRegistry__create_instance["create_instance"]
-        ...["+49 more"]
+        ...["+41 more"]
     end
 
-    class pyqual__cli__init,pyqual__cli__run,pyqual__cli__gates,pyqual__cli__status,pyqual__cli__plugin,pyqual__cli__doctor,pyqual__llm__LLM__complete,pyqual__llm__LLM__fix_code,pyqual__llm__get_llm,pyqual__config__GateConfig__from_dict entry
+    class pyqual__config__GateConfig__from_dict,pyqual__config__PyqualConfig__load,pyqual__config__PyqualConfig___parse,pyqual__config__PyqualConfig__default_yaml,pyqual__llm__LLM__complete,pyqual__llm__LLM__fix_code,pyqual__llm__get_llm,pyqual__cli__init,pyqual__cli__run,pyqual__cli__gates entry

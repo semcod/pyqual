@@ -2,7 +2,7 @@
 
 ## AI Cost Tracking
 
-![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.14-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.15-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
 ![AI Cost](https://img.shields.io/badge/AI%20Cost-$1.05-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-5.0h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
 
 - 🤖 **LLM usage:** $1.0500 (7 commits)
@@ -97,6 +97,16 @@ pyqual run               # execute full loop
 pyqual run --dry-run     # preview without executing
 pyqual gates             # check gates without running stages
 pyqual status            # show current metrics
+pyqual doctor            # check tool availability
+
+# Plugin management
+pyqual plugin list                   # list all plugins
+pyqual plugin list --tag security     # filter by tag
+pyqual plugin search <query>          # search plugins
+pyqual plugin info <name>             # show plugin details
+pyqual plugin add <name>              # add plugin to config
+pyqual plugin remove <name>           # remove plugin from config
+pyqual plugin validate                # validate configuration
 ```
 
 ## Python API
@@ -151,12 +161,27 @@ See [`examples/llm_fix/`](examples/llm_fix/) for complete examples.
 
 pyqual automatically collects metrics from:
 
-| Source | Metrics | How |
-|--------|---------|-----|
-| `analysis_toon.yaml` | `cc` (CC̄), `critical` | Regex parse from code2llm output |
-| `validation_toon.yaml` | `vallm_pass` | Pass rate from vallm batch |
-| `.pyqual/errors.json` | `error_count` | Count of vallm errors |
-| `.pyqual/coverage.json` | `coverage` | pytest-cov JSON report |
+| Source | File | Metrics |
+|--------|------|---------|
+| **Analysis** | `analysis_toon.yaml` | `cc` (CC̄), `critical` |
+| **Validation** | `validation_toon.yaml` | `vallm_pass` |
+| | `.pyqual/errors.json` | `error_count` |
+| **Coverage** | `.pyqual/coverage.json` | `coverage` |
+| **Performance** | `.pyqual/asv.json` | `bench_regression`, `bench_time` |
+| | `.pyqual/mem.json` | `mem_usage`, `cpu_time` |
+| **Security** | `.pyqual/secrets.json` | `secrets_severity`, `secrets_count` |
+| | `.pyqual/vulns.json` | `vuln_critical`, `vuln_count` |
+| | `.pyqual/sbom.json` | `sbom_compliance`, `license_blacklist` |
+| **Project Health** | `.pyqual/vulture.json` | `unused_count` |
+| | `.pyqual/pyroma.json` | `pyroma_score` |
+| | `.pyqual/git_metrics.json` | `git_branch_age`, `todo_count` |
+| **LLM/AI** | `.pyqual/humaneval.json` | `llm_pass_rate` |
+| | `.pyqual/llm_analysis.json` | `llm_cc`, `hallucination_rate`, `prompt_bias_score`, `agent_efficiency` |
+| | `.pyqual/costs.json` | `ai_cost` |
+| **Linting** | `.pyqual/ruff.json` | `ruff_errors`, `ruff_fatal`, `ruff_warnings` |
+| | `.pyqual/pylint.json` | `pylint_errors`, `pylint_fatal`, `pylint_error`, `pylint_warnings`, `pylint_score` |
+| | `.pyqual/flake8.json` | `flake8_violations`, `flake8_errors`, `flake8_warnings`, `flake8_conventions` |
+| **Documentation** | `.pyqual/interrogate.json` | `docstring_coverage`, `docstring_total`, `docstring_missing` |
 
 Custom metrics: extend `GateSet._collect_metrics()` or add your own collector.
 

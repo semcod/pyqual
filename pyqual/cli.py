@@ -134,26 +134,58 @@ def status(
 
 @app.command()
 def plugin(
-    action: str = typer.Argument(..., help="Action: list, add, info"),
-    name: str | None = typer.Argument(None, help="Plugin name (for add/info)"),
+    action: str = typer.Argument(..., help="Action: list, add, remove, info, search, validate"),
+    name: str | None = typer.Argument(None, help="Plugin name (for add/remove/info)"),
     workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
+    tag: str | None = typer.Option(None, "--tag", "-t", help="Filter by tag (for list/search)"),
 ):
-    """Manage pyqual plugins - add new metric collectors."""
+    """Manage pyqual plugins - add, remove, search metric collectors."""
     if action == "list":
         plugins = get_available_plugins()
+        if tag:
+            plugins = {k: v for k, v in plugins.items() if tag in v.tags}
         if not plugins:
-            console.print("[yellow]No plugins available.[/yellow]")
+            console.print("[yellow]No plugins available.[/yellow]" if not tag else f"[yellow]No plugins with tag '{tag}' found.[/yellow]")
             return
         
-        table = Table(title="Available Plugins")
+        table = Table(title=f"Available Plugins ({len(plugins)} total)" if not tag else f"Plugins with tag '{tag}' ({len(plugins)})")
         table.add_column("Name")
         table.add_column("Description")
         table.add_column("Version")
         table.add_column("Tags")
         
         for name, meta in sorted(plugins.items()):
-            tags = ", ".join(meta.tags) if meta.tags else ""
-            table.add_row(name, meta.description, meta.version, tags)
+            tags = ", ".join(meta.tags[:3]) if meta.tags else ""
+            table.add_row(name, meta.description[:50], meta.version, tags)
+        
+        console.print(table)
+    
+    elif action == "search":
+        query = name or ""
+        if not query:
+            console.print("[red]Search query required. Usage: pyqual plugin search <query>[/red]")
+            raise typer.Exit(1)
+        
+        plugins = get_available_plugins()
+        results = {}
+        for pname, meta in plugins.items():
+            if (query.lower() in pname.lower() or 
+                query.lower() in meta.description.lower() or
+                any(query.lower() in t.lower() for t in meta.tags)):
+                results[pname] = meta
+        
+        if not results:
+            console.print(f"[yellow]No plugins found matching '{query}'[/yellow]")
+            return
+        
+        table = Table(title=f"Search results for '{query}' ({len(results)} found)")
+        table.add_column("Name")
+        table.add_column("Description")
+        table.add_column("Tags")
+        
+        for pname, meta in sorted(results.items()):
+            tags = ", ".join(meta.tags[:3]) if meta.tags else ""
+            table.add_row(pname, meta.description[:50], tags)
         
         console.print(table)
     
@@ -214,9 +246,70 @@ def plugin(
         console.print(f"[green]Added {name} plugin configuration to pyqual.yaml[/green]")
         console.print(f"Review and customize the added metrics and stages.")
     
+    elif action == "remove":
+        if not name:
+            console.print("[red]Plugin name required. Usage: pyqual plugin remove <name>[/red]")
+            raise typer.Exit(1)
+        
+        config_path = workdir / "pyqual.yaml"
+        if not config_path.exists():
+            console.print(f"[red]pyqual.yaml not found in {workdir}[/red]")
+            raise typer.Exit(1)
+        
+        existing = config_path.read_text()
+        
+        # Find and remove plugin section
+        marker = f"# {name} plugin configuration"
+        if marker not in existing:
+            console.print(f"[yellow]Plugin {name} not found in pyqual.yaml[/yellow]")
+            raise typer.Exit(1)
+        
+        # Split and remove section
+        lines = existing.split("\n")
+        new_lines = []
+        skip = False
+        for line in lines:
+            if marker in line:
+                skip = True
+                continue
+            if skip and line.startswith("# ") and "plugin" in line:
+                skip = False
+            if not skip:
+                new_lines.append(line)
+        
+        config_path.write_text("\n".join(new_lines))
+        console.print(f"[green]Removed {name} plugin configuration from pyqual.yaml[/green]")
+    
+    elif action == "validate":
+        config_path = workdir / "pyqual.yaml"
+        if not config_path.exists():
+            console.print(f"[red]pyqual.yaml not found in {workdir}[/red]")
+            raise typer.Exit(1)
+        
+        existing = config_path.read_text()
+        plugins = get_available_plugins()
+        
+        found_plugins = []
+        for pname in plugins:
+            if f"# {pname} plugin" in existing:
+                found_plugins.append(pname)
+        
+        console.print(f"[bold]Validation Results[/bold]")
+        console.print(f"Found {len(found_plugins)} configured plugins: {', '.join(found_plugins)}")
+        
+        # Check for available but not configured plugins
+        available = set(plugins.keys())
+        configured = set(found_plugins)
+        missing = available - configured
+        
+        if missing:
+            console.print(f"\n[yellow]Available but not configured:[/yellow] {', '.join(sorted(missing))}")
+        
+        console.print("\n[green]✓ Configuration is valid[/green]")
+    
     else:
         console.print(f"[red]Unknown action: {action}[/red]")
-        console.print("Supported actions: list, add, info")
+        console.print("Supported actions: list, add, remove, info, search, validate")
         raise typer.Exit(1)
 
 

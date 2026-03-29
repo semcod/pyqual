@@ -1,32 +1,32 @@
-# pyqual | 8f 2064L | python:7,shell:1 | 2026-03-29
-# stats: 78 func | 0 cls | 8 mod | CC̄=6.3 | critical:3 | cycles:0
-# alerts[5]: fan-out GateSet._collect_metrics=28; CC GateSet._from_llm_quality=22; fan-out plugin=19; CC GateSet._from_pylint=16; CC plugin=15
-# hotspots[5]: GateSet._collect_metrics fan=28; plugin fan=19; gates fan=13; PyqualConfig.load fan=11; SecurityCollector.collect fan=11
-# evolution: CC̄ 3.2→6.3 (regressed +3.1)
+# pyqual | 8f 1860L | python:7,shell:1 | 2026-03-29
+# stats: 70 func | 0 cls | 8 mod | CC̄=5.9 | critical:2 | cycles:0
+# alerts[5]: CC plugin=46; fan-out plugin=33; fan-out GateSet._collect_metrics=18; CC GateSet._from_pylint=16; fan-out gates=13
+# hotspots[5]: plugin fan=33; GateSet._collect_metrics fan=18; gates fan=13; SecurityCollector.collect fan=11; GateSet._from_sbom fan=11
+# evolution: CC̄ 6.3→5.9 (improved -0.4)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
 M[8]:
   project.sh,24
   pyqual/__init__.py,39
-  pyqual/cli.py,273
-  pyqual/config.py,177
-  pyqual/gates.py,828
+  pyqual/cli.py,362
+  pyqual/config.py,137
+  pyqual/gates.py,575
   pyqual/llm.py,117
   pyqual/pipeline.py,152
   pyqual/plugins.py,454
 D:
-  pyqual/gates.py:
-    e: GateResult,Gate,GateSet
-    GateResult: __str__(0)  # Result of a single gate check...
-    Gate: check(1)  # Single quality gate with metric extraction...
-    GateSet: __init__(1),check_all(1),all_passed(1),_collect_metrics(1),_from_toon(1),_from_vallm(1),_from_coverage(1),_from_safety(1),_from_bandit(1),_from_secrets(1),_from_pip_outdated(1),_from_radon(1),_from_mypy(1),_from_pytest_durations(1),_from_benchmark(1),_from_memory_profile(1),_from_vulnerabilities(1),_from_sbom(1),_from_vulture(1),_from_pyroma(1),_from_git_health(1),_from_llm_quality(1),_from_ai_cost(1),_from_i18n(1),_from_a11y(1),_from_hallucination(1),_from_repo_advanced(1),_from_ruff(1),_from_pylint(1),_from_flake8(1),_from_interrogate(1),_from_import_linter(1),_from_pydocstyle(1),_from_black(1),_from_isort(1)  # Collection of quality gates with metric collection...
   pyqual/cli.py:
     e: init,run,gates,status,plugin,doctor
     init(path)
     run(config;dry_run;workdir)
     gates(config;workdir)
     status(config;workdir)
-    plugin(action;name;workdir)
+    plugin(action;name;workdir;tag)
     doctor()
+  pyqual/gates.py:
+    e: GateResult,Gate,GateSet
+    GateResult: __str__(0)  # Result of a single gate check...
+    Gate: check(1)  # Single quality gate with metric extraction...
+    GateSet: __init__(1),check_all(1),all_passed(1),_collect_metrics(1),_from_toon(1),_from_vallm(1),_from_coverage(1),_from_safety(1),_from_bandit(1),_from_secrets(1),_from_pip_outdated(1),_from_radon(1),_from_mypy(1),_from_pytest_durations(1),_from_benchmark(1),_from_memory_profile(1),_from_secrets(1),_from_vulnerabilities(1),_from_sbom(1),_from_vulture(1),_from_pyroma(1),_from_git_health(1),_from_llm_quality(1),_from_ai_cost(1),_from_ruff(1),_from_pylint(1),_from_flake8(1),_from_interrogate(1)  # Collection of quality gates with metric collection...
   pyqual/plugins.py:
     e: PluginMetadata,MetricCollector,PluginRegistry,LLMBenchCollector,HallucinationCollector,SBOMCollector,I18nCollector,A11yCollector,RepoMetricsCollector,SecurityCollector,get_available_plugins,install_plugin_config
     PluginMetadata: __post_init__(0)  # Metadata for a pyqual plugin...
@@ -43,13 +43,6 @@ Subclasses should ...
     SecurityCollector(MetricCollector): collect(1)  # Security scanning metrics from trufflehog, gitleaks, safety...
     get_available_plugins()
     install_plugin_config(name;workdir)
-  pyqual/config.py:
-    e: StageConfig,GateConfig,LoopConfig,PyqualConfig,_load_env_file
-    StageConfig:  # Single pipeline stage...
-    GateConfig: from_dict(2)  # Single quality gate threshold...
-    LoopConfig:  # Loop iteration settings...
-    PyqualConfig: load(1),_parse(1),default_yaml(-1)  # Full pyqual.yaml configuration...
-    _load_env_file()
   pyqual/llm.py:
     e: LLMResponse,LLM,_ensure_dotenv_loaded,get_llm_model,get_api_key,get_llm
     LLMResponse:  # Response from LLM call...
@@ -64,5 +57,12 @@ Subclasses should ...
     IterationResult:  # Result of one full pipeline iteration...
     PipelineResult:  # Result of the complete pipeline run (all iterations)...
     Pipeline: __init__(2),run(1),check_gates(0),_run_iteration(2),_should_run_stage(2),_execute_stage(2),_ensure_pyqual_dir(0)  # Execute pipeline stages in a loop until quality gates pass...
+  pyqual/config.py:
+    e: StageConfig,GateConfig,LoopConfig,PyqualConfig,_load_env_file
+    StageConfig:  # Single pipeline stage...
+    GateConfig: from_dict(2)  # Single quality gate threshold...
+    LoopConfig:  # Loop iteration settings...
+    PyqualConfig: load(1),_parse(1),default_yaml(-1)  # Full pyqual.yaml configuration...
+    _load_env_file()
   pyqual/__init__.py:
   project.sh:

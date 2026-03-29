@@ -31,6 +31,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.15] - 2026-03-29
+
+### Docs
+- Update README.md
+- Update TODO.md
+- Update docs/README.md
+- Update examples/README.md
+- Update examples/linters/README.md
+- Update examples/security/README.md
+- Update project/README.md
+- Update project/context.md
+
+### Other
+- Update examples/linters/pyqual.yaml
+- Update examples/security/pyqual.yaml
+- Update project/analysis.toon.yaml
+- Update project/calls.mmd
+- Update project/calls.png
+- Update project/compact_flow.mmd
+- Update project/compact_flow.png
+- Update project/duplication.toon.yaml
+- Update project/evolution.toon.yaml
+- Update project/flow.mmd
+- ... and 7 more files
+
 ## [0.1.14] - 2026-03-29
 
 ### Docs

@@ -6,15 +6,15 @@
 - **Primary Language**: python
 - **Languages**: python: 11, shell: 1
 - **Analysis Mode**: static
-- **Total Functions**: 78
+- **Total Functions**: 70
 - **Total Classes**: 23
 - **Modules**: 12
-- **Entry Points**: 72
+- **Entry Points**: 64
 
 ## Architecture by Module
 
 ### pyqual.gates
-- **Functions**: 37
+- **Functions**: 30
 - **Classes**: 3
 - **File**: `gates.py`
 
@@ -47,8 +47,8 @@
 Main execution flows into the system:
 
 ### pyqual.cli.plugin
-> Manage pyqual plugins - add new metric collectors.
-- **Calls**: app.command, typer.Argument, typer.Argument, typer.Option, Path, pyqual.plugins.get_available_plugins, Table, table.add_column
+> Manage pyqual plugins - add, remove, search metric collectors.
+- **Calls**: app.command, typer.Argument, typer.Argument, typer.Option, typer.Option, Path, pyqual.plugins.get_available_plugins, Table
 
 ### pyqual.gates.GateSet._collect_metrics
 > Collect metrics from .pyqual/ artifacts and .toon files.
@@ -57,10 +57,6 @@ Main execution flows into the system:
 ### pyqual.gates.GateSet._from_pylint
 > Extract pylint score and error counts from JSON output.
 - **Calls**: p.exists, json.loads, isinstance, p.read_text, len, sum, sum, sum
-
-### pyqual.gates.GateSet._from_llm_quality
-> Extract LLM code quality metrics from humaneval.json, codebleu.json, and llm_analysis.json.
-- **Calls**: path.exists, json.loads, path.read_text, data.get, data.get, float, data.get, data.get
 
 ### pyqual.gates.GateSet._from_flake8
 > Extract flake8 violation count from JSON output.
@@ -77,10 +73,6 @@ Main execution flows into the system:
 > Show current metrics and pipeline config.
 - **Calls**: app.command, typer.Option, typer.Option, PyqualConfig.load, GateSet, gate_set._collect_metrics, console.print, console.print
 
-### pyqual.gates.GateSet._from_a11y
-> Extract accessibility metrics from a11y.json.
-- **Calls**: a11y_path.exists, json.loads, data.get, float, sum, sum, sum, sum
-
 ### pyqual.cli.gates
 > Check quality gates without running stages.
 - **Calls**: app.command, typer.Option, typer.Option, PyqualConfig.load, GateSet, gate_set.check_all, Table, table.add_column
@@ -88,10 +80,6 @@ Main execution flows into the system:
 ### pyqual.gates.GateSet._from_radon
 > Extract maintainability index and complexity from radon JSON.
 - **Calls**: p.exists, json.loads, p.read_text, isinstance, v.get, float, float, isinstance
-
-### pyqual.gates.GateSet._from_hallucination
-> Extract hallucination detection metrics from hall.json.
-- **Calls**: hall_path.exists, json.loads, data.get, data.get, hall_path.read_text, data.get, data.get, float
 
 ### pyqual.cli.run
 > Execute pipeline loop until quality gates pass.
@@ -108,44 +96,12 @@ Main execution flows into the system:
 > Check availability of external tools used by pyqual collectors.
 - **Calls**: app.command, Table, table.add_column, table.add_column, table.add_column, table.add_column, console.print, console.print
 
-### pyqual.config.PyqualConfig.load
-> Load configuration from YAML file or pyproject.toml.
-- **Calls**: pyqual.config._load_env_file, Path, yaml.safe_load, cls._parse, Path, pyproject.exists, FileNotFoundError, p.exists
-
-### pyqual.gates.GateSet._from_repo_advanced
-> Extract advanced repository metrics from repo_health.json or grimoirelab output.
-- **Calls**: path.exists, json.loads, data.get, path.read_text, data.get, data.get, float, data.get
-
-### pyqual.gates.GateSet._from_import_linter
-> Extract import contract violations from import-linter JSON output.
-- **Calls**: p.exists, json.loads, data.get, isinstance, p.read_text, data.get, float, float
-
-### pyqual.gates.GateSet._from_isort
-> Extract import sorting violations from isort check output.
-- **Calls**: p.exists, json.loads, isinstance, p.read_text, len, float, isinstance, isinstance
-
-### pyqual.gates.GateSet._from_sbom
-> Extract SBOM compliance metrics from sbom.json.
-- **Calls**: sbom_path.exists, json.loads, data.get, len, sum, data.get, float, sum
-
-### pyqual.gates.GateSet._from_pydocstyle
-> Extract docstring style violations from pydocstyle JSON output.
-- **Calls**: p.exists, json.loads, isinstance, p.read_text, len, float, errors_by_type.items, isinstance
-
 ### pyqual.plugins.HallucinationCollector.collect
 - **Calls**: hall_path.exists, json.loads, hall_path.read_text, data.get, data.get, float, data.get, data.get
 
-### pyqual.gates.GateSet._from_secrets
-> Extract leaked secrets count from trufflehog/gitleaks JSON.
-- **Calls**: p.exists, json.loads, isinstance, float, p.read_text, len, isinstance, None.lower
-
-### pyqual.gates.GateSet._from_git_health
-> Extract repository health metrics from git_metrics.json.
-- **Calls**: git_path.exists, json.loads, data.get, data.get, data.get, git_path.read_text, float, float
-
-### pyqual.gates.GateSet._from_black
-> Extract code formatting violations from black check output.
-- **Calls**: p.exists, json.loads, isinstance, p.read_text, len, float, isinstance, data.get
+### pyqual.gates.GateSet._from_llm_quality
+> Extract LLM code quality metrics from humaneval.json and llm_analysis.json.
+- **Calls**: path.exists, json.loads, path.read_text, data.get, data.get, data.get, data.get, data.get
 
 ### pyqual.gates.GateSet._from_safety
 > Extract vulnerability counts from pip-audit/safety JSON output.
@@ -159,9 +115,50 @@ Main execution flows into the system:
 > Extract benchmark metrics from asv.json.
 - **Calls**: bench_path.exists, json.loads, bench_path.read_text, isinstance, None.get, None.get, str, data.get
 
+### pyqual.gates.GateSet._from_sbom
+> Extract SBOM compliance metrics from sbom.json.
+- **Calls**: sbom_path.exists, json.loads, data.get, len, sum, sum, float, sbom_path.read_text
+
 ### pyqual.gates.GateSet._from_pyroma
 > Extract packaging quality from pyroma.json.
 - **Calls**: pyr_path.exists, json.loads, isinstance, pyr_path.read_text, data.get, data.get, float, isinstance
+
+### pyqual.config.PyqualConfig._parse
+- **Calls**: raw.get, pipeline.get, cls, StageConfig, GateConfig.from_dict, LoopConfig, LoopConfig, pipeline.get
+
+### pyqual.plugins.RepoMetricsCollector.collect
+- **Calls**: path.exists, json.loads, path.read_text, data.get, data.get, float, data.get, data.get
+
+### pyqual.gates.GateSet._from_interrogate
+> Extract docstring coverage from interrogate JSON output.
+- **Calls**: p.exists, json.loads, p.read_text, data.get, data.get, float, data.get, data.get
+
+### pyqual.cli.init
+> Create pyqual.yaml with sensible defaults.
+- **Calls**: app.command, typer.Argument, target.exists, target.write_text, None.mkdir, console.print, console.print, Path
+
+### pyqual.gates.GateSet._from_vallm
+> Extract vallm pass rate from validation_toon.yaml or errors.json.
+- **Calls**: errors_path.exists, p.read_text, re.search, p.exists, float, json.loads, isinstance, pass_match.group
+
+### pyqual.gates.GateSet._from_secrets
+> Extract secrets scan metrics from secrets.json.
+- **Calls**: sec_path.exists, json.loads, isinstance, sec_path.read_text, float, float, None.lower, max
+
+### pyqual.pipeline.Pipeline._run_iteration
+> Run one iteration of all stages + gate check.
+- **Calls**: time.monotonic, IterationResult, self.gate_set.all_passed, self.gate_set.check_all, all, self._should_run_stage, self._execute_stage, iteration.stages.append
+
+### pyqual.plugins.SBOMCollector.collect
+- **Calls**: sbom_path.exists, json.loads, data.get, len, sum, data.get, float, sbom_path.read_text
+
+### pyqual.gates.GateSet._from_mypy
+> Extract mypy type error count from JSON output.
+- **Calls**: p.exists, json.loads, isinstance, float, p.read_text, len, isinstance, len
+
+### pyqual.pipeline.Pipeline._execute_stage
+> Execute a single stage command.
+- **Calls**: time.monotonic, StageResult, subprocess.run, StageResult, StageResult, StageResult, time.monotonic, str
 
 ## Process Flows
 
@@ -182,46 +179,46 @@ _collect_metrics [pyqual.gates.GateSet]
 _from_pylint [pyqual.gates.GateSet]
 ```
 
-### Flow 4: _from_llm_quality
-```
-_from_llm_quality [pyqual.gates.GateSet]
-```
-
-### Flow 5: _from_flake8
+### Flow 4: _from_flake8
 ```
 _from_flake8 [pyqual.gates.GateSet]
 ```
 
-### Flow 6: collect
+### Flow 5: collect
 ```
 collect [pyqual.plugins.SecurityCollector]
 ```
 
-### Flow 7: _from_ruff
+### Flow 6: _from_ruff
 ```
 _from_ruff [pyqual.gates.GateSet]
 ```
 
-### Flow 8: status
+### Flow 7: status
 ```
 status [pyqual.cli]
 ```
 
-### Flow 9: _from_a11y
-```
-_from_a11y [pyqual.gates.GateSet]
-```
-
-### Flow 10: gates
+### Flow 8: gates
 ```
 gates [pyqual.cli]
+```
+
+### Flow 9: _from_radon
+```
+_from_radon [pyqual.gates.GateSet]
+```
+
+### Flow 10: run
+```
+run [pyqual.cli]
 ```
 
 ## Key Classes
 
 ### pyqual.gates.GateSet
 > Collection of quality gates with metric collection.
-- **Methods**: 35
+- **Methods**: 28
 - **Key Methods**: pyqual.gates.GateSet.__init__, pyqual.gates.GateSet.check_all, pyqual.gates.GateSet.all_passed, pyqual.gates.GateSet._collect_metrics, pyqual.gates.GateSet._from_toon, pyqual.gates.GateSet._from_vallm, pyqual.gates.GateSet._from_coverage, pyqual.gates.GateSet._from_safety, pyqual.gates.GateSet._from_bandit, pyqual.gates.GateSet._from_secrets
 
 ### pyqual.pipeline.Pipeline
@@ -304,16 +301,6 @@ Subclasses should implement collect() to extract metrics f
 - **Key Methods**: pyqual.plugins.SecurityCollector.collect
 - **Inherits**: MetricCollector
 
-### pyqual.pipeline.StageResult
-> Result of running a single stage.
-- **Methods**: 1
-- **Key Methods**: pyqual.pipeline.StageResult.passed
-
-### pyqual.pipeline.PipelineResult
-> Result of the complete pipeline run (all iterations).
-- **Methods**: 1
-- **Key Methods**: pyqual.pipeline.PipelineResult.iteration_count
-
 ### pyqual.gates.GateResult
 > Result of a single gate check.
 - **Methods**: 1
@@ -324,8 +311,18 @@ Subclasses should implement collect() to extract metrics f
 - **Methods**: 1
 - **Key Methods**: pyqual.gates.Gate.check
 
-### pyqual.llm.LLMResponse
-> Response from LLM call.
+### pyqual.pipeline.StageResult
+> Result of running a single stage.
+- **Methods**: 1
+- **Key Methods**: pyqual.pipeline.StageResult.passed
+
+### pyqual.pipeline.PipelineResult
+> Result of the complete pipeline run (all iterations).
+- **Methods**: 1
+- **Key Methods**: pyqual.pipeline.PipelineResult.iteration_count
+
+### pyqual.config.StageConfig
+> Single pipeline stage.
 - **Methods**: 0
 
 ## Data Transformation Functions
@@ -339,14 +336,13 @@ Key functions that process and transform data:
 
 Functions exposed as public API (no underscore prefix):
 
-- `pyqual.cli.plugin` - 55 calls
+- `pyqual.cli.plugin` - 112 calls
 - `pyqual.plugins.SecurityCollector.collect` - 23 calls
 - `pyqual.cli.status` - 21 calls
 - `pyqual.cli.gates` - 20 calls
 - `pyqual.cli.run` - 18 calls
 - `pyqual.plugins.LLMBenchCollector.collect` - 18 calls
 - `pyqual.cli.doctor` - 17 calls
-- `pyqual.config.PyqualConfig.load` - 17 calls
 - `pyqual.plugins.HallucinationCollector.collect` - 15 calls
 - `pyqual.plugins.RepoMetricsCollector.collect` - 12 calls
 - `pyqual.cli.init` - 11 calls
@@ -355,6 +351,7 @@ Functions exposed as public API (no underscore prefix):
 - `pyqual.plugins.A11yCollector.collect` - 9 calls
 - `pyqual.llm.LLM.complete` - 8 calls
 - `pyqual.config.GateConfig.from_dict` - 7 calls
+- `pyqual.config.PyqualConfig.load` - 7 calls
 - `pyqual.pipeline.Pipeline.run` - 6 calls
 - `pyqual.llm.LLM.fix_code` - 5 calls
 - `pyqual.plugins.install_plugin_config` - 5 calls
@@ -383,17 +380,12 @@ graph TD
     plugin --> command
     plugin --> Argument
     plugin --> Option
-    plugin --> Path
     _collect_metrics --> update
     _from_pylint --> exists
     _from_pylint --> loads
     _from_pylint --> isinstance
     _from_pylint --> read_text
     _from_pylint --> len
-    _from_llm_quality --> exists
-    _from_llm_quality --> loads
-    _from_llm_quality --> read_text
-    _from_llm_quality --> get
     _from_flake8 --> exists
     _from_flake8 --> loads
     _from_flake8 --> isinstance
@@ -410,6 +402,11 @@ graph TD
     status --> command
     status --> Option
     status --> load
+    status --> GateSet
+    gates --> command
+    gates --> Option
+    gates --> load
+    gates --> GateSet
 ```
 
 ## Reverse Engineering Guidelines
