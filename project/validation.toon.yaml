@@ -4,21 +4,17 @@ SUMMARY:
   scanned: 64  passed: 31 (48.4%)  warnings: 3  errors: 0  unsupported: 33
 
 WARNINGS[3]{path,score}:
-  pyqual/cli.py,0.93
-    issues[3]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,plugin has cyclomatic complexity 46 (max: 15),212
-      complexity.lizard_cc,warning,plugin: CC=46 exceeds limit 15,212
-      complexity.lizard_length,warning,plugin: 136 lines exceeds limit 100,212
   pyqual/gates.py,0.96
     issues[3]{rule,severity,message,line}:
       complexity.cyclomatic,warning,_from_pylint has cyclomatic complexity 16 (max: 15),522
       complexity.maintainability,warning,Low maintainability index: 0.0 (threshold: 20),
       complexity.lizard_cc,warning,_from_pylint: CC=16 exceeds limit 15,522
-  pyqual/plugins.py,0.96
-    issues[3]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,collect has cyclomatic complexity 26 (max: 15),475
-      complexity.maintainability,warning,Low maintainability index: 15.5 (threshold: 20),
-      complexity.lizard_cc,warning,collect: CC=26 exceeds limit 15,475
+  pyqual/cli.py,0.98
+    issues[1]{rule,severity,message,line}:
+      complexity.maintainability,warning,Low maintainability index: 13.8 (threshold: 20),
+  pyqual/plugins.py,0.98
+    issues[1]{rule,severity,message,line}:
+      complexity.maintainability,warning,Low maintainability index: 14.4 (threshold: 20),
 
 UNSUPPORTED[5]{bucket,count}:
   *.md,22
