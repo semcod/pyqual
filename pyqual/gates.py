@@ -95,6 +95,17 @@ class GateSet:
         metrics.update(self._from_pylint(workdir))
         metrics.update(self._from_flake8(workdir))
         metrics.update(self._from_interrogate(workdir))
+
+        try:
+            from pyqual.plugins import PluginRegistry
+
+            for plugin_class in PluginRegistry.list_plugins():
+                try:
+                    metrics.update(plugin_class().collect(workdir))
+                except Exception:
+                    pass
+        except Exception:
+            pass
         return metrics
 
     def _from_toon(self, workdir: Path) -> dict[str, float]:

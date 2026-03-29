@@ -456,6 +456,7 @@ stages:
 
 env:
   PYQUAL_LLX_MCP_URL: http://localhost:8000/sse
+  PYQUAL_LLX_PROJECT_PATH: /workspace/project
   PYQUAL_LLX_USE_DOCKER: "false"
 """.strip(),
     )

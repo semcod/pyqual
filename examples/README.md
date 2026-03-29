@@ -25,7 +25,7 @@ Real-world usage patterns for different project types and CI/CD setups.
 |---------|-------|-------|
 | [linters](linters/) | Code quality gates | ruff, pylint, flake8, mypy, interrogate |
 | [security](security/) | Security scanning | bandit, pip-audit, trufflehog, sbom |
-| [llm_fix](llm_fix/) | AI auto-fixing | LLM integration |
+| [llm_fix](llm_fix/) | AI auto-fixing | Docker-backed llx MCP integration |
 | [llx](llx/) | Intelligent LLM routing | LLX model selection, preLLM |
 | [custom_gates](custom_gates/) | Custom metrics | Composite gates, custom collectors |
 

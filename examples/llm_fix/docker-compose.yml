@@ -1,0 +1,23 @@
+services:
+  llx-mcp:
+    build:
+      context: ../../..
+      dockerfile: pyqual/examples/llm_fix/Dockerfile
+    container_name: pyqual-llx-mcp
+    ports:
+      - "8000:8000"
+    environment:
+      PYQUAL_LLX_MCP_HOST: 0.0.0.0
+      PYQUAL_LLX_MCP_PORT: 8000
+      PYQUAL_LLX_PROJECT_PATH: /workspace/project
+      # Optional: if your aider tool should run against a local Ollama instance.
+      # OLLAMA_BASE_URL: http://host.docker.internal:11434
+    volumes:
+      - ${PROJECT_PATH:?set PROJECT_PATH to your project root}:/workspace/project
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5

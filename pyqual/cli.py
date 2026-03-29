@@ -317,6 +317,7 @@ def plugin(
 def doctor():
     """Check availability of external tools used by pyqual collectors."""
     tools = [
+        ("docker", "Container runtime for the llx MCP service", "Install Docker Engine"),
         ("bandit", "Security scanner", "pip install bandit"),
         ("pip-audit", "Dependency vulnerability scanner", "pip install pip-audit"),
         ("trufflehog", "Secret scanner", "brew install trufflehog"),
@@ -331,6 +332,7 @@ def doctor():
         ("pytest", "Test runner", "pip install pytest"),
         ("code2llm", "Code analysis", "pip install code2llm"),
         ("vallm", "LLM validation", "pip install vallm"),
+        ("uvicorn", "ASGI server for the llx MCP service", "pip install pyqual[mcp]"),
     ]
 
     table = Table(title="Tool Availability Check")

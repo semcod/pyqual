@@ -38,6 +38,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.19] - 2026-03-29
+
+### Docs
+- Update README.md
+- Update examples/README.md
+- Update examples/llm_fix/README.md
+- Update project/README.md
+- Update project/context.md
+
+### Test
+- Update tests/test_llx_mcp.py
+
+### Other
+- Update examples/llm_fix/Dockerfile
+- Update examples/llm_fix/docker-compose.yml
+- Update examples/llm_fix/pyqual.yaml
+- Update project/analysis.toon.yaml
+- Update project/calls.mmd
+- Update project/calls.png
+- Update project/compact_flow.mmd
+- Update project/compact_flow.png
+- Update project/evolution.toon.yaml
+- Update project/flow.mmd
+- ... and 11 more files
+
 ## [0.1.18] - 2026-03-29
 
 ### Docs

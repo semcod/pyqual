@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyqual"
-version = "0.1.18"
+version = "0.1.19"
 description = "Declarative quality gate loops for AI-assisted development"
 readme = "README.md"
 license = "Apache-2.0"
@@ -28,13 +28,14 @@ dependencies = [
 [project.optional-dependencies]
 analysis = ["code2llm", "vallm", "redup"]
 costs = ["costs"]
-all = ["code2llm", "vallm", "redup", "costs"]
+mcp = ["mcp>=1.0", "uvicorn>=0.29"]
+all = ["code2llm", "vallm", "redup", "costs", "mcp>=1.0", "uvicorn>=0.29"]
 
 [project.scripts]
 pyqual = "pyqual.cli:app"
 
 [tool.setuptools]
-packages = ["pyqual"]
+packages = ["pyqual", "pyqual.integrations"]
 
 [tool.costs]
 model = "openrouter/qwen/qwen3-coder-next"

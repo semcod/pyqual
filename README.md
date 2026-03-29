@@ -2,7 +2,7 @@
 
 ## AI Cost Tracking
 
-![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.18-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.19-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
 ![AI Cost](https://img.shields.io/badge/AI%20Cost-$1.05-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-5.0h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
 
 - 🤖 **LLM usage:** $1.0500 (7 commits)
@@ -155,6 +155,18 @@ print(response.content)
 print(f"Cost: ${response.cost:.4f}")
 ```
 
+## Docker-backed MCP fixer
+
+If you want pyqual to delegate automatic fixes to a Dockerized `llx` MCP service:
+
+```bash
+docker compose -f examples/llm_fix/docker-compose.yml up --build -d
+pyqual plugin add llx-mcp-fixer
+pyqual run
+```
+
+The plugin writes results to `.pyqual/llx_mcp.json`, which is also collected by `pyqual status` and can be gated with `llx_fix_*` metrics.
+
 See [`examples/llm_fix/`](examples/llm_fix/) for complete examples.
 
 ## Metric sources
@@ -177,6 +189,7 @@ pyqual automatically collects metrics from:
 | | `.pyqual/git_metrics.json` | `git_branch_age`, `todo_count` |
 | **LLM/AI** | `.pyqual/humaneval.json` | `llm_pass_rate` |
 | | `.pyqual/llm_analysis.json` | `llm_cc`, `hallucination_rate`, `prompt_bias_score`, `agent_efficiency` |
+| | `.pyqual/llx_mcp.json` | `llx_fix_success`, `llx_fix_returncode`, `llx_tool_calls`, `llx_fix_tier_rank` |
 | | `.pyqual/costs.json` | `ai_cost` |
 | **Linting** | `.pyqual/ruff.json` | `ruff_errors`, `ruff_fatal`, `ruff_warnings` |
 | | `.pyqual/pylint.json` | `pylint_errors`, `pylint_fatal`, `pylint_error`, `pylint_warnings`, `pylint_score` |

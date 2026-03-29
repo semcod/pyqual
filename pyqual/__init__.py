@@ -11,8 +11,14 @@ from pyqual.plugins import (
     get_available_plugins,
     install_plugin_config,
 )
+from pyqual.integrations.llx_mcp import (
+    LlxMcpClient,
+    LlxMcpRunResult,
+    build_fix_prompt,
+    run_llx_fix_workflow,
+)
 
-__version__ = "0.1.18"
+__version__ = "0.1.19"
 
 __all__ = [
     "PyqualConfig",
@@ -35,5 +41,9 @@ __all__ = [
     "PluginMetadata",
     "get_available_plugins",
     "install_plugin_config",
+    "LlxMcpClient",
+    "LlxMcpRunResult",
+    "build_fix_prompt",
+    "run_llx_fix_workflow",
     "__version__",
 ]

@@ -2,13 +2,30 @@ pipeline:
   name: llm-fix-example
 
   metrics:
-    # Example - adjust as needed
+    llx_fix_success_min: 1
+    llx_fix_returncode_eq: 0
+    llx_tool_calls_min: 2
 
   stages:
-    - name: lint
-      run: echo "Running linter..."
-      when: always
+    - name: analyze
+      run: code2llm ./ --format toon
+
+    - name: validate
+      run: vallm batch ./ --recursive --errors-json > .pyqual/errors.json
+
+    - name: llx_mcp_fix
+      run: python -m pyqual.integrations.llx_mcp --workdir . --issues .pyqual/errors.json --output .pyqual/llx_mcp.json
+      when: metrics_fail
+      timeout: 900
+
+    - name: test
+      run: pytest --cov --cov-report=json:.pyqual/coverage.json
 
   loop:
-    max_iterations: 1
+    max_iterations: 3
     on_fail: report
+
+  env:
+    PYQUAL_LLX_MCP_URL: http://localhost:8000/sse
+    PYQUAL_LLX_PROJECT_PATH: /workspace/project
+    PYQUAL_LLX_USE_DOCKER: "false"
