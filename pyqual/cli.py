@@ -8,9 +8,7 @@ from pathlib import Path
 
 import typer
 from rich.console import Console
-from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
 from rich.table import Table
-from rich import print as rprint
 
 from pyqual.config import PyqualConfig
 from pyqual.gates import GateSet
@@ -45,36 +43,11 @@ def run(
     config: Path = typer.Option("pyqual.yaml", "--config", "-c"),
     dry_run: bool = typer.Option(False, "--dry-run", "-n"),
     workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
-    verbose: bool = typer.Option(False, "--verbose", "-v", help="Show detailed output"),
-    progress: bool = typer.Option(True, "--progress/--no-progress", help="Show progress bar"),
 ):
     """Execute pipeline loop until quality gates pass."""
     cfg = PyqualConfig.load(config)
     pipeline = Pipeline(cfg, workdir)
-    
-    if verbose:
-        console.print(f"[bold]Pipeline:[/bold] {cfg.name}")
-        console.print(f"[bold]Max iterations:[/bold] {cfg.loop.max_iterations}")
-        console.print(f"[bold]Stages:[/bold] {len(cfg.stages)}")
-        console.print(f"[bold]Gates:[/bold] {len(cfg.gates)}")
-        console.print()
-    
-    if progress and not dry_run:
-        with Progress(
-            SpinnerColumn(),
-            TextColumn("[progress.description]{task.description}"),
-            BarColumn(),
-            TaskProgressColumn(),
-            console=console,
-        ) as progress_bar:
-            task = progress_bar.add_task("Running pipeline...", total=cfg.loop.max_iterations * len(cfg.stages))
-            result = pipeline.run(dry_run=dry_run)
-            # Update progress as stages complete (simplified - actual implementation would track per-stage)
-            for iteration in result.iterations:
-                for stage in iteration.stages:
-                    progress_bar.update(task, advance=1)
-    else:
-        result = pipeline.run(dry_run=dry_run)
+    result = pipeline.run(dry_run=dry_run)
 
     for iteration in result.iterations:
         console.rule(f"[bold]Iteration {iteration.iteration}[/bold]")
@@ -82,8 +55,6 @@ def run(
             icon = "⏭" if stage.skipped else ("✅" if stage.passed else "❌")
             label = "skipped" if stage.skipped else f"{stage.duration:.1f}s"
             console.print(f"  {icon} {stage.name} ({label})")
-            if verbose and stage.stdout:
-                console.print(f"     [dim]{stage.stdout[:500]}[/dim]")
             if not stage.passed and stage.stderr:
                 console.print(f"     [red]{stage.stderr[:200]}[/red]")
 
@@ -267,10 +238,6 @@ def doctor():
         ("pytest", "Test runner", "pip install pytest"),
         ("code2llm", "Code analysis", "pip install code2llm"),
         ("vallm", "LLM validation", "pip install vallm"),
-        ("import-linter", "Import structure checker", "pip install import-linter"),
-        ("pydocstyle", "Docstring style checker", "pip install pydocstyle"),
-        ("black", "Code formatter", "pip install black"),
-        ("isort", "Import sorter", "pip install isort"),
     ]
 
     table = Table(title="Tool Availability Check")

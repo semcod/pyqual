@@ -16,15 +16,8 @@ Real-world usage patterns for different project types and CI/CD setups.
 
 | Example | Platform | Features |
 |---------|----------|----------|
-| [github-actions](github-actions/) | GitHub Actions | PR checks, artifacts, coverage, security scanning |
+| [github-actions](github-actions/) | GitHub Actions | PR checks, artifacts, coverage |
 | [gitlab-ci](gitlab-ci/) | GitLab CI | Coverage reports, caching |
-
-### Specialized Configurations
-
-| Example | Focus | Tools |
-|---------|-------|-------|
-| [security](security/) | Security scanning | bandit, pip-audit, trufflehog |
-| [linters](linters/) | Code quality | ruff, pylint, flake8, mypy, radon |
 
 ## Quick Reference
 

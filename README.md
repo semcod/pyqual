@@ -2,7 +2,7 @@
 
 ## AI Cost Tracking
 
-![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.13-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.14-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
 ![AI Cost](https://img.shields.io/badge/AI%20Cost-$1.05-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-5.0h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
 
 - 🤖 **LLM usage:** $1.0500 (7 commits)
@@ -61,10 +61,6 @@ pyqual run:
 
 ## pyqual.yaml
 
-pyqual can be configured via `pyqual.yaml` or `[tool.pyqual]` in `pyproject.toml`:
-
-### Option 1: pyqual.yaml (recommended)
-
 ```yaml
 pipeline:
   name: quality-loop
@@ -93,33 +89,6 @@ pipeline:
     on_fail: report         # report | create_ticket | block
 ```
 
-### Option 2: pyproject.toml
-
-If `pyqual.yaml` doesn't exist, pyqual will automatically check `pyproject.toml`:
-
-```toml
-[tool.pyqual]
-name = "quality-loop"
-
-[tool.pyqual.metrics]
-cc_max = 15
-vallm_pass_min = 90
-coverage_min = 80
-
-[[tool.pyqual.stages]]
-name = "analyze"
-run = "code2llm ./ -f toon,evolution"
-
-[[tool.pyqual.stages]]
-name = "test"
-run = "pytest --cov --cov-report=json:.pyqual/coverage.json"
-when = "always"
-
-[tool.pyqual.loop]
-max_iterations = 3
-on_fail = "report"
-```
-
 ## CLI
 
 ```bash
@@ -128,8 +97,6 @@ pyqual run               # execute full loop
 pyqual run --dry-run     # preview without executing
 pyqual gates             # check gates without running stages
 pyqual status            # show current metrics
-pyqual doctor            # check tool availability
-pyqual plugin list       # list available plugins
 ```
 
 ## Python API
@@ -191,60 +158,6 @@ pyqual automatically collects metrics from:
 | `.pyqual/errors.json` | `error_count` | Count of vallm errors |
 | `.pyqual/coverage.json` | `coverage` | pytest-cov JSON report |
 
-**Security & Dependencies:**
-
-| Source | Metrics | File | Command |
-|--------|---------|------|---------|
-| pip-audit | `vuln_critical`, `vuln_high`, `vuln_medium`, `vuln_low`, `vuln_total` | `.pyqual/pip_audit.json` | `pip-audit --format=json` |
-| bandit | `bandit_high`, `bandit_medium`, `bandit_low` | `.pyqual/bandit.json` | `bandit -r . -f json` |
-| trufflehog/gitleaks | `secrets_found`, `secrets_severity` | `.pyqual/trufflehog.json` | `trufflehog filesystem . --json` |
-| pip | `outdated_deps` | `.pyqual/outdated.json` | `pip list --outdated --format=json` |
-
-**Code Quality:**
-
-| Source | Metrics | File | Command |
-|--------|---------|------|---------|
-| mypy | `mypy_errors` | `.pyqual/mypy.json` | `mypy . --show-error-codes` |
-| ruff | `ruff_errors`, `ruff_fatal`, `ruff_warnings` | `.pyqual/ruff.json` | `ruff check . --output-format=json` |
-| pylint | `pylint_errors`, `pylint_score`, `pylint_fatal`, `pylint_warning` | `.pyqual/pylint.json` | `pylint . --output-format=json` |
-| flake8 | `flake8_violations`, `flake8_errors`, `flake8_warnings`, `flake8_conventions` | `.pyqual/flake8.json` | `flake8 . --format=json` |
-| radon | `mi_avg`, `mi_min`, `cc_rank_avg` | `.pyqual/radon_mi.json` | `radon mi . -j` |
-| interrogate | `docstring_coverage`, `docstring_total`, `docstring_missing` | `.pyqual/interrogate.json` | `interrogate . -v --json` |
-| pydocstyle | `pydocstyle_violations`, `pydocstyle_D<xxx>` | `.pyqual/pydocstyle.json` | `pydocstyle . --format=json` |
-| pytest | `test_time`, `slow_tests` | `.pyqual/pytest_durations.json` | pytest with durations |
-
-**Code Formatting:**
-
-| Source | Metrics | File | Command |
-|--------|---------|------|---------|
-| black | `black_unformatted`, `black_files_changed` | `.pyqual/black.json` | `black --check --diff .` |
-| isort | `isort_unsorted`, `isort_import_changes` | `.pyqual/isort.json` | `isort --check-only --diff .` |
-
-**Import Structure:**
-
-| Source | Metrics | File | Command |
-|--------|---------|------|---------|
-| import-linter | `import_violations`, `broken_import_contracts` | `.pyqual/import_linter.json` | `lint-imports` |
-
-**SARIF Security:**
-
-| Source | Metrics | File | Tools |
-|--------|---------|------|-------|
-| SARIF | `sarif_total`, `sarif_critical`, `sarif_high`, `sarif_medium`, `sarif_low`, `sarif_<rule_id>` | `.pyqual/*.sarif` | bandit, codeql, semgrep, etc. |
-
-**Advanced Metrics:**
-
-| Category | Available Metrics |
-|----------|-------------------|
-| Performance | `bench_time`, `bench_regression`, `mem_usage`, `cpu_time` |
-| SBOM/Licensing | `sbom_compliance`, `sbom_coverage`, `vuln_supply_chain`, `license_blacklist` |
-| Code Health | `unused_count`, `pyroma_score` |
-| Git/Repo | `git_branch_age`, `todo_count`, `bus_factor`, `commit_frequency`, `contributor_diversity` |
-| LLM Quality | `llm_pass_rate`, `code_bleu`, `ai_generated_pct`, `hallucination_rate`, `faithfulness_score` |
-| AI Cost | `ai_cost` |
-| i18n | `i18n_coverage`, `i18n_missing`, `i18n_total` |
-| Accessibility | `a11y_issues`, `a11y_critical`, `a11y_score` |
-
 Custom metrics: extend `GateSet._collect_metrics()` or add your own collector.
 
 ## Gate operators
@@ -279,10 +192,6 @@ See [`examples/`](examples/) directory for real-world configurations:
 - [`python-package`](examples/python-package/) — Standard Python package (src-layout)
 - [`python-flat`](examples/python-flat/) — Simple project without src/
 - [`monorepo`](examples/monorepo/) — Multiple packages in one repository
-
-**Specialized configurations:**
-- [`security/`](examples/security/) — Security-first scanning (bandit, pip-audit, secrets)
-- [`linters/`](examples/linters/) — Comprehensive linting (ruff, pylint, flake8, mypy)
 
 **CI/CD:**
 - [`github-actions`](examples/github-actions/) — CI/CD with GitHub Actions

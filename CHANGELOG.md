@@ -31,6 +31,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.14] - 2026-03-29
+
+### Docs
+- Update README.md
+- Update examples/README.md
+
+### Test
+- Update tests/test_collectors.py
+
+### Other
+- Update examples/github-actions/quality-gates.yml
+- Update examples/linters/pyqual.linters.yaml
+- Update examples/python-package/pyproject.toml
+- Update examples/security/pyqual.security.yaml
+- Update pyqual/cli.py
+- Update pyqual/config.py
+- Update pyqual/gates.py
+
 ## [0.1.13] - 2026-03-29
 
 ### Docs

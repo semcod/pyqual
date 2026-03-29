@@ -79,24 +79,9 @@ class GateSet:
         metrics.update(self._from_toon(workdir))
         metrics.update(self._from_vallm(workdir))
         metrics.update(self._from_coverage(workdir))
-        metrics.update(self._from_safety(workdir))
-        metrics.update(self._from_bandit(workdir))
-        metrics.update(self._from_pip_outdated(workdir))
-        metrics.update(self._from_radon(workdir))
-        metrics.update(self._from_mypy(workdir))
-        metrics.update(self._from_ruff(workdir))
-        metrics.update(self._from_pylint(workdir))
-        metrics.update(self._from_flake8(workdir))
-        metrics.update(self._from_pytest_durations(workdir))
-        metrics.update(self._from_interrogate(workdir))
-        metrics.update(self._from_import_linter(workdir))
-        metrics.update(self._from_pydocstyle(workdir))
-        metrics.update(self._from_black(workdir))
-        metrics.update(self._from_isort(workdir))
-        metrics.update(self._from_sarif(workdir))
-        metrics.update(self._from_secrets(workdir))
         metrics.update(self._from_benchmark(workdir))
         metrics.update(self._from_memory_profile(workdir))
+        metrics.update(self._from_secrets(workdir))
         metrics.update(self._from_vulnerabilities(workdir))
         metrics.update(self._from_sbom(workdir))
         metrics.update(self._from_vulture(workdir))
@@ -225,14 +210,6 @@ class GateSet:
                 data = json.loads(p.read_text())
                 if isinstance(data, list):
                     count = len(data)
-                    # Extract severity scores if available
-                    severities = {"critical": 4, "high": 3, "medium": 2, "low": 1}
-                    max_sev = 0
-                    for finding in data:
-                        sev = finding.get("severity", "").lower()
-                        max_sev = max(max_sev, severities.get(sev, 0))
-                    if max_sev > 0:
-                        result["secrets_severity"] = float(max_sev)
                 elif isinstance(data, dict):
                     count = len(data.get("findings", data.get("results", [])))
                 else:
@@ -354,6 +331,25 @@ class GateSet:
                 pass
         return result
 
+    def _from_secrets(self, workdir: Path) -> dict[str, float]:
+        """Extract secrets scan metrics from secrets.json."""
+        result: dict[str, float] = {}
+        sec_path = workdir / ".pyqual" / "secrets.json"
+        if sec_path.exists():
+            try:
+                data = json.loads(sec_path.read_text())
+                if isinstance(data, list):
+                    severities = {"critical": 4, "high": 3, "medium": 2, "low": 1}
+                    max_sev = 0
+                    for finding in data:
+                        sev = finding.get("severity", "").lower()
+                        max_sev = max(max_sev, severities.get(sev, 0))
+                    result["secrets_severity"] = float(max_sev)
+                    result["secrets_count"] = float(len(data))
+            except (json.JSONDecodeError, TypeError):
+                pass
+        return result
+
     def _from_vulnerabilities(self, workdir: Path) -> dict[str, float]:
         """Extract vulnerability metrics from vulns.json."""
         result: dict[str, float] = {}
@@ -386,10 +382,6 @@ class GateSet:
                 licensed = sum(1 for c in comps if c.get("licenses"))
                 if total > 0:
                     result["sbom_compliance"] = (licensed / total) * 100
-                    result["sbom_coverage"] = (licensed / total) * 100
-                # Supply chain vulnerabilities count
-                vuln_supply = data.get("vulnerabilities", [])
-                result["vuln_supply_chain"] = float(len(vuln_supply))
                 forbidden = sum(
                     1 for c in comps
                     for lic in (c.get("licenses", []) or [])
@@ -442,24 +434,14 @@ class GateSet:
                 todos = data.get("todo_count")
                 if todos:
                     result["todo_count"] = float(todos)
-                # Advanced repo metrics
-                bus_factor = data.get("bus_factor")
-                if bus_factor:
-                    result["bus_factor"] = float(bus_factor)
-                commit_freq = data.get("commit_frequency") or data.get("commits_per_week")
-                if commit_freq:
-                    result["commit_frequency"] = float(commit_freq)
-                contrib_div = data.get("contributor_diversity") or data.get("diversity_gini")
-                if contrib_div:
-                    result["contributor_diversity"] = float(contrib_div)
             except (json.JSONDecodeError, TypeError):
                 pass
         return result
 
     def _from_llm_quality(self, workdir: Path) -> dict[str, float]:
-        """Extract LLM code quality metrics from humaneval.json, codebleu.json, and llm_analysis.json."""
+        """Extract LLM code quality metrics from humaneval.json and llm_analysis.json."""
         result: dict[str, float] = {}
-        for fname in ["humaneval.json", "codebleu.json", "llm_analysis.json"]:
+        for fname in ["humaneval.json", "llm_analysis.json"]:
             path = workdir / ".pyqual" / fname
             if path.exists():
                 try:
@@ -468,21 +450,7 @@ class GateSet:
                         pass_at_1 = data.get("pass_at_1") or data.get("pass@1")
                         if pass_at_1:
                             result["llm_pass_rate"] = float(pass_at_1)
-                        # Extract additional human-eval metrics
-                        pass_at_k = data.get("pass_at_k") or data.get("pass@k")
-                        if pass_at_k:
-                            result["llm_pass_at_k"] = float(pass_at_k)
-                    elif fname == "codebleu.json":
-                        # CodeBLEU score for code similarity
-                        codebleu = data.get("codebleu") or data.get("score")
-                        if codebleu:
-                            result["code_bleu"] = float(codebleu)
-                        # AI-generated code percentage (musely-like detection)
-                        ai_pct = data.get("ai_generated_pct") or data.get("ai_percentage")
-                        if ai_pct:
-                            result["ai_generated_pct"] = float(ai_pct)
                     else:
-                        # llm_analysis.json
                         cc = data.get("avg_cyclomatic_complexity")
                         if cc:
                             result["llm_cc"] = float(cc)
@@ -495,14 +463,6 @@ class GateSet:
                         eff = data.get("agent_iterations") or data.get("agent_efficiency")
                         if eff:
                             result["agent_efficiency"] = float(eff)
-                        # Prompt token efficiency
-                        token_eff = data.get("prompt_token_efficiency")
-                        if token_eff:
-                            result["prompt_token_efficiency"] = float(token_eff)
-                        # Faithfulness score (cosine similarity context-response)
-                        faith = data.get("faithfulness_score") or data.get("faithfulness")
-                        if faith:
-                            result["faithfulness_score"] = float(faith)
                 except (json.JSONDecodeError, TypeError):
                     pass
         return result
@@ -519,404 +479,4 @@ class GateSet:
                     result["ai_cost"] = float(cost)
             except (json.JSONDecodeError, TypeError):
                 pass
-        return result
-
-    def _from_i18n(self, workdir: Path) -> dict[str, float]:
-        """Extract internationalization coverage from i18n.json."""
-        result: dict[str, float] = {}
-        i18n_path = workdir / ".pyqual" / "i18n.json"
-        if i18n_path.exists():
-            try:
-                data = json.loads(i18n_path.read_text())
-                coverage = data.get("coverage") or data.get("i18n_coverage")
-                if coverage:
-                    result["i18n_coverage"] = float(coverage)
-                missing = data.get("missing_keys") or data.get("untranslated")
-                if missing:
-                    result["i18n_missing"] = float(missing)
-                total = data.get("total_strings")
-                if total:
-                    result["i18n_total"] = float(total)
-            except (json.JSONDecodeError, TypeError):
-                pass
-        return result
-
-    def _from_a11y(self, workdir: Path) -> dict[str, float]:
-        """Extract accessibility metrics from a11y.json."""
-        result: dict[str, float] = {}
-        a11y_path = workdir / ".pyqual" / "a11y.json"
-        if a11y_path.exists():
-            try:
-                data = json.loads(a11y_path.read_text())
-                # Count violations by severity
-                violations = data.get("violations", [])
-                result["a11y_issues"] = float(len(violations))
-                critical = sum(1 for v in violations if v.get("impact") == "critical")
-                serious = sum(1 for v in violations if v.get("impact") == "serious")
-                moderate = sum(1 for v in violations if v.get("impact") == "moderate")
-                minor = sum(1 for v in violations if v.get("impact") == "minor")
-                result["a11y_critical"] = float(critical)
-                result["a11y_serious"] = float(serious)
-                result["a11y_moderate"] = float(moderate)
-                result["a11y_minor"] = float(minor)
-                # Overall accessibility score if available
-                score = data.get("score") or data.get("accessibility_score")
-                if score:
-                    result["a11y_score"] = float(score)
-            except (json.JSONDecodeError, TypeError):
-                pass
-        return result
-
-    def _from_hallucination(self, workdir: Path) -> dict[str, float]:
-        """Extract hallucination detection metrics from hall.json."""
-        result: dict[str, float] = {}
-        hall_path = workdir / ".pyqual" / "hall.json"
-        if hall_path.exists():
-            try:
-                data = json.loads(hall_path.read_text())
-                # Faithfulness score (cosine similarity)
-                faith = data.get("faithfulness") or data.get("faithfulness_score")
-                if faith:
-                    result["faithfulness_score"] = float(faith)
-                # Cosine similarity directly
-                cos_sim = data.get("cosine_similarity") or data.get("similarity")
-                if cos_sim:
-                    result["context_response_sim"] = float(cos_sim)
-                # Hallucination rate (percentage of hallucinated content)
-                hall_rate = data.get("hallucination_rate") or data.get("hallucination_pct")
-                if hall_rate:
-                    result["hallucination_rate"] = float(hall_rate)
-                # Token efficiency metrics
-                token_eff = data.get("token_efficiency") or data.get("prompt_token_efficiency")
-                if token_eff:
-                    result["prompt_token_efficiency"] = float(token_eff)
-                # Context precision/recall for RAG evaluation
-                ctx_precision = data.get("context_precision")
-                if ctx_precision:
-                    result["context_precision"] = float(ctx_precision)
-                ctx_recall = data.get("context_recall")
-                if ctx_recall:
-                    result["context_recall"] = float(ctx_recall)
-            except (json.JSONDecodeError, TypeError):
-                pass
-        return result
-
-    def _from_repo_advanced(self, workdir: Path) -> dict[str, float]:
-        """Extract advanced repository metrics from repo_health.json or grimoirelab output."""
-        result: dict[str, float] = {}
-        for fname in ["repo_health.json", "grimoirelab.json", "git_stats.json"]:
-            path = workdir / ".pyqual" / fname
-            if path.exists():
-                try:
-                    data = json.loads(path.read_text())
-                    # Bus factor - minimum number of core committers
-                    bus = data.get("bus_factor") or data.get("core_developers")
-                    if bus:
-                        result["bus_factor"] = float(bus)
-                    # Commit frequency (commits per week)
-                    freq = data.get("commit_frequency") or data.get("commits_per_week")
-                    if freq:
-                        result["commit_frequency"] = float(freq)
-                    # Contributor diversity (Gini index or similar)
-                    diversity = data.get("contributor_diversity") or data.get("diversity_index")
-                    if diversity:
-                        result["contributor_diversity"] = float(diversity)
-                    # Additional repo health metrics
-                    pr_merge_time = data.get("pr_merge_time_hours") or data.get("merge_time_avg")
-                    if pr_merge_time:
-                        result["pr_merge_time"] = float(pr_merge_time)
-                    issue_resolution = data.get("issue_resolution_days")
-                    if issue_resolution:
-                        result["issue_resolution_time"] = float(issue_resolution)
-                except (json.JSONDecodeError, TypeError):
-                    pass
-        return result
-
-    def _from_ruff(self, workdir: Path) -> dict[str, float]:
-        """Extract ruff linter error counts from JSON output."""
-        result: dict[str, float] = {}
-        p = workdir / ".pyqual" / "ruff.json"
-        if p.exists():
-            try:
-                data = json.loads(p.read_text())
-                if isinstance(data, list):
-                    errors = len(data)
-                    fatal = sum(1 for e in data if e.get("severity") == "fatal" or str(e.get("code", "")).startswith("E"))
-                    warning = sum(1 for e in data if e.get("severity") == "warning" or str(e.get("code", "")).startswith("W"))
-                    result["ruff_errors"] = float(errors)
-                    result["ruff_fatal"] = float(fatal)
-                    result["ruff_warnings"] = float(warning)
-                elif isinstance(data, dict):
-                    errors = len(data.get("violations", data.get("messages", [])))
-                    result["ruff_errors"] = float(errors)
-            except (json.JSONDecodeError, TypeError):
-                pass
-        return result
-
-    def _from_pylint(self, workdir: Path) -> dict[str, float]:
-        """Extract pylint score and error counts from JSON output."""
-        result: dict[str, float] = {}
-        p = workdir / ".pyqual" / "pylint.json"
-        if p.exists():
-            try:
-                data = json.loads(p.read_text())
-                if isinstance(data, list):
-                    errors = len(data)
-                    fatal = sum(1 for m in data if m.get("type") == "fatal" or str(m.get("symbol", "")).startswith("F"))
-                    error = sum(1 for m in data if m.get("type") == "error" or str(m.get("symbol", "")).startswith("E"))
-                    warning = sum(1 for m in data if m.get("type") == "warning" or str(m.get("symbol", "")).startswith("W"))
-                    result["pylint_errors"] = float(errors)
-                    result["pylint_fatal"] = float(fatal)
-                    result["pylint_error"] = float(error)
-                    result["pylint_warnings"] = float(warning)
-                elif isinstance(data, dict):
-                    score = data.get("score") or data.get("rating")
-                    if score:
-                        result["pylint_score"] = float(score)
-                    messages = data.get("messages", [])
-                    result["pylint_errors"] = float(len(messages))
-            except (json.JSONDecodeError, TypeError):
-                pass
-        return result
-
-    def _from_flake8(self, workdir: Path) -> dict[str, float]:
-        """Extract flake8 violation count from JSON output."""
-        result: dict[str, float] = {}
-        p = workdir / ".pyqual" / "flake8.json"
-        if p.exists():
-            try:
-                data = json.loads(p.read_text())
-                if isinstance(data, list):
-                    violations = len(data)
-                    errors = sum(1 for v in data if str(v.get("code", "")).startswith(("E", "F")))
-                    warnings = sum(1 for v in data if str(v.get("code", "")).startswith(("W",)))
-                    conventions = sum(1 for v in data if str(v.get("code", "")).startswith(("C", "N")))
-                    result["flake8_violations"] = float(violations)
-                    result["flake8_errors"] = float(errors)
-                    result["flake8_warnings"] = float(warnings)
-                    result["flake8_conventions"] = float(conventions)
-                elif isinstance(data, dict):
-                    violations = data.get("violations", data.get("messages", []))
-                    result["flake8_violations"] = float(len(violations))
-            except (json.JSONDecodeError, TypeError):
-                pass
-        return result
-
-    def _from_interrogate(self, workdir: Path) -> dict[str, float]:
-        """Extract docstring coverage from interrogate JSON output."""
-        result: dict[str, float] = {}
-        p = workdir / ".pyqual" / "interrogate.json"
-        if p.exists():
-            try:
-                data = json.loads(p.read_text())
-                coverage = data.get("coverage") or data.get("percent_covered")
-                if coverage:
-                    result["docstring_coverage"] = float(coverage)
-                total = data.get("total") or data.get("total_objects")
-                documented = data.get("documented") or data.get("documented_objects")
-                if total and documented is not None:
-                    result["docstring_total"] = float(total)
-                    result["docstring_missing"] = float(total - documented)
-            except (json.JSONDecodeError, TypeError):
-                pass
-        return result
-
-    def _from_import_linter(self, workdir: Path) -> dict[str, float]:
-        """Extract import contract violations from import-linter JSON output."""
-        result: dict[str, float] = {}
-        p = workdir / ".pyqual" / "import_linter.json"
-        if p.exists():
-            try:
-                data = json.loads(p.read_text())
-                # Check if it's a newer JSON format with 'contracts' key
-                contracts = data.get("contracts", data.get("results", []))
-                if isinstance(contracts, list):
-                    violations = 0
-                    broken_contracts = 0
-                    for contract in contracts:
-                        if not contract.get("kept", contract.get("passed", True)):
-                            broken_contracts += 1
-                            violations += len(contract.get("violations", contract.get("errors", [])))
-                    result["import_violations"] = float(violations)
-                    result["broken_import_contracts"] = float(broken_contracts)
-                elif isinstance(data, dict):
-                    # Alternative format: direct violation count
-                    violations = data.get("violation_count") or data.get("violations")
-                    if violations is not None:
-                        result["import_violations"] = float(violations)
-            except (json.JSONDecodeError, TypeError):
-                pass
-        return result
-
-    def _from_pydocstyle(self, workdir: Path) -> dict[str, float]:
-        """Extract docstring style violations from pydocstyle JSON output."""
-        result: dict[str, float] = {}
-        p = workdir / ".pyqual" / "pydocstyle.json"
-        if p.exists():
-            try:
-                data = json.loads(p.read_text())
-                if isinstance(data, list):
-                    # Count violations by error code
-                    violations = len(data)
-                    errors_by_type: dict[str, int] = {}
-                    for v in data:
-                        code = v.get("code", "DXXX")
-                        errors_by_type[code] = errors_by_type.get(code, 0) + 1
-                    result["pydocstyle_violations"] = float(violations)
-                    # Add specific counts for common error types
-                    for code, count in errors_by_type.items():
-                        result[f"pydocstyle_{code.lower()}"] = float(count)
-                elif isinstance(data, dict):
-                    violations = len(data.get("violations", data.get("errors", [])))
-                    result["pydocstyle_violations"] = float(violations)
-            except (json.JSONDecodeError, TypeError):
-                pass
-        return result
-
-    def _from_black(self, workdir: Path) -> dict[str, float]:
-        """Extract code formatting violations from black check output."""
-        result: dict[str, float] = {}
-        p = workdir / ".pyqual" / "black.json"
-        if p.exists():
-            try:
-                data = json.loads(p.read_text())
-                if isinstance(data, list):
-                    # Files that would be reformatted
-                    unformatted = len(data)
-                    result["black_unformatted"] = float(unformatted)
-                elif isinstance(data, dict):
-                    unformatted = data.get("unformatted_count", data.get("needs_formatting", 0))
-                    if unformatted:
-                        result["black_unformatted"] = float(unformatted)
-                    # Check for black diff output stats
-                    changed = data.get("files_changed") or data.get("changed_files")
-                    if changed:
-                        result["black_files_changed"] = float(changed)
-                    lines_changed = data.get("lines_changed")
-                    if lines_changed:
-                        result["black_lines_changed"] = float(lines_changed)
-            except (json.JSONDecodeError, TypeError):
-                pass
-        return result
-
-    def _from_isort(self, workdir: Path) -> dict[str, float]:
-        """Extract import sorting violations from isort check output."""
-        result: dict[str, float] = {}
-        p = workdir / ".pyqual" / "isort.json"
-        if p.exists():
-            try:
-                data = json.loads(p.read_text())
-                if isinstance(data, list):
-                    # List of files with import sorting issues
-                    unsorted = len(data)
-                    result["isort_unsorted"] = float(unsorted)
-                    # Count total import changes
-                    import_changes = 0
-                    for item in data:
-                        if isinstance(item, dict):
-                            import_changes += item.get("import_changes", item.get("changes", 0))
-                    if import_changes:
-                        result["isort_import_changes"] = float(import_changes)
-                elif isinstance(data, dict):
-                    unsorted = data.get("unsorted_count", data.get("unorganized", 0))
-                    if unsorted:
-                        result["isort_unsorted"] = float(unsorted)
-                    files = data.get("files_count") or data.get("affected_files")
-                    if files:
-                        result["isort_files"] = float(files)
-            except (json.JSONDecodeError, TypeError):
-                pass
-        return result
-
-    def _from_sarif(self, workdir: Path) -> dict[str, float]:
-        """Extract security metrics from SARIF format output (bandit, codeql, semgrep, etc.)."""
-        result: dict[str, float] = {}
-        sarif_files = [
-            "bandit.sarif",
-            "codeql.sarif",
-            "semgrep.sarif",
-            "security.sarif",
-            "findings.sarif",
-        ]
-        
-        total_findings = 0
-        severity_counts = {"critical": 0, "high": 0, "medium": 0, "low": 0, "error": 0, "warning": 0, "note": 0}
-        rule_violations: dict[str, int] = {}
-        
-        for fname in sarif_files:
-            p = workdir / ".pyqual" / fname
-            if not p.exists():
-                continue
-            try:
-                data = json.loads(p.read_text())
-                # SARIF format structure
-                runs = data.get("runs", [])
-                for run in runs:
-                    results = run.get("results", [])
-                    total_findings += len(results)
-                    
-                    # Get rules for mapping ruleIds to severity
-                    rules = {}
-                    tool = run.get("tool", {})
-                    driver = tool.get("driver", {})
-                    rule_list = driver.get("rules", [])
-                    for rule in rule_list:
-                        rule_id = rule.get("id", "")
-                        default_config = rule.get("defaultConfiguration", {})
-                        level = default_config.get("level", "warning")
-                        rules[rule_id] = level
-                    
-                    # Process each finding
-                    for finding in results:
-                        level = finding.get("level", "")
-                        rule_id = finding.get("ruleId", "unknown")
-                        
-                        # Map SARIF level to severity
-                        if level == "error":
-                            severity_counts["error"] += 1
-                        elif level == "warning":
-                            severity_counts["warning"] += 1
-                        elif level == "note":
-                            severity_counts["note"] += 1
-                        else:
-                            # Try to get from rule configuration
-                            level_from_rule = rules.get(rule_id, "warning")
-                            if level_from_rule == "error":
-                                severity_counts["error"] += 1
-                            elif level_from_rule == "warning":
-                                severity_counts["warning"] += 1
-                            elif level_from_rule == "note":
-                                severity_counts["note"] += 1
-                        
-                        # Count rule violations
-                        rule_violations[rule_id] = rule_violations.get(rule_id, 0) + 1
-                        
-                        # Check for security severity in properties
-                        props = finding.get("properties", {})
-                        sec_severity = props.get("security-severity") or props.get("cvssScore")
-                        if sec_severity:
-                            score = float(sec_severity)
-                            if score >= 9.0:
-                                severity_counts["critical"] += 1
-                            elif score >= 7.0:
-                                severity_counts["high"] += 1
-                            elif score >= 4.0:
-                                severity_counts["medium"] += 1
-                            else:
-                                severity_counts["low"] += 1
-            except (json.JSONDecodeError, TypeError, KeyError):
-                pass
-        
-        if total_findings > 0:
-            result["sarif_total"] = float(total_findings)
-            result["sarif_critical"] = float(severity_counts["critical"])
-            result["sarif_high"] = float(severity_counts["high"] + severity_counts["error"])
-            result["sarif_medium"] = float(severity_counts["medium"] + severity_counts["warning"])
-            result["sarif_low"] = float(severity_counts["low"] + severity_counts["note"])
-            
-            # Add top violated rules
-            top_rules = sorted(rule_violations.items(), key=lambda x: x[1], reverse=True)[:3]
-            for rule_id, count in top_rules:
-                result[f"sarif_{rule_id}"] = float(count)
-        
         return result
