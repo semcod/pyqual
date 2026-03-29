@@ -432,6 +432,104 @@ stages:
         return result
 
 
+@PluginRegistry.register
+class LlxMcpFixCollector(MetricCollector):
+    """Dockerized llx MCP fixer workflow results."""
+
+    name = "llx-mcp-fixer"
+    metadata = PluginMetadata(
+        name="llx-mcp-fixer",
+        description="MCP-backed auto-fix workflow powered by llx and Aider in Docker",
+        version="1.0.0",
+        tags=["mcp", "docker", "llx", "llm", "fix"],
+        config_example="""
+metrics:
+  llx_fix_success_min: 1
+  llx_fix_returncode_eq: 0
+  llx_tool_calls_min: 2
+
+stages:
+  - name: llx_mcp_fix
+    run: python -m pyqual.integrations.llx_mcp --workdir . --issues .pyqual/errors.json --output .pyqual/llx_mcp.json
+    when: metrics_fail
+    timeout: 900
+
+env:
+  PYQUAL_LLX_MCP_URL: http://localhost:8000/sse
+  PYQUAL_LLX_USE_DOCKER: "false"
+""".strip(),
+    )
+
+    @staticmethod
+    def _tier_rank(tier: str | None) -> float | None:
+        if not tier:
+            return None
+        ranks = {"free": 1.0, "cheap": 2.0, "balanced": 3.0, "premium": 4.0}
+        return ranks.get(tier.lower())
+
+    def get_config_example(self) -> str:
+        """Return a ready-to-use YAML snippet for the llx MCP fixer pipeline."""
+        return self.metadata.config_example
+
+    def collect(self, workdir: Path) -> dict[str, float]:
+        result: dict[str, float] = {}
+        fix_path = workdir / ".pyqual" / "llx_mcp.json"
+        if not fix_path.exists():
+            return result
+
+        try:
+            data = json.loads(fix_path.read_text())
+            if not isinstance(data, dict):
+                return result
+
+            success = data.get("success")
+            if success is not None:
+                result["llx_fix_success"] = 1.0 if bool(success) else 0.0
+
+            tool_calls = data.get("tool_calls")
+            if tool_calls is not None:
+                result["llx_tool_calls"] = float(tool_calls)
+
+            analysis = data.get("analysis")
+            if isinstance(analysis, dict):
+                metrics = analysis.get("metrics")
+                if isinstance(metrics, dict):
+                    total_files = metrics.get("total_files")
+                    if total_files is not None:
+                        result["llx_project_files"] = float(total_files)
+                    avg_cc = metrics.get("avg_cc")
+                    if avg_cc is not None:
+                        result["llx_avg_cc"] = float(avg_cc)
+
+                selection = analysis.get("selection")
+                if isinstance(selection, dict):
+                    tier_rank = self._tier_rank(selection.get("tier"))
+                    if tier_rank is not None:
+                        result["llx_fix_tier_rank"] = tier_rank
+
+            aider = data.get("aider")
+            if isinstance(aider, dict):
+                returncode = aider.get("returncode")
+                if returncode is not None:
+                    result["llx_fix_returncode"] = float(returncode)
+                method = aider.get("method")
+                if method == "docker":
+                    result["llx_fix_uses_docker"] = 1.0
+                elif method == "local":
+                    result["llx_fix_uses_docker"] = 0.0
+
+                stdout = aider.get("stdout")
+                if isinstance(stdout, str):
+                    result["llx_stdout_lines"] = float(len([line for line in stdout.splitlines() if line.strip()]))
+                stderr = aider.get("stderr")
+                if isinstance(stderr, str):
+                    result["llx_stderr_lines"] = float(len([line for line in stderr.splitlines() if line.strip()]))
+
+            return result
+        except (json.JSONDecodeError, TypeError):
+            return result
+
+
 def get_available_plugins() -> dict[str, PluginMetadata]:
     """Get metadata for all available built-in plugins."""
     return {

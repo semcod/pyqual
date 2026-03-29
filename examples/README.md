@@ -26,6 +26,7 @@ Real-world usage patterns for different project types and CI/CD setups.
 | [linters](linters/) | Code quality gates | ruff, pylint, flake8, mypy, interrogate |
 | [security](security/) | Security scanning | bandit, pip-audit, trufflehog, sbom |
 | [llm_fix](llm_fix/) | AI auto-fixing | LLM integration |
+| [llx](llx/) | Intelligent LLM routing | LLX model selection, preLLM |
 | [custom_gates](custom_gates/) | Custom metrics | Composite gates, custom collectors |
 
 ## Quick Reference
@@ -60,19 +61,25 @@ pipeline:
     max_iterations: 1
 ```
 
-### Multi-Iteration (Auto-Fix)
+### Multi-Iteration (Auto-Fix with LLX)
 
 ```yaml
 pipeline:
-  name: auto-fix
+  name: auto-fix-llx
   metrics:
     coverage_min: 90
+    cc_max: 15
+    vallm_pass_min: 90
   stages:
+    - name: analyze
+      run: code2llm ./ -f toon,evolution
+    - name: validate
+      run: vallm batch ./ --errors-json > .pyqual/errors.json
+    - name: fix
+      run: llx fix . --errors .pyqual/errors.json --verbose
+      when: metrics_fail
     - name: test
       run: pytest --cov
-    - name: fix
-      run: llx fix  # Your LLM fixer
-      when: metrics_fail
   loop:
     max_iterations: 3
 ```
