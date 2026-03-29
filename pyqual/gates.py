@@ -79,6 +79,16 @@ class GateSet:
         metrics.update(self._from_toon(workdir))
         metrics.update(self._from_vallm(workdir))
         metrics.update(self._from_coverage(workdir))
+        metrics.update(self._from_benchmark(workdir))
+        metrics.update(self._from_memory_profile(workdir))
+        metrics.update(self._from_secrets(workdir))
+        metrics.update(self._from_vulnerabilities(workdir))
+        metrics.update(self._from_sbom(workdir))
+        metrics.update(self._from_vulture(workdir))
+        metrics.update(self._from_pyroma(workdir))
+        metrics.update(self._from_git_health(workdir))
+        metrics.update(self._from_llm_quality(workdir))
+        metrics.update(self._from_ai_cost(workdir))
         return metrics
 
     def _from_toon(self, workdir: Path) -> dict[str, float]:

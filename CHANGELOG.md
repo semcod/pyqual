@@ -23,6 +23,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.10] - 2026-03-29
+
+### Docs
+- Update README.md
+- Update docs/index.md
+- Update docs/quickstart.md
+- Update examples/README.md
+- Update examples/basic/README.md
+- Update examples/custom_gates/README.md
+- Update examples/github-actions/README.md
+- Update examples/gitlab-ci/README.md
+- Update examples/llm_fix/README.md
+- Update examples/monorepo/README.md
+- ... and 2 more files
+
+### Other
+- Update examples/basic/check_gates.py
+- Update examples/basic/minimal.py
+- Update examples/basic/run_pipeline.py
+- Update examples/custom_gates/composite_gates.py
+- Update examples/custom_gates/custom_metric.py
+- Update examples/custom_gates/dynamic_thresholds.py
+- Update examples/llm_fix/fix_code.py
+- Update examples/llm_fix/fix_in_pipeline.py
+- Update examples/llm_fix/simple_prompt.py
+- Update pyqual/gates.py
+
 ## [0.1.9] - 2026-03-29
 
 ### Docs

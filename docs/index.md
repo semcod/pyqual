@@ -51,6 +51,12 @@ pyqual run:
 - [Configuration](configuration.md) - pyqual.yaml reference
 - [Integrations](integrations.md) - Connect with code2llm, vallm, pytest
 - [Python API](api.md) - Use pyqual programmatically
+- [Examples](../examples/) - Real-world usage patterns:
+  - [Python Package (src-layout)](../examples/python-package/)
+  - [Python Flat Layout](../examples/python-flat/)
+  - [GitHub Actions](../examples/github-actions/)
+  - [GitLab CI](../examples/gitlab-ci/)
+  - [Monorepo](../examples/monorepo/)
 
 ## Why pyqual?
 

@@ -2,7 +2,7 @@
 
 ## AI Cost Tracking
 
-![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.9-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.10-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
 ![AI Cost](https://img.shields.io/badge/AI%20Cost-$1.05-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-5.0h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
 
 - 🤖 **LLM usage:** $1.0500 (7 commits)
@@ -114,6 +114,39 @@ else:
     print("Gates not met — check result.iterations for details")
 ```
 
+## LLM Integration
+
+pyqual includes built-in LLM support via [liteLLM](https://litellm.ai/). Configure via `.env`:
+
+```bash
+OPENROUTER_API_KEY=sk-or-v1-...
+LLM_MODEL=openrouter/qwen/qwen3-coder-next
+```
+
+Use in your code:
+
+```python
+from pyqual import get_llm
+
+llm = get_llm()  # Auto-loads config from .env
+
+# Simple completion
+response = llm.complete("Explain Python decorators")
+print(response.content)
+
+# Fix code issues
+response = llm.fix_code(
+    code="def foo(x): return x + 1",  # missing type hints
+    error="Function lacks type annotations"
+)
+print(response.content)
+
+# Access cost info
+print(f"Cost: ${response.cost:.4f}")
+```
+
+See [`examples/llm_fix/`](examples/llm_fix/) for complete examples.
+
 ## Metric sources
 
 pyqual automatically collects metrics from:
@@ -150,6 +183,24 @@ pyqual is intentionally small (~800 lines). It orchestrates, not implements:
 - **planfile** manages tickets → pyqual creates tickets on gate failure
 - **costs** tracks spending → pyqual can gate on budget
 - **algitex** can import pyqual as a dependency for its `go` command
+
+## Examples
+
+See [`examples/`](examples/) directory for real-world configurations:
+
+**Project setups:**
+- [`python-package`](examples/python-package/) — Standard Python package (src-layout)
+- [`python-flat`](examples/python-flat/) — Simple project without src/
+- [`monorepo`](examples/monorepo/) — Multiple packages in one repository
+
+**CI/CD:**
+- [`github-actions`](examples/github-actions/) — CI/CD with GitHub Actions
+- [`gitlab-ci`](examples/gitlab-ci/) — CI/CD with GitLab CI
+
+**Python API usage:**
+- [`basic`](examples/basic/) — Using Pipeline and GateSet from Python
+- [`llm_fix`](examples/llm_fix/) — LLM integration for auto-fixing code
+- [`custom_gates`](examples/custom_gates/) — Custom quality gates and metrics
 
 ## Why not add this to algitex?
 

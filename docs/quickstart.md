@@ -56,3 +56,9 @@ pyqual run --dry-run
 - [Configure your quality gates](configuration.md)
 - [Set up integrations](integrations.md)
 - [Use the Python API](api.md)
+- Browse [Examples](../examples/) for your use case:
+  - [Python Package (src-layout)](../examples/python-package/) - Standard Python package structure
+  - [Python Flat Layout](../examples/python-flat/) - Simple project without src/
+  - [GitHub Actions](../examples/github-actions/) - CI/CD with GitHub
+  - [GitLab CI](../examples/gitlab-ci/) - CI/CD with GitLab
+  - [Monorepo](../examples/monorepo/) - Multiple packages in one repo
