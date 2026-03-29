@@ -5,7 +5,7 @@ This example shows how to connect `pyqual` to a Dockerized `llx` MCP service.
 ## What it does
 
 - `llx` runs as an MCP SSE service in Docker.
-- `pyqual` uses `python -m pyqual.integrations.llx_mcp` as a pipeline stage.
+- `pyqual` uses `pyqual mcp-fix` as a pipeline stage.
 - The helper first runs `llx_analyze`, then calls the `aider` MCP tool.
 - The run result is saved to `.pyqual/llx_mcp.json`, which is also visible in `pyqual status`.
 
@@ -23,7 +23,13 @@ This example shows how to connect `pyqual` to a Dockerized `llx` MCP service.
 docker compose -f examples/llm_fix/docker-compose.yml up --build -d
 ```
 
-2. Run the pipeline from your project directory:
+2. Run the fix workflow from your project directory:
+
+```bash
+pyqual mcp-fix --workdir . --project-path /workspace/project
+```
+
+Or run the full pipeline with the fix stage enabled:
 
 ```bash
 export PYQUAL_LLX_MCP_URL=http://localhost:8000/sse
@@ -43,6 +49,7 @@ pyqual status
 - Use `PYQUAL_LLX_PROJECT_PATH=/workspace/project` so the host project maps to the same path inside the MCP container.
 - Keep `PYQUAL_LLX_USE_DOCKER=false` unless you want the `aider` tool to spawn its own nested Docker container.
 - If your llx routing relies on Ollama or another backend, expose that backend to the container as well.
+- For local development, you can also start the persistent service with `pyqual mcp-service --host 0.0.0.0 --port 8000`.
 
 ## Plugin workflow
 
