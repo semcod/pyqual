@@ -1,0 +1,27 @@
+name: devloop quality gates
+on: [push, pull_request]
+
+jobs:
+  quality-loop:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with: {fetch-depth: 0}
+
+    - uses: actions/setup-python@v5
+      with: {python-version: "3.11"}
+
+    - name: Install devloop + tools
+      run: pip install devloop[all]
+
+    - name: Run quality gate loop
+      run: devloop run --config devloop.yaml
+      env:
+        LLM_MODEL: ${{ secrets.LLM_MODEL || 'openrouter/qwen/qwen3-coder-next' }}
+
+    - name: Upload metrics
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: devloop-metrics
+        path: .devloop/
