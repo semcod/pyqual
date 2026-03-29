@@ -49,6 +49,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.27] - 2026-03-29
+
+### Test
+- Update tests/test_pyqual.py
+
+### Other
+- Update .pyqual/errors.json
+- Update .pyqual/validation.json
+- Update .pyqual/validation.txt
+- Update pyqual/gates.py
+
 ## [0.1.26] - 2026-03-29
 
 ### Docs

@@ -64,6 +64,18 @@ class GateSet:
     def __init__(self, configs: list[GateConfig]):
         self.gates = [Gate(c) for c in configs]
 
+    @staticmethod
+    def _read_artifact_text(workdir: Path, filenames: list[str]) -> str | None:
+        for base in (workdir, workdir / "project"):
+            for name in filenames:
+                p = base / name
+                if p.exists():
+                    try:
+                        return p.read_text()
+                    except OSError:
+                        continue
+        return None
+
     def check_all(self, workdir: Path = Path(".")) -> list[GateResult]:
         """Collect metrics from known sources and check all gates."""
         metrics = self._collect_metrics(workdir)
@@ -111,32 +123,29 @@ class GateSet:
     def _from_toon(self, workdir: Path) -> dict[str, float]:
         """Extract CC̄ and critical count from analysis_toon.yaml or analysis.toon."""
         result: dict[str, float] = {}
-        for name in ["analysis_toon.yaml", "analysis.toon", "project_toon.yaml"]:
-            p = workdir / name
-            if not p.exists():
-                continue
-            text = p.read_text()
-            cc_match = re.search(r"CC̄[=:]?\s*([\d.]+)", text)
-            if cc_match:
-                result["cc"] = float(cc_match.group(1))
-            crit_match = re.search(r"critical[=:]?\s*(\d+)", text)
-            if crit_match:
-                result["critical"] = float(crit_match.group(1))
-            break
+        text = self._read_artifact_text(
+            workdir,
+            ["analysis.toon.yaml", "analysis_toon.yaml", "analysis.toon", "project_toon.yaml"],
+        )
+        if not text:
+            return result
+
+        cc_match = re.search(r"CC̄[=:]?\s*([\d.]+)", text)
+        if cc_match:
+            result["cc"] = float(cc_match.group(1))
+        crit_match = re.search(r"critical[=:]?\s*(\d+)", text)
+        if crit_match:
+            result["critical"] = float(crit_match.group(1))
         return result
 
     def _from_vallm(self, workdir: Path) -> dict[str, float]:
         """Extract vallm pass rate from validation_toon.yaml or errors.json."""
         result: dict[str, float] = {}
-        for name in ["validation_toon.yaml", "validation.toon"]:
-            p = workdir / name
-            if not p.exists():
-                continue
-            text = p.read_text()
+        text = self._read_artifact_text(workdir, ["validation.toon.yaml", "validation_toon.yaml", "validation.toon"])
+        if text:
             pass_match = re.search(r"passed:\s*(\d+)\s*\(([\d.]+)%\)", text)
             if pass_match:
                 result["vallm_pass"] = float(pass_match.group(2))
-            break
         errors_path = workdir / ".pyqual" / "errors.json"
         if errors_path.exists():
             try:

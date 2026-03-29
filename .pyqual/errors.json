@@ -1,0 +1,37 @@
+[
+  {
+    "file": "pyqual/cli.py",
+    "line": 0,
+    "severity": "warning",
+    "message": "Low maintainability index: 12.2 (threshold: 20)",
+    "rule": "complexity.maintainability"
+  },
+  {
+    "file": "pyqual/plugins.py",
+    "line": 0,
+    "severity": "warning",
+    "message": "Low maintainability index: 14.4 (threshold: 20)",
+    "rule": "complexity.maintainability"
+  },
+  {
+    "file": "pyqual/gates.py",
+    "line": 522,
+    "severity": "warning",
+    "message": "_from_pylint has cyclomatic complexity 16 (max: 15)",
+    "rule": "complexity.cyclomatic"
+  },
+  {
+    "file": "pyqual/gates.py",
+    "line": 0,
+    "severity": "warning",
+    "message": "Low maintainability index: 0.0 (threshold: 20)",
+    "rule": "complexity.maintainability"
+  },
+  {
+    "file": "pyqual/gates.py",
+    "line": 522,
+    "severity": "warning",
+    "message": "_from_pylint: CC=16 exceeds limit 15",
+    "rule": "complexity.lizard_cc"
+  }
+]

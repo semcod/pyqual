@@ -1,0 +1,129 @@
+{
+  "summary": {
+    "total_files": 11,
+    "passed": 11,
+    "failed": 0,
+    "success_rate": 100.0
+  },
+  "files": [
+    {
+      "path": "pyqual/config.py",
+      "language": "python",
+      "verdict": "pass",
+      "score": 1.0,
+      "issues": [],
+      "issues_count": 0
+    },
+    {
+      "path": "pyqual/cli.py",
+      "language": "python",
+      "verdict": "pass",
+      "score": 0.98,
+      "issues": [
+        {
+          "rule": "complexity.maintainability",
+          "severity": "warning",
+          "message": "Low maintainability index: 12.2 (threshold: 20)"
+        }
+      ],
+      "issues_count": 1
+    },
+    {
+      "path": "pyqual/llm.py",
+      "language": "python",
+      "verdict": "pass",
+      "score": 1.0,
+      "issues": [],
+      "issues_count": 0
+    },
+    {
+      "path": "pyqual/plugins.py",
+      "language": "python",
+      "verdict": "pass",
+      "score": 0.98,
+      "issues": [
+        {
+          "rule": "complexity.maintainability",
+          "severity": "warning",
+          "message": "Low maintainability index: 14.4 (threshold: 20)"
+        }
+      ],
+      "issues_count": 1
+    },
+    {
+      "path": "pyqual/gates.py",
+      "language": "python",
+      "verdict": "pass",
+      "score": 0.96,
+      "issues": [
+        {
+          "rule": "complexity.cyclomatic",
+          "severity": "warning",
+          "message": "_from_pylint has cyclomatic complexity 16 (max: 15)",
+          "line": 522
+        },
+        {
+          "rule": "complexity.maintainability",
+          "severity": "warning",
+          "message": "Low maintainability index: 0.0 (threshold: 20)"
+        },
+        {
+          "rule": "complexity.lizard_cc",
+          "severity": "warning",
+          "message": "_from_pylint: CC=16 exceeds limit 15",
+          "line": 522
+        }
+      ],
+      "issues_count": 3
+    },
+    {
+      "path": "pyqual/__init__.py",
+      "language": "python",
+      "verdict": "pass",
+      "score": 1.0,
+      "issues": [],
+      "issues_count": 0
+    },
+    {
+      "path": "pyqual/tickets.py",
+      "language": "python",
+      "verdict": "pass",
+      "score": 1.0,
+      "issues": [],
+      "issues_count": 0
+    },
+    {
+      "path": "pyqual/pipeline.py",
+      "language": "python",
+      "verdict": "pass",
+      "score": 1.0,
+      "issues": [],
+      "issues_count": 0
+    },
+    {
+      "path": "pyqual/integrations/llx_mcp_service.py",
+      "language": "python",
+      "verdict": "pass",
+      "score": 1.0,
+      "issues": [],
+      "issues_count": 0
+    },
+    {
+      "path": "pyqual/integrations/__init__.py",
+      "language": "python",
+      "verdict": "pass",
+      "score": 1.0,
+      "issues": [],
+      "issues_count": 0
+    },
+    {
+      "path": "pyqual/integrations/llx_mcp.py",
+      "language": "python",
+      "verdict": "pass",
+      "score": 1.0,
+      "issues": [],
+      "issues_count": 0
+    }
+  ],
+  "failed_files": []
+}
