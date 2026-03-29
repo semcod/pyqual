@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.10] - 2026-03-29
 
 ### Fixed
+- Fix string-concat issues (ticket-ca26484c)
+
+## [0.1.10] - 2026-03-29
+
+### Fixed
 - Fix unused-imports issues (ticket-6ca28800)
 - Fix ai-boilerplate issues (ticket-fb45b220)
 
@@ -43,6 +48,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix string-concat issues (ticket-fc5da382)
 
 ## [Unreleased]
+
+## [0.1.23] - 2026-03-29
+
+### Docs
+- Update CHANGELOG.md
+- Update TODO.md
+- Update docs/README.md
+- Update project/README.md
+- Update project/context.md
+
+### Test
+- Update tests/test_llx_mcp.py
+
+### Other
+- Update planfile.yaml
+- Update project/analysis.toon.yaml
+- Update project/calls.mmd
+- Update project/calls.png
+- Update project/compact_flow.mmd
+- Update project/compact_flow.png
+- Update project/duplication.toon.yaml
+- Update project/evolution.toon.yaml
+- Update project/flow.mmd
+- Update project/flow.png
+- ... and 7 more files
 
 ## [0.1.22] - 2026-03-29
 

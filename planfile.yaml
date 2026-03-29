@@ -316,3 +316,16 @@ sprints:
     model_hints:
       planning: balanced
       implementation: balanced
+  - id: ticket-ca26484c
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in pyqual/integrations/llx_mcp_service.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/integrations/llx_mcp_service.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced

@@ -115,7 +115,7 @@ def test_mcp_service_cli_shows_friendly_error(monkeypatch: pytest.MonkeyPatch) -
     assert "pyqual mcp-service requires `uvicorn`" in result.output
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_persistent_mcp_service_exposes_health_and_metrics() -> None:
     class FakeServer:
         async def run(self, _read_stream: object, _write_stream: object, _options: object) -> None:

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyqual"
-version = "0.1.22"
+version = "0.1.23"
 description = "Declarative quality gate loops for AI-assisted development"
 readme = "README.md"
 license = "Apache-2.0"
@@ -29,6 +29,7 @@ dependencies = [
 [project.optional-dependencies]
 analysis = ["code2llm", "vallm", "redup"]
 costs = ["costs"]
+dev = ["pytest>=8.0", "pytest-cov>=5.0","goal>=2.1.0", "costs>=0.1.20", "pfix>=0.1.60"]
 mcp = ["mcp>=1.0", "uvicorn>=0.29"]
 all = ["code2llm", "vallm", "redup", "costs", "mcp>=1.0", "uvicorn>=0.29"]
 

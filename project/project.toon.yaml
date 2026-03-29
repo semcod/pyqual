@@ -1,29 +1,29 @@
-# pyqual | 90 func | 8f | 2628L | python | 2026-03-29
+# pyqual | 104 func | 8f | 2975L | python | 2026-03-29
 
 HEALTH:
-  CC̄=5.7  critical=17 (limit:10)  dup=0  cycles=0
+  CC̄=5.3  critical=18 (limit:10)  dup=0  cycles=0
 
 ALERTS[20]:
   !!! cc_exceeded      plugin = 46 (limit:15)
   !!! high_fan_out     plugin = 33 (limit:10)
+  !!! cc_exceeded      LlxMcpFixCollector.collect = 26 (limit:15)
   !!! high_fan_out     GateSet._collect_metrics = 23 (limit:10)
-  !!  cc_exceeded      LlxMcpFixCollector.collect = 23 (limit:15)
+  !!! high_fan_out     create_app = 21 (limit:10)
   !!  high_fan_out     run_llx_fix_workflow = 19 (limit:10)
+  !!  high_fan_out     mcp_fix = 16 (limit:10)
   !!  high_fan_out     LlxMcpFixCollector.collect = 16 (limit:10)
   !   cc_exceeded      GateSet._from_pylint = 16 (limit:15)
   !   cc_exceeded      _issue_text = 15 (limit:15)
-  !   high_fan_out     gates = 13 (limit:10)
-  !   high_fan_out     main = 13 (limit:10)
 
 MODULES[11] (top by size):
   M[pyqual/gates.py] 588L C:3 F:29 CC↑16 D:0 (python)
-  M[pyqual/plugins.py] 553L C:11 F:19 CC↑23 D:1 (python)
-  M[pyqual/cli.py] 364L C:0 F:6 CC↑46 D:0 (python)
-  M[pyqual/integrations/llx_mcp.py] 338L C:2 F:13 CC↑15 D:0 (python)
+  M[pyqual/plugins.py] 555L C:11 F:19 CC↑26 D:1 (python)
+  M[pyqual/cli.py] 440L C:0 F:8 CC↑46 D:0 (python)
+  M[pyqual/integrations/llx_mcp.py] 338L C:2 F:13 CC↑15 D:1 (python)
+  M[pyqual/integrations/llx_mcp_service.py] 241L C:1 F:15 CC↑4 D:0 (python)
   M[pyqual/pipeline.py] 152L C:4 F:7 CC↑6 D:0 (python)
-  M[pyqual/config.py] 137L C:4 F:5 CC↑5 D:0 (python)
+  M[pyqual/config.py] 150L C:4 F:6 CC↑6 D:0 (python)
   M[pyqual/llm.py] 117L C:2 F:7 CC↑6 D:0 (python)
-  M[pyqual/integrations/llx_mcp_service.py] 82L C:0 F:4 CC↑1 D:0 (python)
   M[pyqual/__init__.py] 49L C:0 F:0 CC↑0 D:0 (python)
   M[project.sh] 24L C:0 F:0 CC↑0 D:0 (shell)
   M[pyqual/integrations/__init__.py] 1L C:0 F:0 CC↑0 D:0 (python)
@@ -32,16 +32,16 @@ MODULES[11] (top by size):
 HOTSPOTS[10]:
   ★ plugin fan=33  // Manage pyqual plugins - add, remove, search metric collectors.
   ★ GateSet._collect_metrics fan=23  // Collect metrics from .pyqual/ artifacts and .toon files.
+  ★ create_app fan=21  // Create an ASGI app that exposes the llx MCP server over SSE.
   ★ run_llx_fix_workflow fan=19  // Run the analysis + fix workflow and save a JSON report.
-  ★ LlxMcpFixCollector.collect fan=16  // Orchestrates 16 calls
-  ★ gates fan=13  // Check quality gates without running stages.
+  ★ mcp_fix fan=16  // Run the llx-backed MCP fix workflow.
 
 REFACTOR[9]:
   [1] H/L Split plugin (CC=46 → target CC<10)
-  [2] H/H Split god module pyqual/plugins.py (553L, 11 classes)
-  [3] H/H Split god module pyqual/gates.py (588L, 3 classes)
-  [4] M/L Split GateSet._from_pylint (CC=16 → target CC<10)
-  [5] M/L Split LlxMcpFixCollector.collect (CC=23 → target CC<10)
+  [2] H/L Split LlxMcpFixCollector.collect (CC=26 → target CC<10)
+  [3] H/H Split god module pyqual/plugins.py (555L, 11 classes)
+  [4] H/H Split god module pyqual/gates.py (588L, 3 classes)
+  [5] M/L Split GateSet._from_pylint (CC=16 → target CC<10)
 
 EVOLUTION:
-  2026-03-29 CC̄=5.7 crit=17 2628L // Automated analysis
+  2026-03-29 CC̄=5.3 crit=18 2975L // Automated analysis

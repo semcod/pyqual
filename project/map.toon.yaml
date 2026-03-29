@@ -1,28 +1,30 @@
-# pyqual | 11f 2405L | python:10,shell:1 | 2026-03-29
-# stats: 90 func | 0 cls | 11 mod | CC̄=5.7 | critical:4 | cycles:0
-# alerts[5]: CC plugin=46; fan-out plugin=33; fan-out GateSet._collect_metrics=23; CC LlxMcpFixCollector.collect=23; fan-out run_llx_fix_workflow=19
-# hotspots[5]: plugin fan=33; GateSet._collect_metrics fan=23; run_llx_fix_workflow fan=19; LlxMcpFixCollector.collect fan=16; gates fan=13
-# evolution: CC̄ 5.9→5.7 (improved -0.2)
+# pyqual | 11f 2655L | python:10,shell:1 | 2026-03-29
+# stats: 104 func | 0 cls | 11 mod | CC̄=5.3 | critical:4 | cycles:0
+# alerts[5]: CC plugin=46; fan-out plugin=33; CC LlxMcpFixCollector.collect=26; fan-out GateSet._collect_metrics=23; fan-out create_app=21
+# hotspots[5]: plugin fan=33; GateSet._collect_metrics fan=23; create_app fan=21; run_llx_fix_workflow fan=19; mcp_fix fan=16
+# evolution: CC̄ 5.7→5.3 (improved -0.4)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
 M[11]:
   project.sh,24
   pyqual/__init__.py,49
-  pyqual/cli.py,364
-  pyqual/config.py,137
+  pyqual/cli.py,440
+  pyqual/config.py,150
   pyqual/gates.py,588
   pyqual/integrations/__init__.py,1
   pyqual/integrations/llx_mcp.py,338
-  pyqual/integrations/llx_mcp_service.py,82
+  pyqual/integrations/llx_mcp_service.py,241
   pyqual/llm.py,117
   pyqual/pipeline.py,152
-  pyqual/plugins.py,553
+  pyqual/plugins.py,555
 D:
   pyqual/cli.py:
-    e: init,run,gates,status,plugin,doctor
+    e: init,run,gates,status,mcp_fix,mcp_service,plugin,doctor
     init(path)
     run(config;dry_run;workdir)
     gates(config;workdir)
     status(config;workdir)
+    mcp_fix(workdir;project_path;issues;output;endpoint;model;file;use_docker;docker_arg;task;json_output)
+    mcp_service(host;port)
     plugin(action;name;workdir;tag)
     doctor()
   pyqual/plugins.py:
@@ -65,23 +67,27 @@ Subclasses should ...
     get_llm_model()
     get_api_key()
     get_llm(model)
+  pyqual/config.py:
+    e: StageConfig,GateConfig,LoopConfig,PyqualConfig,_load_env_file,_normalize_env_values
+    StageConfig:  # Single pipeline stage...
+    GateConfig: from_dict(2)  # Single quality gate threshold...
+    LoopConfig:  # Loop iteration settings...
+    PyqualConfig: load(1),_parse(1),default_yaml(-1)  # Full pyqual.yaml configuration...
+    _load_env_file()
+    _normalize_env_values(env)
   pyqual/pipeline.py:
     e: StageResult,IterationResult,PipelineResult,Pipeline
     StageResult:  # Result of running a single stage...
     IterationResult:  # Result of one full pipeline iteration...
     PipelineResult:  # Result of the complete pipeline run (all iterations)...
     Pipeline: __init__(2),run(1),check_gates(0),_run_iteration(2),_should_run_stage(2),_execute_stage(2),_ensure_pyqual_dir(0)  # Execute pipeline stages in a loop until quality gates pass...
-  pyqual/config.py:
-    e: StageConfig,GateConfig,LoopConfig,PyqualConfig,_load_env_file
-    StageConfig:  # Single pipeline stage...
-    GateConfig: from_dict(2)  # Single quality gate threshold...
-    LoopConfig:  # Loop iteration settings...
-    PyqualConfig: load(1),_parse(1),default_yaml(-1)  # Full pyqual.yaml configuration...
-    _load_env_file()
   pyqual/integrations/llx_mcp_service.py:
-    e: create_app,run_server,build_parser,main
-    create_app()
-    run_server(host;port)
+    e: McpServiceState,_escape_label_value,_load_llx_server,create_app,run_server,build_parser,main
+    McpServiceState: mark_request(1),mark_session_open(0),mark_session_close(0),mark_message(1),mark_error(1),uptime_seconds(0),last_activity_seconds_ago(0),health_payload(0),metrics_text(0)  # Runtime state exposed via health and metrics endpoints...
+    _escape_label_value(value)
+    _load_llx_server()
+    create_app(state;llx_server)
+    run_server(host;port;state)
     build_parser()
     main(argv)
   pyqual/__init__.py:

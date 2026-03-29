@@ -468,6 +468,67 @@ env:
         ranks = {"free": 1.0, "cheap": 2.0, "balanced": 3.0, "premium": 4.0}
         return ranks.get(tier.lower())
 
+    @staticmethod
+    def _load_report(path: Path) -> dict[str, Any] | None:
+        try:
+            data = json.loads(path.read_text())
+        except (json.JSONDecodeError, OSError):
+            return None
+        return data if isinstance(data, dict) else None
+
+    @staticmethod
+    def _assign_float(result: dict[str, float], key: str, value: Any) -> None:
+        if value is None:
+            return
+        try:
+            result[key] = float(value)
+        except (TypeError, ValueError):
+            pass
+
+    @staticmethod
+    def _count_lines(value: Any) -> float | None:
+        if not isinstance(value, str):
+            return None
+        return float(sum(1 for line in value.splitlines() if line.strip()))
+
+    def _collect_analysis_metrics(self, result: dict[str, float], analysis: Any) -> None:
+        if not isinstance(analysis, dict):
+            return
+
+        metrics = analysis.get("metrics")
+        if isinstance(metrics, dict):
+            self._assign_float(result, "llx_project_files", metrics.get("total_files"))
+            self._assign_float(result, "llx_avg_cc", metrics.get("avg_cc"))
+
+        selection = analysis.get("selection")
+        if isinstance(selection, dict):
+            tier_rank = self._tier_rank(selection.get("tier"))
+            if tier_rank is not None:
+                result["llx_fix_tier_rank"] = tier_rank
+
+    def _collect_aider_metrics(self, result: dict[str, float], aider: Any) -> None:
+        if not isinstance(aider, dict):
+            return
+
+        returncode = aider.get("returncode")
+        if returncode is None and aider.get("success") is not None:
+            returncode = 0 if bool(aider.get("success")) else 1
+        self._assign_float(result, "llx_fix_returncode", returncode)
+
+        method = aider.get("method")
+        if method == "docker":
+            result["llx_fix_uses_docker"] = 1.0
+        elif method == "local":
+            result["llx_fix_uses_docker"] = 0.0
+
+        stdout_lines = self._count_lines(aider.get("stdout"))
+        if stdout_lines is not None:
+            result["llx_stdout_lines"] = stdout_lines
+
+        stderr_lines = self._count_lines(aider.get("stderr"))
+        if stderr_lines is not None:
+            result["llx_stderr_lines"] = stderr_lines
+
     def get_config_example(self) -> str:
         """Return a ready-to-use YAML snippet for the llx MCP fixer pipeline."""
         return self.metadata.config_example
@@ -478,59 +539,18 @@ env:
         if not fix_path.exists():
             return result
 
-        try:
-            data = json.loads(fix_path.read_text())
-            if not isinstance(data, dict):
-                return result
-
-            success = data.get("success")
-            if success is not None:
-                result["llx_fix_success"] = 1.0 if bool(success) else 0.0
-
-            tool_calls = data.get("tool_calls")
-            if tool_calls is not None:
-                result["llx_tool_calls"] = float(tool_calls)
-
-            analysis = data.get("analysis")
-            if isinstance(analysis, dict):
-                metrics = analysis.get("metrics")
-                if isinstance(metrics, dict):
-                    total_files = metrics.get("total_files")
-                    if total_files is not None:
-                        result["llx_project_files"] = float(total_files)
-                    avg_cc = metrics.get("avg_cc")
-                    if avg_cc is not None:
-                        result["llx_avg_cc"] = float(avg_cc)
-
-                selection = analysis.get("selection")
-                if isinstance(selection, dict):
-                    tier_rank = self._tier_rank(selection.get("tier"))
-                    if tier_rank is not None:
-                        result["llx_fix_tier_rank"] = tier_rank
-
-            aider = data.get("aider")
-            if isinstance(aider, dict):
-                returncode = aider.get("returncode")
-                if returncode is None and aider.get("success") is not None:
-                    returncode = 0 if bool(aider.get("success")) else 1
-                if returncode is not None:
-                    result["llx_fix_returncode"] = float(returncode)
-                method = aider.get("method")
-                if method == "docker":
-                    result["llx_fix_uses_docker"] = 1.0
-                elif method == "local":
-                    result["llx_fix_uses_docker"] = 0.0
-
-                stdout = aider.get("stdout")
-                if isinstance(stdout, str):
-                    result["llx_stdout_lines"] = float(len([line for line in stdout.splitlines() if line.strip()]))
-                stderr = aider.get("stderr")
-                if isinstance(stderr, str):
-                    result["llx_stderr_lines"] = float(len([line for line in stderr.splitlines() if line.strip()]))
-
+        data = self._load_report(fix_path)
+        if data is None:
             return result
-        except (json.JSONDecodeError, TypeError):
-            return result
+
+        success = data.get("success")
+        if success is not None:
+            result["llx_fix_success"] = 1.0 if bool(success) else 0.0
+
+        self._assign_float(result, "llx_tool_calls", data.get("tool_calls"))
+        self._collect_analysis_metrics(result, data.get("analysis"))
+        self._collect_aider_metrics(result, data.get("aider"))
+        return result
 
 
 def get_available_plugins() -> dict[str, PluginMetadata]:
