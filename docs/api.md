@@ -116,6 +116,36 @@ for iteration in result.iterations:
         print(stage.stdout)
 ```
 
+## Ticket Sync API
+
+Use the ticket sync API to programmatically sync TODO.md and GitHub tickets:
+
+```python
+from pyqual.tickets import sync_todo_tickets, sync_github_tickets, sync_all_tickets
+from pathlib import Path
+
+# Sync TODO.md through planfile
+sync_todo_tickets(
+    directory=Path("."),
+    dry_run=False,
+    direction="both"  # "from", "to", or "both"
+)
+
+# Sync GitHub issues through planfile
+sync_github_tickets(
+    directory=Path("."),
+    dry_run=False,
+    direction="both"
+)
+
+# Sync both TODO.md and GitHub
+sync_all_tickets(
+    directory=Path("."),
+    dry_run=False,
+    direction="both"
+)
+```
+
 ## API Reference
 
 ### Classes
@@ -132,3 +162,11 @@ for iteration in result.iterations:
 | `PipelineResult` | Complete pipeline result |
 | `IterationResult` | Single iteration result |
 | `StageResult` | Single stage result |
+
+### Ticket Functions
+
+| Function | Description |
+|----------|-------------|
+| `sync_todo_tickets()` | Sync TODO.md through planfile markdown backend |
+| `sync_github_tickets()` | Sync GitHub issues through planfile GitHub backend |
+| `sync_all_tickets()` | Sync both TODO.md and GitHub tickets |

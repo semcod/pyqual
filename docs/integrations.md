@@ -2,6 +2,37 @@
 
 pyqual is intentionally small (~800 lines). It orchestrates, not implements. It reads metrics from tools you already use.
 
+## planfile → Ticket Management
+
+pyqual integrates with **planfile** to manage tickets from `TODO.md` and GitHub Issues.
+
+### Commands
+
+```bash
+pyqual tickets todo      # sync TODO.md through planfile
+pyqual tickets github    # sync GitHub issues through planfile
+pyqual tickets all       # sync both TODO.md and GitHub
+```
+
+### Configuration
+
+Enable automatic ticket sync on gate failure:
+
+```yaml
+loop:
+  on_fail: create_ticket  # triggers planfile TODO sync
+```
+
+### How it works
+
+- **TODO.md**: pyqual uses planfile's markdown backend to parse and sync checklist items
+- **GitHub Issues**: pyqual uses planfile's GitHub backend to sync issues with your repository
+- **Automatic sync**: When `on_fail: create_ticket` is set, failed quality gates trigger TODO.md synchronization
+
+### Requirements
+
+planfile is included as a dependency. Ensure you have `.planfile/` directory initialized in your project root.
+
 ## code2llm → Complexity Metrics
 
 ```yaml
@@ -80,11 +111,12 @@ class MyGateSet(GateSet):
 
 ## Integration Summary
 
-| Tool | Output File | Metrics | Optional? |
-|------|-------------|---------|-----------|
+| Tool | Output File | Metrics / Feature | Optional? |
+|------|-------------|-------------------|-----------|
 | code2llm | `analysis_toon.yaml` | `cc`, `critical` | Yes |
 | vallm | `validation_toon.yaml` | `vallm_pass`, `error_count` | Yes |
 | pytest | `.pyqual/coverage.json` | `coverage` | Yes |
+| planfile | `.planfile/` | Ticket management (TODO.md, GitHub) | Yes |
 | custom | any | any | — |
 
 **All integrations are optional.** Stages can be any shell commands.

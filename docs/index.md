@@ -49,7 +49,7 @@ pyqual run:
 
 - [Quick Start](quickstart.md) - Get up and running in 5 minutes
 - [Configuration](configuration.md) - pyqual.yaml reference
-- [Integrations](integrations.md) - Connect with code2llm, vallm, pytest
+- [Integrations](integrations.md) - Connect with code2llm, vallm, planfile, pytest
 - [Python API](api.md) - Use pyqual programmatically
 - [Examples](../examples/) - Real-world usage patterns:
   - [Python Package (src-layout)](../examples/python-package/)

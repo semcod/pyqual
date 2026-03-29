@@ -54,6 +54,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.29] - 2026-03-29
+
+### Docs
+- Update docs/api.md
+- Update docs/index.md
+- Update docs/integrations.md
+- Update docs/quickstart.md
+
+### Other
+- Update .pyqual/validation.toon.yaml
+
 ## [0.1.28] - 2026-03-29
 
 ### Docs

@@ -36,6 +36,23 @@ The pipeline will:
 4. Iterate up to `max_iterations` times
 5. Report results
 
+## Ticket Management
+
+Sync tickets from TODO.md and GitHub:
+
+```bash
+pyqual tickets todo      # sync TODO.md
+pyqual tickets github    # sync GitHub issues
+pyqual tickets all       # sync both
+```
+
+Enable automatic sync on gate failures in `pyqual.yaml`:
+
+```yaml
+loop:
+  on_fail: create_ticket
+```
+
 ## Check status without running
 
 ```bash
