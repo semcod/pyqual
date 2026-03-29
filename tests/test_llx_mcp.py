@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 from pathlib import Path
 
@@ -8,9 +9,12 @@ import pytest
 from typer.testing import CliRunner
 
 import pyqual.cli as cli_module
+import pyqual.integrations.llx_mcp as llx_module
 from pyqual.cli import app
+from pyqual.integrations.llx_mcp import _load_issue_source
 from pyqual.integrations.llx_mcp import build_fix_prompt
 from pyqual.integrations.llx_mcp import LlxMcpRunResult
+from pyqual.integrations.llx_mcp import run_llx_fix_workflow
 from pyqual.integrations.llx_mcp_service import McpServiceState, create_app
 from pyqual.plugins import LlxMcpFixCollector, install_plugin_config
 
@@ -48,12 +52,122 @@ def test_llx_mcp_plugin_collects_metrics(tmp_path: Path) -> None:
     assert metrics["llx_fix_tier_rank"] == 3.0
 
 
+def test_load_issue_source_parses_todo_md(tmp_path: Path) -> None:
+    todo_path = tmp_path / "TODO.md"
+    todo_path.write_text(
+        """# TODO
+
+- [x] pyqual/cli.py:10 - Completed task should be ignored
+- [ ] pyqual/cli.py:30 - Function 'init' missing return type (suggested: -> None)
+- [ ] General follow-up for the llx workflow
+"""
+    )
+
+    issues = _load_issue_source(todo_path)
+
+    assert issues == [
+        {
+            "file": "pyqual/cli.py",
+            "line": 30,
+            "message": "Function 'init' missing return type (suggested: -> None)",
+            "severity": "todo",
+        },
+        {"message": "General follow-up for the llx workflow", "severity": "todo"},
+    ]
+
+
 def test_llx_mcp_plugin_config_example_contains_stage() -> None:
     snippet = install_plugin_config("llx-mcp-fixer")
 
     assert "pyqual mcp-fix" in snippet
     assert "PYQUAL_LLX_MCP_URL" in snippet
     assert "llx_fix_success_min" in snippet
+
+
+def test_run_llx_fix_workflow_uses_todo_md_fallback(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    todo_path = tmp_path / "TODO.md"
+    todo_path.write_text(
+        """# TODO
+
+- [ ] pyqual/cli.py:30 - Function 'init' missing return type (suggested: -> None)
+"""
+    )
+    output_path = tmp_path / ".pyqual" / "llx_mcp.json"
+    captured: dict[str, object] = {}
+
+    class FakeClient:
+        def __init__(self, endpoint_url: str | None = None):
+            self.endpoint_url = endpoint_url or "http://localhost:8000/sse"
+
+        async def analyze(self, project_path: str, toon_dir: str | None = None, task: str = "quick_fix") -> dict[str, object]:
+            return {
+                "tool": "llx_analyze",
+                "arguments": {"path": project_path, "task": task},
+                "is_error": False,
+                "text": "analysis ok",
+                "data": {
+                    "selection": {"tier": "balanced", "model_id": "demo-model"},
+                    "metrics": {"total_files": 11, "avg_cc": 4.9},
+                },
+                "raw": {"mock": True},
+            }
+
+        async def fix_with_aider(
+            self,
+            project_path: str,
+            prompt: str,
+            model: str | None = None,
+            files: list[str] | None = None,
+            use_docker: bool = False,
+            docker_args: list[str] | None = None,
+        ) -> dict[str, object]:
+            captured["prompt"] = prompt
+            captured["model"] = model
+            return {
+                "tool": "aider",
+                "arguments": {"path": project_path, "prompt": prompt},
+                "is_error": False,
+                "text": "fix ok",
+                "data": {
+                    "success": True,
+                    "returncode": 0,
+                    "method": "local",
+                    "stdout": "fixed\n",
+                    "stderr": "",
+                },
+                "raw": {"mock": True},
+            }
+
+    monkeypatch.setattr(llx_module, "LlxMcpClient", FakeClient)
+
+    result = asyncio.run(
+        run_llx_fix_workflow(
+            workdir=tmp_path,
+            project_path=str(tmp_path),
+            issues_path=Path(".pyqual/errors.json"),
+            output_path=output_path,
+            endpoint_url="http://localhost:8000/sse",
+            model=None,
+            files=[],
+            use_docker=False,
+            docker_args=[],
+            task="quick_fix",
+        )
+    )
+
+    assert result.success is True
+    assert result.issues_path == str(todo_path.resolve())
+    assert result.issues == [
+        {
+            "file": "pyqual/cli.py",
+            "line": 30,
+            "message": "Function 'init' missing return type (suggested: -> None)",
+            "severity": "todo",
+        }
+    ]
+    assert "pyqual/cli.py:30" in result.prompt
+    assert captured["model"] == "demo-model"
+    assert output_path.exists()
 
 
 def test_mcp_fix_cli_invokes_workflow(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

@@ -6,6 +6,7 @@ import argparse
 import asyncio
 import json
 import os
+import re
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, asdict
 from pathlib import Path
@@ -15,6 +16,9 @@ DEFAULT_ENDPOINT = "http://localhost:8000/sse"
 DEFAULT_ISSUES_PATH = ".pyqual/errors.json"
 DEFAULT_OUTPUT_PATH = ".pyqual/llx_mcp.json"
 DEFAULT_PROMPT_LIMIT = 10
+
+_TODO_CHECKLIST_RE = re.compile(r"^- \[(?P<state>[ xX])\]\s+(?P<body>.+)$")
+_TODO_DETAIL_RE = re.compile(r"^(?P<file>.+?):(?P<line>\d+)\s+-\s+(?P<message>.+)$")
 
 
 @dataclass
@@ -130,6 +134,9 @@ def _load_issue_source(issues_path: Path) -> dict[str, Any] | list[dict[str, Any
     if not issues_path.exists():
         return []
 
+    if issues_path.suffix.lower() in {".md", ".markdown"} or issues_path.name.lower() == "todo.md":
+        return _load_todo_markdown(issues_path)
+
     try:
         data = json.loads(issues_path.read_text())
     except (json.JSONDecodeError, OSError):
@@ -144,6 +151,37 @@ def _load_issue_source(issues_path: Path) -> dict[str, Any] | list[dict[str, Any
                 return value
         return data
     return []
+
+
+def _load_todo_markdown(issues_path: Path) -> list[dict[str, Any]]:
+    """Load unchecked TODO checklist items from prefact-generated markdown."""
+    try:
+        lines = issues_path.read_text().splitlines()
+    except OSError:
+        return []
+
+    issues: list[dict[str, Any]] = []
+    for raw_line in lines:
+        match = _TODO_CHECKLIST_RE.match(raw_line.strip())
+        if not match or match.group("state").lower() != " ":
+            continue
+
+        body = match.group("body").strip()
+        detail = _TODO_DETAIL_RE.match(body)
+        if detail:
+            issues.append(
+                {
+                    "file": detail.group("file").strip(),
+                    "line": int(detail.group("line")),
+                    "message": detail.group("message").strip(),
+                    "severity": "todo",
+                }
+            )
+            continue
+
+        issues.append({"message": body, "severity": "todo"})
+
+    return issues
 
 
 def _issue_text(issue: Any) -> str:
@@ -210,6 +248,20 @@ def build_fix_prompt(
     )
 
 
+def _resolve_issue_source(workdir: Path, issues_path: Path) -> Path:
+    """Resolve the issue source, falling back from the default JSON file to TODO.md."""
+    resolved = issues_path if issues_path.is_absolute() else (workdir / issues_path).resolve()
+    if resolved.exists():
+        return resolved
+
+    if resolved.name == Path(DEFAULT_ISSUES_PATH).name:
+        todo_path = (workdir / "TODO.md").resolve()
+        if todo_path.exists():
+            return todo_path
+
+    return resolved
+
+
 async def run_llx_fix_workflow(
     workdir: Path,
     project_path: str,
@@ -224,7 +276,8 @@ async def run_llx_fix_workflow(
 ) -> LlxMcpRunResult:
     """Run the analysis + fix workflow and save a JSON report."""
     client = LlxMcpClient(endpoint_url=endpoint_url)
-    issues = _load_issue_source(issues_path)
+    resolved_issues_path = _resolve_issue_source(workdir, issues_path)
+    issues = _load_issue_source(resolved_issues_path)
 
     try:
         analysis_response = await client.analyze(project_path, task=task)
@@ -256,7 +309,7 @@ async def run_llx_fix_workflow(
             success=success,
             endpoint=client.endpoint_url,
             project_path=project_path,
-            issues_path=str(issues_path),
+            issues_path=str(resolved_issues_path),
             prompt=prompt,
             tool_calls=2,
             analysis=analysis_data,
@@ -269,7 +322,7 @@ async def run_llx_fix_workflow(
             success=False,
             endpoint=client.endpoint_url,
             project_path=project_path,
-            issues_path=str(issues_path),
+            issues_path=str(resolved_issues_path),
             prompt="",
             tool_calls=0,
             issues=issues,
