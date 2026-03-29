@@ -3,8 +3,8 @@ requires = ["setuptools>=68.0", "setuptools-scm>=8.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "devloop"
-version = "0.1.1"
+name = "pyqual"
+version = "0.1.2"
 description = "Declarative quality gate loops for AI-assisted development"
 readme = "README.md"
 license = {text = "Apache-2.0"}
@@ -30,7 +30,7 @@ costs = ["costs"]
 all = ["code2llm", "vallm", "redup", "costs"]
 
 [project.scripts]
-devloop = "devloop.cli:app"
+pyqual = "pyqual.cli:app"
 
 [tool.costs]
 model = "openrouter/qwen/qwen3-coder-next"

@@ -1,19 +1,19 @@
-"""Tests for devloop — config, gates, pipeline."""
+"""Tests for pyqual — config, gates, pipeline."""
 
 import json
 import tempfile
 from pathlib import Path
 
-from devloop.config import DevloopConfig, GateConfig
-from devloop.gates import Gate, GateSet
-from devloop.pipeline import Pipeline
+from pyqual.config import PyqualConfig, GateConfig
+from pyqual.gates import Gate, GateSet
+from pyqual.pipeline import Pipeline
 
 
 def test_default_yaml_parses():
-    """Default devloop.yaml should parse without errors."""
+    """Default pyqual.yaml should parse without errors."""
     import yaml
-    raw = yaml.safe_load(DevloopConfig.default_yaml())
-    config = DevloopConfig._parse(raw)
+    raw = yaml.safe_load(PyqualConfig.default_yaml())
+    config = PyqualConfig._parse(raw)
     assert config.name == "quality-loop"
     assert len(config.stages) == 4
     assert len(config.gates) == 3
@@ -83,12 +83,12 @@ def test_gate_set_from_vallm():
 
 
 def test_gate_set_from_coverage():
-    """GateSet reads coverage from .devloop/coverage.json."""
+    """GateSet reads coverage from .pyqual/coverage.json."""
     with tempfile.TemporaryDirectory() as tmpdir:
         p = Path(tmpdir)
-        devloop_dir = p / ".devloop"
-        devloop_dir.mkdir()
-        (devloop_dir / "coverage.json").write_text(
+        pyqual_dir = p / ".pyqual"
+        pyqual_dir.mkdir()
+        (pyqual_dir / "coverage.json").write_text(
             json.dumps({"totals": {"percent_covered": 92.5}})
         )
         gs = GateSet([GateConfig(metric="coverage", operator="ge", threshold=80.0)])
@@ -102,11 +102,11 @@ def test_pipeline_dry_run():
     import yaml
     with tempfile.TemporaryDirectory() as tmpdir:
         p = Path(tmpdir)
-        config_path = p / "devloop.yaml"
-        config_path.write_text(DevloopConfig.default_yaml())
-        (p / ".devloop").mkdir()
+        config_path = p / "pyqual.yaml"
+        config_path.write_text(PyqualConfig.default_yaml())
+        (p / ".pyqual").mkdir()
 
-        config = DevloopConfig.load(config_path)
+        config = PyqualConfig.load(config_path)
         pipeline = Pipeline(config, workdir=p)
         result = pipeline.run(dry_run=True)
 
@@ -120,17 +120,17 @@ def test_pipeline_with_passing_gates():
     """Pipeline stops after first iteration when gates pass."""
     with tempfile.TemporaryDirectory() as tmpdir:
         p = Path(tmpdir)
-        (p / ".devloop").mkdir()
+        (p / ".pyqual").mkdir()
         # Write metrics that pass all gates
         (p / "analysis_toon.yaml").write_text("CC̄=2.0 critical=0")
         (p / "validation_toon.yaml").write_text(
             "SUMMARY:\n  scanned: 100  passed: 95 (95.0%)"
         )
-        (p / ".devloop" / "coverage.json").write_text(
+        (p / ".pyqual" / "coverage.json").write_text(
             json.dumps({"totals": {"percent_covered": 90.0}})
         )
 
-        config_yaml = p / "devloop.yaml"
+        config_yaml = p / "pyqual.yaml"
         config_yaml.write_text("""\
 pipeline:
   name: test
@@ -144,7 +144,7 @@ pipeline:
   loop:
     max_iterations: 3
 """)
-        config = DevloopConfig.load(config_yaml)
+        config = PyqualConfig.load(config_yaml)
         pipeline = Pipeline(config, workdir=p)
         result = pipeline.run()
 

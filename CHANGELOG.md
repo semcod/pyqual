@@ -7,22 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.1.1] - 2026-03-29
+## [0.1.2] - 2026-03-29
 
 ### Docs
-- Update 11-devloop.md
+- Update 11-pyqual.md
+- Update CHANGELOG.md
 - Update README.md
 
 ### Test
-- Update test_devloop.py
-- Update tests/test_devloop.py
+- Update test_pyqual.py
+- Update tests/test_pyqual.py
+
+### Other
+- Update cli.py
+- Update config.py
+- Update gates.py
+- Update pipeline.py
+- Update pyqual.yml
+
+## [0.1.1] - 2026-03-29
+
+### Docs
+- Update 11-pyqual.md
+- Update README.md
+
+### Test
+- Update test_pyqual.py
+- Update tests/test_pyqual.py
 
 ### Other
 - Update .dockerignore
 - Update .gitignore
 - Update cli.py
 - Update config.py
-- Update devloop.yml
+- Update pyqual.yml
 - Update gates.py
 - Update pipeline.py
 - Update project.sh

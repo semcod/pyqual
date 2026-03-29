@@ -1,4 +1,4 @@
-"""CLI for devloop — declarative quality gate loops."""
+"""CLI for pyqual — declarative quality gate loops."""
 
 from __future__ import annotations
 
@@ -8,9 +8,9 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from devloop.config import DevloopConfig
-from devloop.gates import GateSet
-from devloop.pipeline import Pipeline
+from pyqual.config import PyqualConfig
+from pyqual.gates import GateSet
+from pyqual.pipeline import Pipeline
 
 app = typer.Typer(help="Declarative quality gate loops for AI-assisted development.")
 console = Console()
@@ -18,27 +18,27 @@ console = Console()
 
 @app.command()
 def init(path: Path = typer.Argument(Path("."), help="Project directory")):
-    """Create devloop.yaml with sensible defaults."""
-    target = path / "devloop.yaml"
+    """Create pyqual.yaml with sensible defaults."""
+    target = path / "pyqual.yaml"
     if target.exists():
         overwrite = typer.confirm(f"{target} already exists. Overwrite?")
         if not overwrite:
             raise typer.Abort()
 
-    target.write_text(DevloopConfig.default_yaml())
-    (path / ".devloop").mkdir(exist_ok=True)
+    target.write_text(PyqualConfig.default_yaml())
+    (path / ".pyqual").mkdir(exist_ok=True)
     console.print(f"[green]Created {target}[/green]")
-    console.print("Edit metrics thresholds and stages, then run: [bold]devloop run[/bold]")
+    console.print("Edit metrics thresholds and stages, then run: [bold]pyqual run[/bold]")
 
 
 @app.command()
 def run(
-    config: Path = typer.Option("devloop.yaml", "--config", "-c"),
+    config: Path = typer.Option("pyqual.yaml", "--config", "-c"),
     dry_run: bool = typer.Option(False, "--dry-run", "-n"),
     workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
 ):
     """Execute pipeline loop until quality gates pass."""
-    cfg = DevloopConfig.load(config)
+    cfg = PyqualConfig.load(config)
     pipeline = Pipeline(cfg, workdir)
     result = pipeline.run(dry_run=dry_run)
 
@@ -70,11 +70,11 @@ def run(
 
 @app.command()
 def gates(
-    config: Path = typer.Option("devloop.yaml", "--config", "-c"),
+    config: Path = typer.Option("pyqual.yaml", "--config", "-c"),
     workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
 ):
     """Check quality gates without running stages."""
-    cfg = DevloopConfig.load(config)
+    cfg = PyqualConfig.load(config)
     gate_set = GateSet(cfg.gates)
     results = gate_set.check_all(Path(workdir))
 
@@ -102,11 +102,11 @@ def gates(
 
 @app.command()
 def status(
-    config: Path = typer.Option("devloop.yaml", "--config", "-c"),
+    config: Path = typer.Option("pyqual.yaml", "--config", "-c"),
     workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
 ):
     """Show current metrics and pipeline config."""
-    cfg = DevloopConfig.load(config)
+    cfg = PyqualConfig.load(config)
     gate_set = GateSet(cfg.gates)
     metrics = gate_set._collect_metrics(Path(workdir))
 
@@ -122,7 +122,7 @@ def status(
         for k, v in sorted(metrics.items()):
             console.print(f"  {k}: {v:.1f}")
     else:
-        console.print("[yellow]No metrics found. Run 'devloop run' first.[/yellow]")
+        console.print("[yellow]No metrics found. Run 'pyqual run' first.[/yellow]")
 
 
 if __name__ == "__main__":

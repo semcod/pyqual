@@ -8,8 +8,8 @@ import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from devloop.config import DevloopConfig, StageConfig
-from devloop.gates import GateSet, GateResult
+from pyqual.config import PyqualConfig, StageConfig
+from pyqual.gates import GateSet, GateResult
 
 
 @dataclass
@@ -52,11 +52,11 @@ class PipelineResult:
 class Pipeline:
     """Execute pipeline stages in a loop until quality gates pass."""
 
-    def __init__(self, config: DevloopConfig, workdir: str | Path = "."):
+    def __init__(self, config: PyqualConfig, workdir: str | Path = "."):
         self.config = config
         self.workdir = Path(workdir).resolve()
         self.gate_set = GateSet(config.gates)
-        self._ensure_devloop_dir()
+        self._ensure_pyqual_dir()
 
     def run(self, dry_run: bool = False) -> PipelineResult:
         """Run the full pipeline loop."""
@@ -147,6 +147,6 @@ class Pipeline:
                 duration=time.monotonic() - start,
             )
 
-    def _ensure_devloop_dir(self) -> None:
-        """Create .devloop/ working directory."""
-        (self.workdir / ".devloop").mkdir(exist_ok=True)
+    def _ensure_pyqual_dir(self) -> None:
+        """Create .pyqual/ working directory."""
+        (self.workdir / ".pyqual").mkdir(exist_ok=True)

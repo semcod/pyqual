@@ -8,4 +8,4 @@ def test_placeholder():
 
 def test_import():
     """Verify the main package can be imported."""
-    import devloop  # noqa: F401
+    import pyqual  # noqa: F401

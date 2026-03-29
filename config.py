@@ -1,4 +1,4 @@
-"""Configuration loader for devloop.yaml."""
+"""Configuration loader for pyqual.yaml."""
 
 from __future__ import annotations
 
@@ -44,8 +44,8 @@ class LoopConfig:
 
 
 @dataclass
-class DevloopConfig:
-    """Full devloop.yaml configuration."""
+class PyqualConfig:
+    """Full pyqual.yaml configuration."""
     name: str = "default"
     stages: list[StageConfig] = field(default_factory=list)
     gates: list[GateConfig] = field(default_factory=list)
@@ -53,16 +53,16 @@ class DevloopConfig:
     env: dict[str, str] = field(default_factory=dict)
 
     @classmethod
-    def load(cls, path: str | Path = "devloop.yaml") -> "DevloopConfig":
+    def load(cls, path: str | Path = "pyqual.yaml") -> "PyqualConfig":
         """Load configuration from YAML file."""
         p = Path(path)
         if not p.exists():
-            raise FileNotFoundError(f"Config not found: {p}. Run 'devloop init'.")
+            raise FileNotFoundError(f"Config not found: {p}. Run 'pyqual init'.")
         raw = yaml.safe_load(p.read_text())
         return cls._parse(raw)
 
     @classmethod
-    def _parse(cls, raw: dict[str, Any]) -> "DevloopConfig":
+    def _parse(cls, raw: dict[str, Any]) -> "PyqualConfig":
         pipeline = raw.get("pipeline", raw)
         stages = [
             StageConfig(**s) for s in pipeline.get("stages", [])
@@ -83,7 +83,7 @@ class DevloopConfig:
 
     @staticmethod
     def default_yaml() -> str:
-        """Return default devloop.yaml content."""
+        """Return default pyqual.yaml content."""
         return """\
 pipeline:
   name: quality-loop
@@ -100,14 +100,14 @@ pipeline:
       run: code2llm ./ -f toon,evolution
     
     - name: validate
-      run: vallm batch ./ --recursive --errors-json > .devloop/errors.json
+      run: vallm batch ./ --recursive --errors-json > .pyqual/errors.json
     
     - name: fix
       run: echo "LLM fix placeholder — connect llx or aider here"
       when: metrics_fail
     
     - name: test
-      run: pytest --cov --cov-report=json:.devloop/coverage.json
+      run: pytest --cov --cov-report=json:.pyqual/coverage.json
       when: always
 
   # Loop behavior

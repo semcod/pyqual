@@ -1,4 +1,4 @@
-name: devloop quality gates
+name: pyqual quality gates
 on: [push, pull_request]
 
 jobs:
@@ -11,11 +11,11 @@ jobs:
     - uses: actions/setup-python@v5
       with: {python-version: "3.11"}
 
-    - name: Install devloop + tools
-      run: pip install devloop[all]
+    - name: Install pyqual + tools
+      run: pip install pyqual[all]
 
     - name: Run quality gate loop
-      run: devloop run --config devloop.yaml
+      run: pyqual run --config pyqual.yaml
       env:
         LLM_MODEL: ${{ secrets.LLM_MODEL || 'openrouter/qwen/qwen3-coder-next' }}
 
@@ -23,5 +23,5 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: devloop-metrics
-        path: .devloop/
+        name: pyqual-metrics
+        path: .pyqual/

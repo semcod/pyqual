@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from devloop.config import GateConfig
+from pyqual.config import GateConfig
 
 
 @dataclass
@@ -74,7 +74,7 @@ class GateSet:
         return all(r.passed for r in self.check_all(workdir))
 
     def _collect_metrics(self, workdir: Path) -> dict[str, float]:
-        """Collect metrics from .devloop/ artifacts and .toon files."""
+        """Collect metrics from .pyqual/ artifacts and .toon files."""
         metrics: dict[str, float] = {}
         metrics.update(self._from_toon(workdir))
         metrics.update(self._from_vallm(workdir))
@@ -110,7 +110,7 @@ class GateSet:
             if pass_match:
                 result["vallm_pass"] = float(pass_match.group(2))
             break
-        errors_path = workdir / ".devloop" / "errors.json"
+        errors_path = workdir / ".pyqual" / "errors.json"
         if errors_path.exists():
             try:
                 errors = json.loads(errors_path.read_text())
@@ -123,7 +123,7 @@ class GateSet:
     def _from_coverage(self, workdir: Path) -> dict[str, float]:
         """Extract test coverage from coverage.json."""
         result: dict[str, float] = {}
-        cov_path = workdir / ".devloop" / "coverage.json"
+        cov_path = workdir / ".pyqual" / "coverage.json"
         if not cov_path.exists():
             cov_path = workdir / "coverage.json"
         if cov_path.exists():
