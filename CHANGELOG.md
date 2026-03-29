@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.10] - 2026-03-29
 
 ### Fixed
+- Fix unused-imports issues (ticket-c8767c75)
+
+## [0.1.10] - 2026-03-29
+
+### Fixed
 - Fix string-concat issues (ticket-ca26484c)
 
 ## [0.1.10] - 2026-03-29
@@ -48,6 +53,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix string-concat issues (ticket-fc5da382)
 
 ## [Unreleased]
+
+## [0.1.28] - 2026-03-29
+
+### Docs
+- Update CHANGELOG.md
+- Update TODO.md
+- Update docs/configuration.md
+
+### Other
+- Update .pyqual/llx_mcp.json
+- Update planfile.yaml
 
 ## [0.1.27] - 2026-03-29
 

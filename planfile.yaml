@@ -329,3 +329,16 @@ sprints:
     model_hints:
       planning: balanced
       implementation: balanced
+  - id: ticket-c8767c75
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/tickets.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/tickets.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced

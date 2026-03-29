@@ -76,8 +76,25 @@ loop:
 ```
 
 - `report` — print results, exit with error code
-- `create_ticket` — create planfile tickets for failures
+- `create_ticket` — sync TODO.md tickets via planfile when gates fail
 - `block` — exit immediately on first failure
+
+## Ticket Management Commands
+
+pyqual integrates with **planfile** to manage tickets from `TODO.md` and GitHub Issues:
+
+```bash
+pyqual tickets todo      # sync TODO.md through planfile
+pyqual tickets github    # sync GitHub issues through planfile
+pyqual tickets all       # sync both TODO.md and GitHub
+```
+
+To enable automatic ticket sync on gate failure:
+
+```yaml
+loop:
+  on_fail: create_ticket  # triggers planfile TODO sync
+```
 
 ## Environment Variables
 
