@@ -1,29 +1,29 @@
-# redup/duplication | 2 groups | 22f 5453L | 2026-03-30
+# redup/duplication | 2 groups | 23f 6034L | 2026-03-30
 
 SUMMARY:
-  files_scanned: 22
-  total_lines:   5453
+  files_scanned: 23
+  total_lines:   6034
   dup_groups:    2
   dup_fragments: 4
-  saved_lines:   23
-  scan_ms:       9712
+  saved_lines:   22
+  scan_ms:       3376
 
 DUPLICATES[2] (ranked by impact):
   [e8e1ba5d936993f1]   STRU  get_config_example  L=15 N=2 saved=15 sim=1.00
       examples/custom_plugins/performance_collector.py:0-14  (get_config_example)
       examples/custom_plugins/code_health_collector.py:0-19  (get_config_example)
-  [cade98fabc7ef6c2]   STRU  _load_env_file  L=8 N=2 saved=8 sim=1.00
-      pyqual/config.py:0-7  (_load_env_file)
+  [cade98fabc7ef6c2]   STRU  _ensure_dotenv_loaded  L=7 N=2 saved=7 sim=1.00
       pyqual/llm.py:0-6  (_ensure_dotenv_loaded)
+      pyqual/config.py:0-7  (_load_env_file)
 
 REFACTOR[2] (ranked by priority):
   [1] ○ extract_function   → examples/custom_plugins/utils/get_config_example.py
       WHY: 2 occurrences of 15-line block across 2 files — saves 15 lines
       FILES: examples/custom_plugins/code_health_collector.py, examples/custom_plugins/performance_collector.py
-  [2] ○ extract_function   → pyqual/utils/_load_env_file.py
-      WHY: 2 occurrences of 8-line block across 2 files — saves 8 lines
+  [2] ○ extract_function   → pyqual/utils/_ensure_dotenv_loaded.py
+      WHY: 2 occurrences of 7-line block across 2 files — saves 7 lines
       FILES: pyqual/config.py, pyqual/llm.py
 
 METRICS-TARGET:
   dup_groups:  2 → 0
-  saved_lines: 23 lines recoverable
+  saved_lines: 22 lines recoverable

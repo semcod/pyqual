@@ -236,6 +236,19 @@ def _run_single_project(
         state.duration = 0.0
         return
 
+    # --- Pre-flight validation (fast, local, no subprocess) ---
+    try:
+        from pyqual.validation import Severity, validate_config
+        preflight = validate_config(config_path)
+        if not preflight.ok:
+            state.status = RunStatus.ERROR
+            first_err = preflight.errors[0]
+            state.error_msg = f"[config] {first_err.code}: {first_err.message[:120]}"
+            state.duration = time.monotonic() - state.start_time
+            return
+    except Exception:
+        pass  # validation module import failed — let subprocess report the error
+
     # Parse config to get stage/iteration counts
     try:
         import yaml

@@ -311,10 +311,15 @@ def run(
     dry_run: bool = typer.Option(False, "--dry-run", "-n"),
     workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Show live pipeline log output."),
+    auto_fix_config: bool = typer.Option(False, "--auto-fix-config",
+                                         help="Auto-repair pyqual.yaml when ENV/CONFIG errors are detected."),
 ) -> None:
     """Execute pipeline loop until quality gates pass."""
     _setup_logging(verbose, workdir)
     cfg = PyqualConfig.load(config)
+
+    _workdir = Path(workdir).resolve()
+    _config_path = (_workdir / config) if not Path(config).is_absolute() else Path(config)
 
     def _on_iter_start(num: int) -> None:
         print(f"─── Iteration {num} ───", flush=True)
@@ -322,9 +327,90 @@ def run(
     def _on_stage_start(name: str) -> None:
         print(f"▶ {name}", flush=True)
 
+    def _on_stage_error(failure: Any) -> None:  # failure: StageFailure
+        from pyqual.validation import EC, ErrorDomain, validate_config
+        code = failure.error_code
+        domain = failure.domain
+
+        console.print(f"\n  [bold red]{code}[/bold red]  stage=[cyan]{failure.stage_name}[/cyan]"
+                      f"  rc={failure.returncode}")
+
+        if domain == ErrorDomain.CONFIG or domain == ErrorDomain.ENV:
+            console.print("  [yellow]→ Detected CONFIG/ENV problem — running pre-flight diagnostics…[/yellow]")
+            diag = validate_config(_config_path)
+            if diag.issues:
+                for issue in diag.issues:
+                    badge = "[red]ERR [/]" if issue.severity.value == "error" else "[yellow]WARN[/]"
+                    console.print(f"    {badge}  {issue.code}  {issue.message}")
+                    if issue.suggestion:
+                        console.print(f"         [dim]→ {issue.suggestion}[/dim]")
+                if auto_fix_config and diag.errors:
+                    console.print("\n  [yellow]--auto-fix-config: attempting LLM repair of pyqual.yaml…[/yellow]")
+                    _run_auto_fix_config(_config_path, _workdir, diag)
+            else:
+                console.print("  [dim]Pre-flight: config looks valid — problem is runtime environment.[/dim]")
+                if failure.stderr:
+                    console.print(f"  [dim]stderr: {failure.stderr[:200]}[/dim]")
+
+        elif domain == ErrorDomain.LLM:
+            console.print("  [yellow]→ LLM/fix-stage problem.[/yellow]")
+            if code == EC.LLM_API_KEY_MISSING:
+                console.print("  [red]API key missing.[/red] Set OPENROUTER_API_KEY in .env or environment.")
+            elif code == EC.LLM_NETWORK_ERROR:
+                console.print("  [red]Network error.[/red] Check connectivity to the LLM endpoint.")
+            elif code == EC.LLM_FIX_FAILED:
+                console.print("  [dim]Fix stage failed — project code may be too complex for one pass.[/dim]")
+            if failure.stderr:
+                console.print(f"  [dim]{failure.stderr[:200]}[/dim]")
+
+        elif domain == ErrorDomain.PIPELINE:
+            if code == EC.PIPELINE_TIMEOUT:
+                console.print(f"  [red]Stage timed out[/red] after {failure.duration:.0f}s."
+                              " Increase 'timeout:' in the stage config.")
+            else:
+                console.print(f"  [red]Pipeline execution error.[/red]  {failure.stderr[:200]}")
+
+        elif domain == ErrorDomain.PROJECT:
+            console.print(f"  [dim]→ Project code issue ({code}) — fix stage will handle this.[/dim]")
+
+        print("", flush=True)
+
+    def _run_auto_fix_config(cfg_path: Path, wd: Path, diag: Any) -> None:
+        from pyqual.validation import detect_project_facts
+        from pyqual.llm import LLM
+        facts = detect_project_facts(wd)
+        issues_text = "\n".join(
+            f"  [{i.severity.value.upper()}] {i.code}: {i.message}"
+            + (f" → {i.suggestion}" if i.suggestion else "")
+            for i in diag.issues
+        )
+        prompt = (
+            f"Fix this pyqual.yaml to resolve all validation errors.\n\n"
+            f"Available tools on PATH: {', '.join(facts.get('available_tools', []))}\n"
+            f"Language: {facts.get('lang', 'unknown')}\n\n"
+            f"Current config:\n{facts.get('current_config', '')}\n\n"
+            f"Issues:\n{issues_text}\n\n"
+            "Output ONLY corrected YAML, no fences, no explanation."
+        )
+        try:
+            llm = LLM()
+            resp = llm.complete(prompt, temperature=0.1, max_tokens=1200)
+            new_yaml = resp.content.strip()
+            if new_yaml.startswith("```"):
+                new_yaml = "\n".join(l for l in new_yaml.splitlines()
+                                     if not l.startswith("```")).strip()
+            backup = cfg_path.with_suffix(".yaml.bak")
+            cfg_path.rename(backup)
+            cfg_path.write_text(new_yaml)
+            console.print(f"  [green]pyqual.yaml rewritten[/green] (backup: {backup.name})")
+            console.print("  [dim]Re-run 'pyqual run' to continue with the fixed config.[/dim]")
+        except Exception as exc:
+            console.print(f"  [red]Auto-fix failed: {exc}[/red]")
+
     pipeline = Pipeline(cfg, workdir,
                         on_stage_start=_on_stage_start,
-                        on_iteration_start=_on_iter_start)
+                        on_iteration_start=_on_iter_start,
+                        on_stage_error=_on_stage_error)
     result = pipeline.run(dry_run=dry_run)
 
     for iteration in result.iterations:
@@ -514,7 +600,7 @@ Rules:
     console.print(f"[dim]Issues: {len(validation.issues)} | Lang: {facts.get('lang')} | Tools: {available_tools}[/dim]\n")
 
     try:
-        llm = LLM(model=model or facts.get("current_config", "").find("LLM_MODEL") and None)
+        llm = LLM(model=model)
         response = llm.complete(prompt, temperature=0.1, max_tokens=1500)
     except Exception as exc:
         console.print(f"[red]LLM error: {exc}[/red]")
@@ -544,8 +630,7 @@ Rules:
     if re_check.ok:
         console.print("[bold green]✅ Re-validation passed.[/bold green]")
     else:
-        remaining = [i for i in re_check.errors]
-        console.print(f"[yellow]{len(remaining)} issue(s) remain — review manually.[/yellow]")
+        console.print(f"[yellow]{len(re_check.errors)} issue(s) remain — review manually.[/yellow]")
 
 
 @app.command()

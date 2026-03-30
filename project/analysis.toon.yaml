@@ -1,29 +1,31 @@
-# code2llm | 18f 4694L | python:17,shell:1 | 2026-03-30
-# CC̄=5.9 | critical:8/152 | dups:0 | cycles:0
+# code2llm | 19f 5262L | python:18,shell:1 | 2026-03-30
+# CC̄=6.3 | critical:10/159 | dups:0 | cycles:0
 
-HEALTH[8]:
-  🟡 CC    bulk_run_cmd CC=17 (limit:15)
+HEALTH[10]:
+  🟡 CC    bulk_run_cmd CC=19 (limit:15)
   🟡 CC    logs CC=16 (limit:15)
+  🟡 CC    validate_config CC=26 (limit:15)
+  🟡 CC    detect_project_facts CC=16 (limit:15)
   🟡 CC    collect_fingerprint CC=37 (limit:15)
   🟡 CC    _classify_heuristic CC=26 (limit:15)
   🟡 CC    bulk_init CC=18 (limit:15)
-  🟡 CC    _parse_output_line CC=16 (limit:15)
-  🟡 CC    _build_project_row CC=15 (limit:15)
+  🟡 CC    _run_single_project CC=17 (limit:15)
+  🟡 CC    _build_project_row CC=19 (limit:15)
   🟡 CC    bulk_run CC=17 (limit:15)
 
 REFACTOR[1]:
-  1. split 8 high-CC methods  (CC>15)
+  1. split 10 high-CC methods  (CC>15)
 
-PIPELINES[88]:
+PIPELINES[91]:
   [1] Src [main]: main → run_project
       PURITY: 100% pure
-  [2] Src [get]: get
+  [2] Src [is_available]: is_available
       PURITY: 100% pure
-  [3] Src [list_plugins]: list_plugins
+  [3] Src [shell_command]: shell_command
       PURITY: 100% pure
-  [4] Src [create_instance]: create_instance
+  [4] Src [is_builtin]: is_builtin
       PURITY: 100% pure
-  [5] Src [from_dict]: from_dict
+  [5] Src [resolve_stage_command]: resolve_stage_command → get_preset
       PURITY: 100% pure
 
 LAYERS:
@@ -31,14 +33,15 @@ LAYERS:
   │ run_analysis                88L  0C    2m  CC=11     ←0
   │ project.sh                  24L  0C    0m  CC=0.0    ←0
   │
-  pyqual/                         CC̄=5.9    ←in:1  →out:0
-  │ !! cli                       1038L  0C   28m  CC=17     ←0
+  pyqual/                         CC̄=6.3    ←in:1  →out:0
+  │ !! cli                       1221L  0C   30m  CC=19     ←0
   │ !! bulk_init                  697L  3C    7m  CC=37     ←1
-  │ !! bulk_run                   443L  3C    6m  CC=17     ←1
+  │ !! bulk_run                   535L  3C    7m  CC=19     ←1
   │ _gate_collectors           441L  0C   21m  CC=13     ←0
   │ builtin_collectors         432L  8C   15m  CC=14     ←0
-  │ pipeline                   339L  4C   13m  CC=13     ←0
-  │ tools                      322L  1C    9m  CC=8      ←2
+  │ pipeline                   346L  4C   13m  CC=14     ←0
+  │ tools                      322L  1C    9m  CC=8      ←3
+  │ !! validation                 286L  3C    4m  CC=26     ←1
   │ config                     184L  4C    6m  CC=12     ←4
   │ plugins                    138L  3C    9m  CC=5      ←2
   │ llm                        126L  0C    0m  CC=0.0    ←0

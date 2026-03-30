@@ -72,12 +72,14 @@ class Pipeline:
     """Execute pipeline stages in a loop until quality gates pass."""
 
     def __init__(self, config: PyqualConfig, workdir: str | Path = ".",
-                 on_stage_start: Any = None, on_iteration_start: Any = None):
+                 on_stage_start: Any = None, on_iteration_start: Any = None,
+                 on_stage_error: Any = None):
         self.config = config
         self.workdir = Path(workdir).resolve()
         self.gate_set = GateSet(config.gates)
         self.on_stage_start = on_stage_start
         self.on_iteration_start = on_iteration_start
+        self.on_stage_error = on_stage_error
         self._ensure_pyqual_dir()
         self._nfo = self._init_nfo()
 
@@ -214,6 +216,10 @@ class Pipeline:
         if self.on_stage_start:
             self.on_stage_start(stage.name)
 
+        is_fix_stage = bool(stage.run and any(
+            kw in stage.run for kw in ("llx", "aider", "fix", "repair")
+        ))
+
         env = {**os.environ, **self.config.env}
         start = time.monotonic()
 
@@ -251,6 +257,20 @@ class Pipeline:
             )
 
         self._log_stage(stage, result)
+
+        if not result.passed and not result.skipped and self.on_stage_error:
+            from pyqual.validation import StageFailure
+            failure = StageFailure(
+                stage_name=stage.name,
+                returncode=result.returncode,
+                stderr=result.stderr,
+                stdout=result.stdout,
+                duration=result.duration,
+                is_fix_stage=is_fix_stage,
+                timed_out=(result.returncode == TIMEOUT_EXIT_CODE),
+            )
+            self.on_stage_error(failure)
+
         return result
 
     # ------------------------------------------------------------------
