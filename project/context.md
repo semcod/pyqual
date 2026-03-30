@@ -6,7 +6,7 @@
 - **Primary Language**: python
 - **Languages**: python: 28, shell: 2
 - **Analysis Mode**: static
-- **Total Functions**: 162
+- **Total Functions**: 179
 - **Total Classes**: 37
 - **Modules**: 30
 - **Entry Points**: 103
@@ -14,7 +14,7 @@
 ## Architecture by Module
 
 ### pyqual.cli
-- **Functions**: 31
+- **Functions**: 40
 - **File**: `cli.py`
 
 ### pyqual._gate_collectors
@@ -26,25 +26,25 @@
 - **Classes**: 8
 - **File**: `builtin_collectors.py`
 
+### pyqual.bulk_init
+- **Functions**: 15
+- **Classes**: 3
+- **File**: `bulk_init.py`
+
 ### pyqual.pipeline
 - **Functions**: 13
 - **Classes**: 4
 - **File**: `pipeline.py`
-
-### pyqual.tools
-- **Functions**: 9
-- **Classes**: 1
-- **File**: `tools.py`
 
 ### pyqual.plugins
 - **Functions**: 9
 - **Classes**: 3
 - **File**: `plugins.py`
 
-### pyqual.bulk_init
-- **Functions**: 7
-- **Classes**: 3
-- **File**: `bulk_init.py`
+### pyqual.tools
+- **Functions**: 9
+- **Classes**: 1
+- **File**: `tools.py`
 
 ### pyqual.bulk_run
 - **Functions**: 7
@@ -94,14 +94,15 @@
 - **Functions**: 2
 - **File**: `composite_gates.py`
 
+### examples.custom_plugins.performance_collector
+- **Functions**: 2
+- **Classes**: 1
+- **File**: `performance_collector.py`
+
 ### examples.custom_plugins.code_health_collector
 - **Functions**: 2
 - **Classes**: 1
 - **File**: `code_health_collector.py`
-
-### examples.multi_gate_pipeline.run_pipeline
-- **Functions**: 2
-- **File**: `run_pipeline.py`
 
 ## Key Entry Points
 
@@ -306,15 +307,15 @@ _from_ruff [pyqual._gate_collectors]
 - **Key Methods**: pyqual.builtin_collectors.LlxMcpFixCollector._tier_rank, pyqual.builtin_collectors.LlxMcpFixCollector._load_report, pyqual.builtin_collectors.LlxMcpFixCollector._assign_float, pyqual.builtin_collectors.LlxMcpFixCollector._count_lines, pyqual.builtin_collectors.LlxMcpFixCollector._collect_analysis_metrics, pyqual.builtin_collectors.LlxMcpFixCollector._collect_aider_metrics, pyqual.builtin_collectors.LlxMcpFixCollector.get_config_example, pyqual.builtin_collectors.LlxMcpFixCollector.collect
 - **Inherits**: MetricCollector
 
-### pyqual.config.PyqualConfig
-> Full pyqual.yaml configuration.
-- **Methods**: 4
-- **Key Methods**: pyqual.config.PyqualConfig.load, pyqual.config.PyqualConfig.llm_model, pyqual.config.PyqualConfig._parse, pyqual.config.PyqualConfig.default_yaml
-
 ### pyqual.plugins.PluginRegistry
 > Registry for metric collector plugins.
 - **Methods**: 4
 - **Key Methods**: pyqual.plugins.PluginRegistry.register, pyqual.plugins.PluginRegistry.get, pyqual.plugins.PluginRegistry.list_plugins, pyqual.plugins.PluginRegistry.create_instance
+
+### pyqual.config.PyqualConfig
+> Full pyqual.yaml configuration.
+- **Methods**: 4
+- **Key Methods**: pyqual.config.PyqualConfig.load, pyqual.config.PyqualConfig.llm_model, pyqual.config.PyqualConfig._parse, pyqual.config.PyqualConfig.default_yaml
 
 ### pyqual.gates.GateSet
 > Collection of quality gates with metric collection.
@@ -331,27 +332,21 @@ _from_ruff [pyqual._gate_collectors]
 - **Methods**: 3
 - **Key Methods**: pyqual.bulk_run.ProjectRunState.progress_pct, pyqual.bulk_run.ProjectRunState.elapsed, pyqual.bulk_run.ProjectRunState.gates_label
 
-### pyqual.tools.ToolPreset
-> Definition of a built-in tool invocation preset.
-- **Methods**: 2
-- **Key Methods**: pyqual.tools.ToolPreset.is_available, pyqual.tools.ToolPreset.shell_command
-
 ### pyqual.plugins.MetricCollector
 > Base class for metric collector plugins.
 - **Methods**: 2
 - **Key Methods**: pyqual.plugins.MetricCollector.collect, pyqual.plugins.MetricCollector.get_config_example
 - **Inherits**: ABC
 
+### pyqual.tools.ToolPreset
+> Definition of a built-in tool invocation preset.
+- **Methods**: 2
+- **Key Methods**: pyqual.tools.ToolPreset.is_available, pyqual.tools.ToolPreset.shell_command
+
 ### pyqual.validation.StageFailure
 > Runtime failure description from a completed stage.
 - **Methods**: 2
 - **Key Methods**: pyqual.validation.StageFailure.error_code, pyqual.validation.StageFailure.domain
-
-### examples.custom_plugins.code_health_collector.CodeHealthCollector
-> Weighted composite health score from multiple code quality signals.
-- **Methods**: 2
-- **Key Methods**: examples.custom_plugins.code_health_collector.CodeHealthCollector.collect, examples.custom_plugins.code_health_collector.CodeHealthCollector.get_config_example
-- **Inherits**: MetricCollector
 
 ### examples.custom_plugins.performance_collector.PerformanceCollector
 > Collect latency and throughput metrics from load test results.
@@ -359,15 +354,21 @@ _from_ruff [pyqual._gate_collectors]
 - **Key Methods**: examples.custom_plugins.performance_collector.PerformanceCollector.collect, examples.custom_plugins.performance_collector.PerformanceCollector.get_config_example
 - **Inherits**: MetricCollector
 
-### pyqual.config.GateConfig
-> Single quality gate threshold.
-- **Methods**: 1
-- **Key Methods**: pyqual.config.GateConfig.from_dict
+### examples.custom_plugins.code_health_collector.CodeHealthCollector
+> Weighted composite health score from multiple code quality signals.
+- **Methods**: 2
+- **Key Methods**: examples.custom_plugins.code_health_collector.CodeHealthCollector.collect, examples.custom_plugins.code_health_collector.CodeHealthCollector.get_config_example
+- **Inherits**: MetricCollector
 
 ### pyqual.plugins.PluginMetadata
 > Metadata for a pyqual plugin.
 - **Methods**: 1
 - **Key Methods**: pyqual.plugins.PluginMetadata.__post_init__
+
+### pyqual.config.GateConfig
+> Single quality gate threshold.
+- **Methods**: 1
+- **Key Methods**: pyqual.config.GateConfig.from_dict
 
 ### pyqual.gates.GateResult
 > Result of a single gate check.
@@ -454,10 +455,9 @@ Does NOT run any stages — this is a stati
 
 Functions exposed as public API (no underscore prefix):
 
-- `pyqual.cli.run` - 82 calls
+- `pyqual.cli.run` - 81 calls
 - `pyqual.bulk_init.generate_pyqual_yaml` - 77 calls
 - `pyqual.cli.bulk_run_cmd` - 56 calls
-- `pyqual.bulk_init.collect_fingerprint` - 51 calls
 - `pyqual.cli.fix_config` - 46 calls
 - `pyqual.validation.validate_config` - 45 calls
 - `pyqual.cli.logs` - 44 calls
@@ -486,6 +486,7 @@ Functions exposed as public API (no underscore prefix):
 - `pyqual.builtin_collectors.HallucinationCollector.collect` - 15 calls
 - `pyqual.pipeline.Pipeline.run` - 15 calls
 - `pyqual.cli.plugin` - 14 calls
+- `pyqual.bulk_init.collect_fingerprint` - 13 calls
 - `pyqual.builtin_collectors.RepoMetricsCollector.collect` - 12 calls
 - `examples.custom_gates.composite_gates.compute_composite_score` - 12 calls
 - `examples.ticket_workflow.sync_tickets.tickets_from_gate_failures` - 12 calls

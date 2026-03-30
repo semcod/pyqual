@@ -1,23 +1,23 @@
-# pyqual | 144 func | 15f | 8012L | python | 2026-03-30
+# pyqual | 161 func | 15f | 8077L | python | 2026-03-30
 
 HEALTH:
-  CC̄=6.8  critical=36 (limit:10)  dup=0  cycles=0
+  CC̄=6.1  critical=36 (limit:10)  dup=0  cycles=0
 
 ALERTS[20]:
-  !!! cc_exceeded      _extract_stage_summary = 48 (limit:15)
-  !!! cc_exceeded      collect_fingerprint = 37 (limit:15)
-  !!! high_fan_out     collect_fingerprint = 35 (limit:10)
-  !!! high_fan_out     run = 34 (limit:10)
+  !!! high_fan_out     run = 38 (limit:10)
   !!! cc_exceeded      validate_config = 26 (limit:15)
   !!! cc_exceeded      _classify_heuristic = 26 (limit:15)
   !!! high_fan_out     fix_config = 23 (limit:10)
   !!! high_fan_out     _run_single_project = 21 (limit:10)
   !!! high_fan_out     validate_config = 20 (limit:10)
   !!! high_fan_out     bulk_run = 20 (limit:10)
+  !!  cc_exceeded      _classify_failure = 21 (limit:15)
+  !!  cc_exceeded      Pipeline._execute_stage = 21 (limit:15)
+  !!  high_fan_out     run_project = 19 (limit:10)
 
 MODULES[19] (top by size):
-  M[pyqual/cli.py] 1426L C:0 F:31 CC↑48 D:0 (python)
-  M[pyqual/bulk_init.py] 697L C:3 F:7 CC↑37 D:1 (python)
+  M[pyqual/cli.py] 1479L C:0 F:40 CC↑19 D:0 (python)
+  M[pyqual/bulk_init.py] 713L C:3 F:15 CC↑26 D:1 (python)
   M[pyqual/bulk_run.py] 549L C:3 F:7 CC↑19 D:1 (python)
   M[pyqual/validation.py] 460L C:6 F:6 CC↑26 D:2 (python)
   M[pyqual/_gate_collectors.py] 441L C:0 F:21 CC↑13 D:0 (python)
@@ -34,8 +34,7 @@ MODULES[19] (top by size):
   LANGS: python:18/shell:1
 
 HOTSPOTS[10]:
-  ★ collect_fingerprint fan=35  // Collect a lightweight fingerprint from a project directory.
-  ★ run fan=34  // Execute pipeline loop until quality gates pass.
+  ★ run fan=38  // Execute pipeline loop until quality gates pass.
   ★ fix_config fan=23  // Use LLM to auto-repair pyqual.yaml based on project structure.
 
 Scans the projec
@@ -43,13 +42,18 @@ Scans the projec
   ★ validate_config fan=20  // Validate a pyqual.yaml file and return structured issues.
 
 Does NOT run any stag
+  ★ bulk_run fan=20  // Run pyqual across all projects with parallel execution.
+
+Parameters
+----------
+r
 
 REFACTOR[15]:
-  [1] H/L Split _extract_stage_summary (CC=48 → target CC<10)
-  [2] H/L Split validate_config (CC=26 → target CC<10)
-  [3] H/L Split collect_fingerprint (CC=37 → target CC<10)
-  [4] H/L Split _classify_heuristic (CC=26 → target CC<10)
-  [5] H/H Split god module pyqual/cli.py (1426L, 0 classes)
+  [1] H/L Split validate_config (CC=26 → target CC<10)
+  [2] H/L Split _classify_heuristic (CC=26 → target CC<10)
+  [3] H/H Split god module pyqual/bulk_init.py (713L, 3 classes)
+  [4] H/H Split god module pyqual/bulk_run.py (549L, 3 classes)
+  [5] H/H Split god module pyqual/cli.py (1479L, 0 classes)
 
 EVOLUTION:
-  2026-03-30 CC̄=6.8 crit=36 8012L // Automated analysis
+  2026-03-30 CC̄=6.1 crit=36 8077L // Automated analysis

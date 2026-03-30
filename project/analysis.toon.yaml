@@ -1,16 +1,14 @@
-# code2llm | 19f 5720L | python:18,shell:1 | 2026-03-30
-# CC̄=6.8 | critical:14/162 | dups:0 | cycles:0
+# code2llm | 19f 5789L | python:18,shell:1 | 2026-03-30
+# CC̄=6.1 | critical:12/179 | dups:0 | cycles:0
 
-HEALTH[14]:
+HEALTH[12]:
   🟡 CC    bulk_run_cmd CC=19 (limit:15)
-  🟡 CC    _extract_stage_summary CC=48 (limit:15)
-  🟡 CC    run CC=20 (limit:15)
+  🟡 CC    run CC=17 (limit:15)
   🟡 CC    logs CC=16 (limit:15)
   🟡 CC    _classify_failure CC=21 (limit:15)
   🟡 CC    validate_config CC=26 (limit:15)
   🟡 CC    detect_project_facts CC=16 (limit:15)
   🟡 CC    _execute_stage CC=21 (limit:15)
-  🟡 CC    collect_fingerprint CC=37 (limit:15)
   🟡 CC    _classify_heuristic CC=26 (limit:15)
   🟡 CC    bulk_init CC=18 (limit:15)
   🟡 CC    _run_single_project CC=19 (limit:15)
@@ -18,18 +16,18 @@ HEALTH[14]:
   🟡 CC    bulk_run CC=17 (limit:15)
 
 REFACTOR[1]:
-  1. split 14 high-CC methods  (CC>15)
+  1. split 12 high-CC methods  (CC>15)
 
 PIPELINES[94]:
   [1] Src [main]: main → run_project
       PURITY: 100% pure
-  [2] Src [from_dict]: from_dict
+  [2] Src [get]: get
       PURITY: 100% pure
-  [3] Src [load]: load → _load_env_file
+  [3] Src [list_plugins]: list_plugins
       PURITY: 100% pure
-  [4] Src [_parse]: _parse → load_entry_point_presets → register_preset
+  [4] Src [create_instance]: create_instance
       PURITY: 100% pure
-  [5] Src [is_available]: is_available
+  [5] Src [from_dict]: from_dict
       PURITY: 100% pure
 
 LAYERS:
@@ -37,9 +35,9 @@ LAYERS:
   │ run_analysis                88L  0C    2m  CC=11     ←0
   │ project.sh                  24L  0C    0m  CC=0.0    ←0
   │
-  pyqual/                         CC̄=6.8    ←in:1  →out:0
-  │ !! cli                       1426L  0C   31m  CC=48     ←0
-  │ !! bulk_init                  697L  3C    7m  CC=37     ←1
+  pyqual/                         CC̄=6.1    ←in:1  →out:0
+  │ !! cli                       1479L  0C   40m  CC=19     ←0
+  │ !! bulk_init                  713L  3C   15m  CC=26     ←1
   │ !! bulk_run                   549L  3C    7m  CC=19     ←1
   │ !! validation                 460L  6C    6m  CC=26     ←2
   │ _gate_collectors           441L  0C   21m  CC=13     ←0

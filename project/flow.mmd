@@ -9,6 +9,7 @@ flowchart TD
         pyqual__cli__bulk_init_cmd["bulk_init_cmd"]
         pyqual__cli__bulk_run_cmd["bulk_run_cmd"]
         pyqual__cli___extract_stage_summary["_extract_stage_summary"]
+        pyqual__cli___get_last_error_line["_get_last_error_line"]
         pyqual__cli__run["run"]
         pyqual__cli__gates["gates"]
         pyqual__cli__validate["validate"]
@@ -18,12 +19,18 @@ flowchart TD
         pyqual__cli__mcp_fix["mcp_fix"]
         pyqual__cli__mcp_refactor["mcp_refactor"]
         pyqual__cli__mcp_service["mcp_service"]
-        pyqual__cli__tickets_todo["tickets_todo"]
-        ...["+16 more"]
+        ...["+25 more"]
     end
 
     subgraph Core
         run_analysis__main["main"]
+        pyqual__plugins__PluginMetadata____post_init__["__post_init__"]
+        pyqual__plugins__MetricCollector__collect["collect"]
+        pyqual__plugins__MetricCollector__get_config_example["get_config_example"]
+        pyqual__plugins__PluginRegistry__register["register"]
+        pyqual__plugins__PluginRegistry__get["get"]
+        pyqual__plugins__PluginRegistry__list_plugins["list_plugins"]
+        pyqual__plugins__PluginRegistry__create_instance["create_instance"]
         pyqual__config__GateConfig__from_dict["from_dict"]
         pyqual__config__PyqualConfig__load["load"]
         pyqual__config__PyqualConfig___parse["_parse"]
@@ -31,14 +38,7 @@ flowchart TD
         pyqual__tools__ToolPreset__is_available["is_available"]
         pyqual__tools__ToolPreset__shell_command["shell_command"]
         pyqual__tools__is_builtin["is_builtin"]
-        pyqual__tools__register_preset["register_preset"]
-        pyqual__tools__load_entry_point_presets("load_entry_point_presets CC=8")
-        pyqual__tools__resolve_stage_command["resolve_stage_command"]
-        pyqual__plugins__PluginMetadata____post_init__["__post_init__"]
-        pyqual__plugins__MetricCollector__collect["collect"]
-        pyqual__plugins__MetricCollector__get_config_example["get_config_example"]
-        pyqual__plugins__PluginRegistry__register["register"]
-        ...["+68 more"]
+        ...["+67 more"]
     end
 
-    class run_analysis__main,pyqual__config__GateConfig__from_dict,pyqual__config__PyqualConfig__load,pyqual__config__PyqualConfig___parse,pyqual__config__PyqualConfig__default_yaml,pyqual__tools__ToolPreset__is_available,pyqual__tools__ToolPreset__shell_command,pyqual__tools__is_builtin,pyqual__tools__resolve_stage_command,pyqual__plugins__PluginMetadata____post_init__ entry
+    class run_analysis__main,pyqual__plugins__PluginMetadata____post_init__,pyqual__plugins__MetricCollector__collect,pyqual__plugins__MetricCollector__get_config_example,pyqual__plugins__PluginRegistry__register,pyqual__plugins__PluginRegistry__get,pyqual__plugins__PluginRegistry__list_plugins,pyqual__plugins__PluginRegistry__create_instance,pyqual__config__GateConfig__from_dict,pyqual__config__PyqualConfig__load entry

@@ -7,12 +7,12 @@ import re
 import json
 import logging
 import shutil
-import sys
 
 from pathlib import Path
 
 import typer
 from rich.console import Console
+from rich.syntax import Syntax
 from rich.table import Table
 
 from pyqual.config import PyqualConfig
@@ -308,11 +308,63 @@ def bulk_run_cmd(
         raise typer.Exit(1)
 
 
+def _enrich_from_artifacts(workdir: Path, stages: list[dict[str, Any]]) -> None:
+    """Enrich stage dicts with metrics read from artifact files on disk."""
+    # analysis.toon.yaml → analyze/code2llm stage
+    analysis = workdir / "project" / "analysis.toon.yaml"
+    if analysis.exists():
+        header = analysis.read_text(errors="replace").splitlines()[:2]
+        hdr = "\n".join(header)
+        # line 1: "# code2llm | 12f 4797L | python:11,shell:1"
+        m_f = re.search(r"(\d+)f\s+(\d+)L", hdr)
+        m_cc = re.search(r"CC\u0304?=([0-9.]+)", hdr)
+        m_cr = re.search(r"critical:(\d+)", hdr)
+        for sd in stages:
+            if sd["name"] in ("analyze", "code2llm") and sd.get("status") != "skipped":
+                if m_f:
+                    sd.setdefault("files", int(m_f.group(1)))
+                    sd.setdefault("lines", int(m_f.group(2)))
+                if m_cc:
+                    sd.setdefault("cc", float(m_cc.group(1)))
+                if m_cr:
+                    sd.setdefault("critical", int(m_cr.group(1)))
+
+    # validation.toon.yaml → validate/vallm stage
+    validation = workdir / "project" / "validation.toon.yaml"
+    if validation.exists():
+        header = validation.read_text(errors="replace").splitlines()[:5]
+        hdr = "\n".join(header)
+        # line 1: "# vallm batch | 86f | 36✓ 1⚠ 7✗"
+        m_v = re.search(r"(\d+)\u2713\s+(\d+)\u26a0\s+(\d+)\u2717", hdr)
+        # SUMMARY: scanned: 86  passed: 36 (41.9%)
+        m_s = re.search(r"passed:\s*\d+\s*\(([0-9.]+)%\)", hdr)
+        for sd in stages:
+            if sd["name"] in ("validate", "vallm") and sd.get("status") != "skipped":
+                if m_v:
+                    sd.setdefault("vallm_passed", int(m_v.group(1)))
+                    sd.setdefault("vallm_warnings", int(m_v.group(2)))
+                    sd.setdefault("vallm_errors", int(m_v.group(3)))
+                if m_s:
+                    sd.setdefault("vallm_pass_pct", float(m_s.group(1)))
+
+    # TODO.md → prefact stage
+    todo = workdir / "TODO.md"
+    if todo.exists():
+        head = todo.read_text(errors="replace")[:500]
+        m_t = re.search(r"\*?\*?Total issues:\*?\*?\s*(\d+)\s*active(?:,\s*(\d+)\s*completed)?", head)
+        if m_t:
+            for sd in stages:
+                if sd["name"] in ("prefact",) and sd.get("status") != "skipped":
+                    sd.setdefault("tickets", int(m_t.group(1)))
+                    if m_t.group(2):
+                        sd.setdefault("tickets_completed", int(m_t.group(2)))
+
+
 def _extract_stage_summary(name: str, stdout: str, stderr: str) -> dict[str, str]:
     """Extract key metrics from stage output as YAML-ready key: value pairs."""
     text = (stdout or "") + "\n" + (stderr or "")
     metrics: dict[str, str] = {}
-    metrics.update(_extract_pytest_stage_summary(text))
+    metrics.update(_extract_pytest_stage_summary(name, text))
     metrics.update(_extract_lint_stage_summary(text))
     metrics.update(_extract_prefact_stage_summary(name, text))
     metrics.update(_extract_code2llm_stage_summary(name, text))
@@ -360,10 +412,12 @@ def run(
     _sc = stderr_console  # live progress → stderr (keeps stdout clean YAML)
 
     def _on_iter_start(num: int) -> None:
-        _sc.print(f"[dim]─── Iteration {num} ───[/dim]")
+        if verbose:
+            _sc.print(f"[dim]─── Iteration {num} ───[/dim]")
 
     def _on_stage_start(name: str) -> None:
-        _sc.print(f"[dim]▶ {name}[/dim]")
+        if verbose:
+            _sc.print(f"[dim]▶ {name}[/dim]")
 
     def _on_stage_error(failure: Any) -> None:  # failure: StageFailure
         from pyqual.validation import EC, ErrorDomain, validate_config
@@ -491,6 +545,8 @@ def run(
                         sd["stderr"] = err
             iter_data["stages"].append(sd)
 
+        _enrich_from_artifacts(_workdir, iter_data["stages"])
+
         for gate in iteration.gates:
             gd: dict[str, Any] = {
                 "metric": gate.metric,
@@ -508,8 +564,9 @@ def run(
     report["result"] = "all_gates_passed" if result.final_passed else "gates_not_met"
     report["total_time"] = round(result.total_duration, 1)
 
-    print(_yaml.safe_dump(report, default_flow_style=False, sort_keys=False,
-                          allow_unicode=True), end="")
+    yaml_text = _yaml.safe_dump(report, default_flow_style=False, sort_keys=False,
+                                 allow_unicode=True)
+    console.print(Syntax(yaml_text.rstrip(), "yaml", theme="monokai", background_color="default"))
 
     if not result.final_passed:
         if cfg.loop.on_fail == "create_ticket":
@@ -1198,7 +1255,10 @@ def tools() -> None:
     console.print("      optional: true")
 
 
-def _extract_pytest_stage_summary(text: str) -> dict[str, Any]:
+def _extract_pytest_stage_summary(name: str, text: str) -> dict[str, Any]:
+    lower = name.lower()
+    if not any(kw in lower for kw in ("test", "pytest", "check")):
+        return {}
     out: dict[str, Any] = {}
     m = re.search(r"(\d+) passed", text)
     if m:
@@ -1222,7 +1282,7 @@ def _extract_lint_stage_summary(text: str) -> dict[str, Any]:
 
 
 def _extract_prefact_stage_summary(name: str, text: str) -> dict[str, Any]:
-    m = re.search(r"Total issues:\s*(\d+)\s*active", text)
+    m = re.search(r"\*?\*?Total issues:\*?\*?\s*(\d+)\s*active", text)
     if m:
         return {"tickets": int(m.group(1))}
     if "prefact" in name.lower():
@@ -1260,14 +1320,22 @@ def _extract_validation_stage_summary(name: str, text: str) -> dict[str, Any]:
 
 
 def _extract_fix_stage_summary(name: str, text: str) -> dict[str, Any]:
+    if "fix" not in name.lower():
+        return {}
     out: dict[str, Any] = {}
+    # llx model selection
     m = re.search(r"Selected:\s*\S+\s*\u2192\s*(.+)", text)
     if m:
         out["model"] = m.group(1).strip().split()[0]
+    # issues loaded from errors file
+    m_iss = re.search(r"Loaded (\d+) errors", text)
+    if m_iss:
+        out["issues_loaded"] = int(m_iss.group(1))
+    # git-style files changed
     m2 = re.search(r"(\d+)\s+file[s]?\s+changed", text)
     if m2:
         out["files_changed"] = int(m2.group(1))
-    elif "fix" in name.lower():
+    else:
         m3 = re.search(r"(Applied|No changes)[^\n]*", text)
         if m3:
             out["fix_status"] = m3.group(0)[:80]
