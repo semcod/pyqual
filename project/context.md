@@ -6,7 +6,7 @@
 - **Primary Language**: python
 - **Languages**: python: 28, shell: 2
 - **Analysis Mode**: static
-- **Total Functions**: 161
+- **Total Functions**: 162
 - **Total Classes**: 37
 - **Modules**: 30
 - **Entry Points**: 103
@@ -14,7 +14,7 @@
 ## Architecture by Module
 
 ### pyqual.cli
-- **Functions**: 30
+- **Functions**: 31
 - **File**: `cli.py`
 
 ### pyqual._gate_collectors
@@ -56,14 +56,14 @@
 - **Classes**: 4
 - **File**: `config.py`
 
+### pyqual.tickets
+- **Functions**: 6
+- **File**: `tickets.py`
+
 ### pyqual.gates
 - **Functions**: 6
 - **Classes**: 3
 - **File**: `gates.py`
-
-### pyqual.tickets
-- **Functions**: 6
-- **File**: `tickets.py`
 
 ### pyqual.validation
 - **Functions**: 6
@@ -99,10 +99,9 @@
 - **Classes**: 1
 - **File**: `code_health_collector.py`
 
-### examples.custom_plugins.performance_collector
+### examples.multi_gate_pipeline.run_pipeline
 - **Functions**: 2
-- **Classes**: 1
-- **File**: `performance_collector.py`
+- **File**: `run_pipeline.py`
 
 ## Key Entry Points
 
@@ -312,15 +311,15 @@ _from_ruff [pyqual._gate_collectors]
 - **Methods**: 4
 - **Key Methods**: pyqual.config.PyqualConfig.load, pyqual.config.PyqualConfig.llm_model, pyqual.config.PyqualConfig._parse, pyqual.config.PyqualConfig.default_yaml
 
-### pyqual.gates.GateSet
-> Collection of quality gates with metric collection.
-- **Methods**: 4
-- **Key Methods**: pyqual.gates.GateSet.__init__, pyqual.gates.GateSet.check_all, pyqual.gates.GateSet.all_passed, pyqual.gates.GateSet._collect_metrics
-
 ### pyqual.plugins.PluginRegistry
 > Registry for metric collector plugins.
 - **Methods**: 4
 - **Key Methods**: pyqual.plugins.PluginRegistry.register, pyqual.plugins.PluginRegistry.get, pyqual.plugins.PluginRegistry.list_plugins, pyqual.plugins.PluginRegistry.create_instance
+
+### pyqual.gates.GateSet
+> Collection of quality gates with metric collection.
+- **Methods**: 4
+- **Key Methods**: pyqual.gates.GateSet.__init__, pyqual.gates.GateSet.check_all, pyqual.gates.GateSet.all_passed, pyqual.gates.GateSet._collect_metrics
 
 ### pyqual.validation.ValidationResult
 > Aggregated result of validating one pyqual.yaml.
@@ -365,6 +364,11 @@ _from_ruff [pyqual._gate_collectors]
 - **Methods**: 1
 - **Key Methods**: pyqual.config.GateConfig.from_dict
 
+### pyqual.plugins.PluginMetadata
+> Metadata for a pyqual plugin.
+- **Methods**: 1
+- **Key Methods**: pyqual.plugins.PluginMetadata.__post_init__
+
 ### pyqual.gates.GateResult
 > Result of a single gate check.
 - **Methods**: 1
@@ -374,11 +378,6 @@ _from_ruff [pyqual._gate_collectors]
 > Single quality gate with metric extraction.
 - **Methods**: 1
 - **Key Methods**: pyqual.gates.Gate.check
-
-### pyqual.plugins.PluginMetadata
-> Metadata for a pyqual plugin.
-- **Methods**: 1
-- **Key Methods**: pyqual.plugins.PluginMetadata.__post_init__
 
 ### pyqual.builtin_collectors.LLMBenchCollector
 > LLM code generation quality metrics from human-eval and CodeBLEU.
@@ -455,8 +454,8 @@ Does NOT run any stages — this is a stati
 
 Functions exposed as public API (no underscore prefix):
 
+- `pyqual.cli.run` - 82 calls
 - `pyqual.bulk_init.generate_pyqual_yaml` - 77 calls
-- `pyqual.cli.run` - 70 calls
 - `pyqual.cli.bulk_run_cmd` - 56 calls
 - `pyqual.bulk_init.collect_fingerprint` - 51 calls
 - `pyqual.cli.fix_config` - 46 calls

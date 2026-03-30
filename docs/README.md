@@ -1,7 +1,7 @@
 <!-- code2docs:start --># pyqual
 
-![version](https://img.shields.io/badge/version-0.1.0-blue) ![python](https://img.shields.io/badge/python-%3E%3D3.9-blue) ![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey) ![functions](https://img.shields.io/badge/functions-161-green)
-> **161** functions | **37** classes | **30** files | CC̄ = 6.4
+![version](https://img.shields.io/badge/version-0.1.0-blue) ![python](https://img.shields.io/badge/python-%3E%3D3.9-blue) ![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey) ![functions](https://img.shields.io/badge/functions-162-green)
+> **162** functions | **37** classes | **30** files | CC̄ = 6.7
 
 > Auto-generated project documentation from source code analysis.
 
@@ -151,23 +151,23 @@ Content outside the markers is preserved when regenerating. Enable this with `sy
 
 ```
 pyqual/
-├── run_analysis    ├── config    ├── llm    ├── tools    ├── gates├── pyqual/    ├── plugins    ├── tickets    ├── builtin_collectors    ├── cli    ├── _gate_collectors    ├── validation        ├── llx_mcp_service    ├── integrations/        ├── llx_mcp    ├── pipeline        ├── metric_history        ├── composite_gates        ├── dynamic_thresholds        ├── performance_collector        ├── minimal        ├── check_gates        ├── run_pipeline    ├── bulk_init        ├── run_pipeline├── project        ├── demo        ├── sync_tickets        ├── code_health_collector    ├── bulk_run```
+├── run_analysis    ├── llm    ├── tools    ├── config    ├── plugins├── pyqual/    ├── tickets    ├── gates    ├── cli    ├── builtin_collectors    ├── _gate_collectors    ├── bulk_init        ├── llx_mcp_service    ├── integrations/    ├── validation        ├── llx_mcp        ├── metric_history        ├── composite_gates        ├── dynamic_thresholds        ├── performance_collector        ├── minimal        ├── check_gates        ├── run_pipeline        ├── code_health_collector        ├── run_pipeline├── project        ├── demo        ├── sync_tickets    ├── pipeline    ├── bulk_run```
 
 ## API Overview
 
 ### Classes
 
+- **`ToolPreset`** — Definition of a built-in tool invocation preset.
 - **`StageConfig`** — Single pipeline stage.
 - **`GateConfig`** — Single quality gate threshold.
 - **`LoopConfig`** — Loop iteration settings.
 - **`PyqualConfig`** — Full pyqual.yaml configuration.
-- **`ToolPreset`** — Definition of a built-in tool invocation preset.
-- **`GateResult`** — Result of a single gate check.
-- **`Gate`** — Single quality gate with metric extraction.
-- **`GateSet`** — Collection of quality gates with metric collection.
 - **`PluginMetadata`** — Metadata for a pyqual plugin.
 - **`MetricCollector`** — Base class for metric collector plugins.
 - **`PluginRegistry`** — Registry for metric collector plugins.
+- **`GateResult`** — Result of a single gate check.
+- **`Gate`** — Single quality gate with metric extraction.
+- **`GateSet`** — Collection of quality gates with metric collection.
 - **`LLMBenchCollector`** — LLM code generation quality metrics from human-eval and CodeBLEU.
 - **`HallucinationCollector`** — Hallucination detection and prompt quality metrics.
 - **`SBOMCollector`** — SBOM compliance and supply chain security metrics.
@@ -176,21 +176,21 @@ pyqual/
 - **`RepoMetricsCollector`** — Advanced repository health metrics (bus factor, diversity).
 - **`SecurityCollector`** — Security scanning metrics from trufflehog, gitleaks, safety.
 - **`LlxMcpFixCollector`** — Dockerized llx MCP fix/refactor workflow results.
+- **`ProjectFingerprint`** — Lightweight summary of a project directory sent to LLM for classification.
+- **`ProjectConfig`** — Parsed LLM response — project-specific config decisions.
+- **`BulkInitResult`** — Summary of a bulk-init run.
 - **`ErrorDomain`** — —
 - **`EC`** — Namespace for standardised error-code string constants.
 - **`StageFailure`** — Runtime failure description from a completed stage.
 - **`Severity`** — —
 - **`ValidationIssue`** — Single validation finding.
 - **`ValidationResult`** — Aggregated result of validating one pyqual.yaml.
+- **`PerformanceCollector`** — Collect latency and throughput metrics from load test results.
+- **`CodeHealthCollector`** — Weighted composite health score from multiple code quality signals.
 - **`StageResult`** — Result of running a single stage.
 - **`IterationResult`** — Result of one full pipeline iteration.
 - **`PipelineResult`** — Result of the complete pipeline run (all iterations).
 - **`Pipeline`** — Execute pipeline stages in a loop until quality gates pass.
-- **`PerformanceCollector`** — Collect latency and throughput metrics from load test results.
-- **`ProjectFingerprint`** — Lightweight summary of a project directory sent to LLM for classification.
-- **`ProjectConfig`** — Parsed LLM response — project-specific config decisions.
-- **`BulkInitResult`** — Summary of a bulk-init run.
-- **`CodeHealthCollector`** — Weighted composite health score from multiple code quality signals.
 - **`RunStatus`** — —
 - **`ProjectRunState`** — Mutable state for a single project's pyqual run.
 - **`BulkRunResult`** — Summary of a bulk-run session.
@@ -230,13 +230,17 @@ pyqual/
 - `doctor()` — Check availability of external tools used by pyqual collectors.
 - `tools()` — List built-in tool presets for pipeline stages.
 - `logs(workdir, tail, level, failed)` — View structured pipeline logs from .pyqual/pipeline.db (nfo SQLite).
-- `error_domain(code)` — Return the domain of a standardised error code string.
-- `validate_config(config_path)` — Validate a pyqual.yaml file and return structured issues.
-- `detect_project_facts(workdir)` — Scan project directory and return facts for LLM-based config repair.
+- `collect_fingerprint(project_dir)` — Collect a lightweight fingerprint from a project directory.
+- `classify_with_llm(fp, model)` — Send fingerprint to LLM, parse structured response.
+- `generate_pyqual_yaml(project_name, cfg)` — Generate pyqual.yaml content from a ProjectConfig.
+- `bulk_init(root)` — Scan subdirectories of *root* and generate pyqual.yaml for each project.
 - `create_app(state, llx_server)` — Create an ASGI app — delegates to ``llx.mcp.service.create_service_app``.
 - `run_server(host, port, state)` — Run the persistent MCP service with uvicorn.
 - `build_parser()` — Build the CLI parser for the MCP service.
 - `main(argv)` — CLI entry point for the llx MCP service.
+- `error_domain(code)` — Return the domain of a standardised error code string.
+- `validate_config(config_path)` — Validate a pyqual.yaml file and return structured issues.
+- `detect_project_facts(workdir)` — Scan project directory and return facts for LLM-based config repair.
 - `build_parser()` — Build the CLI parser for the llx MCP helper.
 - `main(argv)` — CLI entry point used by pyqual pipeline stages.
 - `load_history(workdir)` — Load metric history from JSON file.
@@ -247,10 +251,6 @@ pyqual/
 - `compute_composite_score(metrics)` — Compute a weighted quality score (0–100) from available metrics.
 - `run_composite_check(workdir)` — Run individual gates + composite score on a workdir.
 - `main()` — Run the dynamic-threshold gate example.
-- `collect_fingerprint(project_dir)` — Collect a lightweight fingerprint from a project directory.
-- `classify_with_llm(fp, model)` — Send fingerprint to LLM, parse structured response.
-- `generate_pyqual_yaml(project_name, cfg)` — Generate pyqual.yaml content from a ProjectConfig.
-- `bulk_init(root)` — Scan subdirectories of *root* and generate pyqual.yaml for each project.
 - `build_report(result, gate_results)` — Build a structured JSON report from pipeline + gate results.
 - `main()` — —
 - `check_tool()` — —
@@ -281,7 +281,7 @@ pyqual/
 📄 `pyqual.builtin_collectors` (15 functions, 8 classes)
 📄 `pyqual.bulk_init` (7 functions, 3 classes)
 📄 `pyqual.bulk_run` (7 functions, 3 classes)
-📄 `pyqual.cli` (30 functions)
+📄 `pyqual.cli` (31 functions)
 📄 `pyqual.config` (6 functions, 4 classes)
 📄 `pyqual.gates` (6 functions, 3 classes)
 📦 `pyqual.integrations`

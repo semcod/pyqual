@@ -1,8 +1,8 @@
-# pyqual | 19f 5594L | python:18,shell:1 | 2026-03-30
-# stats: 143 func | 0 cls | 19 mod | CC̄=6.4 | critical:12 | cycles:0
-# alerts[5]: CC collect_fingerprint=37; fan-out collect_fingerprint=35; fan-out run=30; CC _classify_heuristic=26; CC validate_config=26
-# hotspots[5]: collect_fingerprint fan=35; run fan=30; fix_config fan=23; _run_single_project fan=21; validate_config fan=20
-# evolution: CC̄ 6.4→6.4 (flat 0.0)
+# pyqual | 19f 5720L | python:18,shell:1 | 2026-03-30
+# stats: 144 func | 0 cls | 19 mod | CC̄=6.8 | critical:14 | cycles:0
+# alerts[5]: CC _extract_stage_summary=48; CC collect_fingerprint=37; fan-out collect_fingerprint=35; fan-out run=34; CC _classify_heuristic=26
+# hotspots[5]: collect_fingerprint fan=35; run fan=34; fix_config fan=23; _run_single_project fan=21; validate_config fan=20
+# evolution: CC̄ 6.4→6.8 (regressed +0.4)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
 M[19]:
   project.sh,24
@@ -11,7 +11,7 @@ M[19]:
   pyqual/builtin_collectors.py,432
   pyqual/bulk_init.py,697
   pyqual/bulk_run.py,549
-  pyqual/cli.py,1307
+  pyqual/cli.py,1426
   pyqual/config.py,194
   pyqual/gates.py,91
   pyqual/integrations/__init__.py,1
@@ -21,10 +21,43 @@ M[19]:
   pyqual/pipeline.py,378
   pyqual/plugins.py,138
   pyqual/tickets.py,73
-  pyqual/tools.py,338
+  pyqual/tools.py,345
   pyqual/validation.py,460
   run_analysis.py,88
 D:
+  pyqual/cli.py:
+    e: _setup_logging,init,bulk_init_cmd,bulk_run_cmd,_extract_stage_summary,run,gates,validate,fix_config,status,_run_mcp_workflow,mcp_fix,mcp_refactor,mcp_service,tickets_todo,tickets_github,tickets_all,_plugin_list,_plugin_search,_plugin_info,_plugin_add,_plugin_remove,_plugin_validate,_plugin_unknown_action,plugin,doctor,tools,_format_log_entry_row,_query_nfo_db,_row_to_event_dict,logs
+    _setup_logging(verbose;workdir)
+    init(path)
+    bulk_init_cmd(path;dry_run;no_llm;model;overwrite;show_schema;json_output)
+    bulk_run_cmd(path;parallel;dry_run;timeout;filter_name;no_live;verbose;json_output;log_dir;analyze)
+    _extract_stage_summary(name;stdout;stderr)
+    run(config;dry_run;workdir;verbose;auto_fix_config)
+    gates(config;workdir)
+    validate(config;workdir;strict)
+    fix_config(config;workdir;dry_run;model)
+    status(config;workdir)
+    _run_mcp_workflow()
+    mcp_fix(workdir;project_path;issues;output;endpoint;model;file;use_docker;docker_arg;task;json_output)
+    mcp_refactor(workdir;project_path;issues;output;endpoint;model;file;use_docker;docker_arg;json_output)
+    mcp_service(host;port)
+    tickets_todo(workdir;dry_run;direction)
+    tickets_github(workdir;dry_run;direction)
+    tickets_all(workdir;dry_run;direction)
+    _plugin_list(plugins;tag)
+    _plugin_search(plugins;query)
+    _plugin_info(name;workdir)
+    _plugin_add(name;workdir)
+    _plugin_remove(name;workdir)
+    _plugin_validate(plugins;workdir)
+    _plugin_unknown_action(action)
+    plugin(action;name;workdir;tag)
+    doctor()
+    tools()
+    _format_log_entry_row(entry)
+    _query_nfo_db(db_path;event;failed;tail;sql)
+    _row_to_event_dict(row)
+    logs(workdir;tail;level;failed;json_output;sql)
   pyqual/bulk_init.py:
     e: ProjectFingerprint,ProjectConfig,BulkInitResult,collect_fingerprint,_build_llm_prompt,classify_with_llm,_classify_heuristic,_safe_name,generate_pyqual_yaml,bulk_init
     ProjectFingerprint:  # Lightweight summary of a project directory sent to LLM for c...
@@ -56,38 +89,6 @@ D:
     IterationResult:  # Result of one full pipeline iteration...
     PipelineResult:  # Result of the complete pipeline run (all iterations)...
     Pipeline: __init__(5),run(1),check_gates(0),_run_iteration(2),_should_run_stage(3),_resolve_tool_stage(1),_execute_stage(2),_init_nfo(0),_nfo_emit(4),_log_stage(2),_log_gates(2),_log_event(1),_ensure_pyqual_dir(0)  # Execute pipeline stages in a loop until quality gates pass...
-  pyqual/cli.py:
-    e: _setup_logging,init,bulk_init_cmd,bulk_run_cmd,run,gates,validate,fix_config,status,_run_mcp_workflow,mcp_fix,mcp_refactor,mcp_service,tickets_todo,tickets_github,tickets_all,_plugin_list,_plugin_search,_plugin_info,_plugin_add,_plugin_remove,_plugin_validate,_plugin_unknown_action,plugin,doctor,tools,_format_log_entry_row,_query_nfo_db,_row_to_event_dict,logs
-    _setup_logging(verbose;workdir)
-    init(path)
-    bulk_init_cmd(path;dry_run;no_llm;model;overwrite;show_schema;json_output)
-    bulk_run_cmd(path;parallel;dry_run;timeout;filter_name;no_live;verbose;json_output;log_dir;analyze)
-    run(config;dry_run;workdir;verbose;auto_fix_config)
-    gates(config;workdir)
-    validate(config;workdir;strict)
-    fix_config(config;workdir;dry_run;model)
-    status(config;workdir)
-    _run_mcp_workflow()
-    mcp_fix(workdir;project_path;issues;output;endpoint;model;file;use_docker;docker_arg;task;json_output)
-    mcp_refactor(workdir;project_path;issues;output;endpoint;model;file;use_docker;docker_arg;json_output)
-    mcp_service(host;port)
-    tickets_todo(workdir;dry_run;direction)
-    tickets_github(workdir;dry_run;direction)
-    tickets_all(workdir;dry_run;direction)
-    _plugin_list(plugins;tag)
-    _plugin_search(plugins;query)
-    _plugin_info(name;workdir)
-    _plugin_add(name;workdir)
-    _plugin_remove(name;workdir)
-    _plugin_validate(plugins;workdir)
-    _plugin_unknown_action(action)
-    plugin(action;name;workdir;tag)
-    doctor()
-    tools()
-    _format_log_entry_row(entry)
-    _query_nfo_db(db_path;event;failed;tail;sql)
-    _row_to_event_dict(row)
-    logs(workdir;tail;level;failed;json_output;sql)
   pyqual/bulk_run.py:
     e: RunStatus,ProjectRunState,BulkRunResult,_parse_output_line,_analyze_project,_run_single_project,_build_project_row,build_dashboard_table,discover_projects,bulk_run
     RunStatus(str,Enum):
@@ -159,11 +160,6 @@ D:
     e: build_parser,main
     build_parser()
     main(argv)
-  pyqual/gates.py:
-    e: GateResult,Gate,GateSet
-    GateResult: __str__(0)  # Result of a single gate check...
-    Gate: check(1)  # Single quality gate with metric extraction...
-    GateSet: __init__(1),check_all(1),all_passed(1),_collect_metrics(1)  # Collection of quality gates with metric collection...
   pyqual/plugins.py:
     e: PluginMetadata,MetricCollector,PluginRegistry,get_available_plugins,install_plugin_config
     PluginMetadata: __post_init__(0)  # Metadata for a pyqual plugin...
@@ -171,6 +167,11 @@ D:
     PluginRegistry: register(1),get(1),list_plugins(1),create_instance(1)  # Registry for metric collector plugins...
     get_available_plugins()
     install_plugin_config(name;workdir)
+  pyqual/gates.py:
+    e: GateResult,Gate,GateSet
+    GateResult: __str__(0)  # Result of a single gate check...
+    Gate: check(1)  # Single quality gate with metric extraction...
+    GateSet: __init__(1),check_all(1),all_passed(1),_collect_metrics(1)  # Collection of quality gates with metric collection...
   pyqual/tickets.py:
     e: _load_sync_integration,_normalize_sources,sync_planfile_tickets,sync_todo_tickets,sync_github_tickets,sync_all_tickets
     _load_sync_integration()

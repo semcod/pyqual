@@ -1,12 +1,12 @@
-# redup/duplication | 2 groups | 23f 6353L | 2026-03-30
+# redup/duplication | 2 groups | 23f 6479L | 2026-03-30
 
 SUMMARY:
   files_scanned: 23
-  total_lines:   6353
+  total_lines:   6479
   dup_groups:    2
   dup_fragments: 4
   saved_lines:   22
-  scan_ms:       3014
+  scan_ms:       3882
 
 DUPLICATES[2] (ranked by impact):
   [e8e1ba5d936993f1]   STRU  get_config_example  L=15 N=2 saved=15 sim=1.00

@@ -1,13 +1,13 @@
-# code2llm/evolution | 143 func | 15f | 2026-03-30
+# code2llm/evolution | 144 func | 15f | 2026-03-30
 
 NEXT[10] (ranked by impact):
-  [1] !! SPLIT           pyqual/bulk_init.py
+  [1] !! SPLIT           pyqual/cli.py
+      WHY: 1426L, 0 classes, max CC=48
+      EFFORT: ~4h  IMPACT: 68448
+
+  [2] !! SPLIT           pyqual/bulk_init.py
       WHY: 697L, 3 classes, max CC=37
       EFFORT: ~4h  IMPACT: 25789
-
-  [2] !! SPLIT           pyqual/cli.py
-      WHY: 1307L, 0 classes, max CC=19
-      EFFORT: ~4h  IMPACT: 24833
 
   [3] !! SPLIT           pyqual/bulk_run.py
       WHY: 549L, 3 classes, max CC=19
@@ -17,41 +17,41 @@ NEXT[10] (ranked by impact):
       WHY: CC=37 exceeds 15
       EFFORT: ~1h  IMPACT: 1295
 
-  [5] !! SPLIT-FUNC      validate_config  CC=26  fan=20
+  [5] !! SPLIT-FUNC      _extract_stage_summary  CC=48  fan=16
+      WHY: CC=48 exceeds 15
+      EFFORT: ~1h  IMPACT: 768
+
+  [6] !  SPLIT-FUNC      run  CC=20  fan=34
+      WHY: CC=20 exceeds 15
+      EFFORT: ~1h  IMPACT: 680
+
+  [7] !! SPLIT-FUNC      validate_config  CC=26  fan=20
       WHY: CC=26 exceeds 15
       EFFORT: ~1h  IMPACT: 520
 
-  [6] !  SPLIT-FUNC      _run_single_project  CC=19  fan=21
+  [8] !  SPLIT-FUNC      _run_single_project  CC=19  fan=21
       WHY: CC=19 exceeds 15
       EFFORT: ~1h  IMPACT: 399
 
-  [7] !  SPLIT-FUNC      bulk_run_cmd  CC=19  fan=18
+  [9] !  SPLIT-FUNC      bulk_run_cmd  CC=19  fan=18
       WHY: CC=19 exceeds 15
       EFFORT: ~1h  IMPACT: 342
 
-  [8] !  SPLIT-FUNC      bulk_run  CC=17  fan=20
+  [10] !  SPLIT-FUNC      bulk_run  CC=17  fan=20
       WHY: CC=17 exceeds 15
       EFFORT: ~1h  IMPACT: 340
 
-  [9] !  SPLIT-FUNC      bulk_init  CC=18  fan=18
-      WHY: CC=18 exceeds 15
-      EFFORT: ~1h  IMPACT: 324
-
-  [10] !  SPLIT-FUNC      logs  CC=16  fan=19
-      WHY: CC=16 exceeds 15
-      EFFORT: ~1h  IMPACT: 304
-
 
 RISKS[3]:
-  ⚠ Splitting pyqual/cli.py may break 30 import paths
+  ⚠ Splitting pyqual/cli.py may break 31 import paths
   ⚠ Splitting pyqual/bulk_init.py may break 7 import paths
   ⚠ Splitting pyqual/bulk_run.py may break 7 import paths
 
 METRICS-TARGET:
-  CC̄:          6.4 → ≤4.5
-  max-CC:      37 → ≤18
+  CC̄:          6.8 → ≤4.8
+  max-CC:      48 → ≤20
   god-modules: 3 → 0
-  high-CC(≥15): 12 → ≤6
+  high-CC(≥15): 14 → ≤7
   hub-types:   0 → ≤0
 
 PATTERNS (language parser shared logic):
@@ -79,4 +79,4 @@ PATTERNS (language parser shared logic):
     - Standardized FunctionInfo/ClassInfo models
 
 HISTORY:
-  prev CC̄=6.4 → now CC̄=6.4
+  prev CC̄=6.4 → now CC̄=6.8

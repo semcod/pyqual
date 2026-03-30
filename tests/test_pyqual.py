@@ -31,6 +31,61 @@ def test_llm_exports_use_llx_when_available():
     assert pyqual.get_llm_model is llx.get_llm_model
 
 
+from pyqual.cli import _extract_stage_summary as _ess
+
+
+class TestExtractStageSummary:
+    def test_pytest_passed(self) -> None:
+        assert any("5 passed" in l for l in _ess("test", "5 passed in 1.4s", ""))
+
+    def test_pytest_failed(self) -> None:
+        lines = _ess("test", "3 passed, 2 failed in 2.1s", "")
+        assert any("2 failed" in l for l in lines)
+        assert any("3 passed" in l for l in lines)
+
+    def test_pytest_no_match_returns_empty(self) -> None:
+        assert _ess("test", "collecting ...", "") == []
+
+    def test_ruff_errors(self) -> None:
+        assert any("7 lint error" in l for l in _ess("lint", "Found 7 errors.", ""))
+
+    def test_ruff_clean(self) -> None:
+        assert any("0 lint errors" in l for l in _ess("lint", "All checks passed!", ""))
+
+    def test_prefact_tickets(self) -> None:
+        assert any("71 ticket" in l for l in _ess("prefact", "Total issues: 71 active, 0 completed", ""))
+
+    def test_prefact_zero_tickets(self) -> None:
+        assert any("0 ticket" in l for l in _ess("prefact", "Total issues: 0 active, 5 completed", ""))
+
+    def test_validate_cc_critical(self) -> None:
+        lines = _ess("validate", "cc: 3.1\ncritical: 0", "")
+        assert any("cc=3.1" in l for l in lines)
+        assert any("critical=0" in l for l in lines)
+
+    def test_llx_fix_model(self) -> None:
+        lines = _ess("fix", "Selected: balanced → claude-sonnet-4-20250514\n", "")
+        assert any("claude-sonnet-4-20250514" in l for l in lines)
+
+    def test_llx_fix_files_changed(self) -> None:
+        assert any("3 file" in l for l in _ess("fix", "3 files changed, 42 insertions(+)", ""))
+
+    def test_mypy_errors(self) -> None:
+        lines = _ess("mypy", "", "Found 4 errors in 2 files (checked 12 source files)")
+        assert any("4 mypy error" in l for l in lines)
+
+    def test_bandit_severity(self) -> None:
+        lines = _ess("bandit", "High: 1  Medium: 3  Low: 5", "")
+        assert any("High:1" in l for l in lines)
+        assert any("Med:3" in l for l in lines)
+
+    def test_empty_output_no_crash(self) -> None:
+        assert _ess("analyze", "", "") == []
+
+    def test_uses_stderr_as_fallback(self) -> None:
+        assert any("5 passed" in l for l in _ess("test", "", "5 passed in 0.9s"))
+
+
 def test_gate_set_reads_project_toon_artifacts(tmp_path: Path):
     """Verify metrics are collected from dotted toon files in project/."""
     project_dir = tmp_path / "project"
