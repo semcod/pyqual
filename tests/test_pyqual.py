@@ -36,54 +36,62 @@ from pyqual.cli import _extract_stage_summary as _ess
 
 class TestExtractStageSummary:
     def test_pytest_passed(self) -> None:
-        assert any("5 passed" in l for l in _ess("test", "5 passed in 1.4s", ""))
+        d = _ess("test", "5 passed in 1.4s", "")
+        assert "passed" in d
+        assert "5" in d["passed"]
 
     def test_pytest_failed(self) -> None:
-        lines = _ess("test", "3 passed, 2 failed in 2.1s", "")
-        assert any("2 failed" in l for l in lines)
-        assert any("3 passed" in l for l in lines)
+        d = _ess("test", "3 passed, 2 failed in 2.1s", "")
+        assert "passed" in d and "3" in d["passed"]
+        assert "failed" in d and "2" in d["failed"]
 
     def test_pytest_no_match_returns_empty(self) -> None:
-        assert _ess("test", "collecting ...", "") == []
+        assert _ess("test", "collecting ...", "") == {}
 
     def test_ruff_errors(self) -> None:
-        assert any("7 lint error" in l for l in _ess("lint", "Found 7 errors.", ""))
+        d = _ess("lint", "Found 7 errors.", "")
+        assert "lint_errors" in d and "7" in d["lint_errors"]
 
     def test_ruff_clean(self) -> None:
-        assert any("0 lint errors" in l for l in _ess("lint", "All checks passed!", ""))
+        d = _ess("lint", "All checks passed!", "")
+        assert "lint_errors" in d and "0" in d["lint_errors"]
 
     def test_prefact_tickets(self) -> None:
-        assert any("71 ticket" in l for l in _ess("prefact", "Total issues: 71 active, 0 completed", ""))
+        d = _ess("prefact", "Total issues: 71 active, 0 completed", "")
+        assert "tickets" in d and "71" in d["tickets"]
 
     def test_prefact_zero_tickets(self) -> None:
-        assert any("0 ticket" in l for l in _ess("prefact", "Total issues: 0 active, 5 completed", ""))
+        d = _ess("prefact", "Total issues: 0 active, 5 completed", "")
+        assert "tickets" in d and "0" in d["tickets"]
 
     def test_validate_cc_critical(self) -> None:
-        lines = _ess("validate", "cc: 3.1\ncritical: 0", "")
-        assert any("cc=3.1" in l for l in lines)
-        assert any("critical=0" in l for l in lines)
+        d = _ess("validate", "cc: 3.1\ncritical: 0", "")
+        assert d.get("cc") == "3.1"
+        assert d.get("critical") == "0"
 
     def test_llx_fix_model(self) -> None:
-        lines = _ess("fix", "Selected: balanced → claude-sonnet-4-20250514\n", "")
-        assert any("claude-sonnet-4-20250514" in l for l in lines)
+        d = _ess("fix", "Selected: balanced → claude-sonnet-4-20250514\n", "")
+        assert "model" in d and "claude-sonnet-4-20250514" in d["model"]
 
     def test_llx_fix_files_changed(self) -> None:
-        assert any("3 file" in l for l in _ess("fix", "3 files changed, 42 insertions(+)", ""))
+        d = _ess("fix", "3 files changed, 42 insertions(+)", "")
+        assert "files_changed" in d and "3" in d["files_changed"]
 
     def test_mypy_errors(self) -> None:
-        lines = _ess("mypy", "", "Found 4 errors in 2 files (checked 12 source files)")
-        assert any("4 mypy error" in l for l in lines)
+        d = _ess("mypy", "", "Found 4 errors in 2 files (checked 12 source files)")
+        assert "mypy_errors" in d and "4" in d["mypy_errors"]
 
     def test_bandit_severity(self) -> None:
-        lines = _ess("bandit", "High: 1  Medium: 3  Low: 5", "")
-        assert any("High:1" in l for l in lines)
-        assert any("Med:3" in l for l in lines)
+        d = _ess("bandit", "High: 1  Medium: 3  Low: 5", "")
+        assert "high" in d and "1" in d["high"]
+        assert "medium" in d and "3" in d["medium"]
 
     def test_empty_output_no_crash(self) -> None:
-        assert _ess("analyze", "", "") == []
+        assert _ess("analyze", "", "") == {}
 
     def test_uses_stderr_as_fallback(self) -> None:
-        assert any("5 passed" in l for l in _ess("test", "", "5 passed in 0.9s"))
+        d = _ess("test", "", "5 passed in 0.9s")
+        assert "passed" in d and "5" in d["passed"]
 
 
 def test_gate_set_reads_project_toon_artifacts(tmp_path: Path):
