@@ -129,7 +129,7 @@ class Pipeline:
         gates_status = self.gate_set.all_passed(self.workdir)
 
         for stage_cfg in self.config.stages:
-            should_run = self._should_run_stage(stage_cfg, gates_status)
+            should_run = self._should_run_stage(stage_cfg, gates_status, iteration.stages)
             if not should_run:
                 iteration.stages.append(StageResult(
                     name=stage_cfg.name, returncode=0,
@@ -146,7 +146,12 @@ class Pipeline:
         self._log_gates(num, iteration.gates)
         return iteration
 
-    def _should_run_stage(self, stage: StageConfig, gates_pass: bool) -> bool:
+    def _should_run_stage(
+        self,
+        stage: StageConfig,
+        gates_pass: bool,
+        stages_so_far: list[StageResult] | None = None,
+    ) -> bool:
         """Determine if a stage should run based on its 'when' condition."""
         if stage.when == "always":
             return True
@@ -154,6 +159,12 @@ class Pipeline:
             return not gates_pass
         if stage.when == "metrics_pass":
             return gates_pass
+        if stage.when == "any_stage_fail":
+            if not stages_so_far:
+                return False
+            return any(
+                not s.passed and not s.skipped for s in stages_so_far
+            )
         return True
 
     def _resolve_tool_stage(self, stage: StageConfig) -> tuple[str, bool]:
@@ -216,9 +227,10 @@ class Pipeline:
         if self.on_stage_start:
             self.on_stage_start(stage.name)
 
-        is_fix_stage = bool(stage.run and any(
-            kw in stage.run for kw in ("llx", "aider", "fix", "repair")
-        ))
+        is_fix_stage = bool(
+            (stage.run and any(kw in stage.run for kw in ("llx", "aider", "fix", "repair")))
+            or (stage.tool and stage.tool in ("llx-fix", "aider"))
+        )
 
         env = {**os.environ, **self.config.env}
         start = time.monotonic()

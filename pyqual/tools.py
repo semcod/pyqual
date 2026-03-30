@@ -169,6 +169,22 @@ TOOL_PRESETS: dict[str, ToolPreset] = {
         allow_failure=True,
     ),
 
+    # -- LLX-driven code fixing (reads TODO.md / .pyqual/errors.json) --
+    "llx-fix": ToolPreset(
+        binary="llx",
+        command="llx fix . --apply",
+        output="",
+        allow_failure=True,
+    ),
+
+    # -- Aider AI pair-programmer --
+    "aider": ToolPreset(
+        binary="aider",
+        command="aider --yes-always --message \"$(cat TODO.md 2>/dev/null || echo 'Fix all issues')\"",
+        output="",
+        allow_failure=True,
+    ),
+
     # -- SBOM --
     "cyclonedx": ToolPreset(
         binary="cyclonedx-py",

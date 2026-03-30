@@ -21,9 +21,15 @@ pipeline:
     - name: validate
       tool: vallm
 
+    - name: prefact
+      tool: prefact
+      when: any_stage_fail   # run when validate fails
+      optional: true
+
     - name: fix
-      run: llx fix . --errors .pyqual/errors.json --verbose
-      when: metrics_fail       # only runs if gates fail
+      tool: llx-fix         # reads TODO.md from prefact
+      when: any_stage_fail
+      optional: true
 
     - name: test
       tool: pytest
@@ -87,6 +93,9 @@ pyqual automatically:
 | `pytest` | pytest | `.pyqual/coverage.json` | **no** |
 | `code2llm` | code2llm | (toon files) | **no** |
 | `vallm` | vallm | `.pyqual/errors.json` | **no** |
+| `prefact` | prefact | `TODO.md` | yes |
+| `llx-fix` | llx | (applies fixes) | yes |
+| `aider` | aider | (applies fixes) | yes |
 | `cyclonedx` | cyclonedx-py | `.pyqual/sbom.json` | yes |
 
 List presets: `pyqual tools`
@@ -149,6 +158,7 @@ stages:
 - `when: always` — run every iteration
 - `when: metrics_fail` — only run if gates failed
 - `when: metrics_pass` — only run if gates passed (rarely used)
+- `when: any_stage_fail` — run only if a prior stage in this iteration failed
 
 ## Stage Options
 

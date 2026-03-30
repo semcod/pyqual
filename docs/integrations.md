@@ -162,19 +162,32 @@ stages:
 
 **Metrics extracted:** `vuln_critical`, `vuln_high`, `vuln_medium`, `vuln_total`
 
-## llx MCP → AI-Powered Fixes and Refactors
+## llx MCP → AI-Powered Fixes
+
+Use the built-in `llx-fix` preset for automatic code repair:
 
 ```yaml
 stages:
-  - name: llx-fix
-    run: pyqual mcp-fix --workdir . --project-path . --issues .pyqual/errors.json
-    when: metrics_fail
-    timeout: 900
+  - name: prefact
+    tool: prefact           # analyze issues → TODO.md
+    when: any_stage_fail
+    optional: true
 
-  - name: llx-refactor
-    run: pyqual mcp-refactor --workdir . --project-path . --issues .pyqual/errors.json
-    when: metrics_fail
-    timeout: 900
+  - name: fix
+    tool: llx-fix           # apply fixes from TODO.md
+    when: any_stage_fail
+    optional: true
+    timeout: 1800
+```
+
+Or use `aider` for AI pair-programming:
+
+```yaml
+stages:
+  - name: aider-fix
+    tool: aider
+    when: any_stage_fail
+    optional: true
 ```
 
 The MCP workflow:
@@ -223,6 +236,8 @@ Or use the plugin system (see [Plugin API](api.md#plugin-api) and [examples/cust
 | pip-audit | `.pyqual/vulns.json` | `vuln_critical`, `vuln_high`, `vuln_total` | Yes |
 | planfile | `.planfile/` | Ticket management (TODO.md, GitHub) | Yes |
 | llx MCP | `.pyqual/llx_mcp.json` | AI fix/refactor results | Yes |
+| llx fix | (code changes) | Applies fixes from TODO.md | Yes |
+| prefact | `TODO.md` | Issue detection for llx fix | Yes |
 | custom | any | any | — |
 
 **All integrations are optional.** Stages can be any shell commands.

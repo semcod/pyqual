@@ -126,6 +126,7 @@ def _parse_output_line(state: ProjectRunState, line: str) -> None:
             num_str = clean.split("Iteration ")[1].split()[0].strip("─ ")
             state.iteration = int(num_str)
             state.stages_done = 0
+            state.gates_passed = 0   # reset per-iteration gate counter
         except (ValueError, IndexError):
             pass
 

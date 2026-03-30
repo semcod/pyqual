@@ -151,6 +151,35 @@ class TestParseOutputLine:
         _parse_output_line(s, "some random output here")
         assert s.last_line == "some random output here"
 
+    def test_gate_line_increments_passed(self) -> None:
+        s = ProjectRunState(name="test", path=Path("/tmp/test"), gates_total=2)
+        _parse_output_line(s, "  ✅ coverage: 85.0 ≥ 80.0")
+        assert s.gates_passed == 1
+
+    def test_gate_line_failed_does_not_increment(self) -> None:
+        s = ProjectRunState(name="test", path=Path("/tmp/test"), gates_total=2)
+        _parse_output_line(s, "  ❌ coverage: 42.0 ≥ 80.0")
+        assert s.gates_passed == 0
+
+    def test_gates_reset_on_new_iteration(self) -> None:
+        """gates_passed must NOT accumulate across iterations (regression: showed 3/2)."""
+        s = ProjectRunState(name="test", path=Path("/tmp/test"), gates_total=2)
+        # iteration 1: 1 gate passes
+        _parse_output_line(s, "─── Iteration 1 ───")
+        _parse_output_line(s, "  ✅ coverage: 85.0 ≥ 80.0")
+        assert s.gates_passed == 1
+        # iteration 2: 1 gate passes — counter must reset, not reach 2
+        _parse_output_line(s, "─── Iteration 2 ───")
+        assert s.gates_passed == 0
+        _parse_output_line(s, "  ✅ coverage: 90.0 ≥ 80.0")
+        assert s.gates_passed == 1
+        # iteration 3: both gates pass
+        _parse_output_line(s, "─── Iteration 3 ───")
+        _parse_output_line(s, "  ✅ coverage: 92.0 ≥ 80.0")
+        _parse_output_line(s, "  ✅ cc: 8.0 ≤ 15.0")
+        assert s.gates_passed == 2
+        assert s.gates_passed <= s.gates_total  # never exceeds total
+
 
 # ---------------------------------------------------------------------------
 # ProjectRunState tests

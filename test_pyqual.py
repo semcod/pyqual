@@ -15,7 +15,7 @@ def test_default_yaml_parses() -> None:
     raw = yaml.safe_load(PyqualConfig.default_yaml())
     config = PyqualConfig._parse(raw)
     assert config.name == "quality-loop"
-    assert len(config.stages) == 4
+    assert len(config.stages) == 5
     assert len(config.gates) == 3
     assert config.loop.max_iterations == 3
 

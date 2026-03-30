@@ -29,7 +29,8 @@ pyqual.yaml defines everything:
     │  stages:                                │
     │    - analyze  (code2llm)                │
     │    - validate (vallm)                   │
-    │    - fix      (llx/aider, when: fail)   │
+    │    - prefact  (detect issues)           │
+    │    - fix      (llx-fix, when: any_fail) │
     │    - test     (pytest)                  │
     │                                         │
     │  loop:                                  │

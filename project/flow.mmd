@@ -23,22 +23,22 @@ flowchart TD
     end
 
     subgraph Core
-        run_analysis__run_project("run_project CC=11")
         run_analysis__main["main"]
-        pyqual__tools__ToolPreset__is_available["is_available"]
-        pyqual__tools__ToolPreset__shell_command["shell_command"]
-        pyqual__tools__is_builtin["is_builtin"]
-        pyqual__tools__resolve_stage_command["resolve_stage_command"]
-        pyqual__config___load_env_file["_load_env_file"]
         pyqual__config__GateConfig__from_dict["from_dict"]
         pyqual__config__PyqualConfig__load["load"]
         pyqual__config__PyqualConfig___parse["_parse"]
         pyqual__config__PyqualConfig__default_yaml["default_yaml"]
+        pyqual__tools__ToolPreset__is_available["is_available"]
+        pyqual__tools__ToolPreset__shell_command["shell_command"]
+        pyqual__tools__is_builtin["is_builtin"]
+        pyqual__tools__register_preset["register_preset"]
+        pyqual__tools__load_entry_point_presets("load_entry_point_presets CC=8")
+        pyqual__tools__resolve_stage_command["resolve_stage_command"]
         pyqual__plugins__PluginMetadata____post_init__["__post_init__"]
         pyqual__plugins__MetricCollector__collect["collect"]
         pyqual__plugins__MetricCollector__get_config_example["get_config_example"]
         pyqual__plugins__PluginRegistry__register["register"]
-        ...["+66 more"]
+        ...["+68 more"]
     end
 
-    class run_analysis__main,pyqual__tools__ToolPreset__is_available,pyqual__tools__ToolPreset__shell_command,pyqual__tools__is_builtin,pyqual__tools__resolve_stage_command,pyqual__config__GateConfig__from_dict,pyqual__config__PyqualConfig__load,pyqual__config__PyqualConfig___parse,pyqual__config__PyqualConfig__default_yaml,pyqual__plugins__PluginMetadata____post_init__ entry
+    class run_analysis__main,pyqual__config__GateConfig__from_dict,pyqual__config__PyqualConfig__load,pyqual__config__PyqualConfig___parse,pyqual__config__PyqualConfig__default_yaml,pyqual__tools__ToolPreset__is_available,pyqual__tools__ToolPreset__shell_command,pyqual__tools__is_builtin,pyqual__tools__resolve_stage_command,pyqual__plugins__PluginMetadata____post_init__ entry

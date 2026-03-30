@@ -159,6 +159,8 @@ pipeline:
 
   # Pipeline stages — use 'tool:' for built-in presets or 'run:' for custom commands
   # See all presets: pyqual tools
+  # when: any_stage_fail  — run only when a prior stage in this iteration failed
+  # when: metrics_fail    — run only when quality gates are not yet passing
   stages:
     - name: analyze
       tool: code2llm
@@ -166,9 +168,17 @@ pipeline:
     - name: validate
       tool: vallm
 
+    - name: prefact
+      tool: prefact
+      optional: true
+      when: any_stage_fail
+      timeout: 900
+
     - name: fix
-      run: echo "LLM fix placeholder — connect llx or aider here"
-      when: metrics_fail
+      tool: llx-fix
+      optional: true
+      when: any_stage_fail
+      timeout: 1800
 
     - name: test
       tool: pytest
