@@ -7,6 +7,7 @@ import re
 import json
 import logging
 import shutil
+import sys
 
 from pathlib import Path
 
@@ -44,6 +45,7 @@ LOG_FORMAT = "%(asctime)s %(levelname)s %(name)s — %(message)s"
 
 app = typer.Typer(help="Declarative quality gate loops for AI-assisted development.")
 console = Console()
+stderr_console = Console(stderr=True)
 tickets_app = typer.Typer(help="Control planfile-backed tickets from TODO.md and GitHub.")
 app.add_typer(tickets_app, name="tickets")
 
@@ -355,11 +357,13 @@ def run(
     _workdir = Path(workdir).resolve()
     _config_path = (_workdir / config) if not Path(config).is_absolute() else Path(config)
 
+    _sc = stderr_console  # live progress → stderr (keeps stdout clean YAML)
+
     def _on_iter_start(num: int) -> None:
-        print(f"─── Iteration {num} ───", flush=True)
+        _sc.print(f"[dim]─── Iteration {num} ───[/dim]")
 
     def _on_stage_start(name: str) -> None:
-        print(f"▶ {name}", flush=True)
+        _sc.print(f"[dim]▶ {name}[/dim]")
 
     def _on_stage_error(failure: Any) -> None:  # failure: StageFailure
         from pyqual.validation import EC, ErrorDomain, validate_config
@@ -367,51 +371,51 @@ def run(
         domain = failure.domain
 
         if domain == ErrorDomain.CONFIG or domain == ErrorDomain.ENV:
-            console.print(f"\n  [bold red]{code}[/bold red]  stage=[cyan]{failure.stage_name}[/cyan]"
-                          f"  rc={failure.returncode}")
-            console.print("  [yellow]→ Detected CONFIG/ENV problem — running pre-flight diagnostics…[/yellow]")
+            _sc.print(f"\n  [bold red]{code}[/bold red]  stage=[cyan]{failure.stage_name}[/cyan]"
+                      f"  rc={failure.returncode}")
+            _sc.print("  [yellow]→ Detected CONFIG/ENV problem — running pre-flight diagnostics…[/yellow]")
             diag = validate_config(_config_path)
             if diag.issues:
                 for issue in diag.issues:
                     badge = "[red]ERR [/]" if issue.severity.value == "error" else "[yellow]WARN[/]"
-                    console.print(f"    {badge}  {issue.code}  {issue.message}")
+                    _sc.print(f"    {badge}  {issue.code}  {issue.message}")
                     if issue.suggestion:
-                        console.print(f"         [dim]→ {issue.suggestion}[/dim]")
+                        _sc.print(f"         [dim]→ {issue.suggestion}[/dim]")
                 if auto_fix_config and diag.errors:
-                    console.print("\n  [yellow]--auto-fix-config: attempting LLM repair of pyqual.yaml…[/yellow]")
+                    _sc.print("\n  [yellow]--auto-fix-config: attempting LLM repair of pyqual.yaml…[/yellow]")
                     _run_auto_fix_config(_config_path, _workdir, diag)
             else:
-                console.print("  [dim]Pre-flight: config looks valid — problem is runtime environment.[/dim]")
+                _sc.print("  [dim]Pre-flight: config looks valid — problem is runtime environment.[/dim]")
                 if failure.stderr:
-                    console.print(f"  [dim]stderr: {failure.stderr[:200]}[/dim]")
-            print("", flush=True)
+                    _sc.print(f"  [dim]stderr: {failure.stderr[:200]}[/dim]")
+            _sc.print()
 
         elif domain == ErrorDomain.LLM:
-            console.print(f"\n  [bold red]{code}[/bold red]  stage=[cyan]{failure.stage_name}[/cyan]"
-                          f"  rc={failure.returncode}")
-            console.print("  [yellow]→ LLM/fix-stage problem.[/yellow]")
+            _sc.print(f"\n  [bold red]{code}[/bold red]  stage=[cyan]{failure.stage_name}[/cyan]"
+                      f"  rc={failure.returncode}")
+            _sc.print("  [yellow]→ LLM/fix-stage problem.[/yellow]")
             if code == EC.LLM_API_KEY_MISSING:
-                console.print("  [red]API key missing.[/red] Set OPENROUTER_API_KEY in .env or environment.")
+                _sc.print("  [red]API key missing.[/red] Set OPENROUTER_API_KEY in .env or environment.")
             elif code == EC.LLM_NETWORK_ERROR:
-                console.print("  [red]Network error.[/red] Check connectivity to the LLM endpoint.")
+                _sc.print("  [red]Network error.[/red] Check connectivity to the LLM endpoint.")
             elif code == EC.LLM_FIX_FAILED:
-                console.print("  [dim]Fix stage failed — project code may be too complex for one pass.[/dim]")
+                _sc.print("  [dim]Fix stage failed — project code may be too complex for one pass.[/dim]")
             if failure.stderr:
-                console.print(f"  [dim]{failure.stderr[:200]}[/dim]")
-            print("", flush=True)
+                _sc.print(f"  [dim]{failure.stderr[:200]}[/dim]")
+            _sc.print()
 
         elif domain == ErrorDomain.PIPELINE:
-            console.print(f"\n  [bold red]{code}[/bold red]  stage=[cyan]{failure.stage_name}[/cyan]"
-                          f"  rc={failure.returncode}")
+            _sc.print(f"\n  [bold red]{code}[/bold red]  stage=[cyan]{failure.stage_name}[/cyan]"
+                      f"  rc={failure.returncode}")
             if code == EC.PIPELINE_TIMEOUT:
-                console.print(f"  [red]Stage timed out[/red] after {failure.duration:.0f}s."
-                              " Increase 'timeout:' in the stage config.")
+                _sc.print(f"  [red]Stage timed out[/red] after {failure.duration:.0f}s."
+                          " Increase 'timeout:' in the stage config.")
             else:
-                console.print(f"  [red]Pipeline execution error.[/red]  {failure.stderr[:200]}")
-            print("", flush=True)
+                _sc.print(f"  [red]Pipeline execution error.[/red]  {failure.stderr[:200]}")
+            _sc.print()
 
         elif domain == ErrorDomain.PROJECT:
-            console.print(f"  [dim][{failure.stage_name}] {code}  → fix stage will handle this.[/dim]")
+            _sc.print(f"  [dim][{failure.stage_name}] {code}  → fix stage will handle this.[/dim]")
 
     def _run_auto_fix_config(cfg_path: Path, wd: Path, diag: Any) -> None:
         from pyqual.validation import detect_project_facts
@@ -440,14 +444,14 @@ def run(
             backup = cfg_path.with_suffix(".yaml.bak")
             cfg_path.rename(backup)
             cfg_path.write_text(new_yaml)
-            console.print(f"  [green]pyqual.yaml rewritten[/green] (backup: {backup.name})")
-            console.print("  [dim]Re-run 'pyqual run' to continue with the fixed config.[/dim]")
+            _sc.print(f"  [green]pyqual.yaml rewritten[/green] (backup: {backup.name})")
+            _sc.print("  [dim]Re-run 'pyqual run' to continue with the fixed config.[/dim]")
         except Exception as exc:
-            console.print(f"  [red]Auto-fix failed: {exc}[/red]")
+            _sc.print(f"  [red]Auto-fix failed: {exc}[/red]")
 
     import pyqual as _pq
+    import yaml as _yaml
     _ver = getattr(_pq, "__version__", "?")
-    console.print(f"[dim]pyqual: {_ver}  config: {config}  workdir: {_workdir}[/dim]")
 
     pipeline = Pipeline(cfg, workdir,
                         on_stage_start=_on_stage_start,
@@ -455,52 +459,67 @@ def run(
                         on_stage_error=_on_stage_error)
     result = pipeline.run(dry_run=dry_run)
 
-    op_sym = {"le": "≤", "ge": "≥", "lt": "<", "gt": ">", "eq": "="}
+    # ── Build structured report and emit as YAML to stdout ──
+    op_sym = {"le": "<=", "ge": ">=", "lt": "<", "gt": ">", "eq": "=="}
+    report: dict[str, Any] = {
+        "pyqual": _ver,
+        "config": str(config),
+        "workdir": str(_workdir),
+        "iterations": [],
+    }
 
     for iteration in result.iterations:
-        console.rule(f"[bold]Iteration {iteration.iteration}[/bold]")
+        iter_data: dict[str, Any] = {
+            "iteration": iteration.iteration,
+            "stages": [],
+            "gates": [],
+            "all_gates_passed": iteration.all_gates_passed,
+        }
         for stage in iteration.stages:
+            sd: dict[str, Any] = {"name": stage.name}
             if stage.skipped:
-                console.print(f"  [dim]{stage.name}: skipped[/dim]")
-                continue
-            icon = "✅" if stage.passed else "❌"
-            console.print(f"  {stage.name}:  {icon}  {stage.duration:.1f}s")
-            metrics = _extract_stage_summary(stage.name, stage.stdout, stage.stderr)
-            for key, val in metrics.items():
-                console.print(f"    {key}: {val}")
-            if not stage.passed:
-                console.print(f"    rc: [red]{stage.returncode}[/red]")
-                err = _get_last_error_line(stage.stderr or stage.stdout or "")
-                if err:
-                    console.print(f"    stderr: [red]{err}[/red]")
+                sd["status"] = "skipped"
+            else:
+                sd["status"] = "passed" if stage.passed else "failed"
+                sd["duration"] = round(stage.duration, 1)
+                metrics = _extract_stage_summary(stage.name, stage.stdout, stage.stderr)
+                sd.update(metrics)
+                if not stage.passed:
+                    sd["rc"] = stage.returncode
+                    err = _get_last_error_line(stage.stderr or stage.stdout or "")
+                    if err:
+                        sd["stderr"] = err
+            iter_data["stages"].append(sd)
 
-        console.print()
-        console.print("  gates:")
         for gate in iteration.gates:
-            gate_icon = "✅" if gate.passed else "❌"
-            val = f"{gate.value:.1f}" if gate.value is not None else "N/A"
-            sym = op_sym.get(gate.operator, gate.operator)
-            color = "green" if gate.passed else "red"
-            console.print(f"    {gate.metric}: [{color}]{val} {sym} {gate.threshold:.1f}  {gate_icon}[/{color}]")
+            gd: dict[str, Any] = {
+                "metric": gate.metric,
+                "value": round(gate.value, 1) if gate.value is not None else None,
+                "threshold": gate.threshold,
+                "operator": op_sym.get(gate.operator, gate.operator),
+                "passed": gate.passed,
+            }
+            iter_data["gates"].append(gd)
 
+        report["iterations"].append(iter_data)
         if iteration.all_gates_passed:
-            console.print("\nresult: [bold green]all_gates_passed[/bold green]")
             break
-        else:
-            console.print(f"\nresult: [yellow]gates_not_met (iteration {iteration.iteration}/{cfg.loop.max_iterations})[/yellow]")
+
+    report["result"] = "all_gates_passed" if result.final_passed else "gates_not_met"
+    report["total_time"] = round(result.total_duration, 1)
+
+    print(_yaml.safe_dump(report, default_flow_style=False, sort_keys=False,
+                          allow_unicode=True), end="")
 
     if not result.final_passed:
-        console.print(f"\n[bold red]Gates not met after {result.iteration_count} iterations.[/bold red]")
         if cfg.loop.on_fail == "create_ticket":
-            console.print("[yellow]Creating planfile tickets from TODO.md...[/yellow]")
+            _sc.print("[yellow]Creating planfile tickets from TODO.md...[/yellow]")
             try:
                 sync_todo_tickets(workdir=workdir, dry_run=False, direction="from")
             except RuntimeError as exc:
-                console.print(f"[red]{exc}[/red]")
+                _sc.print(f"[red]{exc}[/red]")
                 raise typer.Exit(1)
         raise typer.Exit(1)
-
-    console.print(f"total_time: {result.total_duration:.1f}s")
 
 
 @app.command()
@@ -1179,104 +1198,98 @@ def tools() -> None:
     console.print("      optional: true")
 
 
-def _extract_pytest_stage_summary(text: str) -> dict[str, str]:
-    out: dict[str, str] = {}
+def _extract_pytest_stage_summary(text: str) -> dict[str, Any]:
+    out: dict[str, Any] = {}
     m = re.search(r"(\d+) passed", text)
     if m:
-        out["passed"] = f"[green]{m.group(1)}[/]"
+        out["passed"] = int(m.group(1))
     m = re.search(r"(\d+) failed", text)
     if m:
-        out["failed"] = f"[red]{m.group(1)}[/]"
+        out["failed"] = int(m.group(1))
     m = re.search(r"(\d+) error", text)
     if m:
-        out["errors"] = f"[red]{m.group(1)}[/]"
+        out["errors"] = int(m.group(1))
     return out
 
 
-def _extract_lint_stage_summary(text: str) -> dict[str, str]:
+def _extract_lint_stage_summary(text: str) -> dict[str, Any]:
     m = re.search(r"Found (\d+) error", text)
     if m:
-        n = int(m.group(1))
-        return {"lint_errors": f"[{'red' if n else 'green'}]{n}[/]"}
+        return {"lint_errors": int(m.group(1))}
     if "All checks passed" in text:
-        return {"lint_errors": "[green]0[/]"}
+        return {"lint_errors": 0}
     return {}
 
 
-def _extract_prefact_stage_summary(name: str, text: str) -> dict[str, str]:
+def _extract_prefact_stage_summary(name: str, text: str) -> dict[str, Any]:
     m = re.search(r"Total issues:\s*(\d+)\s*active", text)
     if m:
-        n = int(m.group(1))
-        return {"tickets": f"[{'yellow' if n else 'green'}]{n}[/]"}
+        return {"tickets": int(m.group(1))}
     if "prefact" in name.lower():
         open_tickets = text.count("- [ ]")
         if open_tickets:
-            return {"tickets": f"[yellow]{open_tickets}[/]"}
+            return {"tickets": open_tickets}
     return {}
 
 
-def _extract_code2llm_stage_summary(name: str, text: str) -> dict[str, str]:
+def _extract_code2llm_stage_summary(name: str, text: str) -> dict[str, Any]:
     m = re.search(r"(\d+)\s+file", text)
     if m and ("analyze" in name.lower() or "code2llm" in name.lower()):
-        out: dict[str, str] = {"files": m.group(1)}
+        out: dict[str, Any] = {"files": int(m.group(1))}
         m2 = re.search(r"([\d,]+)\s+line", text)
         if m2:
-            out["lines"] = m2.group(1)
+            out["lines"] = int(m2.group(1).replace(",", ""))
         return out
     return {}
 
 
-def _extract_validation_stage_summary(name: str, text: str) -> dict[str, str]:
+def _extract_validation_stage_summary(name: str, text: str) -> dict[str, Any]:
     lower_name = name.lower()
     if "valid" not in lower_name and "vallm" not in lower_name:
         return {}
-    out: dict[str, str] = {}
+    out: dict[str, Any] = {}
     m_cc = re.search(r"CC\u0304?[:\s=]+([0-9.]+)", text)
     if not m_cc:
         m_cc = re.search(r"\bcc[:\s=]+([0-9.]+)", text, re.IGNORECASE)
     if m_cc:
-        out["cc"] = m_cc.group(1)
+        out["cc"] = float(m_cc.group(1))
     m_crit = re.search(r"critical[:\s=]+([0-9]+)", text, re.IGNORECASE)
     if m_crit:
-        out["critical"] = m_crit.group(1)
+        out["critical"] = int(m_crit.group(1))
     return out
 
 
-def _extract_fix_stage_summary(name: str, text: str) -> dict[str, str]:
-    out: dict[str, str] = {}
+def _extract_fix_stage_summary(name: str, text: str) -> dict[str, Any]:
+    out: dict[str, Any] = {}
     m = re.search(r"Selected:\s*\S+\s*\u2192\s*(.+)", text)
     if m:
         out["model"] = m.group(1).strip().split()[0]
     m2 = re.search(r"(\d+)\s+file[s]?\s+changed", text)
     if m2:
-        out["files_changed"] = f"[green]{m2.group(1)}[/]"
+        out["files_changed"] = int(m2.group(1))
     elif "fix" in name.lower():
         m3 = re.search(r"(Applied|No changes)[^\n]*", text)
         if m3:
-            out["status"] = m3.group(0)[:80]
+            out["fix_status"] = m3.group(0)[:80]
     return out
 
 
-def _extract_mypy_stage_summary(name: str, text: str) -> dict[str, str]:  # noqa: ARG001
+def _extract_mypy_stage_summary(name: str, text: str) -> dict[str, Any]:  # noqa: ARG001
     m = re.search(r"Found (\d+) error[s]? in (\d+) file", text)
     if m:
-        return {"mypy_errors": f"[red]{m.group(1)} in {m.group(2)} file(s)[/]"}
+        return {"mypy_errors": int(m.group(1)), "mypy_files": int(m.group(2))}
     return {}
 
 
-def _extract_bandit_stage_summary(text: str) -> dict[str, str]:
+def _extract_bandit_stage_summary(text: str) -> dict[str, Any]:
     m = re.search(r"High: (\d+)\s+Medium: (\d+)\s+Low: (\d+)", text)
     if not m:
         return {}
-    hi, med, lo = int(m.group(1)), int(m.group(2)), int(m.group(3))
-    out: dict[str, str] = {}
-    if hi:
-        out["high"] = f"[red]{hi}[/]"
-    if med:
-        out["medium"] = f"[yellow]{med}[/]"
-    if lo:
-        out["low"] = f"[dim]{lo}[/]"
-    return out
+    return {
+        "bandit_high": int(m.group(1)),
+        "bandit_medium": int(m.group(2)),
+        "bandit_low": int(m.group(3)),
+    }
 
 
 def _format_log_entry_row(entry: dict) -> tuple:

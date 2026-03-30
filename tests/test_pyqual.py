@@ -37,61 +37,56 @@ from pyqual.cli import _extract_stage_summary as _ess
 class TestExtractStageSummary:
     def test_pytest_passed(self) -> None:
         d = _ess("test", "5 passed in 1.4s", "")
-        assert "passed" in d
-        assert "5" in d["passed"]
+        assert d["passed"] == 5
 
     def test_pytest_failed(self) -> None:
         d = _ess("test", "3 passed, 2 failed in 2.1s", "")
-        assert "passed" in d and "3" in d["passed"]
-        assert "failed" in d and "2" in d["failed"]
+        assert d["passed"] == 3
+        assert d["failed"] == 2
 
     def test_pytest_no_match_returns_empty(self) -> None:
         assert _ess("test", "collecting ...", "") == {}
 
     def test_ruff_errors(self) -> None:
-        d = _ess("lint", "Found 7 errors.", "")
-        assert "lint_errors" in d and "7" in d["lint_errors"]
+        assert _ess("lint", "Found 7 errors.", "")["lint_errors"] == 7
 
     def test_ruff_clean(self) -> None:
-        d = _ess("lint", "All checks passed!", "")
-        assert "lint_errors" in d and "0" in d["lint_errors"]
+        assert _ess("lint", "All checks passed!", "")["lint_errors"] == 0
 
     def test_prefact_tickets(self) -> None:
-        d = _ess("prefact", "Total issues: 71 active, 0 completed", "")
-        assert "tickets" in d and "71" in d["tickets"]
+        assert _ess("prefact", "Total issues: 71 active, 0 completed", "")["tickets"] == 71
 
     def test_prefact_zero_tickets(self) -> None:
-        d = _ess("prefact", "Total issues: 0 active, 5 completed", "")
-        assert "tickets" in d and "0" in d["tickets"]
+        assert _ess("prefact", "Total issues: 0 active, 5 completed", "")["tickets"] == 0
 
     def test_validate_cc_critical(self) -> None:
         d = _ess("validate", "cc: 3.1\ncritical: 0", "")
-        assert d.get("cc") == "3.1"
-        assert d.get("critical") == "0"
+        assert d["cc"] == 3.1
+        assert d["critical"] == 0
 
     def test_llx_fix_model(self) -> None:
         d = _ess("fix", "Selected: balanced → claude-sonnet-4-20250514\n", "")
-        assert "model" in d and "claude-sonnet-4-20250514" in d["model"]
+        assert d["model"] == "claude-sonnet-4-20250514"
 
     def test_llx_fix_files_changed(self) -> None:
-        d = _ess("fix", "3 files changed, 42 insertions(+)", "")
-        assert "files_changed" in d and "3" in d["files_changed"]
+        assert _ess("fix", "3 files changed, 42 insertions(+)", "")["files_changed"] == 3
 
     def test_mypy_errors(self) -> None:
         d = _ess("mypy", "", "Found 4 errors in 2 files (checked 12 source files)")
-        assert "mypy_errors" in d and "4" in d["mypy_errors"]
+        assert d["mypy_errors"] == 4
+        assert d["mypy_files"] == 2
 
     def test_bandit_severity(self) -> None:
         d = _ess("bandit", "High: 1  Medium: 3  Low: 5", "")
-        assert "high" in d and "1" in d["high"]
-        assert "medium" in d and "3" in d["medium"]
+        assert d["bandit_high"] == 1
+        assert d["bandit_medium"] == 3
+        assert d["bandit_low"] == 5
 
     def test_empty_output_no_crash(self) -> None:
         assert _ess("analyze", "", "") == {}
 
     def test_uses_stderr_as_fallback(self) -> None:
-        d = _ess("test", "", "5 passed in 0.9s")
-        assert "passed" in d and "5" in d["passed"]
+        assert _ess("test", "", "5 passed in 0.9s")["passed"] == 5
 
 
 def test_gate_set_reads_project_toon_artifacts(tmp_path: Path):
