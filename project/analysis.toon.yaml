@@ -1,48 +1,59 @@
-# code2llm | 12f 2870L | python:11,shell:1 | 2026-03-30
-# CC̄=4.6 | critical:1/145 | dups:0 | cycles:0
+# code2llm | 16f 4734L | python:15,shell:1 | 2026-03-30
+# CC̄=6.1 | critical:8/154 | dups:0 | cycles:0
 
-HEALTH[2]:
+HEALTH[9]:
   🔴 GOD   pyqual/plugins.py = 547L, 11 classes, 24m, max CC=14
-  🟡 CC    _issue_text CC=15 (limit:15)
+  🟡 CC    bulk_run_cmd CC=17 (limit:15)
+  🟡 CC    logs CC=29 (limit:15)
+  🟡 CC    collect_fingerprint CC=37 (limit:15)
+  🟡 CC    _classify_heuristic CC=26 (limit:15)
+  🟡 CC    bulk_init CC=18 (limit:15)
+  🟡 CC    _parse_output_line CC=16 (limit:15)
+  🟡 CC    build_dashboard_table CC=28 (limit:15)
+  🟡 CC    bulk_run CC=17 (limit:15)
 
 REFACTOR[2]:
   1. split pyqual/plugins.py  (god module)
-  2. split 1 high-CC methods  (CC>15)
+  2. split 8 high-CC methods  (CC>15)
 
-PIPELINES[98]:
-  [1] Src [init]: init
+PIPELINES[94]:
+  [1] Src [main]: main → run_project
       PURITY: 100% pure
-  [2] Src [run]: run → sync_todo_tickets → sync_planfile_tickets → _load_sync_integration
+  [2] Src [from_dict]: from_dict
       PURITY: 100% pure
-  [3] Src [gates]: gates
+  [3] Src [load]: load → _load_env_file
       PURITY: 100% pure
-  [4] Src [status]: status
+  [4] Src [_parse]: _parse → load_entry_point_presets → register_preset
       PURITY: 100% pure
-  [5] Src [mcp_fix]: mcp_fix → run_llx_fix_workflow → _resolve_issue_source → _load_issue_source → ...(1 more)
+  [5] Src [is_available]: is_available
       PURITY: 100% pure
 
 LAYERS:
-  pyqual/                         CC̄=4.6    ←in:0  →out:1
+  ./                              CC̄=7.5    ←in:0  →out:0
+  │ run_analysis                88L  0C    2m  CC=11     ←0
+  │ project.sh                  24L  0C    0m  CC=0.0    ←0
+  │
+  pyqual/                         CC̄=6.1    ←in:1  →out:0
+  │ !! cli                       1031L  0C   27m  CC=29     ←0
+  │ !! bulk_init                  697L  3C    7m  CC=37     ←1
   │ !! gates                      601L  3C   31m  CC=14     ←0
   │ !! plugins                    547L  11C   24m  CC=14     ←2
-  │ !! cli                        513L  0C   18m  CC=13     ←0
-  │ !! llx_mcp                    394L  2C   15m  CC=15     ←1
-  │ llx_mcp_service            243L  1C   15m  CC=4      ←0
-  │ pipeline                   154L  4C    7m  CC=6      ←0
-  │ config                     152L  4C    6m  CC=6      ←3
-  │ llm                        119L  2C    7m  CC=6      ←0
+  │ !! bulk_run                   444L  3C    5m  CC=28     ←1
+  │ pipeline                   339L  4C   13m  CC=13     ←0
+  │ tools                      322L  1C    9m  CC=8      ←2
+  │ config                     184L  4C    6m  CC=12     ←4
+  │ llm                        126L  0C    0m  CC=0.0    ←0
+  │ llx_mcp                    102L  0C    2m  CC=6      ←0
+  │ __init__                    85L  0C    0m  CC=0.0    ←0
   │ tickets                     73L  0C    6m  CC=4      ←2
-  │ __init__                    49L  0C    0m  CC=0.0    ←0
+  │ llx_mcp_service             70L  0C    4m  CC=1      ←0
   │ __init__                     1L  0C    0m  CC=0.0    ←0
-  │
-  ./                              CC̄=0.0    ←in:0  →out:0
-  │ project.sh                  24L  0C    0m  CC=0.0    ←0
   │
 
 COUPLING:
-                                    pyqual  pyqual.integrations
-               pyqual                   ──                    1
-  pyqual.integrations                   ←1                   ──
+                      pyqual  run_analysis
+        pyqual            ──            ←1
+  run_analysis             1            ──
   CYCLES: none
 
 EXTERNAL:

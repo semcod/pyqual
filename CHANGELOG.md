@@ -8,6 +8,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.10] - 2026-03-30
 
 ### Fixed
+- Fix ai-boilerplate issues (ticket-b9090fc9)
+- Fix duplicate-imports issues (ticket-23eaebd9)
+- Fix string-concat issues (ticket-2d3f8393)
+- Fix unused-imports issues (ticket-7b55429d)
+- Fix duplicate-imports issues (ticket-6532aee5)
+- Fix magic-numbers issues (ticket-5ceab799)
+- Fix string-concat issues (ticket-50135bff)
+- Fix unused-imports issues (ticket-5d12f8dd)
+- Fix magic-numbers issues (ticket-bba0cb4f)
+- Fix string-concat issues (ticket-cab0a541)
+- Fix smart-return-type issues (ticket-6f91d8d7)
+- Fix unused-imports issues (ticket-778b0159)
+- Fix magic-numbers issues (ticket-7024a84c)
+- Fix ai-boilerplate issues (ticket-0b7c06b9)
+
+## [0.1.38] - 2026-03-30
+
+### Added
+- **Bulk initialization** (`pyqual bulk-init`): Auto-generate `pyqual.yaml` for all subprojects in a workspace using LLM classification with JSON schema and heuristic fallback. Detects Python, Node.js, PHP, Makefile, Rust, and Go projects.
+- **Bulk runner** (`pyqual bulk-run`): Run pyqual across multiple projects with a real-time dashboard showing status, iteration progress, current stage, gates, and elapsed time for each project.
+- Parallel execution with configurable concurrency (`--parallel`)
+- Project filtering (`--filter` name)
+- Per-project timeout (`--timeout`)
+- CI mode (`--no-live` for non-interactive environments)
+- JSON output mode (`--json`)
+- Smart skipping of artifact/data directories (venv, node_modules, recordings, archives)
+- Protection against overwriting existing `pyqual.yaml` (use `--overwrite` to force)
+
+## [0.1.10] - 2026-03-30
+
+### Fixed
 - Fix unused-imports issues (ticket-d962f5ce)
 - Fix magic-numbers issues (ticket-b3de414a)
 - Fix ai-boilerplate issues (ticket-b002f9fb)
@@ -75,6 +106,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix string-concat issues (ticket-fc5da382)
 
 ## [Unreleased]
+
+## [0.1.39] - 2026-03-30
+
+### Docs
+- Update CHANGELOG.md
+- Update README.md
+- Update TODO.md
+- Update docs/README.md
+- Update docs/quickstart.md
+- Update project/README.md
+- Update project/context.md
+
+### Other
+- Update planfile.yaml
+- Update project/analysis.toon.yaml
+- Update project/calls.mmd
+- Update project/calls.png
+- Update project/compact_flow.mmd
+- Update project/compact_flow.png
+- Update project/duplication.toon.yaml
+- Update project/evolution.toon.yaml
+- Update project/flow.mmd
+- Update project/flow.png
+- ... and 5 more files
 
 ## [0.1.38] - 2026-03-30
 

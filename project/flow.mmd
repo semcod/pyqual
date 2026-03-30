@@ -4,41 +4,41 @@ flowchart TD
     classDef entry fill:#4dabf7,stroke:#1971c2,color:#fff
 
     subgraph CLI
+        pyqual__cli___setup_logging["_setup_logging"]
         pyqual__cli__init["init"]
+        pyqual__cli__bulk_init_cmd["bulk_init_cmd"]
+        pyqual__cli__bulk_run_cmd["bulk_run_cmd"]
         pyqual__cli__run["run"]
         pyqual__cli__gates["gates"]
         pyqual__cli__status["status"]
+        pyqual__cli___run_mcp_workflow["_run_mcp_workflow"]
         pyqual__cli__mcp_fix["mcp_fix"]
+        pyqual__cli__mcp_refactor["mcp_refactor"]
         pyqual__cli__mcp_service["mcp_service"]
         pyqual__cli__tickets_todo["tickets_todo"]
         pyqual__cli__tickets_github["tickets_github"]
         pyqual__cli__tickets_all["tickets_all"]
         pyqual__cli___plugin_list["_plugin_list"]
-        pyqual__cli___plugin_search["_plugin_search"]
-        pyqual__cli___plugin_info["_plugin_info"]
-        pyqual__cli___plugin_add["_plugin_add"]
-        pyqual__cli___plugin_remove["_plugin_remove"]
-        pyqual__cli___plugin_validate["_plugin_validate"]
-        ...["+3 more"]
+        ...["+12 more"]
     end
 
     subgraph Core
+        run_analysis__run_project("run_project CC=11")
+        run_analysis__main["main"]
+        pyqual__config___load_env_file["_load_env_file"]
         pyqual__config__GateConfig__from_dict["from_dict"]
         pyqual__config__PyqualConfig__load["load"]
         pyqual__config__PyqualConfig___parse["_parse"]
         pyqual__config__PyqualConfig__default_yaml["default_yaml"]
-        pyqual__llm__LLM__complete["complete"]
-        pyqual__llm__LLM__fix_code["fix_code"]
-        pyqual__llm__get_llm["get_llm"]
+        pyqual__tools__ToolPreset__is_available["is_available"]
+        pyqual__tools__ToolPreset__shell_command["shell_command"]
+        pyqual__tools__is_builtin["is_builtin"]
+        pyqual__tools__resolve_stage_command["resolve_stage_command"]
         pyqual__plugins__PluginMetadata____post_init__["__post_init__"]
         pyqual__plugins__MetricCollector__collect["collect"]
         pyqual__plugins__MetricCollector__get_config_example["get_config_example"]
         pyqual__plugins__PluginRegistry__register["register"]
-        pyqual__plugins__PluginRegistry__get["get"]
-        pyqual__plugins__PluginRegistry__list_plugins["list_plugins"]
-        pyqual__plugins__PluginRegistry__create_instance["create_instance"]
-        pyqual__plugins__LLMBenchCollector__collect["collect"]
-        ...["+72 more"]
+        ...["+69 more"]
     end
 
-    class pyqual__cli__init,pyqual__cli__run,pyqual__cli__gates,pyqual__cli__status,pyqual__cli__mcp_fix,pyqual__cli__mcp_service,pyqual__cli__tickets_todo,pyqual__cli__tickets_github,pyqual__cli__tickets_all,pyqual__cli___plugin_list entry
+    class run_analysis__main,pyqual__config__GateConfig__from_dict,pyqual__config__PyqualConfig__load,pyqual__config__PyqualConfig___parse,pyqual__config__PyqualConfig__default_yaml,pyqual__tools__ToolPreset__is_available,pyqual__tools__ToolPreset__shell_command,pyqual__tools__is_builtin,pyqual__tools__resolve_stage_command,pyqual__cli___setup_logging entry

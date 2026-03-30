@@ -1,7 +1,7 @@
 <!-- code2docs:start --># pyqual
 
-![version](https://img.shields.io/badge/version-0.1.0-blue) ![python](https://img.shields.io/badge/python-%3E%3D3.9-blue) ![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey) ![functions](https://img.shields.io/badge/functions-145-green)
-> **145** functions | **29** classes | **23** files | CC̄ = 4.7
+![version](https://img.shields.io/badge/version-0.1.0-blue) ![python](https://img.shields.io/badge/python-%3E%3D3.9-blue) ![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey) ![functions](https://img.shields.io/badge/functions-154-green)
+> **154** functions | **31** classes | **27** files | CC̄ = 6.1
 
 > Auto-generated project documentation from source code analysis.
 
@@ -31,9 +31,9 @@ pip install -e .
 pip install pyqual[analysis]    # analysis features
 pip install pyqual[costs]    # costs features
 pip install pyqual[dev]    # development tools
-pip install pyqual[llx]     # llx-backed MCP helpers and shared utilities
-pip install pyqual[mcp]     # mcp features (includes llx)
-pip install pyqual[all]     # all optional features (includes llx)
+pip install pyqual[llx]    # llx features
+pip install pyqual[mcp]    # mcp features
+pip install pyqual[all]    # all optional features
 ```
 
 ## Quick Start
@@ -41,90 +41,127 @@ pip install pyqual[all]     # all optional features (includes llx)
 ### CLI Usage
 
 ```bash
-# Initialize project with default pyqual.yaml
-pyqual init
+# Generate full documentation for your project
+pyqual ./my-project
 
-# Run the quality pipeline loop
-pyqual run
+# Only regenerate README
+pyqual ./my-project --readme-only
 
-# Check quality gates without running stages
-pyqual gates
+# Preview what would be generated (no file writes)
+pyqual ./my-project --dry-run
 
-# Show current metrics
-pyqual status
+# Check documentation health
+pyqual check ./my-project
 
-# Preview without executing
-pyqual run --dry-run
-
-# List available tool presets
-pyqual tools
-
-# Check tool availability
-pyqual doctor
+# Sync — regenerate only changed modules
+pyqual sync ./my-project
 ```
 
 ### Python API
 
 ```python
-from pyqual import Pipeline, PyqualConfig, GateSet
+from pyqual import generate_readme, generate_docs, Code2DocsConfig
 
-# Run full pipeline
-config = PyqualConfig.load("pyqual.yaml")
-result = Pipeline(config).run()
+# Quick: generate README
+generate_readme("./my-project")
 
-# Check gates only
-gate_set = GateSet(config.gates)
-results = gate_set.check_all()
+# Full: generate all documentation
+config = Code2DocsConfig(project_name="mylib", verbose=True)
+docs = generate_docs("./my-project", config=config)
 ```
 
-## Tool Presets
+## Generated Output
 
-Use `tool:` instead of complex shell commands — pyqual handles invocation, output capture, and error handling:
+When you run `pyqual`, the following files are produced:
+
+```
+<project>/
+├── README.md                 # Main project README (auto-generated sections)
+├── docs/
+│   ├── api.md               # Consolidated API reference
+│   ├── modules.md           # Module documentation with metrics
+│   ├── architecture.md      # Architecture overview with diagrams
+│   ├── dependency-graph.md  # Module dependency graphs
+│   ├── coverage.md          # Docstring coverage report
+│   ├── getting-started.md   # Getting started guide
+│   ├── configuration.md    # Configuration reference
+│   └── api-changelog.md    # API change tracking
+├── examples/
+│   ├── quickstart.py       # Basic usage examples
+│   └── advanced_usage.py   # Advanced usage examples
+├── CONTRIBUTING.md         # Contribution guidelines
+└── mkdocs.yml             # MkDocs site configuration
+```
+
+## Configuration
+
+Create `pyqual.yaml` in your project root (or run `pyqual init`):
 
 ```yaml
-stages:
-  - name: lint
-    tool: ruff           # built-in preset
+project:
+  name: my-project
+  source: ./
+  output: ./docs/
 
-  - name: secrets
-    tool: trufflehog
-    optional: true       # skip if not installed
+readme:
+  sections:
+    - overview
+    - install
+    - quickstart
+    - api
+    - structure
+  badges:
+    - version
+    - python
+    - coverage
+  sync_markers: true
 
-  - name: custom
-    run: my-tool --flag  # custom command still works
+docs:
+  api_reference: true
+  module_docs: true
+  architecture: true
+  changelog: true
+
+examples:
+  auto_generate: true
+  from_entry_points: true
+
+sync:
+  strategy: markers    # markers | full | git-diff
+  watch: false
+  ignore:
+    - "tests/"
+    - "__pycache__"
 ```
 
-**15 built-in presets:** ruff, pylint, flake8, mypy, interrogate, radon, bandit, pip-audit, trufflehog, gitleaks, safety, pytest, code2llm, vallm, cyclonedx
+## Sync Markers
 
-List all: `pyqual tools`
+pyqual can update only specific sections of an existing README using HTML comment markers:
+
+```markdown
+<!-- pyqual:start -->
+# Project Title
+... auto-generated content ...
+<!-- pyqual:end -->
+```
+
+Content outside the markers is preserved when regenerating. Enable this with `sync_markers: true` in your configuration.
 
 ## Architecture
 
 ```
 pyqual/
-├── cli.py                  # CLI commands (typer)
-├── config.py               # YAML configuration loader
-├── gates.py                # Quality gate checking + metric collection
-├── pipeline.py             # Pipeline loop executor
-├── plugins.py              # Plugin system (MetricCollector base)
-├── tools.py                # Built-in tool presets (15 tools)
-├── llm.py                  # LiteLLM wrapper
-├── tickets.py              # Planfile ticket sync
-└── integrations/
-    ├── llx_mcp.py          # thin llx MCP client/wrapper helpers
-    └── llx_mcp_service.py  # thin MCP SSE service wrapper (delegates to llx)
-```
+├── run_analysis    ├── llm    ├── tools    ├── config    ├── cli├── pyqual/    ├── tickets    ├── plugins    ├── gates        ├── llx_mcp_service    ├── integrations/        ├── llx_mcp        ├── metric_history    ├── pipeline        ├── dynamic_thresholds        ├── composite_gates    ├── bulk_init        ├── minimal        ├── check_gates        ├── run_pipeline        ├── performance_collector        ├── run_pipeline├── project        ├── demo        ├── sync_tickets        ├── code_health_collector    ├── bulk_run```
 
 ## API Overview
 
 ### Classes
 
+- **`ToolPreset`** — Definition of a built-in tool invocation preset.
 - **`StageConfig`** — Single pipeline stage.
 - **`GateConfig`** — Single quality gate threshold.
 - **`LoopConfig`** — Loop iteration settings.
 - **`PyqualConfig`** — Full pyqual.yaml configuration.
-- **`LLMResponse`** — Response from LLM call (re-exported from `llx.llm`).
-- **`LLM`** — LiteLLM wrapper with .env configuration (re-exported from `llx.llm`).
 - **`PluginMetadata`** — Metadata for a pyqual plugin.
 - **`MetricCollector`** — Base class for metric collector plugins.
 - **`PluginRegistry`** — Registry for metric collector plugins.
@@ -135,62 +172,83 @@ pyqual/
 - **`A11yCollector`** — Accessibility (a11y) compliance metrics.
 - **`RepoMetricsCollector`** — Advanced repository health metrics (bus factor, diversity).
 - **`SecurityCollector`** — Security scanning metrics from trufflehog, gitleaks, safety.
-- **`LlxMcpFixCollector`** — Dockerized llx MCP fixer workflow results.
+- **`LlxMcpFixCollector`** — Dockerized llx MCP fix/refactor workflow results.
+- **`GateResult`** — Result of a single gate check.
+- **`Gate`** — Single quality gate with metric extraction.
+- **`GateSet`** — Collection of quality gates with metric collection.
 - **`StageResult`** — Result of running a single stage.
 - **`IterationResult`** — Result of one full pipeline iteration.
 - **`PipelineResult`** — Result of the complete pipeline run (all iterations).
 - **`Pipeline`** — Execute pipeline stages in a loop until quality gates pass.
-- **`LlxMcpRunResult`** — Result of an llx MCP fix workflow.
-- **`LlxMcpClient`** — MCP client re-exported from `llx.mcp.client`.
+- **`ProjectFingerprint`** — Lightweight summary of a project directory sent to LLM for classification.
+- **`ProjectConfig`** — Parsed LLM response — project-specific config decisions.
+- **`BulkInitResult`** — Summary of a bulk-init run.
 - **`PerformanceCollector`** — Collect latency and throughput metrics from load test results.
 - **`CodeHealthCollector`** — Weighted composite health score from multiple code quality signals.
-- **`GateResult`** — Result of a single gate check.
-- **`Gate`** — Single quality gate with metric extraction.
-- **`GateSet`** — Collection of quality gates with metric collection.
-- **`McpServiceState`** — Runtime state re-exported from `llx.mcp.service`.
+- **`RunStatus`** — —
+- **`ProjectRunState`** — Mutable state for a single project's pyqual run.
+- **`BulkRunResult`** — Summary of a bulk-run session.
 
 ### Functions
 
+- `run_project(project_path)` — —
+- `main()` — —
+- `get_preset(name)` — Look up a tool preset by name (case-insensitive).
+- `list_presets()` — Return sorted list of available preset names.
+- `is_builtin(name)` — Return True if *name* is a built-in (not externally registered) preset.
+- `register_preset(name, preset)` — Register a custom tool preset at runtime.
+- `register_custom_tools_from_yaml(custom_tools)` — Register tool presets from the ``custom_tools:`` YAML section.
+- `load_entry_point_presets()` — Discover and load tool presets from ``pyqual.tools`` entry point group.
+- `resolve_stage_command(tool_name, workdir)` — Resolve a tool name to (shell_command, allow_failure).
 - `init(path)` — Create pyqual.yaml with sensible defaults.
-- `run(config, dry_run, workdir)` — Execute pipeline loop until quality gates pass.
+- `bulk_init_cmd(path, dry_run, no_llm, model)` — Bulk-generate pyqual.yaml for every project in a directory.
+- `bulk_run_cmd(path, parallel, dry_run, timeout)` — Run pyqual across all projects with a real-time dashboard.
+- `run(config, dry_run, workdir, verbose)` — Execute pipeline loop until quality gates pass.
 - `gates(config, workdir)` — Check quality gates without running stages.
 - `status(config, workdir)` — Show current metrics and pipeline config.
 - `mcp_fix(workdir, project_path, issues, output)` — Run the llx-backed MCP fix workflow.
+- `mcp_refactor(workdir, project_path, issues, output)` — Run the llx-backed MCP refactor workflow.
 - `mcp_service(host, port)` — Run the persistent llx MCP service with health and metrics endpoints.
 - `tickets_todo(workdir, dry_run, direction)` — Sync TODO.md tickets using planfile's markdown backend.
 - `tickets_github(workdir, dry_run, direction)` — Sync GitHub Issues using planfile's GitHub backend.
 - `tickets_all(workdir, dry_run, direction)` — Sync TODO.md and GitHub tickets using planfile.
 - `plugin(action, name, workdir, tag)` — Manage pyqual plugins - add, remove, search metric collectors.
 - `doctor()` — Check availability of external tools used by pyqual collectors.
-- `get_llm_model()` — Get LLM model from environment or default (re-exported from `llx.llm`).
-- `get_api_key()` — Get OpenRouter API key from environment (re-exported from `llx.llm`).
-- `get_llm(model)` — Get configured LLM instance (re-exported from `llx.llm`).
+- `tools()` — List built-in tool presets for pipeline stages.
+- `logs(workdir, tail, level, failed)` — View structured pipeline logs from .pyqual/pipeline.db (nfo SQLite).
 - `sync_planfile_tickets(source, directory, dry_run, direction)` — Sync tickets via planfile backends.
 - `sync_todo_tickets(directory, dry_run, direction)` — Sync TODO.md tickets through planfile's markdown backend.
 - `sync_github_tickets(directory, dry_run, direction)` — Sync GitHub issues through planfile's GitHub backend.
 - `sync_all_tickets(directory, dry_run, direction)` — Sync TODO.md and GitHub tickets through planfile.
 - `get_available_plugins()` — Get metadata for all available built-in plugins.
 - `install_plugin_config(name, workdir)` — Generate YAML configuration snippet for a named plugin.
+- `create_app(state, llx_server)` — Create an ASGI app — delegates to ``llx.mcp.service.create_service_app``.
+- `run_server(host, port, state)` — Run the persistent MCP service with uvicorn.
+- `build_parser()` — Build the CLI parser for the MCP service.
+- `main(argv)` — CLI entry point for the llx MCP service.
+- `build_parser()` — Build the CLI parser for the llx MCP helper.
+- `main(argv)` — CLI entry point used by pyqual pipeline stages.
 - `load_history(workdir)` — Load metric history from JSON file.
 - `save_snapshot(workdir, metrics)` — Append current metrics as a timestamped snapshot and return full history.
 - `detect_regressions(history, tolerance)` — Compare latest snapshot to previous and detect regressions.
 - `print_trend_report(analysis)` — Print trend analysis and return True if no regressions found.
+- `main()` — Run the metric history self-test with synthetic history.
+- `main()` — Run the dynamic-threshold gate example.
 - `compute_composite_score(metrics)` — Compute a weighted quality score (0–100) from available metrics.
 - `run_composite_check(workdir)` — Run individual gates + composite score on a workdir.
-- `build_fix_prompt(project_path, issues, analysis, prompt_limit)` — Shared prompt builder re-exported from `llx.utils.issues`.
-- `run_llx_fix_workflow(workdir, project_path, issues_path, output_path)` — Run the analysis + fix workflow and save a JSON report.
-- `build_parser()` — Build the CLI parser for the llx MCP helper.
-- `main(argv)` — CLI entry point used by pyqual pipeline stages.
+- `collect_fingerprint(project_dir)` — Collect a lightweight fingerprint from a project directory.
+- `classify_with_llm(fp, model)` — Send fingerprint to LLM, parse structured response.
+- `generate_pyqual_yaml(project_name, cfg)` — Generate pyqual.yaml content from a ProjectConfig.
+- `bulk_init(root)` — Scan subdirectories of *root* and generate pyqual.yaml for each project.
 - `build_report(result, gate_results)` — Build a structured JSON report from pipeline + gate results.
 - `main()` — —
 - `check_tool()` — —
 - `sync_from_cli(args)` — Parse CLI args and run the appropriate sync.
 - `tickets_from_gate_failures(workdir, dry_run)` — Check gates and create tickets for any failures.
 - `main()` — —
-- `create_app(state, llx_server)` — Create an ASGI app that delegates to `llx.mcp.service`.
-- `run_server(host, port, state)` — Run the persistent MCP service via `llx.mcp.service` and uvicorn.
-- `build_parser()` — Build the CLI parser for the MCP service.
-- `main(argv)` — CLI entry point for the llx MCP service.
+- `build_dashboard_table(states)` — Build a Rich Table showing the current status of all projects.
+- `discover_projects(root)` — Find all subdirectories with pyqual.yaml and create run states.
+- `bulk_run(root)` — Run pyqual across all projects with parallel execution.
 
 
 ## Project Structure
@@ -199,8 +257,8 @@ pyqual/
 📄 `examples.basic.minimal`
 📄 `examples.basic.run_pipeline`
 📄 `examples.custom_gates.composite_gates` (2 functions)
-📄 `examples.custom_gates.dynamic_thresholds`
-📄 `examples.custom_gates.metric_history` (4 functions)
+📄 `examples.custom_gates.dynamic_thresholds` (1 functions)
+📄 `examples.custom_gates.metric_history` (5 functions)
 📄 `examples.custom_plugins.code_health_collector` (2 functions, 1 classes)
 📄 `examples.custom_plugins.performance_collector` (2 functions, 1 classes)
 📄 `examples.llx.demo` (1 functions)
@@ -208,21 +266,25 @@ pyqual/
 📄 `examples.ticket_workflow.sync_tickets` (3 functions)
 📄 `project`
 📦 `pyqual`
-📄 `pyqual.cli` (18 functions)
+📄 `pyqual.bulk_init` (7 functions, 3 classes)
+📄 `pyqual.bulk_run` (5 functions, 3 classes)
+📄 `pyqual.cli` (27 functions)
 📄 `pyqual.config` (6 functions, 4 classes)
 📄 `pyqual.gates` (32 functions, 3 classes)
 📦 `pyqual.integrations`
-📄 `pyqual.integrations.llx_mcp` (15 functions, 2 classes)
-📄 `pyqual.integrations.llx_mcp_service` (15 functions, 1 classes)
-📄 `pyqual.llm` (7 functions, 2 classes)
-📄 `pyqual.pipeline` (7 functions, 4 classes)
+📄 `pyqual.integrations.llx_mcp` (2 functions)
+📄 `pyqual.integrations.llx_mcp_service` (4 functions)
+📄 `pyqual.llm`
+📄 `pyqual.pipeline` (13 functions, 4 classes)
 📄 `pyqual.plugins` (24 functions, 11 classes)
 📄 `pyqual.tickets` (6 functions)
+📄 `pyqual.tools` (9 functions, 1 classes)
+📄 `run_analysis` (2 functions)
 
 ## Requirements
 
 - Python >= >=3.9
-- pyyaml >=6.0- typer >=0.12- rich >=13.0- litellm >=1.0- python-dotenv >=1.0- mcp >=1.0- prefact- planfile
+- pyyaml >=6.0- typer >=0.12- rich >=13.0- litellm >=1.0- python-dotenv >=1.0- mcp >=1.0- nfo >=0.2.13- prefact- planfile
 
 ## Contributing
 

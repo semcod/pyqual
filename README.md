@@ -2,7 +2,7 @@
 
 ## AI Cost Tracking
 
-![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.38-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.39-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
 ![AI Cost](https://img.shields.io/badge/AI%20Cost-$1.05-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-5.0h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
 
 - 🤖 **LLM usage:** $1.0500 (7 commits)
@@ -93,6 +93,8 @@ pipeline:
 
 ```bash
 pyqual init              # create pyqual.yaml
+pyqual bulk-init .       # auto-generate pyqual.yaml for all subprojects
+pyqual bulk-run .        # run all projects with live dashboard
 pyqual run               # execute full loop
 pyqual run --dry-run     # preview without executing
 pyqual gates             # check gates without running stages
@@ -114,6 +116,55 @@ pyqual plugin add <name>              # add plugin to config
 pyqual plugin remove <name>           # remove plugin from config
 pyqual plugin validate                # validate configuration
 ```
+
+## Bulk Operations
+
+Manage multiple projects in a workspace with `bulk-init` and `bulk-run`.
+
+### `pyqual bulk-init`
+
+Auto-generate `pyqual.yaml` for every subdirectory in a workspace.
+
+```bash
+pyqual bulk-init /path/to/workspace
+pyqual bulk-init /path/to/workspace --dry-run           # preview only
+pyqual bulk-init /path/to/workspace --no-llm          # use heuristics only
+pyqual bulk-init /path/to/workspace --overwrite       # regenerate existing configs
+```
+
+- Detects project type (Python, Node.js, PHP, Makefile, etc.)
+- Uses LLM classification with JSON schema or heuristic fallback
+- Never overwrites existing `pyqual.yaml` unless `--overwrite` is used
+- Skips data/artifact directories (venv, node_modules, recordings, etc.)
+
+### `pyqual bulk-run`
+
+Run pyqual across all projects with a real-time dashboard.
+
+```bash
+pyqual bulk-run /path/to/workspace
+pyqual bulk-run /path/to/workspace --parallel 8         # more concurrency
+pyqual bulk-run /path/to/workspace --dry-run          # simulate only
+pyqual bulk-run /path/to/workspace --filter mylib      # run selected projects
+pyqual bulk-run /path/to/workspace --timeout 600       # 10min per project
+pyqual bulk-run /path/to/workspace --no-live           # no dashboard (CI mode)
+pyqual bulk-run /path/to/workspace --json              # JSON output
+```
+
+**Live Dashboard:**
+```
+pyqual bulk-run  running:3  pass:12  fail:1  err:0  queue:43  total:59
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━┳━━━━━━┓
+┃Project       ┃  Status    ┃ Iter  ┃ Stage    ┃  Progress  ┃ Gates ┃ Time ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━╇━━━━━━┩
+│aidesk        │ ✅ passed   │  2/3  │          │   100%     │  2/2  │12.3s │
+│allama        │ 🔄 running │  1/3  │ validate │ ████░░░░░░ │  0/2  │ 8.5s │
+│blog-pactown  │ ❌ failed   │  3/3  │          │   60%      │  1/2  │45.2s │
+│...           │ ⏳ queued   │       │          │            │       │      │
+└──────────────┴────────────┴───────┴──────────┴────────────┴───────┴──────┘
+```
+
+Shows status, iteration progress, current stage, gate results, and elapsed time in real-time.
 
 ## Python API
 
