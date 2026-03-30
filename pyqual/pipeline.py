@@ -24,6 +24,7 @@ PIPELINE_DB = ".pyqual/pipeline.db"
 PIPELINE_TABLE = "pipeline_logs"
 
 TIMEOUT_EXIT_CODE = 124
+STDERR_TAIL_CHARS = 500
 
 
 @dataclass
@@ -71,13 +72,14 @@ class Pipeline:
 
     def __init__(self, config: PyqualConfig, workdir: str | Path = ".",
                  on_stage_start: Any = None, on_iteration_start: Any = None,
-                 on_stage_error: Any = None):
+                 on_stage_error: Any = None, on_stage_done: Any = None):
         self.config = config
         self.workdir = Path(workdir).resolve()
         self.gate_set = GateSet(config.gates)
         self.on_stage_start = on_stage_start
         self.on_iteration_start = on_iteration_start
         self.on_stage_error = on_stage_error
+        self.on_stage_done = on_stage_done
         self._ensure_pyqual_dir()
         self._nfo = self._init_nfo()
 
@@ -137,6 +139,9 @@ class Pipeline:
 
             stage_result = self._execute_stage(stage_cfg, dry_run)
             iteration.stages.append(stage_result)
+            if self.on_stage_done:
+                self.on_stage_done(stage_result.name, stage_result.passed,
+                                   stage_result.duration, stage_result.skipped)
 
         iteration.gates = self.gate_set.check_all(self.workdir)
         iteration.all_gates_passed = all(g.passed for g in iteration.gates)
@@ -333,7 +338,7 @@ class Pipeline:
             "allow_failure": bool(preset and preset.allow_failure),
         }
         if result.stderr:
-            kwargs["stderr_tail"] = result.stderr[-500:]
+            kwargs["stderr_tail"] = result.stderr[-STDERR_TAIL_CHARS:]
 
         level_str = "INFO" if result.passed else "WARNING"
         log.log(logging.INFO if result.passed else logging.WARNING,

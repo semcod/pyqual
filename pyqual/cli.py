@@ -412,12 +412,18 @@ def run(
     _sc = stderr_console  # live progress → stderr (keeps stdout clean YAML)
 
     def _on_iter_start(num: int) -> None:
-        if verbose:
-            _sc.print(f"[dim]─── Iteration {num} ───[/dim]")
+        _sc.print(f"[dim]─── Iteration {num} ───[/dim]")
 
     def _on_stage_start(name: str) -> None:
-        if verbose:
-            _sc.print(f"[dim]▶ {name}[/dim]")
+        _sc.print(f"[dim]▶ {name}[/dim]")
+
+    def _on_stage_done(name: str, passed: bool, duration: float, skipped: bool) -> None:
+        if skipped:
+            _sc.print(f"[dim]  ⏭ {name} (skipped)[/dim]")
+        elif passed:
+            _sc.print(f"[dim]  ✅ {name} ({duration:.1f}s)[/dim]")
+        else:
+            _sc.print(f"[dim]  ❌ {name} ({duration:.1f}s)[/dim]")
 
     def _on_stage_error(failure: Any) -> None:  # failure: StageFailure
         from pyqual.validation import EC, ErrorDomain, validate_config
@@ -510,7 +516,8 @@ def run(
     pipeline = Pipeline(cfg, workdir,
                         on_stage_start=_on_stage_start,
                         on_iteration_start=_on_iter_start,
-                        on_stage_error=_on_stage_error)
+                        on_stage_error=_on_stage_error,
+                        on_stage_done=_on_stage_done)
     result = pipeline.run(dry_run=dry_run)
 
     # ── Build structured report and emit as YAML to stdout ──
@@ -771,7 +778,7 @@ Rules:
 def status(
     config: Path = typer.Option("pyqual.yaml", "--config", "-c"),
     workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
-):
+) -> None:
     """Show current metrics and pipeline config."""
     cfg = PyqualConfig.load(config)
     gate_set = GateSet(cfg.gates)
@@ -1159,7 +1166,7 @@ def plugin(
     name: str | None = typer.Argument(None, help="Plugin name (for add/remove/info)"),
     workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
     tag: str | None = typer.Option(None, "--tag", "-t", help="Filter by tag (for list/search)"),
-):
+) -> None:
     """Manage pyqual plugins - add, remove, search metric collectors."""
     plugins = get_available_plugins()
     if action == "list":
@@ -1179,7 +1186,7 @@ def plugin(
 
 
 @app.command()
-def doctor():
+def doctor() -> None:
     """Check availability of external tools used by pyqual collectors."""
     tools = [
         ("docker", "Container runtime for the llx MCP service", "Install Docker Engine"),

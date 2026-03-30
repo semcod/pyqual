@@ -3,7 +3,7 @@ flowchart TD
     examples__ticket_workflow["examples.ticket_workflow<br/>3 funcs"]
     pyqual__bulk_init["pyqual.bulk_init<br/>15 funcs"]
     pyqual__bulk_run["pyqual.bulk_run<br/>7 funcs"]
-    pyqual__cli["pyqual.cli<br/>40 funcs"]
+    pyqual__cli["pyqual.cli<br/>41 funcs"]
     pyqual__config["pyqual.config<br/>6 funcs"]
     pyqual__gates["pyqual.gates<br/>6 funcs"]
     pyqual__pipeline["pyqual.pipeline<br/>13 funcs"]
@@ -24,6 +24,6 @@ flowchart TD
     run_analysis -->|1| pyqual__config
     pyqual__gates -->|1| pyqual__plugins
     pyqual__cli -->|1| pyqual__bulk_init
-    examples__multi_gate_pipeline -->|1| pyqual__config
-    examples__ticket_workflow -->|1| pyqual__config
     pyqual__bulk_run -->|1| pyqual__validation
+    examples__ticket_workflow -->|1| pyqual__config
+    examples__multi_gate_pipeline -->|1| pyqual__config

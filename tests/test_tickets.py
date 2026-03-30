@@ -116,7 +116,8 @@ def test_run_on_fail_create_ticket_syncs_todo_tickets(tmp_path: Path, monkeypatc
 
     class FakePipeline:
         def __init__(self, config: object, workdir: Path, on_stage_start=None,
-                     on_iteration_start=None, on_stage_error=None):
+                     on_iteration_start=None, on_stage_error=None,
+                     on_stage_done=None):
             self.config = config
             self.workdir = workdir
 

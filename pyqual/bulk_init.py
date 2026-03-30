@@ -283,9 +283,9 @@ def _build_llm_prompt(fp: ProjectFingerprint) -> str:
     fp_dict = asdict(fp)
     # Trim large fields
     if len(fp_dict.get("readme_excerpt", "")) > 300:
-        fp_dict["readme_excerpt"] = fp_dict["readme_excerpt"][:300] + "..."
+        fp_dict["readme_excerpt"] = f"{fp_dict['readme_excerpt'][:300]}..."
     if len(fp_dict.get("top_level_files", [])) > 30:
-        fp_dict["top_level_files"] = fp_dict["top_level_files"][:30] + ["..."]
+        fp_dict["top_level_files"] = [*fp_dict["top_level_files"][:30], "..."]
 
     return (
         f"## Project fingerprint\n\n"

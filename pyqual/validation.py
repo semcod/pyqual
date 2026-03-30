@@ -31,6 +31,8 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
+CONFIG_READ_MAX_CHARS = 2000
+
 
 # ---------------------------------------------------------------------------
 # Standardised error taxonomy
@@ -456,6 +458,6 @@ def detect_project_facts(workdir: Path) -> dict[str, Any]:
     # Existing pyqual.yaml
     config_path = workdir / "pyqual.yaml"
     if config_path.exists():
-        facts["current_config"] = config_path.read_text()[:2000]
+        facts["current_config"] = config_path.read_text()[:CONFIG_READ_MAX_CHARS]
 
     return facts

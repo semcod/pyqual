@@ -8,17 +8,17 @@ from pyqual.config import GateConfig
 from pyqual.gates import GateSet
 
 
-def test_placeholder():
+def test_placeholder() -> None:
     """Placeholder test to verify the test setup works."""
     assert True
 
 
-def test_import():
+def test_import() -> None:
     """Verify the main package can be imported."""
     import pyqual  # noqa: F401
 
 
-def test_llm_exports_use_llx_when_available():
+def test_llm_exports_use_llx_when_available() -> None:
     """Verify pyqual re-exports the llx LLM API when llx is installed."""
     llx = pytest.importorskip("llx")
     import pyqual
@@ -89,7 +89,7 @@ class TestExtractStageSummary:
         assert _ess("test", "", "5 passed in 0.9s")["passed"] == 5
 
 
-def test_gate_set_reads_project_toon_artifacts(tmp_path: Path):
+def test_gate_set_reads_project_toon_artifacts(tmp_path: Path) -> None:
     """Verify metrics are collected from dotted toon files in project/."""
     project_dir = tmp_path / "project"
     project_dir.mkdir()

@@ -1,10 +1,10 @@
-# pyqual | 161 func | 15f | 8077L | python | 2026-03-30
+# pyqual | 162 func | 15f | 8146L | python | 2026-03-30
 
 HEALTH:
-  CC̄=6.1  critical=36 (limit:10)  dup=0  cycles=0
+  CC̄=6.2  critical=37 (limit:10)  dup=0  cycles=0
 
 ALERTS[20]:
-  !!! high_fan_out     run = 38 (limit:10)
+  !!! high_fan_out     run = 41 (limit:10)
   !!! cc_exceeded      validate_config = 26 (limit:15)
   !!! cc_exceeded      _classify_heuristic = 26 (limit:15)
   !!! high_fan_out     fix_config = 23 (limit:10)
@@ -13,16 +13,16 @@ ALERTS[20]:
   !!! high_fan_out     bulk_run = 20 (limit:10)
   !!  cc_exceeded      _classify_failure = 21 (limit:15)
   !!  cc_exceeded      Pipeline._execute_stage = 21 (limit:15)
-  !!  high_fan_out     run_project = 19 (limit:10)
+  !!  cc_exceeded      _enrich_from_artifacts = 20 (limit:15)
 
 MODULES[19] (top by size):
-  M[pyqual/cli.py] 1479L C:0 F:40 CC↑19 D:0 (python)
+  M[pyqual/cli.py] 1542L C:0 F:41 CC↑20 D:0 (python)
   M[pyqual/bulk_init.py] 713L C:3 F:15 CC↑26 D:1 (python)
-  M[pyqual/bulk_run.py] 549L C:3 F:7 CC↑19 D:1 (python)
-  M[pyqual/validation.py] 460L C:6 F:6 CC↑26 D:2 (python)
+  M[pyqual/bulk_run.py] 548L C:3 F:7 CC↑19 D:1 (python)
+  M[pyqual/validation.py] 463L C:6 F:6 CC↑26 D:2 (python)
   M[pyqual/_gate_collectors.py] 441L C:0 F:21 CC↑13 D:0 (python)
   M[pyqual/builtin_collectors.py] 432L C:8 F:15 CC↑14 D:0 (python)
-  M[pyqual/pipeline.py] 378L C:4 F:13 CC↑21 D:0 (python)
+  M[pyqual/pipeline.py] 381L C:4 F:13 CC↑21 D:0 (python)
   M[pyqual/tools.py] 345L C:1 F:9 CC↑8 D:3 (python)
   M[pyqual/config.py] 194L C:4 F:6 CC↑12 D:0 (python)
   M[pyqual/plugins.py] 138L C:3 F:9 CC↑5 D:1 (python)
@@ -34,7 +34,7 @@ MODULES[19] (top by size):
   LANGS: python:18/shell:1
 
 HOTSPOTS[10]:
-  ★ run fan=38  // Execute pipeline loop until quality gates pass.
+  ★ run fan=41  // Execute pipeline loop until quality gates pass.
   ★ fix_config fan=23  // Use LLM to auto-repair pyqual.yaml based on project structure.
 
 Scans the projec
@@ -52,8 +52,8 @@ REFACTOR[15]:
   [1] H/L Split validate_config (CC=26 → target CC<10)
   [2] H/L Split _classify_heuristic (CC=26 → target CC<10)
   [3] H/H Split god module pyqual/bulk_init.py (713L, 3 classes)
-  [4] H/H Split god module pyqual/bulk_run.py (549L, 3 classes)
-  [5] H/H Split god module pyqual/cli.py (1479L, 0 classes)
+  [4] H/H Split god module pyqual/cli.py (1542L, 0 classes)
+  [5] H/H Split god module pyqual/bulk_run.py (548L, 3 classes)
 
 EVOLUTION:
-  2026-03-30 CC̄=6.1 crit=36 8077L // Automated analysis
+  2026-03-30 CC̄=6.2 crit=37 8146L // Automated analysis
