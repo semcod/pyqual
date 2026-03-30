@@ -378,9 +378,9 @@ async def test_persistent_mcp_service_exposes_health_and_metrics() -> None:
         metrics_response = await client.get("/metrics")
         assert metrics_response.status_code == 200
         metrics = metrics_response.text
-        assert "pyqual_mcp_http_requests_total" in metrics
-        assert 'pyqual_mcp_route_hits_total{route="health"}' in metrics
-        assert 'pyqual_mcp_route_hits_total{route="metrics"}' in metrics
+        assert "llx_mcp_http_requests_total" in metrics
+        assert 'llx_mcp_route_hits_total{route="health"}' in metrics
+        assert 'llx_mcp_route_hits_total{route="metrics"}' in metrics
 
 
 def test_build_fix_prompt_uses_issue_summary() -> None:

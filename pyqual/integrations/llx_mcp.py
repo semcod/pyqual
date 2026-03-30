@@ -6,19 +6,22 @@ import argparse
 import asyncio
 import json
 import os
-import re
-from contextlib import asynccontextmanager
 from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import Any
+
+from llx.mcp.client import LlxMcpClient  # canonical upstream
+from llx.utils.issues import (  # canonical upstream
+    build_fix_prompt,
+    load_issue_source as _load_issue_source,
+    load_todo_markdown as _load_todo_markdown,
+    task_prompt_label as _task_prompt_label,
+)
 
 DEFAULT_ENDPOINT = "http://localhost:8000/sse"
 DEFAULT_ISSUES_PATH = ".pyqual/errors.json"
 DEFAULT_OUTPUT_PATH = ".pyqual/llx_mcp.json"
 DEFAULT_PROMPT_LIMIT = 10
-
-_TODO_CHECKLIST_RE = re.compile(r"^- \[(?P<state>[ xX])\]\s+(?P<body>.+)$")
-_TODO_DETAIL_RE = re.compile(r"^(?P<file>.+?):(?P<line>\d+)\s+-\s+(?P<message>.+)$")
 
 
 @dataclass
@@ -42,222 +45,8 @@ class LlxMcpRunResult:
         return asdict(self)
 
 
-class LlxMcpClient:
-    """Thin MCP client for the llx SSE service."""
-
-    def __init__(self, endpoint_url: str | None = None):
-        self.endpoint_url = endpoint_url or os.getenv("PYQUAL_LLX_MCP_URL", DEFAULT_ENDPOINT)
-
-    @asynccontextmanager
-    async def _session(self):
-        try:
-            from mcp.client.session import ClientSession
-            from mcp.client.sse import sse_client
-        except ImportError as exc:  # pragma: no cover - dependency error
-            raise RuntimeError(
-                "mcp is required for pyqual's llx integration. Install with: pip install pyqual[mcp]"
-            ) from exc
-
-        async with sse_client(self.endpoint_url) as streams:
-            async with ClientSession(streams[0], streams[1]) as session:
-                await session.initialize()
-                yield session
-
-    @staticmethod
-    def _extract_text_payload(result: Any) -> tuple[str, Any]:
-        """Return the concatenated text and parsed JSON payload if possible."""
-        text_parts: list[str] = []
-        content = getattr(result, "content", []) or []
-        for item in content:
-            text = getattr(item, "text", None)
-            if text:
-                text_parts.append(text)
-
-        combined = "\n".join(text_parts).strip()
-        if not combined:
-            return "", None
-
-        try:
-            return combined, json.loads(combined)
-        except json.JSONDecodeError:
-            return combined, combined
-
-    async def call_tool(self, name: str, arguments: dict[str, Any] | None = None) -> dict[str, Any]:
-        """Call a named MCP tool and return a JSON-friendly payload."""
-        async with self._session() as session:
-            result = await session.call_tool(name, arguments or {})
-
-        text, parsed = self._extract_text_payload(result)
-        is_error = bool(getattr(result, "isError", False))
-        return {
-            "tool": name,
-            "arguments": arguments or {},
-            "is_error": is_error,
-            "text": text,
-            "data": parsed,
-            "raw": result.model_dump(mode="json", by_alias=True, exclude_none=True),
-        }
-
-    async def analyze(self, project_path: str, toon_dir: str | None = None, task: str = "quick_fix") -> dict[str, Any]:
-        """Run llx analysis and return the parsed payload."""
-        payload = {"path": project_path, "task": task}
-        if toon_dir:
-            payload["toon_dir"] = toon_dir
-        return await self.call_tool("llx_analyze", payload)
-
-    async def fix_with_aider(
-        self,
-        project_path: str,
-        prompt: str,
-        model: str | None = None,
-        files: list[str] | None = None,
-        use_docker: bool = False,
-        docker_args: list[str] | None = None,
-    ) -> dict[str, Any]:
-        """Invoke the llx `aider` tool with a prepared prompt."""
-        payload: dict[str, Any] = {
-            "path": project_path,
-            "prompt": prompt,
-            "use_docker": use_docker,
-        }
-        if model:
-            payload["model"] = model
-        if files:
-            payload["files"] = files
-        if docker_args:
-            payload["docker_args"] = docker_args
-        return await self.call_tool("aider", payload)
-
-
-def _load_issue_source(issues_path: Path) -> dict[str, Any] | list[dict[str, Any]] | list[Any]:
-    """Load the issue source file if it exists."""
-    if not issues_path.exists():
-        return []
-
-    if issues_path.suffix.lower() in {".md", ".markdown"} or issues_path.name.lower() == "todo.md":
-        return _load_todo_markdown(issues_path)
-
-    try:
-        data = json.loads(issues_path.read_text())
-    except (json.JSONDecodeError, OSError):
-        return []
-
-    if isinstance(data, list):
-        return data
-    if isinstance(data, dict):
-        for key in ("errors", "messages", "findings", "results"):
-            value = data.get(key)
-            if isinstance(value, list):
-                return value
-        return data
-    return []
-
-
-def _load_todo_markdown(issues_path: Path) -> list[dict[str, Any]]:
-    """Load unchecked TODO checklist items from prefact-generated markdown."""
-    try:
-        lines = issues_path.read_text().splitlines()
-    except OSError:
-        return []
-
-    issues: list[dict[str, Any]] = []
-    for raw_line in lines:
-        match = _TODO_CHECKLIST_RE.match(raw_line.strip())
-        if not match or match.group("state").lower() != " ":
-            continue
-
-        body = match.group("body").strip()
-        detail = _TODO_DETAIL_RE.match(body)
-        if detail:
-            issues.append(
-                {
-                    "file": detail.group("file").strip(),
-                    "line": int(detail.group("line")),
-                    "message": detail.group("message").strip(),
-                    "severity": "todo",
-                }
-            )
-            continue
-
-        issues.append({"message": body, "severity": "todo"})
-
-    return issues
-
-
-def _issue_text(issue: Any) -> str:
-    """Render one issue entry as a compact string."""
-    if isinstance(issue, str):
-        return issue
-    if isinstance(issue, dict):
-        parts: list[str] = []
-        location = issue.get("file") or issue.get("path")
-        line = issue.get("line") or issue.get("lineno")
-        if location:
-            loc = str(location)
-            if line:
-                loc = f"{loc}:{line}"
-            parts.append(loc)
-        severity = issue.get("severity") or issue.get("level")
-        if severity:
-            parts.append(str(severity))
-        code = issue.get("code") or issue.get("symbol")
-        if code:
-            parts.append(str(code))
-        message = issue.get("message") or issue.get("msg") or issue.get("description")
-        if message:
-            parts.append(str(message))
-        if parts:
-            return " - ".join(parts)
-    return str(issue)
-
-
-def _task_prompt_label(task: str) -> str:
-    """Map llx task hints to prompt wording."""
-    labels = {
-        "explain": "explaining code",
-        "quick_fix": "fixing code",
-        "refactor": "refactoring code",
-        "review": "reviewing code",
-    }
-    return labels.get(task, "fixing code")
-
-
-def build_fix_prompt(
-    project_path: Path,
-    issues: dict[str, Any] | list[dict[str, Any]] | list[Any],
-    analysis: dict[str, Any] | None = None,
-    prompt_limit: int = DEFAULT_PROMPT_LIMIT,
-    action_label: str = "fixing code",
-) -> str:
-    """Build a concise prompt for llx/aider from gate failures."""
-    selected_model = None
-    tier = None
-    if analysis:
-        selection = analysis.get("selection")
-        if isinstance(selection, dict):
-            selected_model = selection.get("model_id")
-            tier = selection.get("tier")
-
-    issue_lines: list[str] = []
-    if isinstance(issues, dict):
-        issue_lines.append(_issue_text(issues))
-    else:
-        for issue in list(issues)[:prompt_limit]:
-            issue_lines.append(_issue_text(issue))
-
-    issue_block = "\n".join(f"- {line}" for line in issue_lines) if issue_lines else "- No structured issues were found."
-    analysis_block = json.dumps(analysis, indent=2, ensure_ascii=False) if analysis else "{}"
-
-    return (
-        f"You are {action_label} in {project_path}.\n"
-        "Use the smallest safe changes that make the quality gates pass.\n"
-        "Preserve existing behavior unless a change is clearly justified.\n"
-        f"Selected model: {selected_model or 'auto'}\n"
-        f"Selection tier: {tier or 'unknown'}\n\n"
-        f"Issue summary:\n{issue_block}\n\n"
-        f"Analysis payload:\n{analysis_block}\n\n"
-        "Return code edits only."
-    )
+# _load_issue_source, _load_todo_markdown, _task_prompt_label, and
+# build_fix_prompt are now imported from llx.utils.issues above.
 
 
 def _resolve_issue_source(
