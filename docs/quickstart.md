@@ -68,6 +68,26 @@ Preview what would happen without executing:
 pyqual run --dry-run
 ```
 
+## Verbose mode & logs
+
+See live pipeline logging during execution:
+
+```bash
+pyqual run --verbose
+```
+
+View structured logs after a run:
+
+```bash
+pyqual logs                    # all entries (table view)
+pyqual logs --tail 20          # last 20 entries
+pyqual logs --failed           # only failures
+pyqual logs --json --failed    # JSON for LLM/llx consumption
+pyqual logs --level gate_check # only gate results
+```
+
+Logs are written as JSON lines to `.pyqual/pipeline.log` — readable by LLM tools like llx for auto-diagnosis and repair.
+
 ## Next steps
 
 - [Configure your quality gates](configuration.md)

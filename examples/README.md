@@ -54,7 +54,7 @@ pipeline:
     coverage_min: 80
   stages:
     - name: test
-      run: pytest --cov
+      tool: pytest
   loop:
     max_iterations: 1
 ```
@@ -69,9 +69,9 @@ pipeline:
     ruff_errors_max: 5
   stages:
     - name: lint
-      run: ruff check . --output-format=json > .pyqual/ruff.json || true
+      tool: ruff
     - name: test
-      run: pytest --cov
+      tool: pytest
   loop:
     max_iterations: 1
 ```
@@ -87,14 +87,14 @@ pipeline:
     vallm_pass_min: 90
   stages:
     - name: analyze
-      run: code2llm ./ -f toon,evolution
+      tool: code2llm
     - name: validate
-      run: vallm batch ./ --errors-json > .pyqual/errors.json
+      tool: vallm
     - name: fix
       run: llx fix . --errors .pyqual/errors.json --verbose
       when: metrics_fail
     - name: test
-      run: pytest --cov
+      tool: pytest
   loop:
     max_iterations: 3
     on_fail: create_ticket

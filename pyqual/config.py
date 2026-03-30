@@ -10,6 +10,13 @@ from typing import Any
 import yaml
 from dotenv import load_dotenv
 
+from pyqual.tools import (
+    get_preset,
+    list_presets,
+    load_entry_point_presets,
+    register_custom_tools_from_yaml,
+)
+
 DEFAULT_STAGE_TIMEOUT = 300
 
 
@@ -37,8 +44,10 @@ def _normalize_env_values(env: dict[str, Any] | None) -> dict[str, str]:
 class StageConfig:
     """Single pipeline stage."""
     name: str
-    run: str
-    when: str = "always"  # always | metrics_fail | metrics_pass
+    run: str = ""
+    tool: str = ""            # built-in tool preset (e.g. "ruff", "pytest")
+    optional: bool = False    # skip silently when tool binary is missing
+    when: str = "always"      # always | metrics_fail | metrics_pass
     timeout: int = DEFAULT_STAGE_TIMEOUT
     capture_output: bool = True
 
@@ -95,9 +104,32 @@ class PyqualConfig:
     @classmethod
     def _parse(cls, raw: dict[str, Any]) -> "PyqualConfig":
         pipeline = raw.get("pipeline", raw)
-        stages = [
-            StageConfig(**s) for s in pipeline.get("stages", [])
-        ]
+
+        # Register external tool presets before validating stages
+        load_entry_point_presets()
+        custom_tools = pipeline.get("custom_tools", [])
+        if custom_tools:
+            register_custom_tools_from_yaml(custom_tools)
+
+        stages = []
+        for s in pipeline.get("stages", []):
+            stage = StageConfig(**s)
+            if not stage.run and not stage.tool:
+                raise ValueError(
+                    f"Stage '{stage.name}': must have either 'run' or 'tool' (got neither)."
+                )
+            if stage.run and stage.tool:
+                raise ValueError(
+                    f"Stage '{stage.name}': set 'run' or 'tool', not both. "
+                    f"Use 'run' for custom commands, 'tool' for built-in presets."
+                )
+            if stage.tool and get_preset(stage.tool) is None:
+                raise ValueError(
+                    f"Stage '{stage.name}': unknown tool preset '{stage.tool}'. "
+                    f"Available: {', '.join(list_presets())}. "
+                    f"Use 'run:' for custom commands."
+                )
+            stages.append(stage)
         gates = [
             GateConfig.from_dict(k, v)
             for k, v in (pipeline.get("metrics") or {}).items()
@@ -125,21 +157,21 @@ pipeline:
     vallm_pass_min: 90   # vallm validation pass rate (%)
     coverage_min: 80     # test coverage (%)
 
-  # Pipeline stages — executed in order
+  # Pipeline stages — use 'tool:' for built-in presets or 'run:' for custom commands
+  # See all presets: pyqual tools
   stages:
     - name: analyze
-      run: code2llm ./ -f toon,evolution
-    
+      tool: code2llm
+
     - name: validate
-      run: vallm batch ./ --recursive --errors-json > .pyqual/errors.json
-    
+      tool: vallm
+
     - name: fix
       run: echo "LLM fix placeholder — connect llx or aider here"
       when: metrics_fail
-    
+
     - name: test
-      run: pytest --cov --cov-report=json:.pyqual/coverage.json
-      when: always
+      tool: pytest
 
   # Loop behavior
   loop:

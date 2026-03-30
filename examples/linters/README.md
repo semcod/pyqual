@@ -35,22 +35,23 @@ pyqual run
 
 ## Generating Reports
 
-```bash
-# ruff JSON output
-ruff check . --output-format=json > .pyqual/ruff.json
+With `tool:` presets, pyqual handles all output capture automatically:
 
-# pylint JSON output
-pylint --output-format=json . > .pyqual/pylint.json 2>/dev/null || true
-
-# flake8 with JSON formatter
-flake8 --format=json . > .pyqual/flake8.json 2>/dev/null || true
-
-# mypy JSON
-mypy --output=json . > .pyqual/mypy.json 2>/dev/null || true
-
-# interrogate JSON
-interrogate --generate-badge=never --format=json . > .pyqual/interrogate.json
+```yaml
+stages:
+  - name: ruff
+    tool: ruff         # → .pyqual/ruff.json
+  - name: pylint
+    tool: pylint       # → .pyqual/pylint.json
+  - name: flake8
+    tool: flake8       # → .pyqual/flake8.json
+  - name: mypy
+    tool: mypy         # → .pyqual/mypy.json
+  - name: interrogate
+    tool: interrogate  # → .pyqual/interrogate.json
 ```
+
+No shell redirections or error handling needed — pyqual manages it all.
 
 ## pyqual.yaml
 

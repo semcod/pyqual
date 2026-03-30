@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyqual"
-version = "0.1.30"
+version = "0.1.31"
 description = "Declarative quality gate loops for AI-assisted development"
 readme = "README.md"
 license = "Apache-2.0"
@@ -24,6 +24,7 @@ dependencies = [
     "litellm>=1.0",
     "python-dotenv>=1.0",
     "mcp>=1.0",
+    "nfo>=0.2.13",
     "prefact",
     "planfile",
 ]

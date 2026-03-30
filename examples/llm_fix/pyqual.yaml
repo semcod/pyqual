@@ -8,10 +8,10 @@ pipeline:
 
   stages:
     - name: analyze
-      run: code2llm ./ --format toon
+      tool: code2llm
 
     - name: validate
-      run: vallm batch ./ --recursive --errors-json > .pyqual/errors.json
+      tool: vallm
 
     - name: llx_mcp_fix
       run: pyqual mcp-fix --workdir . --project-path /workspace/project --issues .pyqual/errors.json --output .pyqual/llx_mcp.json
@@ -19,7 +19,7 @@ pipeline:
       timeout: 900
 
     - name: test
-      run: pytest --cov --cov-report=json:.pyqual/coverage.json
+      tool: pytest
 
   loop:
     max_iterations: 3

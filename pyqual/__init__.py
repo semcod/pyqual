@@ -11,6 +11,16 @@ from pyqual.plugins import (
     get_available_plugins,
     install_plugin_config,
 )
+from pyqual.tools import (
+    ToolPreset,
+    get_preset,
+    list_presets,
+    is_builtin,
+    register_preset,
+    register_custom_tools_from_yaml,
+    load_entry_point_presets,
+    TOOL_PRESETS,
+)
 from pyqual.integrations.llx_mcp import (
     LlxMcpClient,
     LlxMcpRunResult,
@@ -18,7 +28,7 @@ from pyqual.integrations.llx_mcp import (
     run_llx_fix_workflow,
 )
 
-__version__ = "0.1.30"
+__version__ = "0.1.31"
 
 __all__ = [
     "PyqualConfig",
@@ -45,5 +55,14 @@ __all__ = [
     "LlxMcpRunResult",
     "build_fix_prompt",
     "run_llx_fix_workflow",
+    # Tool presets
+    "ToolPreset",
+    "get_preset",
+    "list_presets",
+    "is_builtin",
+    "register_preset",
+    "register_custom_tools_from_yaml",
+    "load_entry_point_presets",
+    "TOOL_PRESETS",
     "__version__",
 ]

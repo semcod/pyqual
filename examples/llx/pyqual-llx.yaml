@@ -17,31 +17,27 @@ pipeline:
   # Pipeline stages — executed in order
   stages:
     - name: analyze
-      run: code2llm ./ -f toon,evolution
-    
+      tool: code2llm
+
     # Security scans (uncomment to enable):
     # - name: audit
-    #   run: pip-audit --format=json -o .pyqual/pip_audit.json
+    #   tool: pip-audit
     # - name: bandit
-    #   run: bandit -r . -f json -o .pyqual/bandit.json || true
+    #   tool: bandit
     # - name: secrets
-    #   run: trufflehog filesystem . --json > .pyqual/trufflehog.json 2>/dev/null || true
-    
+    #   tool: trufflehog
+    #   optional: true
+
     - name: validate
-      run: vallm batch ./ --recursive --errors-json > .pyqual/errors.json
-    
+      tool: vallm
+
     # LLX-powered code generation
     - name: fix
       run: llx fix . --errors .pyqual/errors.json --verbose
       when: metrics_fail
-    
-    # Alternative: Apply fixes automatically (use with caution)
-    # - name: fix-auto
-    #   run: llx fix . --errors .pyqual/errors.json --apply --verbose
-    #   when: metrics_fail
-    
+
     - name: test
-      run: pytest --cov --cov-report=json:.pyqual/coverage.json
+      tool: pytest
       when: always
 
   # Loop behavior

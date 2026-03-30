@@ -25,22 +25,24 @@ pipeline:
 
   stages:
     - name: ruff
-      run: ruff check . --output-format=json > .pyqual/ruff.json 2>/dev/null || true
+      tool: ruff
+      optional: true
 
     - name: pylint
-      run: pylint --output-format=json . > .pyqual/pylint.json 2>/dev/null || true
+      tool: pylint
+      optional: true
 
     - name: flake8
-      run: flake8 --format=json . > .pyqual/flake8.json 2>/dev/null || true
+      tool: flake8
+      optional: true
 
     - name: mypy
-      run: mypy --output=json . > .pyqual/mypy.json 2>/dev/null || true
+      tool: mypy
+      optional: true
 
     - name: interrogate
-      run: interrogate --generate-badge=never --format=json . > .pyqual/interrogate.json
-
-    - name: check
-      run: pyqual gates
+      tool: interrogate
+      optional: true
 
   loop:
     max_iterations: 1

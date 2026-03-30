@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import shutil
 
 from pathlib import Path
@@ -29,10 +30,31 @@ DEFAULT_MCP_PORT = 8000
 STATUS_COLUMN_WIDTH = 12
 MAX_DESCRIPTION_LENGTH = 50
 
+LOG_FORMAT = "%(asctime)s %(levelname)s %(name)s — %(message)s"
+
 app = typer.Typer(help="Declarative quality gate loops for AI-assisted development.")
 console = Console()
 tickets_app = typer.Typer(help="Control planfile-backed tickets from TODO.md and GitHub.")
 app.add_typer(tickets_app, name="tickets")
+
+
+def _setup_logging(verbose: bool, workdir: Path = Path(".")) -> None:
+    """Configure Python logging for pyqual.pipeline.
+
+    Always writes structured JSON lines to .pyqual/pipeline.log (handled by Pipeline).
+    With --verbose, also prints human-readable lines to stderr.
+    """
+    logger = logging.getLogger("pyqual")
+    logger.setLevel(logging.DEBUG)
+    logger.handlers.clear()
+
+    if verbose:
+        handler = logging.StreamHandler()
+        handler.setLevel(logging.DEBUG)
+        handler.setFormatter(logging.Formatter(LOG_FORMAT, datefmt="%H:%M:%S"))
+        logger.addHandler(handler)
+    else:
+        logger.addHandler(logging.NullHandler())
 
 
 @app.command()
@@ -55,8 +77,10 @@ def run(
     config: Path = typer.Option("pyqual.yaml", "--config", "-c"),
     dry_run: bool = typer.Option(False, "--dry-run", "-n"),
     workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
+    verbose: bool = typer.Option(False, "--verbose", "-v", help="Show live pipeline log output."),
 ) -> None:
     """Execute pipeline loop until quality gates pass."""
+    _setup_logging(verbose, workdir)
     cfg = PyqualConfig.load(config)
     pipeline = Pipeline(cfg, workdir)
     result = pipeline.run(dry_run=dry_run)
@@ -507,6 +531,211 @@ def doctor():
         console.print("\n[yellow]Install missing tools to enable all metrics:[/yellow]")
         console.print("  pip install bandit pip-audit mypy ruff pylint flake8 radon interrogate vulture")
         console.print("  # For secret scanning, install trufflehog or gitleaks separately")
+
+
+@app.command()
+def tools() -> None:
+    """List built-in tool presets for pipeline stages."""
+    from pyqual.tools import TOOL_PRESETS
+
+    table = Table(title="Built-in Tool Presets")
+    table.add_column("Tool")
+    table.add_column("Binary")
+    table.add_column("Output")
+    table.add_column("Allow Failure")
+    table.add_column("Available")
+
+    for name in sorted(TOOL_PRESETS):
+        preset = TOOL_PRESETS[name]
+        avail = "[green]✓[/green]" if preset.is_available() else "[red]✗[/red]"
+        af = "yes" if preset.allow_failure else "no"
+        table.add_row(name, preset.binary, preset.output or "(inline)", af, avail)
+
+    console.print(table)
+    console.print()
+    console.print("[dim]Use in pyqual.yaml:[/dim]")
+    console.print("  stages:")
+    console.print("    - name: lint")
+    console.print("      tool: ruff")
+    console.print("    - name: secrets")
+    console.print("      tool: trufflehog")
+    console.print("      optional: true")
+
+
+def _query_nfo_db(db_path: Path, event: str = "", failed: bool = False,
+                  tail: int = 0, sql: str = "") -> list[dict]:
+    """Query the nfo SQLite pipeline log and return structured dicts."""
+    import sqlite3
+    from pyqual.pipeline import PIPELINE_TABLE
+
+    conn = sqlite3.connect(str(db_path))
+    conn.row_factory = sqlite3.Row
+
+    if sql:
+        rows = conn.execute(sql).fetchall()
+        conn.close()
+        return [dict(r) for r in rows]
+
+    # Build query from filters
+    where_clauses: list[str] = []
+    params: list[str] = []
+
+    if event:
+        where_clauses.append("function_name = ?")
+        params.append(event)
+
+    if failed:
+        where_clauses.append("level = 'WARNING'")
+
+    where = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+    limit = f"LIMIT {tail}" if tail > 0 else ""
+    order = "ORDER BY rowid DESC" if tail > 0 else "ORDER BY rowid ASC"
+
+    query = f"SELECT * FROM {PIPELINE_TABLE} {where} {order} {limit}"
+    rows = conn.execute(query, params).fetchall()
+    conn.close()
+
+    entries = [dict(r) for r in rows]
+    if tail > 0:
+        entries.reverse()
+    return entries
+
+
+def _row_to_event_dict(row: dict) -> dict:
+    """Parse an nfo SQLite row into a structured event dict.
+
+    nfo stores kwargs as repr string in the 'kwargs' column.
+    We parse it back to extract structured fields.
+    """
+    import ast
+    kwargs_raw = row.get("kwargs", "{}")
+    try:
+        data = ast.literal_eval(kwargs_raw) if isinstance(kwargs_raw, str) else kwargs_raw
+    except (ValueError, SyntaxError):
+        data = {}
+    data["_timestamp"] = row.get("timestamp", "")
+    data["_level"] = row.get("level", "")
+    data["_function_name"] = row.get("function_name", "")
+    data["_duration_ms"] = row.get("duration_ms")
+    return data
+
+
+@app.command()
+def logs(
+    workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
+    tail: int = typer.Option(0, "--tail", "-n", help="Show last N entries (0 = all)."),
+    level: str = typer.Option("", "--level", "-l", help="Filter by event type (stage_done, gate_check, pipeline_start, pipeline_end)."),
+    failed: bool = typer.Option(False, "--failed", "-f", help="Show only failed stages/gates."),
+    json_output: bool = typer.Option(False, "--json", "-j", help="Raw JSON lines (for LLM/llx consumption)."),
+    sql: str = typer.Option("", "--sql", help="Run raw SQL query against pipeline.db (advanced)."),
+) -> None:
+    """View structured pipeline logs from .pyqual/pipeline.db (nfo SQLite).
+
+    Logs are written via nfo to SQLite during every pipeline run.
+    Use --json for machine-readable output (ideal for llx auto-diagnosis).
+    Use --sql for arbitrary SQL queries against the log database.
+
+    Examples:
+        pyqual logs                    # show all entries
+        pyqual logs --tail 20          # last 20 entries
+        pyqual logs --failed           # only failures
+        pyqual logs --json --failed    # JSON failures for LLM consumption
+        pyqual logs --level gate_check # only gate results
+        pyqual logs --sql "SELECT * FROM pipeline_logs WHERE function_name='stage_done' AND level='WARNING'"
+    """
+    from pyqual.pipeline import PIPELINE_DB
+
+    db_path = Path(workdir) / PIPELINE_DB
+    if not db_path.exists():
+        console.print("[yellow]No pipeline log found. Run 'pyqual run' first.[/yellow]")
+        raise typer.Exit(1)
+
+    if sql:
+        rows = _query_nfo_db(db_path, sql=sql)
+        if json_output:
+            for row in rows:
+                console.print(json.dumps(row, default=str))
+        else:
+            if not rows:
+                console.print("[dim]No results.[/dim]")
+                return
+            table = Table(title=f"SQL Query ({len(rows)} rows)")
+            for col in rows[0].keys():
+                table.add_column(col)
+            for row in rows:
+                table.add_row(*[str(v)[:80] for v in row.values()])
+            console.print(table)
+        return
+
+    rows = _query_nfo_db(db_path, event=level, failed=failed, tail=tail)
+    entries = [_row_to_event_dict(r) for r in rows]
+
+    if not entries:
+        console.print("[dim]No matching log entries.[/dim]")
+        return
+
+    if json_output:
+        for entry in entries:
+            clean = {k: v for k, v in entry.items() if not k.startswith("_")}
+            console.print(json.dumps(clean, default=str))
+        return
+
+    # Human-readable table output
+    table = Table(title=f"Pipeline Log ({len(entries)} entries)")
+    table.add_column("Time", style="dim", width=12)
+    table.add_column("Event", width=14)
+    table.add_column("Stage/Metric")
+    table.add_column("Status", width=8)
+    table.add_column("Details")
+
+    for entry in entries:
+        ts = entry.get("_timestamp", "")[:19].replace("T", " ")[11:]
+        event_name = entry.get("event", entry.get("_function_name", ""))
+        ok = entry.get("ok")
+        status = "[green]PASS[/green]" if ok else ("[red]FAIL[/red]" if ok is False else "[dim]—[/dim]")
+
+        if event_name == "stage_done":
+            name = entry.get("stage", "")
+            tool_info = f"tool:{entry['tool']}" if entry.get("tool") else ""
+            rc_info = f"rc={entry.get('original_returncode', '?')}"
+            dur = f"{entry.get('duration_s', 0):.1f}s"
+            details = " ".join(filter(None, [tool_info, rc_info, dur]))
+            if entry.get("skipped"):
+                status = "[dim]SKIP[/dim]"
+            if entry.get("stderr_tail"):
+                details += f" err: {entry['stderr_tail'][:80]}"
+            table.add_row(ts, event_name, name, status, details)
+
+        elif event_name == "gate_check":
+            metric = entry.get("metric", "")
+            val = entry.get("value")
+            thr = entry.get("threshold")
+            op = {"le": "≤", "ge": "≥", "lt": "<", "gt": ">", "eq": "="}.get(str(entry.get("operator", "")), "?")
+            val_s = f"{val:.1f}" if val is not None else "N/A"
+            details = f"{val_s} {op} {thr}"
+            table.add_row(ts, event_name, metric, status, details)
+
+        elif event_name in ("pipeline_start", "pipeline_end"):
+            details_parts = []
+            if event_name == "pipeline_start":
+                details_parts.append(f"stages={entry.get('stages')}")
+                details_parts.append(f"gates={entry.get('gates')}")
+                details_parts.append(f"max_iter={entry.get('max_iterations')}")
+                if entry.get("dry_run"):
+                    details_parts.append("DRY-RUN")
+            else:
+                details_parts.append("PASS" if entry.get("final_ok") else "FAIL")
+                details_parts.append(f"iter={entry.get('iterations')}")
+                dur_s = entry.get("total_duration_s", 0)
+                details_parts.append(f"{dur_s:.1f}s" if isinstance(dur_s, (int, float)) else str(dur_s))
+            table.add_row(ts, event_name, entry.get("pipeline", ""), status, " ".join(details_parts))
+        else:
+            table.add_row(ts, event_name, "", status, str(entry)[:80])
+
+    console.print(table)
+    console.print(f"\n[dim]Log DB: {db_path}[/dim]")
+    console.print("[dim]For LLM consumption: pyqual logs --json --failed[/dim]")
+    console.print("[dim]SQL access: pyqual logs --sql \"SELECT * FROM pipeline_logs WHERE level='WARNING'\"[/dim]")
 
 
 if __name__ == "__main__":

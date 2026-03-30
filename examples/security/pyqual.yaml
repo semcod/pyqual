@@ -22,25 +22,20 @@ pipeline:
 
   stages:
     - name: bandit
-      run: bandit -r . -f json -o .pyqual/bandit.json 2>/dev/null || true
+      tool: bandit
+      optional: true
 
     - name: pip-audit
-      run: pip-audit --format=json --output=.pyqual/vulns.json 2>/dev/null || true
+      tool: pip-audit
+      optional: true
 
-    - name: secrets-trufflehog
-      run: |
-        if command -v trufflehog &> /dev/null; then
-          trufflehog git file://. --json > .pyqual/secrets.json 2>/dev/null || true
-        fi
+    - name: secrets
+      tool: trufflehog
+      optional: true
 
     - name: sbom
-      run: |
-        if command -v cyclonedx-py &> /dev/null; then
-          cyclonedx-py -r -o .pyqual/sbom.json 2>/dev/null || true
-        fi
-
-    - name: check
-      run: pyqual gates
+      tool: cyclonedx
+      optional: true
 
   loop:
     max_iterations: 1

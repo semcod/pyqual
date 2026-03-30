@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.10] - 2026-03-30
+
+### Fixed
+- Fix unused-imports issues (ticket-d962f5ce)
+- Fix magic-numbers issues (ticket-b3de414a)
+- Fix ai-boilerplate issues (ticket-b002f9fb)
+- Fix unused-imports issues (ticket-8e0794f1)
+- Fix magic-numbers issues (ticket-4db15ee9)
+- Fix ai-boilerplate issues (ticket-f539d3c9)
+- Fix string-concat issues (ticket-ced6bbce)
+- Fix unused-imports issues (ticket-73bdeda2)
+- Fix magic-numbers issues (ticket-950c3ba5)
+- Fix ai-boilerplate issues (ticket-b2d77b93)
+- Fix unused-imports issues (ticket-135462f9)
+- Fix magic-numbers issues (ticket-e693ad3b)
+- Fix ai-boilerplate issues (ticket-23203b41)
+- Fix unused-imports issues (ticket-50caefc4)
+- Fix ai-boilerplate issues (ticket-5c1aab40)
+- Fix unused-imports issues (ticket-73f53872)
+- Fix ai-boilerplate issues (ticket-d83cc138)
+- Fix unused-imports issues (ticket-d736cb84)
+
 ## [0.1.10] - 2026-03-29
 
 ### Fixed
@@ -53,6 +75,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix string-concat issues (ticket-fc5da382)
 
 ## [Unreleased]
+
+## [0.1.31] - 2026-03-30
+
+### Docs
+- Update CHANGELOG.md
+- Update TODO.md
+- Update docs/README.md
+- Update docs/configuration.md
+- Update docs/quickstart.md
+- Update examples/README.md
+- Update examples/linters/README.md
+- Update project/README.md
+- Update project/context.md
+
+### Test
+- Update test_pyqual.py
+
+### Other
+- Update examples/linters/pyqual.yaml
+- Update examples/llm_fix/pyqual.yaml
+- Update examples/llx/pyqual-llx.yaml
+- Update examples/multi_gate_pipeline/pyqual.yaml
+- Update examples/project_analysis/pyqual.yaml
+- Update examples/security/pyqual.yaml
+- Update examples/ticket_workflow/pyqual.yaml
+- Update planfile.yaml
+- Update project/analysis.toon.yaml
+- Update project/calls.mmd
+- ... and 19 more files
 
 ## [0.1.30] - 2026-03-30
 

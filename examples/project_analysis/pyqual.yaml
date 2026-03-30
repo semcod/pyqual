@@ -1,0 +1,35 @@
+pipeline:
+  name: project-analysis
+
+  # Full project analysis pipeline — replaces project.sh
+  # Runs: code2llm → cleanup → code2docs → redup → vallm → prefact
+  # timeout: 0 = no limit (analysis tools can take 10-30 min on large repos)
+
+  stages:
+    - name: analyze
+      tool: code2llm
+      timeout: 0
+
+    - name: cleanup
+      run: rm -f project/analysis.json project/analysis.yaml
+      when: always
+
+    - name: docs
+      tool: code2docs
+      timeout: 0
+
+    - name: duplicates
+      tool: redup
+      timeout: 0
+
+    - name: validate
+      tool: vallm
+      timeout: 0
+
+    - name: prefact
+      tool: prefact
+      timeout: 0
+
+  loop:
+    max_iterations: 1
+    on_fail: report

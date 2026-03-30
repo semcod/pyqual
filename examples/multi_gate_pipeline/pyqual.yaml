@@ -33,42 +33,45 @@ pipeline:
   stages:
     # Phase 1: Analysis
     - name: analyze
-      run: code2llm ./ -f toon,evolution
+      tool: code2llm
 
-    # Phase 2: Linting (parallel-safe, independent outputs)
+    # Phase 2: Linting
     - name: ruff
-      run: ruff check . --output-format=json > .pyqual/ruff.json 2>/dev/null || true
+      tool: ruff
+      optional: true
 
     - name: pylint
-      run: pylint --output-format=json . > .pyqual/pylint.json 2>/dev/null || true
+      tool: pylint
+      optional: true
 
     - name: flake8
-      run: flake8 --format=json . > .pyqual/flake8.json 2>/dev/null || true
+      tool: flake8
+      optional: true
 
     - name: mypy
-      run: mypy --output=json . > .pyqual/mypy.json 2>/dev/null || true
+      tool: mypy
+      optional: true
 
     - name: interrogate
-      run: interrogate --generate-badge=never --format=json . > .pyqual/interrogate.json 2>/dev/null || true
+      tool: interrogate
+      optional: true
 
     # Phase 3: Security
     - name: bandit
-      run: bandit -r . -f json -o .pyqual/bandit.json 2>/dev/null || true
+      tool: bandit
+      optional: true
 
     - name: pip-audit
-      run: pip-audit --format=json --output=.pyqual/vulns.json 2>/dev/null || true
+      tool: pip-audit
+      optional: true
 
     - name: secrets
-      run: |
-        if command -v trufflehog &> /dev/null; then
-          trufflehog git file://. --json > .pyqual/secrets.json 2>/dev/null || true
-        elif command -v gitleaks &> /dev/null; then
-          gitleaks detect --source . --report-format json --report-path .pyqual/secrets.json 2>/dev/null || true
-        fi
+      tool: trufflehog
+      optional: true
 
     # Phase 4: AI validation
     - name: validate
-      run: vallm batch ./ --recursive --errors-json > .pyqual/errors.json
+      tool: vallm
 
     # Phase 5: AI fix (only on failure)
     - name: fix
@@ -78,12 +81,12 @@ pipeline:
 
     # Phase 6: Testing
     - name: test
-      run: pytest --cov --cov-report=json:.pyqual/coverage.json -q
-      when: always
+      tool: pytest
 
-    # Phase 7: Complexity check
+    # Phase 7: Complexity
     - name: radon
-      run: radon mi . -j > .pyqual/radon.json 2>/dev/null || true
+      tool: radon
+      optional: true
 
   loop:
     max_iterations: 3

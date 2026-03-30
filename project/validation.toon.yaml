@@ -1,23 +1,21 @@
-# vallm batch | 73f | 37✓ 3⚠ 0✗ | 2026-03-30
+# vallm batch | 87f | 47✓ 3⚠ 0✗ | 2026-03-30
 
 SUMMARY:
-  scanned: 73  passed: 37 (50.7%)  warnings: 3  errors: 0  unsupported: 36
+  scanned: 87  passed: 47 (54.0%)  warnings: 3  errors: 0  unsupported: 40
 
 WARNINGS[3]{path,score}:
-  pyqual/gates.py,0.96
-    issues[3]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,_from_pylint has cyclomatic complexity 16 (max: 15),531
-      complexity.maintainability,warning,Low maintainability index: 0.0 (threshold: 20),
-      complexity.lizard_cc,warning,_from_pylint: CC=16 exceeds limit 15,531
   pyqual/cli.py,0.98
     issues[1]{rule,severity,message,line}:
       complexity.maintainability,warning,Low maintainability index: 12.2 (threshold: 20),
+  pyqual/gates.py,0.98
+    issues[1]{rule,severity,message,line}:
+      complexity.maintainability,warning,Low maintainability index: 0.0 (threshold: 20),
   pyqual/plugins.py,0.98
     issues[1]{rule,severity,message,line}:
       complexity.maintainability,warning,Low maintainability index: 14.4 (threshold: 20),
 
 UNSUPPORTED[5]{bucket,count}:
-  *.md,24
+  *.md,28
   Dockerfile*,1
   *.txt,2
   *.yml,2

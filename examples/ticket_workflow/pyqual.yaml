@@ -8,13 +8,13 @@ pipeline:
 
   stages:
     - name: analyze
-      run: code2llm ./ -f toon,evolution
+      tool: code2llm
 
     - name: lint
-      run: ruff check . --output-format=json > .pyqual/ruff.json 2>/dev/null || true
+      tool: ruff
 
     - name: test
-      run: pytest --cov --cov-report=json:.pyqual/coverage.json -q
+      tool: pytest
 
   loop:
     max_iterations: 2

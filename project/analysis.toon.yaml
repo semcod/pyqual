@@ -1,16 +1,15 @@
-# code2llm | 12f 2884L | python:11,shell:1 | 2026-03-30
-# CC̄=4.7 | critical:2/129 | dups:0 | cycles:0
+# code2llm | 12f 2870L | python:11,shell:1 | 2026-03-30
+# CC̄=4.6 | critical:1/145 | dups:0 | cycles:0
 
-HEALTH[3]:
-  🔴 GOD   pyqual/plugins.py = 575L, 11 classes, 24m, max CC=14
+HEALTH[2]:
+  🔴 GOD   pyqual/plugins.py = 547L, 11 classes, 24m, max CC=14
   🟡 CC    _issue_text CC=15 (limit:15)
-  🟡 CC    _from_pylint CC=16 (limit:15)
 
 REFACTOR[2]:
   1. split pyqual/plugins.py  (god module)
-  2. split 2 high-CC methods  (CC>15)
+  2. split 1 high-CC methods  (CC>15)
 
-PIPELINES[89]:
+PIPELINES[98]:
   [1] Src [init]: init
       PURITY: 100% pure
   [2] Src [run]: run → sync_todo_tickets → sync_planfile_tickets → _load_sync_integration
@@ -23,16 +22,16 @@ PIPELINES[89]:
       PURITY: 100% pure
 
 LAYERS:
-  pyqual/                         CC̄=4.7    ←in:0  →out:1
-  │ !! gates                      597L  3C   30m  CC=16     ←0
-  │ !! plugins                    575L  11C   24m  CC=14     ←2
-  │ !! cli                        509L  0C   18m  CC=13     ←0
+  pyqual/                         CC̄=4.6    ←in:0  →out:1
+  │ !! gates                      601L  3C   31m  CC=14     ←0
+  │ !! plugins                    547L  11C   24m  CC=14     ←2
+  │ !! cli                        513L  0C   18m  CC=13     ←0
   │ !! llx_mcp                    394L  2C   15m  CC=15     ←1
-  │ llx_mcp_service            241L  1C   15m  CC=4      ←0
-  │ pipeline                   152L  4C    7m  CC=6      ←0
-  │ config                     150L  4C    6m  CC=6      ←1
-  │ llm                        117L  2C    7m  CC=6      ←0
-  │ tickets                     75L  0C    6m  CC=4      ←1
+  │ llx_mcp_service            243L  1C   15m  CC=4      ←0
+  │ pipeline                   154L  4C    7m  CC=6      ←0
+  │ config                     152L  4C    6m  CC=6      ←3
+  │ llm                        119L  2C    7m  CC=6      ←0
+  │ tickets                     73L  0C    6m  CC=4      ←2
   │ __init__                    49L  0C    0m  CC=0.0    ←0
   │ __init__                     1L  0C    0m  CC=0.0    ←0
   │

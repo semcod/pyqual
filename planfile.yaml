@@ -342,3 +342,237 @@ sprints:
     model_hints:
       planning: balanced
       implementation: balanced
+  - id: ticket-d962f5ce
+    name: Fix unused-imports issues
+    description: Resolve 6 unused-imports issues in examples/custom_gates/composite_gates.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - examples/custom_gates/composite_gates.py
+    rule_id: unused-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b3de414a
+    name: Fix magic-numbers issues
+    description: Resolve 7 magic-numbers issues in examples/custom_gates/composite_gates.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - examples/custom_gates/composite_gates.py
+    rule_id: magic-numbers
+    count: 7
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b002f9fb
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in examples/custom_gates/composite_gates.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/custom_gates/composite_gates.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8e0794f1
+    name: Fix unused-imports issues
+    description: Resolve 10 unused-imports issues in examples/custom_gates/metric_history.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - examples/custom_gates/metric_history.py
+    rule_id: unused-imports
+    count: 10
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4db15ee9
+    name: Fix magic-numbers issues
+    description: Resolve 5 magic-numbers issues in examples/custom_gates/metric_history.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - examples/custom_gates/metric_history.py
+    rule_id: magic-numbers
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f539d3c9
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in examples/custom_gates/metric_history.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/custom_gates/metric_history.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ced6bbce
+    name: Fix string-concat issues
+    description: Resolve 3 string-concat issues in examples/custom_plugins/code_health_collector.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/custom_plugins/code_health_collector.py
+    rule_id: string-concat
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-73bdeda2
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in examples/custom_plugins/code_health_collector.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/custom_plugins/code_health_collector.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-950c3ba5
+    name: Fix magic-numbers issues
+    description: Resolve 8 magic-numbers issues in examples/custom_plugins/code_health_collector.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - examples/custom_plugins/code_health_collector.py
+    rule_id: magic-numbers
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b2d77b93
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in examples/custom_plugins/code_health_collector.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/custom_plugins/code_health_collector.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-135462f9
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in examples/custom_plugins/performance_collector.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/custom_plugins/performance_collector.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e693ad3b
+    name: Fix magic-numbers issues
+    description: Resolve 10 magic-numbers issues in examples/custom_plugins/performance_collector.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - examples/custom_plugins/performance_collector.py
+    rule_id: magic-numbers
+    count: 10
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-23203b41
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in examples/custom_plugins/performance_collector.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/custom_plugins/performance_collector.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-50caefc4
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in examples/multi_gate_pipeline/run_pipeline.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/multi_gate_pipeline/run_pipeline.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-5c1aab40
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in examples/multi_gate_pipeline/run_pipeline.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/multi_gate_pipeline/run_pipeline.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-73f53872
+    name: Fix unused-imports issues
+    description: Resolve 6 unused-imports issues in examples/ticket_workflow/sync_tickets.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - examples/ticket_workflow/sync_tickets.py
+    rule_id: unused-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d83cc138
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in examples/ticket_workflow/sync_tickets.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/ticket_workflow/sync_tickets.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d736cb84
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/tools.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/tools.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced

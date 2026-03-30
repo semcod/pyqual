@@ -1,28 +1,23 @@
-# pyqual | 12f 2884L | python:11,shell:1 | 2026-03-30
-# stats: 128 func | 0 cls | 12 mod | CC̄=4.7 | critical:2 | cycles:0
-# alerts[5]: fan-out GateSet._collect_metrics=23; fan-out create_app=21; fan-out run_llx_fix_workflow=19; fan-out _plugin_search=17; CC GateSet._from_pylint=16
+# pyqual | 12f 2870L | python:11,shell:1 | 2026-03-30
+# stats: 129 func | 0 cls | 12 mod | CC̄=4.6 | critical:1 | cycles:0
+# alerts[5]: fan-out GateSet._collect_metrics=23; fan-out create_app=21; fan-out run_llx_fix_workflow=19; fan-out _plugin_search=17; fan-out mcp_fix=16
 # hotspots[5]: GateSet._collect_metrics fan=23; create_app fan=21; run_llx_fix_workflow fan=19; _plugin_search fan=17; mcp_fix fan=16
-# evolution: CC̄ 4.9→4.7 (improved -0.2)
+# evolution: CC̄ 4.7→4.6 (improved -0.1)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
 M[12]:
   project.sh,24
   pyqual/__init__.py,49
-  pyqual/cli.py,509
-  pyqual/config.py,150
-  pyqual/gates.py,597
+  pyqual/cli.py,513
+  pyqual/config.py,152
+  pyqual/gates.py,601
   pyqual/integrations/__init__.py,1
   pyqual/integrations/llx_mcp.py,394
-  pyqual/integrations/llx_mcp_service.py,241
-  pyqual/llm.py,117
-  pyqual/pipeline.py,152
-  pyqual/plugins.py,575
-  pyqual/tickets.py,75
+  pyqual/integrations/llx_mcp_service.py,243
+  pyqual/llm.py,119
+  pyqual/pipeline.py,154
+  pyqual/plugins.py,547
+  pyqual/tickets.py,73
 D:
-  pyqual/gates.py:
-    e: GateResult,Gate,GateSet
-    GateResult: __str__(0)  # Result of a single gate check...
-    Gate: check(1)  # Single quality gate with metric extraction...
-    GateSet: __init__(1),_read_artifact_text(1),check_all(1),all_passed(1),_collect_metrics(1),_from_toon(1),_from_vallm(1),_from_coverage(1),_from_safety(1),_from_bandit(1),_from_secrets(1),_from_pip_outdated(1),_from_radon(1),_from_mypy(1),_from_pytest_durations(1),_from_benchmark(1),_from_memory_profile(1),_from_secrets(1),_from_vulnerabilities(1),_from_sbom(1),_from_vulture(1),_from_pyroma(1),_from_git_health(1),_from_llm_quality(1),_from_ai_cost(1),_from_ruff(1),_from_pylint(1),_from_flake8(1),_from_interrogate(1)  # Collection of quality gates with metric collection...
   pyqual/integrations/llx_mcp.py:
     e: LlxMcpRunResult,LlxMcpClient,_load_issue_source,_load_todo_markdown,_issue_text,build_fix_prompt,_resolve_issue_source,run_llx_fix_workflow,build_parser,main
     LlxMcpRunResult: to_dict(0)  # Result of an llx MCP fix workflow...
@@ -38,9 +33,7 @@ D:
   pyqual/plugins.py:
     e: PluginMetadata,MetricCollector,PluginRegistry,LLMBenchCollector,HallucinationCollector,SBOMCollector,I18nCollector,A11yCollector,RepoMetricsCollector,SecurityCollector,LlxMcpFixCollector,get_available_plugins,install_plugin_config
     PluginMetadata: __post_init__(0)  # Metadata for a pyqual plugin...
-    MetricCollector(ABC): collect(1),get_config_example(0)  # Base class for metric collector plugins.
-
-Subclasses should ...
+    MetricCollector(ABC): collect(1),get_config_example(0)  # Base class for metric collector plugins...
     PluginRegistry: register(1),get(1),list_plugins(1),create_instance(1)  # Registry for metric collector plugins...
     LLMBenchCollector(MetricCollector): collect(1)  # LLM code generation quality metrics from human-eval and Code...
     HallucinationCollector(MetricCollector): collect(1)  # Hallucination detection and prompt quality metrics...
@@ -52,6 +45,11 @@ Subclasses should ...
     LlxMcpFixCollector(MetricCollector): _tier_rank(0),_load_report(0),_assign_float(2),_count_lines(0),_collect_analysis_metrics(2),_collect_aider_metrics(2),get_config_example(0),collect(1)  # Dockerized llx MCP fixer workflow results...
     get_available_plugins()
     install_plugin_config(name;workdir)
+  pyqual/gates.py:
+    e: GateResult,Gate,GateSet
+    GateResult: __str__(0)  # Result of a single gate check...
+    Gate: check(1)  # Single quality gate with metric extraction...
+    GateSet: __init__(1),_read_artifact_text(1),check_all(1),all_passed(1),_collect_metrics(1),_from_toon(1),_from_vallm(1),_from_coverage(1),_from_safety(1),_from_bandit(1),_from_secrets(1),_from_pip_outdated(1),_from_radon(1),_from_mypy(1),_from_pytest_durations(1),_from_benchmark(1),_from_memory_profile(1),_from_secrets(1),_from_vulnerabilities(1),_from_sbom(1),_from_vulture(1),_from_pyroma(1),_from_git_health(1),_from_llm_quality(1),_from_ai_cost(1),_from_ruff(1),_count_pylint_by_type(2),_from_pylint(1),_from_flake8(1),_from_interrogate(1)  # Collection of quality gates with metric collection...
   pyqual/cli.py:
     e: init,run,gates,status,mcp_fix,mcp_service,tickets_todo,tickets_github,tickets_all,_plugin_list,_plugin_search,_plugin_info,_plugin_add,_plugin_remove,_plugin_validate,_plugin_unknown_action,plugin,doctor
     init(path)
@@ -72,14 +70,6 @@ Subclasses should ...
     _plugin_unknown_action(action)
     plugin(action;name;workdir;tag)
     doctor()
-  pyqual/llm.py:
-    e: LLMResponse,LLM,_ensure_dotenv_loaded,get_llm_model,get_api_key,get_llm
-    LLMResponse:  # Response from LLM call...
-    LLM: __init__(2),complete(4),fix_code(3)  # LiteLLM wrapper with .env configuration...
-    _ensure_dotenv_loaded()
-    get_llm_model()
-    get_api_key()
-    get_llm(model)
   pyqual/config.py:
     e: StageConfig,GateConfig,LoopConfig,PyqualConfig,_load_env_file,_normalize_env_values
     StageConfig:  # Single pipeline stage...
@@ -88,6 +78,14 @@ Subclasses should ...
     PyqualConfig: load(1),_parse(1),default_yaml(-1)  # Full pyqual.yaml configuration...
     _load_env_file()
     _normalize_env_values(env)
+  pyqual/llm.py:
+    e: LLMResponse,LLM,_ensure_dotenv_loaded,get_llm_model,get_api_key,get_llm
+    LLMResponse:  # Response from LLM call...
+    LLM: __init__(2),complete(4),fix_code(3)  # LiteLLM wrapper with .env configuration...
+    _ensure_dotenv_loaded()
+    get_llm_model()
+    get_api_key()
+    get_llm(model)
   pyqual/pipeline.py:
     e: StageResult,IterationResult,PipelineResult,Pipeline
     StageResult:  # Result of running a single stage...
