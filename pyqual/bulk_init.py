@@ -145,11 +145,7 @@ class ProjectFingerprint:
     readme_excerpt: str = ""
 
 
-def collect_fingerprint(project_dir: Path) -> ProjectFingerprint:
-    """Collect a lightweight fingerprint from a project directory."""
-    fp = ProjectFingerprint(name=project_dir.name, path=str(project_dir))
-
-    # Top-level files (non-hidden)
+def _collect_top_level_entries(project_dir: Path, fp: ProjectFingerprint) -> None:
     for child in sorted(project_dir.iterdir()):
         if child.name.startswith("."):
             continue
@@ -161,21 +157,20 @@ def collect_fingerprint(project_dir: Path) -> ProjectFingerprint:
             if child.name == "src":
                 fp.has_src_dir = True
 
-    # Manifest detection
+
+def _collect_manifests(project_dir: Path, fp: ProjectFingerprint) -> None:
     manifest_names = [
         "pyproject.toml", "setup.py", "setup.cfg",
         "package.json", "composer.json",
         "Cargo.toml", "go.mod",
         "Makefile", "Taskfile.yml",
     ]
-    for m in manifest_names:
-        if (project_dir / m).exists():
-            fp.manifests.append(m)
+    for manifest_name in manifest_names:
+        if (project_dir / manifest_name).exists():
+            fp.manifests.append(manifest_name)
 
-    fp.has_pyqual_yaml = (project_dir / "pyqual.yaml").exists()
-    fp.has_dockerfile = (project_dir / "Dockerfile").exists() or (project_dir / "docker-compose.yml").exists()
 
-    # File extensions (sample top-level + one level deep)
+def _collect_file_extensions(project_dir: Path) -> list[str]:
     exts: set[str] = set()
     for f in project_dir.glob("*.*"):
         if f.is_file() and not f.name.startswith("."):
@@ -183,69 +178,90 @@ def collect_fingerprint(project_dir: Path) -> ProjectFingerprint:
     for f in project_dir.glob("*/*.*"):
         if f.is_file() and not f.name.startswith("."):
             exts.add(f.suffix)
-    fp.file_extensions = sorted(exts)
+    return sorted(exts)
 
-    # package.json scripts
-    pkg_json = project_dir / "package.json"
-    if pkg_json.exists():
-        try:
-            data = json.loads(pkg_json.read_text(errors="ignore"))
-            fp.node_scripts = data.get("scripts", {})
-        except (json.JSONDecodeError, OSError):
-            pass
 
-    # composer.json scripts
-    composer = project_dir / "composer.json"
-    if composer.exists():
-        try:
-            data = json.loads(composer.read_text(errors="ignore"))
-            fp.composer_scripts = data.get("scripts", {})
-        except (json.JSONDecodeError, OSError):
-            pass
+def _load_json_object(path: Path) -> dict[str, Any] | None:
+    try:
+        data = json.loads(path.read_text(errors="ignore"))
+    except (json.JSONDecodeError, OSError):
+        return None
+    return data if isinstance(data, dict) else None
 
-    # Makefile targets (top-level only)
+
+def _collect_json_scripts(project_dir: Path, filename: str) -> dict[str, str]:
+    path = project_dir / filename
+    if not path.exists():
+        return {}
+    data = _load_json_object(path)
+    if data is None:
+        return {}
+    scripts = data.get("scripts", {})
+    return scripts if isinstance(scripts, dict) else {}
+
+
+def _collect_makefile_targets(project_dir: Path) -> list[str]:
     makefile = project_dir / "Makefile"
-    if makefile.exists():
-        try:
-            targets: list[str] = []
-            for line in makefile.read_text(errors="ignore").splitlines():
-                m = re.match(r"^([A-Za-z0-9_-]+):", line)
-                if m and not m.group(1).startswith("."):
-                    targets.append(m.group(1))
-            fp.makefile_targets = targets[:30]
-        except OSError:
-            pass
+    if not makefile.exists():
+        return []
+    try:
+        targets: list[str] = []
+        for line in makefile.read_text(errors="ignore").splitlines():
+            m = re.match(r"^([A-Za-z0-9_-]+):", line)
+            if m and not m.group(1).startswith("."):
+                targets.append(m.group(1))
+        return targets[:30]
+    except OSError:
+        return []
 
-    # pyproject.toml basics
+
+def _collect_pyproject_metadata(project_dir: Path, fp: ProjectFingerprint) -> None:
     pyproject = project_dir / "pyproject.toml"
-    if pyproject.exists():
+    if not pyproject.exists():
+        return
+    try:
+        import tomllib
+    except ImportError:
         try:
-            import tomllib
+            import tomli as tomllib  # type: ignore[no-redef]
         except ImportError:
-            try:
-                import tomli as tomllib  # type: ignore[no-redef]
-            except ImportError:
-                tomllib = None  # type: ignore[assignment]
-        if tomllib is not None:
-            try:
-                data = tomllib.loads(pyproject.read_text(errors="ignore"))
-                bs = data.get("build-system", {}).get("requires", [])
-                fp.pyproject_build_system = bs[0] if bs else None
-                dev_deps = data.get("project", {}).get("optional-dependencies", {}).get("dev", [])
-                fp.pyproject_test_deps = [d for d in dev_deps if "pytest" in d.lower() or "test" in d.lower()]
-            except Exception:
-                pass
+            tomllib = None  # type: ignore[assignment]
+    if tomllib is None:
+        return
+    try:
+        data = tomllib.loads(pyproject.read_text(errors="ignore"))
+        bs = data.get("build-system", {}).get("requires", [])
+        fp.pyproject_build_system = bs[0] if bs else None
+        dev_deps = data.get("project", {}).get("optional-dependencies", {}).get("dev", [])
+        fp.pyproject_test_deps = [d for d in dev_deps if "pytest" in d.lower() or "test" in d.lower()]
+    except Exception:
+        pass
 
-    # README excerpt (first 500 chars)
+
+def _collect_readme_excerpt(project_dir: Path) -> str:
     for readme_name in ("README.md", "README.rst", "README.txt", "README"):
         readme = project_dir / readme_name
         if readme.exists():
             try:
-                fp.readme_excerpt = readme.read_text(errors="ignore")[:500]
+                return readme.read_text(errors="ignore")[:500]
             except OSError:
-                pass
-            break
+                return ""
+    return ""
 
+
+def collect_fingerprint(project_dir: Path) -> ProjectFingerprint:
+    """Collect a lightweight fingerprint from a project directory."""
+    fp = ProjectFingerprint(name=project_dir.name, path=str(project_dir))
+    _collect_top_level_entries(project_dir, fp)
+    _collect_manifests(project_dir, fp)
+    fp.has_pyqual_yaml = (project_dir / "pyqual.yaml").exists()
+    fp.has_dockerfile = (project_dir / "Dockerfile").exists() or (project_dir / "docker-compose.yml").exists()
+    fp.file_extensions = _collect_file_extensions(project_dir)
+    fp.node_scripts = _collect_json_scripts(project_dir, "package.json")
+    fp.composer_scripts = _collect_json_scripts(project_dir, "composer.json")
+    fp.makefile_targets = _collect_makefile_targets(project_dir)
+    _collect_pyproject_metadata(project_dir, fp)
+    fp.readme_excerpt = _collect_readme_excerpt(project_dir)
     return fp
 
 

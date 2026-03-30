@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import re
 import json
 import logging
 import shutil
@@ -307,103 +308,16 @@ def bulk_run_cmd(
 
 def _extract_stage_summary(name: str, stdout: str, stderr: str) -> list[str]:
     """Extract key metrics/counts from a stage's stdout/stderr for display."""
-    import re
-    lines: list[str] = []
     text = (stdout or "") + "\n" + (stderr or "")
-
-    # pytest: "5 passed", "2 failed", "1 error"
-    m = re.search(r"(\d+) passed", text)
-    passed = int(m.group(1)) if m else None
-    m_fail = re.search(r"(\d+) failed", text)
-    failed_tests = int(m_fail.group(1)) if m_fail else None
-    m_err = re.search(r"(\d+) error", text)
-    test_errors = int(m_err.group(1)) if m_err else None
-    if passed is not None or failed_tests or test_errors:
-        parts = []
-        if passed:
-            parts.append(f"[green]{passed} passed[/]")
-        if failed_tests:
-            parts.append(f"[red]{failed_tests} failed[/]")
-        if test_errors:
-            parts.append(f"[red]{test_errors} error[/]")
-        if parts:
-            lines.append("  " + "  ".join(parts))
-
-    # ruff / flake8: "Found N errors" or "All checks passed"
-    m = re.search(r"Found (\d+) error", text)
-    if m:
-        n = int(m.group(1))
-        lines.append(f"  [{'red' if n else 'green'}]{n} lint error{'s' if n != 1 else ''}[/]")
-    elif "All checks passed" in text:
-        lines.append("  [green]0 lint errors[/]")
-
-    # prefact: "Total issues: N active"
-    m = re.search(r"Total issues:\s*(\d+)\s*active", text)
-    if m:
-        n = int(m.group(1))
-        c = "yellow" if n else "green"
-        lines.append(f"  [{c}]{n} ticket{'s' if n != 1 else ''} generated[/]")
-    elif "prefact" in name.lower():
-        # fallback: count "- [ ]" lines in stdout (TODO.md written to stdout sometimes)
-        open_tickets = text.count("- [ ]")
-        if open_tickets:
-            lines.append(f"  [yellow]{open_tickets} open ticket{'s' if open_tickets != 1 else ''}[/]")
-
-    # code2llm / analyze: "N files" or "Processed N"
-    m = re.search(r"(\d+)\s+file", text)
-    if m and ("analyze" in name.lower() or "code2llm" in name.lower()):
-        n = int(m.group(1))
-        m2 = re.search(r"([\d,]+)\s+line", text)
-        loc = m2.group(1) if m2 else None
-        info = f"{n} files"
-        if loc:
-            info += f", {loc} lines"
-        lines.append(f"  [dim]{info}[/]")
-
-    # vallm / validate: look for cc/critical values in TOON output
-    m_cc = re.search(r"cc[:\s=]+([0-9.]+)", text, re.IGNORECASE)
-    m_crit = re.search(r"critical[:\s=]+([0-9]+)", text, re.IGNORECASE)
-    if (m_cc or m_crit) and ("valid" in name.lower() or "vallm" in name.lower()):
-        parts = []
-        if m_cc:
-            parts.append(f"cc={m_cc.group(1)}")
-        if m_crit:
-            parts.append(f"critical={m_crit.group(1)}")
-        if parts:
-            lines.append(f"  [dim]{', '.join(parts)}[/]")
-
-    # llx-fix / fix: model selection and file changes
-    m = re.search(r"Selected:\s*\S+\s*→\s*(.+)", text)
-    if m:
-        model = m.group(1).strip().split()[0]
-        lines.append(f"  [dim]model: {model}[/]")
-    m = re.search(r"(\d+)\s+file[s]?\s+changed", text)
-    if m:
-        lines.append(f"  [green]{m.group(1)} file(s) changed[/]")
-    elif "fix" in name.lower() and any(w in text for w in ("Applied", "fixed", "No changes")):
-        m2 = re.search(r"(Applied|fixed|No changes)[^\n]*", text)
-        if m2:
-            lines.append(f"  [dim]{m2.group(0)[:80]}[/]")
-
-    # mypy: "Found N errors in M files"
-    m = re.search(r"Found (\d+) error[s]? in (\d+) file", text)
-    if m:
-        lines.append(f"  [red]{m.group(1)} mypy error{'s' if int(m.group(1)) != 1 else ''} in {m.group(2)} file(s)[/]")
-
-    # bandit: "Total: Severity High/Med/Low"
-    m = re.search(r"High: (\d+)\s+Medium: (\d+)\s+Low: (\d+)", text)
-    if m:
-        hi, med, lo = int(m.group(1)), int(m.group(2)), int(m.group(3))
-        parts = []
-        if hi:
-            parts.append(f"[red]High:{hi}[/]")
-        if med:
-            parts.append(f"[yellow]Med:{med}[/]")
-        if lo:
-            parts.append(f"[dim]Low:{lo}[/]")
-        if parts:
-            lines.append("  " + " ".join(parts))
-
+    lines: list[str] = []
+    lines.extend(_extract_pytest_stage_summary(text))
+    lines.extend(_extract_lint_stage_summary(text))
+    lines.extend(_extract_prefact_stage_summary(name, text))
+    lines.extend(_extract_code2llm_stage_summary(name, text))
+    lines.extend(_extract_validation_stage_summary(name, text))
+    lines.extend(_extract_fix_stage_summary(name, text))
+    lines.extend(_extract_mypy_stage_summary(name, text))
+    lines.extend(_extract_bandit_stage_summary(text))
     return lines
 
 
@@ -1237,6 +1151,123 @@ def tools() -> None:
     console.print("    - name: secrets")
     console.print("      tool: trufflehog")
     console.print("      optional: true")
+
+
+def _extract_pytest_stage_summary(text: str) -> list[str]:
+    lines: list[str] = []
+    m = re.search(r"(\d+) passed", text)
+    passed = int(m.group(1)) if m else None
+    m_fail = re.search(r"(\d+) failed", text)
+    failed_tests = int(m_fail.group(1)) if m_fail else None
+    m_err = re.search(r"(\d+) error", text)
+    test_errors = int(m_err.group(1)) if m_err else None
+    if passed is not None or failed_tests or test_errors:
+        parts = []
+        if passed:
+            parts.append(f"[green]{passed} passed[/]")
+        if failed_tests:
+            parts.append(f"[red]{failed_tests} failed[/]")
+        if test_errors:
+            parts.append(f"[red]{test_errors} error[/]")
+        if parts:
+            lines.append("  " + "  ".join(parts))
+    return lines
+
+
+def _extract_lint_stage_summary(text: str) -> list[str]:
+    lines: list[str] = []
+    m = re.search(r"Found (\d+) error", text)
+    if m:
+        n = int(m.group(1))
+        lines.append(f"  [{'red' if n else 'green'}]{n} lint error{'s' if n != 1 else ''}[/]")
+    elif "All checks passed" in text:
+        lines.append("  [green]0 lint errors[/]")
+    return lines
+
+
+def _extract_prefact_stage_summary(name: str, text: str) -> list[str]:
+    lines: list[str] = []
+    m = re.search(r"Total issues:\s*(\d+)\s*active", text)
+    if m:
+        n = int(m.group(1))
+        c = "yellow" if n else "green"
+        lines.append(f"  [{c}]{n} ticket{'s' if n != 1 else ''} generated[/]")
+    elif "prefact" in name.lower():
+        open_tickets = text.count("- [ ]")
+        if open_tickets:
+            lines.append(f"  [yellow]{open_tickets} open ticket{'s' if open_tickets != 1 else ''}[/]")
+    return lines
+
+
+def _extract_code2llm_stage_summary(name: str, text: str) -> list[str]:
+    lines: list[str] = []
+    m = re.search(r"(\d+)\s+file", text)
+    if m and ("analyze" in name.lower() or "code2llm" in name.lower()):
+        n = int(m.group(1))
+        m2 = re.search(r"([\d,]+)\s+line", text)
+        loc = m2.group(1) if m2 else None
+        info = f"{n} files"
+        if loc:
+            info += f", {loc} lines"
+        lines.append(f"  [dim]{info}[/]")
+    return lines
+
+
+def _extract_validation_stage_summary(name: str, text: str) -> list[str]:
+    lines: list[str] = []
+    lower_name = name.lower()
+    m_cc = re.search(r"cc[:\s=]+([0-9.]+)", text, re.IGNORECASE)
+    m_crit = re.search(r"critical[:\s=]+([0-9]+)", text, re.IGNORECASE)
+    if (m_cc or m_crit) and ("valid" in lower_name or "vallm" in lower_name):
+        parts = []
+        if m_cc:
+            parts.append(f"cc={m_cc.group(1)}")
+        if m_crit:
+            parts.append(f"critical={m_crit.group(1)}")
+        if parts:
+            lines.append(f"  [dim]{', '.join(parts)}[/]")
+    return lines
+
+
+def _extract_fix_stage_summary(name: str, text: str) -> list[str]:
+    lines: list[str] = []
+    m = re.search(r"Selected:\s*\S+\s*→\s*(.+)", text)
+    if m:
+        model = m.group(1).strip().split()[0]
+        lines.append(f"  [dim]model: {model}[/]")
+    m = re.search(r"(\d+)\s+file[s]?\s+changed", text)
+    if m:
+        lines.append(f"  [green]{m.group(1)} file(s) changed[/]")
+    elif "fix" in name.lower() and any(w in text for w in ("Applied", "fixed", "No changes")):
+        m2 = re.search(r"(Applied|fixed|No changes)[^\n]*", text)
+        if m2:
+            lines.append(f"  [dim]{m2.group(0)[:80]}[/]")
+    return lines
+
+
+def _extract_mypy_stage_summary(name: str, text: str) -> list[str]:
+    lines: list[str] = []
+    m = re.search(r"Found (\d+) error[s]? in (\d+) file", text)
+    if m:
+        lines.append(f"  [red]{m.group(1)} mypy error{'s' if int(m.group(1)) != 1 else ''} in {m.group(2)} file(s)[/]")
+    return lines
+
+
+def _extract_bandit_stage_summary(text: str) -> list[str]:
+    lines: list[str] = []
+    m = re.search(r"High: (\d+)\s+Medium: (\d+)\s+Low: (\d+)", text)
+    if m:
+        hi, med, lo = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        parts = []
+        if hi:
+            parts.append(f"[red]High:{hi}[/]")
+        if med:
+            parts.append(f"[yellow]Med:{med}[/]")
+        if lo:
+            parts.append(f"[dim]Low:{lo}[/]")
+        if parts:
+            lines.append("  " + " ".join(parts))
+    return lines
 
 
 def _format_log_entry_row(entry: dict) -> tuple:
