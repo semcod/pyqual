@@ -77,6 +77,7 @@ class ProjectRunState:
     error_msg: str = ""
     start_time: float = 0.0
     last_line: str = ""
+    analysis: str = ""
 
     @property
     def progress_pct(self) -> int:
@@ -112,45 +113,103 @@ def _parse_output_line(state: ProjectRunState, line: str) -> None:
         return
 
     state.last_line = line[:120]
-
-    # Rich markup removal for parsing
     clean = line
 
-    # Detect iteration header: "─── Iteration 2 ───" or similar
+    # Detect stage START: "▶ lint" (emitted before stage executes)
+    if clean.startswith("▶ ") or clean.startswith("► "):
+        state.current_stage = clean[2:].strip()
+        return
+
+    # Detect iteration header: "─── Iteration 2 ───"
     if "Iteration " in clean:
         try:
-            parts = clean.split("Iteration ")
-            if len(parts) > 1:
-                num_str = parts[1].split()[0].strip("─ ")
-                state.iteration = int(num_str)
-                state.stages_done = 0
+            num_str = clean.split("Iteration ")[1].split()[0].strip("─ ")
+            state.iteration = int(num_str)
+            state.stages_done = 0
         except (ValueError, IndexError):
             pass
 
-    # Detect stage completion: "  ✅ lint (1.2s)" or "  ❌ test (3.4s)" or "  ⏭ fix (skipped)"
-    for icon in ("✅", "❌", "⏭", "⏭"):
-        if icon in clean:
-            state.stages_done += 1
-            try:
-                after_icon = clean.split(icon, 1)[1].strip()
-                stage_name = after_icon.split("(")[0].strip()
-                state.current_stage = stage_name
-            except (IndexError, ValueError):
-                pass
-            break
-
-    # Detect gate results: "  cc: 4.9 ≤ 15 ✅" or "  coverage: 28.9 ≥ 80 ❌"
-    if "≤" in clean or "≥" in clean or ">" in clean or "<" in clean or "=" in clean:
+    # Gate lines: "  ✅ critical: 0.0 ≤ 0.0" — handle before stage detection
+    if "≤" in clean or "≥" in clean:
         if "✅" in clean:
             state.gates_passed += 1
+        return
 
-    # Detect "All gates passed!"
+    # Stage completion: "  ✅ lint (1.2s)" or "  ❌ test (3.4s)" or "  ⏭ fix (skipped)"
+    # Stage lines always have "(Xs)" or "(skipped)" after the name
+    for icon in ("✅", "❌", "⏭"):
+        if icon in clean:
+            after_icon = clean.split(icon, 1)[1].strip()
+            if "(" in after_icon:
+                state.stages_done += 1
+                state.current_stage = after_icon.split("(")[0].strip()
+            break
+
     if "All gates passed" in clean:
         state.status = RunStatus.PASSED
-
-    # Detect "Gates not met after"
     if "Gates not met after" in clean:
         state.status = RunStatus.FAILED
+
+
+# ---------------------------------------------------------------------------
+# LLM log analysis (optional, triggered for failed/error projects)
+# ---------------------------------------------------------------------------
+
+def _analyze_project(state: ProjectRunState, log_dir: Path | None = None) -> None:
+    """Call LLM to produce a 1-line failure diagnosis. Updates state.analysis."""
+    try:
+        from pyqual.llm import LLM  # type: ignore[import]
+        import yaml
+
+        model: str | None = None
+        config_path = state.path / "pyqual.yaml"
+        if config_path.exists():
+            try:
+                data = yaml.safe_load(config_path.read_text())
+                pipe = data.get("pipeline", data)
+                model = pipe.get("env", {}).get("LLM_MODEL")
+            except Exception:
+                pass
+
+        context_lines: list[str] = []
+        if log_dir is not None:
+            log_file = log_dir / f"{state.name}.log"
+            if log_file.exists():
+                try:
+                    lines = log_file.read_text().splitlines()
+                    context_lines = lines[-80:]
+                except Exception:
+                    pass
+
+        if not context_lines:
+            lines = [state.last_line] if state.last_line else []
+            if state.error_msg:
+                lines.append(state.error_msg)
+            context_lines = lines
+
+        if not context_lines:
+            state.analysis = "no log data"
+            return
+
+        log_excerpt = "\n".join(context_lines)
+        prompt = (
+            f"Project: {state.name}\n"
+            f"Pipeline log (last lines):\n{log_excerpt}\n\n"
+            "Diagnose the main failure in ONE sentence, max 80 characters. "
+            "No code, no suggestions, just diagnosis."
+        )
+
+        llm = LLM(model=model)
+        response = llm.complete(
+            prompt,
+            system="You are a concise code quality analyst. Reply with exactly one sentence.",
+            temperature=0.1,
+            max_tokens=100,
+        )
+        analysis = response.content.strip().replace("\n", " ")
+        state.analysis = analysis[:80]
+    except Exception as exc:
+        state.analysis = f"[llm error: {str(exc)[:40]}]"
 
 
 # ---------------------------------------------------------------------------
@@ -162,6 +221,8 @@ def _run_single_project(
     dry_run: bool = False,
     timeout: int = 0,
     pyqual_cmd: str = "pyqual",
+    log_dir: Path | None = None,
+    analyze: bool = False,
 ) -> None:
     """Run pyqual in a single project directory. Updates state in-place."""
     state.status = RunStatus.RUNNING
@@ -193,6 +254,11 @@ def _run_single_project(
 
     effective_timeout = timeout if timeout > 0 else None
 
+    log_fh = None
+    if log_dir is not None:
+        log_dir.mkdir(parents=True, exist_ok=True)
+        log_fh = open(log_dir / f"{state.name}.log", "w")
+
     try:
         proc = subprocess.Popen(
             cmd,
@@ -203,9 +269,11 @@ def _run_single_project(
             bufsize=1,
         )
 
-        # Read output line by line
         assert proc.stdout is not None
         for line in proc.stdout:
+            if log_fh is not None:
+                log_fh.write(line)
+                log_fh.flush()
             _parse_output_line(state, line)
 
         proc.wait(timeout=effective_timeout)
@@ -213,7 +281,6 @@ def _run_single_project(
         state.duration = time.monotonic() - state.start_time
 
         if state.status == RunStatus.RUNNING:
-            # Finished but status not yet set by parser
             if proc.returncode == 0:
                 state.status = RunStatus.PASSED
             else:
@@ -233,13 +300,21 @@ def _run_single_project(
         state.duration = time.monotonic() - state.start_time
         state.status = RunStatus.ERROR
         state.error_msg = str(exc)[:200]
+    finally:
+        if log_fh is not None:
+            log_fh.close()
+
+    if analyze and state.status in (RunStatus.FAILED, RunStatus.ERROR, RunStatus.TIMEOUT):
+        state.analysis = "🤔 analyzing…"
+        _analyze_project(state, log_dir=log_dir)
 
 
 # ---------------------------------------------------------------------------
 # Dashboard table builder
 # ---------------------------------------------------------------------------
 
-def _build_project_row(s: ProjectRunState, show_last_line: bool) -> list:
+def _build_project_row(s: ProjectRunState, show_last_line: bool,
+                        show_analysis: bool = False) -> list:
     """Build a single dashboard table row for one project state."""
     icon = STATUS_ICON.get(s.status, "?")
     style = STATUS_STYLE.get(s.status, "")
@@ -288,6 +363,14 @@ def _build_project_row(s: ProjectRunState, show_last_line: bool) -> list:
     row: list = [s.name, status_text, iter_text, stage_text, progress, gates_text, time_text]
     if show_last_line:
         row.append(s.last_line[:50] if s.last_line else "")
+    if show_analysis:
+        if s.analysis.startswith("🤔"):
+            row.append(f"[dim]{s.analysis}[/]")
+        elif s.analysis:
+            color = "yellow" if s.status in (RunStatus.FAILED, RunStatus.ERROR, RunStatus.TIMEOUT) else "dim"
+            row.append(f"[{color}]{s.analysis[:60]}[/]")
+        else:
+            row.append("")
     return row
 
 
@@ -295,6 +378,7 @@ def build_dashboard_table(
     states: list[ProjectRunState],
     *,
     show_last_line: bool = False,
+    show_analysis: bool = False,
 ) -> Table:
     """Build a Rich Table showing the current status of all projects."""
     running = sum(1 for s in states if s.status == RunStatus.RUNNING)
@@ -323,9 +407,11 @@ def build_dashboard_table(
     table.add_column("Time", width=8, justify="right")
     if show_last_line:
         table.add_column("Last Output", max_width=50, style="dim")
+    if show_analysis:
+        table.add_column("LLX Analysis", max_width=60, style="dim")
 
     for s in states:
-        table.add_row(*_build_project_row(s, show_last_line))
+        table.add_row(*_build_project_row(s, show_last_line, show_analysis))
 
     return table
 
@@ -365,6 +451,8 @@ def bulk_run(
     pyqual_cmd: str = "pyqual",
     filter_names: list[str] | None = None,
     live_callback: Any = None,
+    log_dir: Path | None = None,
+    analyze: bool = False,
 ) -> BulkRunResult:
     """Run pyqual across all projects with parallel execution.
 
@@ -384,9 +472,11 @@ def bulk_run(
         If set, only run these project names.
     live_callback:
         Callable invoked after each state change (for dashboard refresh).
+    log_dir:
+        If set, save each project's output to ``log_dir/<name>.log``.
+    analyze:
+        If True, call LLM to diagnose each failed/error project after it finishes.
     """
-    import concurrent.futures
-
     all_states = discover_projects(root)
 
     if filter_names:
@@ -403,7 +493,9 @@ def bulk_run(
     def _run_with_semaphore(state: ProjectRunState) -> None:
         semaphore.acquire()
         try:
-            _run_single_project(state, dry_run=dry_run, timeout=timeout, pyqual_cmd=pyqual_cmd)
+            _run_single_project(state, dry_run=dry_run, timeout=timeout,
+                                 pyqual_cmd=pyqual_cmd, log_dir=log_dir,
+                                 analyze=analyze)
         finally:
             semaphore.release()
 

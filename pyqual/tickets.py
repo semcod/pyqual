@@ -30,7 +30,7 @@ def _normalize_sources(source: str) -> list[str]:
 
 def sync_planfile_tickets(
     source: str,
-    directory: Path = Path("."),
+    workdir: Path = Path("."),
     dry_run: bool = False,
     direction: str = "both",
 ) -> None:
@@ -39,7 +39,7 @@ def sync_planfile_tickets(
     for index, integration_name in enumerate(_normalize_sources(source)):
         sync_integration(
             integration_name,
-            str(directory),
+            str(workdir),
             dry_run,
             direction,
             show_header=index == 0,
@@ -47,27 +47,27 @@ def sync_planfile_tickets(
 
 
 def sync_todo_tickets(
-    directory: Path = Path("."),
+    workdir: Path = Path("."),
     dry_run: bool = False,
     direction: str = "both",
 ) -> None:
     """Sync TODO.md tickets through planfile's markdown backend."""
-    sync_planfile_tickets("todo", directory=directory, dry_run=dry_run, direction=direction)
+    sync_planfile_tickets("todo", workdir=workdir, dry_run=dry_run, direction=direction)
 
 
 def sync_github_tickets(
-    directory: Path = Path("."),
+    workdir: Path = Path("."),
     dry_run: bool = False,
     direction: str = "both",
 ) -> None:
     """Sync GitHub issues through planfile's GitHub backend."""
-    sync_planfile_tickets("github", directory=directory, dry_run=dry_run, direction=direction)
+    sync_planfile_tickets("github", workdir=workdir, dry_run=dry_run, direction=direction)
 
 
 def sync_all_tickets(
-    directory: Path = Path("."),
+    workdir: Path = Path("."),
     dry_run: bool = False,
     direction: str = "both",
 ) -> None:
     """Sync TODO.md and GitHub tickets through planfile."""
-    sync_planfile_tickets("all", directory=directory, dry_run=dry_run, direction=direction)
+    sync_planfile_tickets("all", workdir=workdir, dry_run=dry_run, direction=direction)

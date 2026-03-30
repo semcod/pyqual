@@ -1,30 +1,28 @@
-# vallm batch | 92f | 52✓ 6⚠ 1✗ | 2026-03-30
+# vallm batch | 94f | 54✓ 6⚠ 1✗ | 2026-03-30
 
 SUMMARY:
-  scanned: 92  passed: 52 (56.5%)  warnings: 6  errors: 1  unsupported: 39
+  scanned: 94  passed: 54 (57.4%)  warnings: 6  errors: 1  unsupported: 39
 
 WARNINGS[6]{path,score}:
-  pyqual/bulk_run.py,0.90
-    issues[6]{rule,severity,message,line}:
+  pyqual/bulk_run.py,0.93
+    issues[4]{rule,severity,message,line}:
       complexity.cyclomatic,warning,_parse_output_line has cyclomatic complexity 16 (max: 15),108
-      complexity.cyclomatic,warning,build_dashboard_table has cyclomatic complexity 28 (max: 15),242
-      complexity.cyclomatic,warning,bulk_run has cyclomatic complexity 17 (max: 15),360
+      complexity.cyclomatic,warning,bulk_run has cyclomatic complexity 17 (max: 15),359
       complexity.lizard_cc,warning,_parse_output_line: CC=16 exceeds limit 15,108
-      complexity.lizard_cc,warning,build_dashboard_table: CC=28 exceeds limit 15,242
-      complexity.lizard_cc,warning,bulk_run: CC=17 exceeds limit 15,360
+      complexity.lizard_cc,warning,bulk_run: CC=17 exceeds limit 15,359
   pyqual/cli.py,0.93
     issues[5]{rule,severity,message,line}:
       complexity.cyclomatic,warning,bulk_run_cmd has cyclomatic complexity 17 (max: 15),175
-      complexity.cyclomatic,warning,logs has cyclomatic complexity 29 (max: 15),913
-      complexity.maintainability,warning,Low maintainability index: 2.4 (threshold: 20),
+      complexity.cyclomatic,warning,logs has cyclomatic complexity 16 (max: 15),960
+      complexity.maintainability,warning,Low maintainability index: 2.3 (threshold: 20),
       complexity.lizard_cc,warning,bulk_run_cmd: CC=17 exceeds limit 15,175
-      complexity.lizard_cc,warning,logs: CC=29 exceeds limit 15,913
-  pyqual/gates.py,0.98
+      complexity.lizard_cc,warning,logs: CC=16 exceeds limit 15,960
+  pyqual/_gate_collectors.py,0.98
     issues[1]{rule,severity,message,line}:
-      complexity.maintainability,warning,Low maintainability index: 0.0 (threshold: 20),
-  pyqual/plugins.py,0.98
+      complexity.maintainability,warning,Low maintainability index: 7.2 (threshold: 20),
+  pyqual/builtin_collectors.py,0.98
     issues[1]{rule,severity,message,line}:
-      complexity.maintainability,warning,Low maintainability index: 14.4 (threshold: 20),
+      complexity.maintainability,warning,Low maintainability index: 12.4 (threshold: 20),
   test_pyqual.py,0.98
     issues[1]{rule,severity,message,line}:
       complexity.cyclomatic,warning,test_pipeline_writes_nfo_sqlite_log has cyclomatic complexity 17 (max: 15),325

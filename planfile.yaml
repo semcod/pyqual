@@ -758,3 +758,42 @@ sprints:
     model_hints:
       planning: balanced
       implementation: balanced
+  - id: ticket-b922e465
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in pyqual/_gate_collectors.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/_gate_collectors.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-30f596db
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/_gate_collectors.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/_gate_collectors.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e71e5810
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/builtin_collectors.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/builtin_collectors.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced

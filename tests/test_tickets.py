@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 
 import pytest
 from typer.testing import CliRunner
@@ -9,6 +10,7 @@ from typer.testing import CliRunner
 import pyqual.cli as cli_module
 from pyqual.cli import app
 from pyqual import tickets as tickets_module
+from pyqual import pipeline as pipeline_module
 
 
 def test_sync_todo_tickets_uses_planfile_markdown_backend(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -25,7 +27,7 @@ def test_sync_todo_tickets_uses_planfile_markdown_backend(tmp_path: Path, monkey
 
     monkeypatch.setattr(tickets_module, "_load_sync_integration", lambda: fake_sync_integration)
 
-    tickets_module.sync_todo_tickets(tmp_path, dry_run=True, direction="from")
+    tickets_module.sync_todo_tickets(workdir=tmp_path, dry_run=True, direction="from")
 
     assert calls == [("markdown", str(tmp_path), True, "from", True)]
 
@@ -44,7 +46,7 @@ def test_sync_github_tickets_uses_planfile_github_backend(tmp_path: Path, monkey
 
     monkeypatch.setattr(tickets_module, "_load_sync_integration", lambda: fake_sync_integration)
 
-    tickets_module.sync_github_tickets(tmp_path, dry_run=False, direction="both")
+    tickets_module.sync_github_tickets(workdir=tmp_path, dry_run=False, direction="both")
 
     assert calls == [("github", str(tmp_path), False, "both", True)]
 
@@ -63,7 +65,7 @@ def test_sync_all_tickets_calls_both_backends(tmp_path: Path, monkeypatch: pytes
 
     monkeypatch.setattr(tickets_module, "_load_sync_integration", lambda: fake_sync_integration)
 
-    tickets_module.sync_all_tickets(tmp_path, dry_run=False, direction="to")
+    tickets_module.sync_all_tickets(workdir=tmp_path, dry_run=False, direction="to")
 
     assert calls == [
         ("markdown", str(tmp_path), False, "to", True),
@@ -113,7 +115,7 @@ def test_run_on_fail_create_ticket_syncs_todo_tickets(tmp_path: Path, monkeypatc
     captured: dict[str, object] = {}
 
     class FakePipeline:
-        def __init__(self, config: object, workdir: Path):
+        def __init__(self, config: object, workdir: Path, on_stage_start=None, on_iteration_start=None):
             self.config = config
             self.workdir = workdir
 
@@ -128,12 +130,16 @@ def test_run_on_fail_create_ticket_syncs_todo_tickets(tmp_path: Path, monkeypatc
     def fake_sync_todo_tickets(*, workdir: Path, dry_run: bool, direction: str) -> None:
         captured.update({"workdir": workdir, "dry_run": dry_run, "direction": direction})
 
-    monkeypatch.setattr(cli_module, "Pipeline", FakePipeline)
-    monkeypatch.setattr(cli_module, "sync_todo_tickets", fake_sync_todo_tickets)
+    # Patch in cli_module where Pipeline and sync_todo_tickets are used
+    # (cli.py does: from pyqual.pipeline import Pipeline)
+    # (cli.py does: from pyqual.tickets import sync_todo_tickets)
+    import pyqual.cli as cli_mod
+    monkeypatch.setattr(cli_mod, "Pipeline", FakePipeline)
+    monkeypatch.setattr(cli_mod, "sync_todo_tickets", fake_sync_todo_tickets)
 
     runner = CliRunner()
     result = runner.invoke(
-        app,
+        cli_mod.app,
         [
             "run",
             "--config",

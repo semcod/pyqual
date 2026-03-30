@@ -181,6 +181,8 @@ def bulk_run_cmd(
     no_live: bool = typer.Option(False, "--no-live", help="Disable live dashboard, print final summary only."),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Show last output line per project in dashboard."),
     json_output: bool = typer.Option(False, "--json", "-j", help="Output final results as JSON."),
+    log_dir: Path | None = typer.Option(None, "--log-dir", "-l", help="Save per-project output to LOG_DIR/<name>.log."),
+    analyze: bool = typer.Option(False, "--analyze", "-a", help="Call LLX/LLM to diagnose each failed project (adds LLX Analysis column)."),
 ) -> None:
     """Run pyqual across all projects with a real-time dashboard.
 
@@ -194,6 +196,9 @@ def bulk_run_cmd(
         pyqual bulk-run /path/to/workspace --dry-run
         pyqual bulk-run /path/to/workspace --filter mylib --filter webapp
         pyqual bulk-run /path/to/workspace --timeout 600
+        pyqual bulk-run /path/to/workspace --log-dir /tmp/bulk-logs
+        pyqual bulk-run /path/to/workspace --analyze
+        pyqual bulk-run /path/to/workspace --analyze --log-dir /tmp/logs
     """
     from rich.live import Live
 
@@ -221,6 +226,11 @@ def bulk_run_cmd(
         console.print("[yellow]DRY RUN mode[/yellow]")
     console.print()
 
+    if log_dir:
+        console.print(f"[dim]Logs → {log_dir}/[/dim]")
+    if analyze:
+        console.print("[dim]LLX analysis enabled for failed projects.[/dim]")
+
     if no_live:
         # No live dashboard — just run and print summary
         result = bulk_run(
@@ -229,6 +239,8 @@ def bulk_run_cmd(
             dry_run=dry_run,
             timeout=timeout,
             filter_names=filter_name or None,
+            log_dir=log_dir,
+            analyze=analyze,
         )
     else:
         # Live dashboard
@@ -238,7 +250,8 @@ def bulk_run_cmd(
             def _refresh(states):
                 states_ref.clear()
                 states_ref.extend(states)
-                live.update(build_dashboard_table(states, show_last_line=verbose))
+                live.update(build_dashboard_table(states, show_last_line=verbose,
+                                                  show_analysis=analyze))
 
             return bulk_run(
                 root=path,
@@ -247,15 +260,19 @@ def bulk_run_cmd(
                 timeout=timeout,
                 filter_names=filter_name or None,
                 live_callback=_refresh,
+                log_dir=log_dir,
+                analyze=analyze,
             )
 
         states_ref: list = []
-        with Live(build_dashboard_table(all_states, show_last_line=verbose),
+        with Live(build_dashboard_table(all_states, show_last_line=verbose,
+                                        show_analysis=analyze),
                   console=console, refresh_per_second=2) as live:
             result = _run_with_live(live, states_ref)
             # Final update
             if states_ref:
-                live.update(build_dashboard_table(states_ref, show_last_line=verbose))
+                live.update(build_dashboard_table(states_ref, show_last_line=verbose,
+                                                  show_analysis=analyze))
 
     if json_output:
         console.print(json.dumps({
@@ -298,7 +315,16 @@ def run(
     """Execute pipeline loop until quality gates pass."""
     _setup_logging(verbose, workdir)
     cfg = PyqualConfig.load(config)
-    pipeline = Pipeline(cfg, workdir)
+
+    def _on_iter_start(num: int) -> None:
+        print(f"─── Iteration {num} ───", flush=True)
+
+    def _on_stage_start(name: str) -> None:
+        print(f"▶ {name}", flush=True)
+
+    pipeline = Pipeline(cfg, workdir,
+                        on_stage_start=_on_stage_start,
+                        on_iteration_start=_on_iter_start)
     result = pipeline.run(dry_run=dry_run)
 
     for iteration in result.iterations:
@@ -362,6 +388,164 @@ def gates(
     else:
         console.print("[bold red]Some gates fail.[/bold red]")
         raise typer.Exit(1)
+
+
+@app.command()
+def validate(
+    config: Path = typer.Option("pyqual.yaml", "--config", "-c"),
+    workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
+    strict: bool = typer.Option(False, "--strict", "-s", help="Exit 1 on warnings too."),
+) -> None:
+    """Validate pyqual.yaml without running the pipeline.
+
+    Checks for:
+    - YAML parse errors
+    - Unknown or missing tool binaries
+    - Gate metric names that no collector produces
+    - Stage configuration mistakes
+
+    Examples:
+        pyqual validate
+        pyqual validate --config path/to/pyqual.yaml
+        pyqual validate --strict
+    """
+    from pyqual.validation import Severity, validate_config
+
+    cfg_path = Path(workdir) / config if not Path(config).is_absolute() else Path(config)
+    result = validate_config(cfg_path)
+
+    SEV_STYLE = {
+        Severity.ERROR:   ("[bold red]ERROR  [/]", "red"),
+        Severity.WARNING: ("[yellow]WARNING[/]", "yellow"),
+        Severity.INFO:    ("[dim]INFO   [/]", "dim"),
+    }
+
+    if not result.issues:
+        console.print(f"[bold green]✅ {cfg_path.name} is valid.[/bold green]"
+                      f" ({result.stages_checked} stages, {result.gates_checked} gates)")
+        return
+
+    console.print(f"[bold]Validating {cfg_path.name}[/bold]"
+                  f" — {result.stages_checked} stages, {result.gates_checked} gates\n")
+
+    for issue in result.issues:
+        badge, style = SEV_STYLE[issue.severity]
+        location = f" [dim][{issue.stage}][/dim]" if issue.stage else ""
+        console.print(f"  {badge}{location}  [{style}]{issue.message}[/{style}]")
+        if issue.suggestion:
+            console.print(f"          [dim]→ {issue.suggestion}[/dim]")
+
+    console.print()
+    nerr = len(result.errors)
+    nwarn = len(result.warnings)
+    if nerr:
+        console.print(f"[bold red]{nerr} error(s)[/bold red]"
+                      + (f", {nwarn} warning(s)" if nwarn else "")
+                      + " — pipeline cannot start.")
+        raise typer.Exit(1)
+    if nwarn:
+        console.print(f"[yellow]{nwarn} warning(s)[/yellow] — pipeline may behave unexpectedly.")
+        if strict:
+            raise typer.Exit(1)
+
+
+@app.command("fix-config")
+def fix_config(
+    config: Path = typer.Option("pyqual.yaml", "--config", "-c"),
+    workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
+    dry_run: bool = typer.Option(False, "--dry-run", "-n", help="Print proposed config, do not write."),
+    model: str | None = typer.Option(None, "--model", "-m", help="Override LLM model."),
+) -> None:
+    """Use LLM to auto-repair pyqual.yaml based on project structure.
+
+    Scans the project (language, available tools, test framework) and asks the
+    LLM to produce a corrected pyqual.yaml that matches the actual project.
+    Validation issues are included in the prompt so the LLM knows what to fix.
+
+    Examples:
+        pyqual fix-config
+        pyqual fix-config --dry-run
+        pyqual fix-config --workdir /path/to/project
+    """
+    from pyqual.validation import Severity, detect_project_facts, validate_config
+    from pyqual.llm import LLM
+
+    workdir_path = Path(workdir).resolve()
+    cfg_path = workdir_path / config if not Path(config).is_absolute() else Path(config)
+
+    validation = validate_config(cfg_path)
+    facts = detect_project_facts(workdir_path)
+
+    if validation.ok and not validation.warnings:
+        console.print("[bold green]✅ Config is already valid — nothing to fix.[/bold green]")
+        return
+
+    issues_text = "\n".join(
+        f"  [{i.severity.value.upper()}] {i.message}"
+        + (f" → {i.suggestion}" if i.suggestion else "")
+        for i in validation.issues
+    )
+
+    available_tools = ", ".join(facts.get("available_tools", [])) or "none detected"
+    current_config = facts.get("current_config", "(file missing)")
+
+    prompt = f"""You are a pyqual configuration expert.
+
+Project facts:
+  Language: {facts.get("lang", "unknown")}
+  Has tests: {facts.get("has_tests", False)}
+  Tools available on PATH: {available_tools}
+
+Current pyqual.yaml:
+{current_config}
+
+Validation issues found:
+{issues_text}
+
+Fix the pyqual.yaml to resolve all issues above.
+Rules:
+- Only use tool presets that are available on PATH (listed above).
+- Use 'run:' for any command not in the tool preset list.
+- Keep stages that work correctly; only fix broken ones.
+- Output ONLY the corrected YAML content, no explanation, no markdown fences.
+"""
+
+    console.print(f"[bold]Asking LLM to fix {cfg_path.name}…[/bold]")
+    console.print(f"[dim]Issues: {len(validation.issues)} | Lang: {facts.get('lang')} | Tools: {available_tools}[/dim]\n")
+
+    try:
+        llm = LLM(model=model or facts.get("current_config", "").find("LLM_MODEL") and None)
+        response = llm.complete(prompt, temperature=0.1, max_tokens=1500)
+    except Exception as exc:
+        console.print(f"[red]LLM error: {exc}[/red]")
+        raise typer.Exit(1)
+
+    new_yaml = response.content.strip()
+    if new_yaml.startswith("```"):
+        lines = new_yaml.splitlines()
+        new_yaml = "\n".join(
+            l for l in lines
+            if not l.startswith("```")
+        ).strip()
+
+    console.print(new_yaml)
+    console.print()
+
+    if dry_run:
+        console.print("[yellow]--dry-run: not writing.[/yellow]")
+        return
+
+    backup = cfg_path.with_suffix(".yaml.bak")
+    cfg_path.rename(backup)
+    cfg_path.write_text(new_yaml)
+    console.print(f"[green]Written to {cfg_path}[/green] (backup: {backup.name})")
+
+    re_check = validate_config(cfg_path)
+    if re_check.ok:
+        console.print("[bold green]✅ Re-validation passed.[/bold green]")
+    else:
+        remaining = [i for i in re_check.errors]
+        console.print(f"[yellow]{len(remaining)} issue(s) remain — review manually.[/yellow]")
 
 
 @app.command()

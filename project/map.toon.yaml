@@ -1,23 +1,25 @@
-# pyqual | 16f 4734L | python:15,shell:1 | 2026-03-30
-# stats: 136 func | 0 cls | 16 mod | CC̄=6.1 | critical:8 | cycles:0
-# alerts[5]: CC collect_fingerprint=37; fan-out collect_fingerprint=35; CC logs=29; CC build_dashboard_table=28; CC _classify_heuristic=26
-# hotspots[5]: collect_fingerprint fan=35; logs fan=25; GateSet._collect_metrics fan=23; bulk_run fan=20; run_project fan=19
-# evolution: CC̄ 4.6→6.1 (regressed +1.5)
+# pyqual | 18f 4694L | python:17,shell:1 | 2026-03-30
+# stats: 134 func | 0 cls | 18 mod | CC̄=5.9 | critical:8 | cycles:0
+# alerts[5]: CC collect_fingerprint=37; fan-out collect_fingerprint=35; CC _classify_heuristic=26; fan-out bulk_run=20; fan-out logs=19
+# hotspots[5]: collect_fingerprint fan=35; bulk_run fan=20; run_project fan=19; logs fan=19; bulk_run_cmd fan=18
+# evolution: CC̄ 5.9→5.9 (flat 0.0)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[16]:
+M[18]:
   project.sh,24
   pyqual/__init__.py,85
+  pyqual/_gate_collectors.py,441
+  pyqual/builtin_collectors.py,432
   pyqual/bulk_init.py,697
-  pyqual/bulk_run.py,444
-  pyqual/cli.py,1031
+  pyqual/bulk_run.py,443
+  pyqual/cli.py,1038
   pyqual/config.py,184
-  pyqual/gates.py,601
+  pyqual/gates.py,91
   pyqual/integrations/__init__.py,1
   pyqual/integrations/llx_mcp.py,102
   pyqual/integrations/llx_mcp_service.py,70
   pyqual/llm.py,126
   pyqual/pipeline.py,339
-  pyqual/plugins.py,547
+  pyqual/plugins.py,138
   pyqual/tickets.py,73
   pyqual/tools.py,322
   run_analysis.py,88
@@ -35,7 +37,7 @@ D:
     generate_pyqual_yaml(project_name;cfg)
     bulk_init(root)
   pyqual/cli.py:
-    e: _setup_logging,init,bulk_init_cmd,bulk_run_cmd,run,gates,status,_run_mcp_workflow,mcp_fix,mcp_refactor,mcp_service,tickets_todo,tickets_github,tickets_all,_plugin_list,_plugin_search,_plugin_info,_plugin_add,_plugin_remove,_plugin_validate,_plugin_unknown_action,plugin,doctor,tools,_query_nfo_db,_row_to_event_dict,logs
+    e: _setup_logging,init,bulk_init_cmd,bulk_run_cmd,run,gates,status,_run_mcp_workflow,mcp_fix,mcp_refactor,mcp_service,tickets_todo,tickets_github,tickets_all,_plugin_list,_plugin_search,_plugin_info,_plugin_add,_plugin_remove,_plugin_validate,_plugin_unknown_action,plugin,doctor,tools,_format_log_entry_row,_query_nfo_db,_row_to_event_dict,logs
     _setup_logging(verbose;workdir)
     init(path)
     bulk_init_cmd(path;dry_run;no_llm;model;overwrite;show_schema;json_output)
@@ -60,24 +62,23 @@ D:
     plugin(action;name;workdir;tag)
     doctor()
     tools()
+    _format_log_entry_row(entry)
     _query_nfo_db(db_path;event;failed;tail;sql)
     _row_to_event_dict(row)
     logs(workdir;tail;level;failed;json_output;sql)
   pyqual/bulk_run.py:
-    e: RunStatus,ProjectRunState,BulkRunResult,_parse_output_line,_run_single_project,build_dashboard_table,discover_projects,bulk_run
+    e: RunStatus,ProjectRunState,BulkRunResult,_parse_output_line,_run_single_project,_build_project_row,build_dashboard_table,discover_projects,bulk_run
     RunStatus(str,Enum):
     ProjectRunState:  # Mutable state for a single project's pyqual run...
     BulkRunResult:  # Summary of a bulk-run session...
     _parse_output_line(state;line)
     _run_single_project(state;dry_run;timeout;pyqual_cmd)
+    _build_project_row(s;show_last_line)
     build_dashboard_table(states)
     discover_projects(root)
     bulk_run(root)
-  pyqual/plugins.py:
-    e: PluginMetadata,MetricCollector,PluginRegistry,LLMBenchCollector,HallucinationCollector,SBOMCollector,I18nCollector,A11yCollector,RepoMetricsCollector,SecurityCollector,LlxMcpFixCollector,get_available_plugins,install_plugin_config
-    PluginMetadata: __post_init__(0)  # Metadata for a pyqual plugin...
-    MetricCollector(ABC): collect(1),get_config_example(0)  # Base class for metric collector plugins...
-    PluginRegistry: register(1),get(1),list_plugins(1),create_instance(1)  # Registry for metric collector plugins...
+  pyqual/builtin_collectors.py:
+    e: LLMBenchCollector,HallucinationCollector,SBOMCollector,I18nCollector,A11yCollector,RepoMetricsCollector,SecurityCollector,LlxMcpFixCollector
     LLMBenchCollector(MetricCollector): collect(1)  # LLM code generation quality metrics from human-eval and Code...
     HallucinationCollector(MetricCollector): collect(1)  # Hallucination detection and prompt quality metrics...
     SBOMCollector(MetricCollector): collect(1)  # SBOM compliance and supply chain security metrics...
@@ -86,13 +87,29 @@ D:
     RepoMetricsCollector(MetricCollector): collect(1)  # Advanced repository health metrics (bus factor, diversity)...
     SecurityCollector(MetricCollector): collect(1)  # Security scanning metrics from trufflehog, gitleaks, safety...
     LlxMcpFixCollector(MetricCollector): _tier_rank(0),_load_report(0),_assign_float(2),_count_lines(0),_collect_analysis_metrics(2),_collect_aider_metrics(2),get_config_example(0),collect(1)  # Dockerized llx MCP fix/refactor workflow results...
-    get_available_plugins()
-    install_plugin_config(name;workdir)
-  pyqual/gates.py:
-    e: GateResult,Gate,GateSet
-    GateResult: __str__(0)  # Result of a single gate check...
-    Gate: check(1)  # Single quality gate with metric extraction...
-    GateSet: __init__(1),_read_artifact_text(1),check_all(1),all_passed(1),_collect_metrics(1),_from_toon(1),_from_vallm(1),_from_coverage(1),_from_safety(1),_from_bandit(1),_from_secrets(1),_from_pip_outdated(1),_from_radon(1),_from_mypy(1),_from_pytest_durations(1),_from_benchmark(1),_from_memory_profile(1),_from_secrets(1),_from_vulnerabilities(1),_from_sbom(1),_from_vulture(1),_from_pyroma(1),_from_git_health(1),_from_llm_quality(1),_from_ai_cost(1),_from_ruff(1),_count_pylint_by_type(2),_from_pylint(1),_from_flake8(1),_from_interrogate(1)  # Collection of quality gates with metric collection...
+  pyqual/_gate_collectors.py:
+    e: _read_artifact_text,_from_toon,_from_vallm,_from_coverage,_from_bandit,_from_secrets,_from_vulnerabilities,_from_sbom,_from_vulture,_from_pyroma,_from_git_health,_from_llm_quality,_from_ai_cost,_from_benchmark,_from_memory_profile,_from_mypy,_from_ruff,_count_pylint_by_type,_from_pylint,_from_flake8,_from_interrogate
+    _read_artifact_text(workdir;filenames)
+    _from_toon(workdir)
+    _from_vallm(workdir)
+    _from_coverage(workdir)
+    _from_bandit(workdir)
+    _from_secrets(workdir)
+    _from_vulnerabilities(workdir)
+    _from_sbom(workdir)
+    _from_vulture(workdir)
+    _from_pyroma(workdir)
+    _from_git_health(workdir)
+    _from_llm_quality(workdir)
+    _from_ai_cost(workdir)
+    _from_benchmark(workdir)
+    _from_memory_profile(workdir)
+    _from_mypy(workdir)
+    _from_ruff(workdir)
+    _count_pylint_by_type(messages;type_name;symbol_prefix)
+    _from_pylint(workdir)
+    _from_flake8(workdir)
+    _from_interrogate(workdir)
   pyqual/pipeline.py:
     e: StageResult,IterationResult,PipelineResult,Pipeline
     StageResult:  # Result of running a single stage...
@@ -125,6 +142,18 @@ D:
     e: build_parser,main
     build_parser()
     main(argv)
+  pyqual/plugins.py:
+    e: PluginMetadata,MetricCollector,PluginRegistry,get_available_plugins,install_plugin_config
+    PluginMetadata: __post_init__(0)  # Metadata for a pyqual plugin...
+    MetricCollector(ABC): collect(1),get_config_example(0)  # Base class for metric collector plugins...
+    PluginRegistry: register(1),get(1),list_plugins(1),create_instance(1)  # Registry for metric collector plugins...
+    get_available_plugins()
+    install_plugin_config(name;workdir)
+  pyqual/gates.py:
+    e: GateResult,Gate,GateSet
+    GateResult: __str__(0)  # Result of a single gate check...
+    Gate: check(1)  # Single quality gate with metric extraction...
+    GateSet: __init__(1),check_all(1),all_passed(1),_collect_metrics(1)  # Collection of quality gates with metric collection...
   pyqual/tickets.py:
     e: _load_sync_integration,_normalize_sources,sync_planfile_tickets,sync_todo_tickets,sync_github_tickets,sync_all_tickets
     _load_sync_integration()
@@ -139,7 +168,7 @@ D:
     run_server(host;port;state)
     build_parser()
     main(argv)
-  pyqual/llm.py:
   pyqual/__init__.py:
+  pyqual/llm.py:
   pyqual/integrations/__init__.py:
   project.sh:

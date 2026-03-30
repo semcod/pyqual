@@ -71,10 +71,13 @@ class PipelineResult:
 class Pipeline:
     """Execute pipeline stages in a loop until quality gates pass."""
 
-    def __init__(self, config: PyqualConfig, workdir: str | Path = "."):
+    def __init__(self, config: PyqualConfig, workdir: str | Path = ".",
+                 on_stage_start: Any = None, on_iteration_start: Any = None):
         self.config = config
         self.workdir = Path(workdir).resolve()
         self.gate_set = GateSet(config.gates)
+        self.on_stage_start = on_stage_start
+        self.on_iteration_start = on_iteration_start
         self._ensure_pyqual_dir()
         self._nfo = self._init_nfo()
 
@@ -117,6 +120,8 @@ class Pipeline:
 
     def _run_iteration(self, num: int, dry_run: bool) -> IterationResult:
         """Run one iteration of all stages + gate check."""
+        if self.on_iteration_start:
+            self.on_iteration_start(num)
         start = time.monotonic()
         iteration = IterationResult(iteration=num)
         gates_status = self.gate_set.all_passed(self.workdir)
@@ -206,6 +211,8 @@ class Pipeline:
             return result
 
         log.info("stage=%s tool=%s command=%r status=started", stage.name, stage.tool or "-", command)
+        if self.on_stage_start:
+            self.on_stage_start(stage.name)
 
         env = {**os.environ, **self.config.env}
         start = time.monotonic()

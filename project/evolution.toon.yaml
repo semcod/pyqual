@@ -1,52 +1,47 @@
-# code2llm/evolution | 136 func | 12f | 2026-03-30
+# code2llm/evolution | 134 func | 14f | 2026-03-30
 
-NEXT[9] (ranked by impact):
-  [1] !! SPLIT           pyqual/cli.py
-      WHY: 1031L, 0 classes, max CC=29
-      EFFORT: ~4h  IMPACT: 29899
-
-  [2] !! SPLIT           pyqual/bulk_init.py
+NEXT[8] (ranked by impact):
+  [1] !! SPLIT           pyqual/bulk_init.py
       WHY: 697L, 3 classes, max CC=37
       EFFORT: ~4h  IMPACT: 25789
 
-  [3] !! SPLIT           pyqual/gates.py
-      WHY: 601L, 3 classes, max CC=14
-      EFFORT: ~4h  IMPACT: 8414
+  [2] !! SPLIT           pyqual/cli.py
+      WHY: 1038L, 0 classes, max CC=17
+      EFFORT: ~4h  IMPACT: 17646
 
-  [4] !! SPLIT-FUNC      collect_fingerprint  CC=37  fan=35
+  [3] !! SPLIT-FUNC      collect_fingerprint  CC=37  fan=35
       WHY: CC=37 exceeds 15
       EFFORT: ~1h  IMPACT: 1295
 
-  [5] !! SPLIT-FUNC      logs  CC=29  fan=25
-      WHY: CC=29 exceeds 15
-      EFFORT: ~1h  IMPACT: 725
-
-  [6] !  SPLIT-FUNC      bulk_run  CC=17  fan=20
+  [4] !  SPLIT-FUNC      bulk_run  CC=17  fan=20
       WHY: CC=17 exceeds 15
       EFFORT: ~1h  IMPACT: 340
 
-  [7] !  SPLIT-FUNC      bulk_init  CC=18  fan=18
+  [5] !  SPLIT-FUNC      bulk_init  CC=18  fan=18
       WHY: CC=18 exceeds 15
       EFFORT: ~1h  IMPACT: 324
 
-  [8] !  SPLIT-FUNC      bulk_run_cmd  CC=17  fan=18
+  [6] !  SPLIT-FUNC      bulk_run_cmd  CC=17  fan=18
       WHY: CC=17 exceeds 15
       EFFORT: ~1h  IMPACT: 306
 
-  [9] !! SPLIT-FUNC      build_dashboard_table  CC=28  fan=9
-      WHY: CC=28 exceeds 15
-      EFFORT: ~1h  IMPACT: 252
+  [7] !  SPLIT-FUNC      logs  CC=16  fan=19
+      WHY: CC=16 exceeds 15
+      EFFORT: ~1h  IMPACT: 304
+
+  [8] !  SPLIT-FUNC      _parse_output_line  CC=16  fan=7
+      WHY: CC=16 exceeds 15
+      EFFORT: ~1h  IMPACT: 112
 
 
-RISKS[3]:
-  ⚠ Splitting pyqual/cli.py may break 27 import paths
+RISKS[2]:
+  ⚠ Splitting pyqual/cli.py may break 28 import paths
   ⚠ Splitting pyqual/bulk_init.py may break 7 import paths
-  ⚠ Splitting pyqual/gates.py may break 31 import paths
 
 METRICS-TARGET:
-  CC̄:          6.1 → ≤4.3
+  CC̄:          5.9 → ≤4.1
   max-CC:      37 → ≤18
-  god-modules: 4 → 0
+  god-modules: 2 → 0
   high-CC(≥15): 8 → ≤4
   hub-types:   0 → ≤0
 
@@ -75,4 +70,4 @@ PATTERNS (language parser shared logic):
     - Standardized FunctionInfo/ClassInfo models
 
 HISTORY:
-  prev CC̄=4.6 → now CC̄=6.1
+  prev CC̄=5.9 → now CC̄=5.9
