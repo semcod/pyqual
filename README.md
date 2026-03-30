@@ -2,7 +2,7 @@
 
 ## AI Cost Tracking
 
-![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.31-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.32-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
 ![AI Cost](https://img.shields.io/badge/AI%20Cost-$1.05-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-5.0h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
 
 - 🤖 **LLM usage:** $1.0500 (7 commits)
@@ -99,6 +99,7 @@ pyqual gates             # check gates without running stages
 pyqual status            # show current metrics
 pyqual doctor            # check tool availability
 pyqual mcp-fix           # run the llx-backed MCP fix workflow
+pyqual mcp-refactor      # run the llx-backed MCP refactor workflow
 pyqual mcp-service       # start the persistent llx MCP service
 pyqual tickets todo      # sync TODO.md through planfile
 pyqual tickets github    # sync GitHub issues through planfile
@@ -160,9 +161,9 @@ print(response.content)
 print(f"Cost: ${response.cost:.4f}")
 ```
 
-## Docker-backed MCP fixer
+## Docker-backed MCP fixer/refactor
 
-If you want pyqual to delegate automatic fixes to a Dockerized `llx` MCP service:
+If you want pyqual to delegate automatic fixes or refactors to a Dockerized `llx` MCP service:
 
 ```bash
 docker compose -f examples/llm_fix/docker-compose.yml up --build -d
@@ -172,10 +173,11 @@ pyqual run
 
 The plugin writes results to `.pyqual/llx_mcp.json`, which is also collected by `pyqual status` and can be gated with `llx_fix_*` metrics.
 
-If you only want to run the fix workflow directly, use:
+If you only want to run the workflows directly, use:
 
 ```bash
 pyqual mcp-fix --workdir . --project-path /workspace/project
+pyqual mcp-refactor --workdir . --project-path /workspace/project
 ```
 
 If you want to run the service standalone in development, use:

@@ -15,8 +15,14 @@ from pyqual.integrations.llx_mcp import _load_issue_source
 from pyqual.integrations.llx_mcp import build_fix_prompt
 from pyqual.integrations.llx_mcp import LlxMcpRunResult
 from pyqual.integrations.llx_mcp import run_llx_fix_workflow
+from pyqual.integrations.llx_mcp import run_llx_refactor_workflow
 from pyqual.integrations.llx_mcp_service import McpServiceState, create_app
 from pyqual.plugins import LlxMcpFixCollector, install_plugin_config
+
+
+@pytest.fixture
+def anyio_backend() -> str:
+    return "asyncio"
 
 
 def test_llx_mcp_plugin_collects_metrics(tmp_path: Path) -> None:
@@ -100,6 +106,7 @@ def test_run_llx_fix_workflow_uses_todo_md_fallback(tmp_path: Path, monkeypatch:
             self.endpoint_url = endpoint_url or "http://localhost:8000/sse"
 
         async def analyze(self, project_path: str, toon_dir: str | None = None, task: str = "quick_fix") -> dict[str, object]:
+            captured["task"] = task
             return {
                 "tool": "llx_analyze",
                 "arguments": {"path": project_path, "task": task},
@@ -166,6 +173,78 @@ def test_run_llx_fix_workflow_uses_todo_md_fallback(tmp_path: Path, monkeypatch:
         }
     ]
     assert "pyqual/cli.py:30" in result.prompt
+    assert captured["task"] == "quick_fix"
+    assert captured["model"] == "demo-model"
+    assert output_path.exists()
+
+
+def test_run_llx_refactor_workflow_uses_refactor_prompt(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    output_path = tmp_path / ".pyqual" / "llx_mcp.json"
+    captured: dict[str, object] = {}
+
+    class FakeClient:
+        def __init__(self, endpoint_url: str | None = None):
+            self.endpoint_url = endpoint_url or "http://localhost:8000/sse"
+
+        async def analyze(self, project_path: str, toon_dir: str | None = None, task: str = "quick_fix") -> dict[str, object]:
+            captured["task"] = task
+            return {
+                "tool": "llx_analyze",
+                "arguments": {"path": project_path, "task": task},
+                "is_error": False,
+                "text": "analysis ok",
+                "data": {
+                    "selection": {"tier": "balanced", "model_id": "demo-model"},
+                    "metrics": {"total_files": 11, "avg_cc": 4.9},
+                },
+                "raw": {"mock": True},
+            }
+
+        async def fix_with_aider(
+            self,
+            project_path: str,
+            prompt: str,
+            model: str | None = None,
+            files: list[str] | None = None,
+            use_docker: bool = False,
+            docker_args: list[str] | None = None,
+        ) -> dict[str, object]:
+            captured["prompt"] = prompt
+            captured["model"] = model
+            return {
+                "tool": "aider",
+                "arguments": {"path": project_path, "prompt": prompt},
+                "is_error": False,
+                "text": "fix ok",
+                "data": {
+                    "success": True,
+                    "returncode": 0,
+                    "method": "local",
+                    "stdout": "fixed\n",
+                    "stderr": "",
+                },
+                "raw": {"mock": True},
+            }
+
+    monkeypatch.setattr(llx_module, "LlxMcpClient", FakeClient)
+
+    result = asyncio.run(
+        run_llx_refactor_workflow(
+            workdir=tmp_path,
+            project_path=str(tmp_path),
+            issues_path=Path(".pyqual/errors.json"),
+            output_path=output_path,
+            endpoint_url="http://localhost:8000/sse",
+            model=None,
+            files=[],
+            use_docker=False,
+            docker_args=[],
+        )
+    )
+
+    assert result.success is True
+    assert captured["task"] == "refactor"
+    assert "refactoring code" in captured["prompt"]
     assert captured["model"] == "demo-model"
     assert output_path.exists()
 
@@ -198,6 +277,52 @@ def test_mcp_fix_cli_invokes_workflow(tmp_path: Path, monkeypatch: pytest.Monkey
         app,
         [
             "mcp-fix",
+            "--workdir",
+            str(tmp_path),
+            "--project-path",
+            "/workspace/project",
+            "--output",
+            str(output_path),
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert captured["project_path"] == "/workspace/project"
+    assert captured["workdir"] == tmp_path
+    assert output_path.exists()
+    assert '"success": true' in result.output
+    assert '"tool_calls": 2' in result.output
+
+
+def test_mcp_refactor_cli_invokes_workflow(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    output_path = tmp_path / ".pyqual" / "llx_mcp.json"
+    captured: dict[str, object] = {}
+
+    async def fake_run_llx_refactor_workflow(**kwargs: object) -> LlxMcpRunResult:
+        captured.update(kwargs)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps({"success": True, "tool_calls": 2}))
+        return LlxMcpRunResult(
+            success=True,
+            endpoint="http://localhost:8000/sse",
+            project_path="/workspace/project",
+            issues_path=str(tmp_path / ".pyqual" / "errors.json"),
+            prompt="Refactor the project",
+            tool_calls=2,
+            analysis={"selection": {"tier": "balanced", "model_id": "claude-sonnet-4"}},
+            aider={"success": True, "returncode": 0, "method": "docker"},
+            issues=[],
+            model="claude-sonnet-4",
+        )
+
+    monkeypatch.setattr(cli_module, "run_llx_refactor_workflow", fake_run_llx_refactor_workflow)
+
+    runner = CliRunner()
+    result = runner.invoke(
+        app,
+        [
+            "mcp-refactor",
             "--workdir",
             str(tmp_path),
             "--project-path",

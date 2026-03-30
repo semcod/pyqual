@@ -23,7 +23,7 @@ _TODO_DETAIL_RE = re.compile(r"^(?P<file>.+?):(?P<line>\d+)\s+-\s+(?P<message>.+
 
 @dataclass
 class LlxMcpRunResult:
-    """Result of an llx MCP fix workflow."""
+    """Result of an llx MCP fix/refactor workflow."""
 
     success: bool
     endpoint: str
@@ -211,11 +211,23 @@ def _issue_text(issue: Any) -> str:
     return str(issue)
 
 
+def _task_prompt_label(task: str) -> str:
+    """Map llx task hints to prompt wording."""
+    labels = {
+        "explain": "explaining code",
+        "quick_fix": "fixing code",
+        "refactor": "refactoring code",
+        "review": "reviewing code",
+    }
+    return labels.get(task, "fixing code")
+
+
 def build_fix_prompt(
     project_path: Path,
     issues: dict[str, Any] | list[dict[str, Any]] | list[Any],
     analysis: dict[str, Any] | None = None,
     prompt_limit: int = DEFAULT_PROMPT_LIMIT,
+    action_label: str = "fixing code",
 ) -> str:
     """Build a concise prompt for llx/aider from gate failures."""
     selected_model = None
@@ -237,9 +249,9 @@ def build_fix_prompt(
     analysis_block = json.dumps(analysis, indent=2, ensure_ascii=False) if analysis else "{}"
 
     return (
-        f"You are fixing code in {project_path}.\n"
+        f"You are {action_label} in {project_path}.\n"
         "Use the smallest safe changes that make the quality gates pass.\n"
-        "Preserve existing behavior unless a fix is clearly justified.\n"
+        "Preserve existing behavior unless a change is clearly justified.\n"
         f"Selected model: {selected_model or 'auto'}\n"
         f"Selection tier: {tier or 'unknown'}\n\n"
         f"Issue summary:\n{issue_block}\n\n"
@@ -278,7 +290,7 @@ async def run_llx_fix_workflow(
     docker_args: list[str] | None = None,
     task: str = "quick_fix",
 ) -> LlxMcpRunResult:
-    """Run the analysis + fix workflow and save a JSON report."""
+    """Run the analysis + fix/refactor workflow and save a JSON report."""
     client = LlxMcpClient(endpoint_url=endpoint_url)
     resolved_issues_path, issues = _resolve_issue_source(workdir, issues_path)
 
@@ -288,7 +300,12 @@ async def run_llx_fix_workflow(
         if not isinstance(analysis_data, dict):
             analysis_data = {"raw": analysis_response.get("text", "")}
 
-        prompt = build_fix_prompt(Path(project_path), issues, analysis_data)
+        prompt = build_fix_prompt(
+            Path(project_path),
+            issues,
+            analysis_data,
+            action_label=_task_prompt_label(task),
+        )
         selected_model = model
         if not selected_model:
             selection = analysis_data.get("selection") if isinstance(analysis_data, dict) else None
@@ -337,9 +354,35 @@ async def run_llx_fix_workflow(
     return result
 
 
+async def run_llx_refactor_workflow(
+    workdir: Path,
+    project_path: str,
+    issues_path: Path,
+    output_path: Path,
+    endpoint_url: str | None = None,
+    model: str | None = None,
+    files: list[str] | None = None,
+    use_docker: bool = False,
+    docker_args: list[str] | None = None,
+) -> LlxMcpRunResult:
+    """Run the llx refactor workflow and save a JSON report."""
+    return await run_llx_fix_workflow(
+        workdir=workdir,
+        project_path=project_path,
+        issues_path=issues_path,
+        output_path=output_path,
+        endpoint_url=endpoint_url,
+        model=model,
+        files=files,
+        use_docker=use_docker,
+        docker_args=docker_args,
+        task="refactor",
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Build the CLI parser for the llx MCP helper."""
-    parser = argparse.ArgumentParser(description="Run the llx-backed MCP fix workflow.")
+    parser = argparse.ArgumentParser(description="Run the llx-backed MCP fix/refactor workflow.")
     parser.add_argument("--workdir", default=os.getenv("PYQUAL_LLX_PROJECT_ROOT", "."), help="Project working directory.")
     parser.add_argument("--project-path", default=os.getenv("PYQUAL_LLX_PROJECT_PATH"), help="Project path as seen by the MCP service container.")
     parser.add_argument("--issues", default=DEFAULT_ISSUES_PATH, help="Path to gate failure JSON.")

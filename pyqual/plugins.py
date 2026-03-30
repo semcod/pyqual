@@ -410,14 +410,14 @@ stages:
 
 @PluginRegistry.register
 class LlxMcpFixCollector(MetricCollector):
-    """Dockerized llx MCP fixer workflow results."""
+    """Dockerized llx MCP fix/refactor workflow results."""
 
     name = "llx-mcp-fixer"
     metadata = PluginMetadata(
         name="llx-mcp-fixer",
-        description="MCP-backed auto-fix workflow powered by llx and Aider in Docker",
+        description="MCP-backed auto-fix/refactor workflow powered by llx and Aider in Docker",
         version="1.0.0",
-        tags=["mcp", "docker", "llx", "llm", "fix"],
+        tags=["mcp", "docker", "llx", "llm", "fix", "refactor"],
         config_example="""
 metrics:
   llx_fix_success_min: 1

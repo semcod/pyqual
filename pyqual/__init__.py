@@ -26,9 +26,10 @@ from pyqual.integrations.llx_mcp import (
     LlxMcpRunResult,
     build_fix_prompt,
     run_llx_fix_workflow,
+    run_llx_refactor_workflow,
 )
 
-__version__ = "0.1.31"
+__version__ = "0.1.32"
 
 __all__ = [
     "PyqualConfig",
@@ -55,6 +56,7 @@ __all__ = [
     "LlxMcpRunResult",
     "build_fix_prompt",
     "run_llx_fix_workflow",
+    "run_llx_refactor_workflow",
     # Tool presets
     "ToolPreset",
     "get_preset",

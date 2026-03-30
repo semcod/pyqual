@@ -76,6 +76,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.32] - 2026-03-30
+
+### Docs
+- Update README.md
+- Update docs/integrations.md
+- Update examples/llm_fix/README.md
+
+### Test
+- Update tests/test_llx_mcp.py
+
+### Other
+- Update examples/llm_fix/pyqual.yaml
+- Update examples/project_analysis/pyqual.yaml
+- Update pyqual/__init__.py
+- Update pyqual/cli.py
+- Update pyqual/integrations/llx_mcp.py
+- Update pyqual/plugins.py
+
 ## [0.1.31] - 2026-03-30
 
 ### Docs

@@ -162,7 +162,7 @@ stages:
 
 **Metrics extracted:** `vuln_critical`, `vuln_high`, `vuln_medium`, `vuln_total`
 
-## llx MCP → AI-Powered Fixes
+## llx MCP → AI-Powered Fixes and Refactors
 
 ```yaml
 stages:
@@ -170,13 +170,20 @@ stages:
     run: pyqual mcp-fix --workdir . --project-path . --issues .pyqual/errors.json
     when: metrics_fail
     timeout: 900
+
+  - name: llx-refactor
+    run: pyqual mcp-refactor --workdir . --project-path . --issues .pyqual/errors.json
+    when: metrics_fail
+    timeout: 900
 ```
 
-The MCP fix workflow:
+The MCP workflow:
 1. Analyzes the project via `llx_analyze`
-2. Builds a fix prompt from gate failures or `TODO.md` issues
+2. Builds a fix/refactor prompt from gate failures or `TODO.md` issues
 3. Calls `aider` through the MCP service
 4. Saves results to `.pyqual/llx_mcp.json`
+
+Use `pyqual mcp-refactor` when you want the same flow framed as a refactor task rather than a bugfix.
 
 See [examples/llm_fix/](../examples/llm_fix/) and [examples/llx/](../examples/llx/) for Docker-based and standalone setups.
 
@@ -215,7 +222,7 @@ Or use the plugin system (see [Plugin API](api.md#plugin-api) and [examples/cust
 | interrogate | `.pyqual/interrogate.json` | `docstring_coverage`, `docstring_missing` | Yes |
 | pip-audit | `.pyqual/vulns.json` | `vuln_critical`, `vuln_high`, `vuln_total` | Yes |
 | planfile | `.planfile/` | Ticket management (TODO.md, GitHub) | Yes |
-| llx MCP | `.pyqual/llx_mcp.json` | AI fix results | Yes |
+| llx MCP | `.pyqual/llx_mcp.json` | AI fix/refactor results | Yes |
 | custom | any | any | — |
 
 **All integrations are optional.** Stages can be any shell commands.
@@ -224,6 +231,6 @@ Or use the plugin system (see [Plugin API](api.md#plugin-api) and [examples/cust
 
 - [Linters pipeline](../examples/linters/) — ruff, pylint, flake8, mypy, interrogate
 - [Security scanning](../examples/security/) — bandit, pip-audit, trufflehog, SBOM
-- [LLM fix (Docker)](../examples/llm_fix/) — Dockerized llx MCP workflow
+- [LLM fix/refactor (Docker)](../examples/llm_fix/) — Dockerized llx MCP workflow
 - [LLX integration](../examples/llx/) — standalone llx pipeline
 - [Multi-gate pipeline](../examples/multi_gate_pipeline/) — combining all tools

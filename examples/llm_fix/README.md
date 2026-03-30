@@ -5,15 +5,15 @@ This example shows how to connect `pyqual` to a Dockerized `llx` MCP service.
 ## What it does
 
 - `llx` runs as an MCP SSE service in Docker.
-- `pyqual` uses `pyqual mcp-fix` as a pipeline stage.
-- The helper first runs `llx_analyze`, then calls the `aider` MCP tool.
+- `pyqual` uses `pyqual mcp-refactor` as a pipeline stage.
+- The helper first runs `llx_analyze`, then calls the `aider` MCP tool with a refactor prompt.
 - The run result is saved to `.pyqual/llx_mcp.json`, which is also visible in `pyqual status`.
 
 ## Files
 
 - `Dockerfile` - builds an image containing both `llx` and `pyqual`
 - `docker-compose.yml` - starts the MCP service on `http://localhost:8000/sse`
-- `pyqual.yaml` - pipeline config that uses the MCP fixer stage
+- `pyqual.yaml` - pipeline config that uses the MCP refactor stage
 
 ## Quick start
 
@@ -23,13 +23,13 @@ This example shows how to connect `pyqual` to a Dockerized `llx` MCP service.
 docker compose -f examples/llm_fix/docker-compose.yml up --build -d
 ```
 
-2. Run the fix workflow from your project directory:
+2. Run the refactor workflow from your project directory:
 
 ```bash
-pyqual mcp-fix --workdir . --project-path /workspace/project
+pyqual mcp-refactor --workdir . --project-path /workspace/project
 ```
 
-Or run the full pipeline with the fix stage enabled:
+Or run the full pipeline with the refactor stage enabled:
 
 ```bash
 export PYQUAL_LLX_MCP_URL=http://localhost:8000/sse
@@ -37,7 +37,7 @@ export PYQUAL_LLX_PROJECT_PATH=/workspace/project
 pyqual run -c pyqual.yaml
 ```
 
-3. Inspect the latest fix run:
+3. Inspect the latest refactor run:
 
 ```bash
 cat .pyqual/llx_mcp.json
