@@ -54,6 +54,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.30] - 2026-03-30
+
+### Docs
+- Update TODO.md
+- Update docs/README.md
+- Update docs/api.md
+- Update docs/configuration.md
+- Update docs/index.md
+- Update docs/integrations.md
+- Update docs/quickstart.md
+- Update examples/README.md
+- Update examples/custom_gates/README.md
+- Update examples/custom_plugins/README.md
+- ... and 4 more files
+
+### Test
+- Update test_pyqual.py
+
+### Other
+- Update examples/custom_gates/composite_gates.py
+- Update examples/custom_gates/dynamic_thresholds.py
+- Update examples/custom_gates/metric_history.py
+- Update examples/custom_plugins/code_health_collector.py
+- Update examples/custom_plugins/performance_collector.py
+- Update examples/custom_plugins/pyqual.yaml
+- Update examples/multi_gate_pipeline/pyqual.yaml
+- Update examples/multi_gate_pipeline/run_pipeline.py
+- Update examples/ticket_workflow/pyqual.yaml
+- Update examples/ticket_workflow/sync_tickets.py
+- ... and 22 more files
+
 ## [0.1.29] - 2026-03-29
 
 ### Docs

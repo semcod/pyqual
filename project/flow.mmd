@@ -10,25 +10,26 @@ flowchart TD
         pyqual__cli__status["status"]
         pyqual__cli__mcp_fix["mcp_fix"]
         pyqual__cli__mcp_service["mcp_service"]
+        pyqual__cli__tickets_todo["tickets_todo"]
+        pyqual__cli__tickets_github["tickets_github"]
+        pyqual__cli__tickets_all["tickets_all"]
         pyqual__cli___plugin_list["_plugin_list"]
         pyqual__cli___plugin_search["_plugin_search"]
         pyqual__cli___plugin_info["_plugin_info"]
         pyqual__cli___plugin_add["_plugin_add"]
         pyqual__cli___plugin_remove["_plugin_remove"]
         pyqual__cli___plugin_validate["_plugin_validate"]
-        pyqual__cli___plugin_unknown_action["_plugin_unknown_action"]
-        pyqual__cli__plugin["plugin"]
-        pyqual__cli__doctor["doctor"]
+        ...["+3 more"]
     end
 
     subgraph Core
+        pyqual__llm__LLM__complete["complete"]
+        pyqual__llm__LLM__fix_code["fix_code"]
+        pyqual__llm__get_llm["get_llm"]
         pyqual__config__GateConfig__from_dict["from_dict"]
         pyqual__config__PyqualConfig__load["load"]
         pyqual__config__PyqualConfig___parse["_parse"]
         pyqual__config__PyqualConfig__default_yaml["default_yaml"]
-        pyqual__llm__LLM__complete["complete"]
-        pyqual__llm__LLM__fix_code["fix_code"]
-        pyqual__llm__get_llm["get_llm"]
         pyqual__plugins__PluginMetadata____post_init__["__post_init__"]
         pyqual__plugins__MetricCollector__collect["collect"]
         pyqual__plugins__MetricCollector__get_config_example["get_config_example"]
@@ -37,7 +38,7 @@ flowchart TD
         pyqual__plugins__PluginRegistry__list_plugins["list_plugins"]
         pyqual__plugins__PluginRegistry__create_instance["create_instance"]
         pyqual__plugins__LLMBenchCollector__collect["collect"]
-        ...["+68 more"]
+        ...["+71 more"]
     end
 
-    class pyqual__config__GateConfig__from_dict,pyqual__config__PyqualConfig__load,pyqual__config__PyqualConfig___parse,pyqual__config__PyqualConfig__default_yaml,pyqual__llm__LLM__complete,pyqual__llm__LLM__fix_code,pyqual__llm__get_llm,pyqual__cli__init,pyqual__cli__run,pyqual__cli__gates entry
+    class pyqual__cli__init,pyqual__cli__run,pyqual__cli__gates,pyqual__cli__status,pyqual__cli__mcp_fix,pyqual__cli__mcp_service,pyqual__cli__tickets_todo,pyqual__cli__tickets_github,pyqual__cli__tickets_all,pyqual__cli___plugin_list entry

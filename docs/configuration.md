@@ -61,7 +61,7 @@ pipeline:
 stages:
   - name: analyze
     run: code2llm ./
-    timeout: 300          # seconds (default: 60)
+    timeout: 600          # seconds (default: 300)
     when: always
     env:                  # stage-specific env vars
       DEBUG: "1"
@@ -107,3 +107,48 @@ env:
 ```
 
 Or use shell variable syntax in stage commands.
+
+## Named Constants
+
+pyqual uses named constants for all default values. Override them in `pyqual.yaml` or programmatically:
+
+| Constant | Module | Default | Description |
+|----------|--------|---------|-------------|
+| `DEFAULT_STAGE_TIMEOUT` | `pyqual.config` | 300 | Stage timeout in seconds |
+| `DEFAULT_MCP_PORT` | `pyqual.cli` | 8000 | MCP service port |
+| `DEFAULT_MAX_TOKENS` | `pyqual.llm` | 2000 | LLM max response tokens |
+| `TIMEOUT_EXIT_CODE` | `pyqual.pipeline` | 124 | Exit code for timed-out stages |
+
+## Plugin Configuration
+
+Add plugin metrics to your pipeline:
+
+```yaml
+pipeline:
+  metrics:
+    # Built-in plugin metrics
+    pass_at_1_min: 0.8        # LLM benchmark (llm-bench plugin)
+    hallucination_rate_max: 5  # Hallucination rate (hallucination plugin)
+    sbom_compliance_min: 95    # SBOM compliance (sbom plugin)
+    a11y_score_min: 90         # Accessibility score (a11y plugin)
+    bus_factor_min: 2          # Bus factor (repo-metrics plugin)
+```
+
+Generate a plugin config snippet:
+
+```bash
+pyqual plugin info llm-bench
+pyqual plugin add llm-bench
+```
+
+## Examples
+
+See the [examples/](../examples/) directory for complete configurations:
+
+- [Basic pipeline](../examples/basic/pyqual.yaml)
+- [Linters (ruff, pylint, flake8, mypy)](../examples/linters/pyqual.yaml)
+- [Security scanning](../examples/security/pyqual.yaml)
+- [LLM fix with llx MCP](../examples/llm_fix/pyqual.yaml)
+- [Custom gates](../examples/custom_gates/pyqual.yaml)
+- [Multi-gate pipeline](../examples/multi_gate_pipeline/pyqual.yaml)
+- [Ticket workflow](../examples/ticket_workflow/pyqual.yaml)

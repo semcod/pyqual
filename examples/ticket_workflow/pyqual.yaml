@@ -1,0 +1,21 @@
+pipeline:
+  name: ticket-workflow-example
+
+  metrics:
+    coverage_min: 80
+    cc_max: 15
+    ruff_errors_max: 5
+
+  stages:
+    - name: analyze
+      run: code2llm ./ -f toon,evolution
+
+    - name: lint
+      run: ruff check . --output-format=json > .pyqual/ruff.json 2>/dev/null || true
+
+    - name: test
+      run: pytest --cov --cov-report=json:.pyqual/coverage.json -q
+
+  loop:
+    max_iterations: 2
+    on_fail: create_ticket   # auto-sync TODO.md via planfile on gate failure

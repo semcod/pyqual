@@ -1,34 +1,37 @@
-# pyqual | 11f 2692L | python:10,shell:1 | 2026-03-29
-# stats: 116 func | 0 cls | 11 mod | CC̄=4.9 | critical:2 | cycles:0
+# pyqual | 12f 2884L | python:11,shell:1 | 2026-03-30
+# stats: 128 func | 0 cls | 12 mod | CC̄=4.7 | critical:2 | cycles:0
 # alerts[5]: fan-out GateSet._collect_metrics=23; fan-out create_app=21; fan-out run_llx_fix_workflow=19; fan-out _plugin_search=17; CC GateSet._from_pylint=16
 # hotspots[5]: GateSet._collect_metrics fan=23; create_app fan=21; run_llx_fix_workflow fan=19; _plugin_search fan=17; mcp_fix fan=16
-# evolution: CC̄ 5.3→4.9 (improved -0.4)
+# evolution: CC̄ 4.9→4.7 (improved -0.2)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[11]:
+M[12]:
   project.sh,24
   pyqual/__init__.py,49
-  pyqual/cli.py,457
+  pyqual/cli.py,509
   pyqual/config.py,150
-  pyqual/gates.py,588
+  pyqual/gates.py,597
   pyqual/integrations/__init__.py,1
-  pyqual/integrations/llx_mcp.py,338
+  pyqual/integrations/llx_mcp.py,394
   pyqual/integrations/llx_mcp_service.py,241
   pyqual/llm.py,117
   pyqual/pipeline.py,152
   pyqual/plugins.py,575
+  pyqual/tickets.py,75
 D:
   pyqual/gates.py:
     e: GateResult,Gate,GateSet
     GateResult: __str__(0)  # Result of a single gate check...
     Gate: check(1)  # Single quality gate with metric extraction...
-    GateSet: __init__(1),check_all(1),all_passed(1),_collect_metrics(1),_from_toon(1),_from_vallm(1),_from_coverage(1),_from_safety(1),_from_bandit(1),_from_secrets(1),_from_pip_outdated(1),_from_radon(1),_from_mypy(1),_from_pytest_durations(1),_from_benchmark(1),_from_memory_profile(1),_from_secrets(1),_from_vulnerabilities(1),_from_sbom(1),_from_vulture(1),_from_pyroma(1),_from_git_health(1),_from_llm_quality(1),_from_ai_cost(1),_from_ruff(1),_from_pylint(1),_from_flake8(1),_from_interrogate(1)  # Collection of quality gates with metric collection...
+    GateSet: __init__(1),_read_artifact_text(1),check_all(1),all_passed(1),_collect_metrics(1),_from_toon(1),_from_vallm(1),_from_coverage(1),_from_safety(1),_from_bandit(1),_from_secrets(1),_from_pip_outdated(1),_from_radon(1),_from_mypy(1),_from_pytest_durations(1),_from_benchmark(1),_from_memory_profile(1),_from_secrets(1),_from_vulnerabilities(1),_from_sbom(1),_from_vulture(1),_from_pyroma(1),_from_git_health(1),_from_llm_quality(1),_from_ai_cost(1),_from_ruff(1),_from_pylint(1),_from_flake8(1),_from_interrogate(1)  # Collection of quality gates with metric collection...
   pyqual/integrations/llx_mcp.py:
-    e: LlxMcpRunResult,LlxMcpClient,_load_issue_source,_issue_text,build_fix_prompt,run_llx_fix_workflow,build_parser,main
+    e: LlxMcpRunResult,LlxMcpClient,_load_issue_source,_load_todo_markdown,_issue_text,build_fix_prompt,_resolve_issue_source,run_llx_fix_workflow,build_parser,main
     LlxMcpRunResult: to_dict(0)  # Result of an llx MCP fix workflow...
     LlxMcpClient: __init__(1),_session(0),_extract_text_payload(0),call_tool(2),analyze(3),fix_with_aider(6)  # Thin MCP client for the llx SSE service...
     _load_issue_source(issues_path)
+    _load_todo_markdown(issues_path)
     _issue_text(issue)
     build_fix_prompt(project_path;issues;analysis;prompt_limit)
+    _resolve_issue_source(workdir;issues_path)
     run_llx_fix_workflow(workdir;project_path;issues_path;output_path;endpoint_url;model;files;use_docker;docker_args;task)
     build_parser()
     main(argv)
@@ -50,13 +53,16 @@ Subclasses should ...
     get_available_plugins()
     install_plugin_config(name;workdir)
   pyqual/cli.py:
-    e: init,run,gates,status,mcp_fix,mcp_service,_plugin_list,_plugin_search,_plugin_info,_plugin_add,_plugin_remove,_plugin_validate,_plugin_unknown_action,plugin,doctor
+    e: init,run,gates,status,mcp_fix,mcp_service,tickets_todo,tickets_github,tickets_all,_plugin_list,_plugin_search,_plugin_info,_plugin_add,_plugin_remove,_plugin_validate,_plugin_unknown_action,plugin,doctor
     init(path)
     run(config;dry_run;workdir)
     gates(config;workdir)
     status(config;workdir)
     mcp_fix(workdir;project_path;issues;output;endpoint;model;file;use_docker;docker_arg;task;json_output)
     mcp_service(host;port)
+    tickets_todo(workdir;dry_run;direction)
+    tickets_github(workdir;dry_run;direction)
+    tickets_all(workdir;dry_run;direction)
     _plugin_list(plugins;tag)
     _plugin_search(plugins;query)
     _plugin_info(name;workdir)
@@ -66,14 +72,6 @@ Subclasses should ...
     _plugin_unknown_action(action)
     plugin(action;name;workdir;tag)
     doctor()
-  pyqual/config.py:
-    e: StageConfig,GateConfig,LoopConfig,PyqualConfig,_load_env_file,_normalize_env_values
-    StageConfig:  # Single pipeline stage...
-    GateConfig: from_dict(2)  # Single quality gate threshold...
-    LoopConfig:  # Loop iteration settings...
-    PyqualConfig: load(1),_parse(1),default_yaml(-1)  # Full pyqual.yaml configuration...
-    _load_env_file()
-    _normalize_env_values(env)
   pyqual/llm.py:
     e: LLMResponse,LLM,_ensure_dotenv_loaded,get_llm_model,get_api_key,get_llm
     LLMResponse:  # Response from LLM call...
@@ -82,12 +80,28 @@ Subclasses should ...
     get_llm_model()
     get_api_key()
     get_llm(model)
+  pyqual/config.py:
+    e: StageConfig,GateConfig,LoopConfig,PyqualConfig,_load_env_file,_normalize_env_values
+    StageConfig:  # Single pipeline stage...
+    GateConfig: from_dict(2)  # Single quality gate threshold...
+    LoopConfig:  # Loop iteration settings...
+    PyqualConfig: load(1),_parse(1),default_yaml(-1)  # Full pyqual.yaml configuration...
+    _load_env_file()
+    _normalize_env_values(env)
   pyqual/pipeline.py:
     e: StageResult,IterationResult,PipelineResult,Pipeline
     StageResult:  # Result of running a single stage...
     IterationResult:  # Result of one full pipeline iteration...
     PipelineResult:  # Result of the complete pipeline run (all iterations)...
     Pipeline: __init__(2),run(1),check_gates(0),_run_iteration(2),_should_run_stage(2),_execute_stage(2),_ensure_pyqual_dir(0)  # Execute pipeline stages in a loop until quality gates pass...
+  pyqual/tickets.py:
+    e: _load_sync_integration,_normalize_sources,sync_planfile_tickets,sync_todo_tickets,sync_github_tickets,sync_all_tickets
+    _load_sync_integration()
+    _normalize_sources(source)
+    sync_planfile_tickets(source;directory;dry_run;direction)
+    sync_todo_tickets(directory;dry_run;direction)
+    sync_github_tickets(directory;dry_run;direction)
+    sync_all_tickets(directory;dry_run;direction)
   pyqual/integrations/llx_mcp_service.py:
     e: McpServiceState,_escape_label_value,_load_llx_server,create_app,run_server,build_parser,main
     McpServiceState: mark_request(1),mark_session_open(0),mark_session_close(0),mark_message(1),mark_error(1),uptime_seconds(0),last_activity_seconds_ago(0),health_payload(0),metrics_text(0)  # Runtime state exposed via health and metrics endpoints...

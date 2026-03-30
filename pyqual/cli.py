@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 import shutil
-import subprocess
+
 from pathlib import Path
 
 import typer
@@ -25,6 +25,10 @@ from pyqual.tickets import sync_all_tickets
 from pyqual.tickets import sync_github_tickets
 from pyqual.tickets import sync_todo_tickets
 
+DEFAULT_MCP_PORT = 8000
+STATUS_COLUMN_WIDTH = 12
+MAX_DESCRIPTION_LENGTH = 50
+
 app = typer.Typer(help="Declarative quality gate loops for AI-assisted development.")
 console = Console()
 tickets_app = typer.Typer(help="Control planfile-backed tickets from TODO.md and GitHub.")
@@ -32,7 +36,7 @@ app.add_typer(tickets_app, name="tickets")
 
 
 @app.command()
-def init(path: Path = typer.Argument(Path("."), help="Project directory")):
+def init(path: Path = typer.Argument(Path("."), help="Project directory")) -> None:
     """Create pyqual.yaml with sensible defaults."""
     target = path / "pyqual.yaml"
     if target.exists():
@@ -51,7 +55,7 @@ def run(
     config: Path = typer.Option("pyqual.yaml", "--config", "-c"),
     dry_run: bool = typer.Option(False, "--dry-run", "-n"),
     workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
-):
+) -> None:
     """Execute pipeline loop until quality gates pass."""
     cfg = PyqualConfig.load(config)
     pipeline = Pipeline(cfg, workdir)
@@ -92,7 +96,7 @@ def run(
 def gates(
     config: Path = typer.Option("pyqual.yaml", "--config", "-c"),
     workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
-):
+) -> None:
     """Check quality gates without running stages."""
     cfg = PyqualConfig.load(config)
     gate_set = GateSet(cfg.gates)
@@ -208,7 +212,7 @@ def mcp_fix(
 @app.command("mcp-service")
 def mcp_service(
     host: str = typer.Option("0.0.0.0", "--host", help="Host interface to bind to."),
-    port: int = typer.Option(8000, "--port", help="Port to listen on."),
+    port: int = typer.Option(DEFAULT_MCP_PORT, "--port", help="Port to listen on."),
 ) -> None:
     """Run the persistent llx MCP service with health and metrics endpoints."""
     try:
@@ -282,7 +286,7 @@ def _plugin_list(plugins: dict[str, object], tag: str | None) -> None:
 
     for plugin_name, meta in sorted(plugins.items()):
         tags = ", ".join(getattr(meta, "tags", [])[:3]) if getattr(meta, "tags", None) else ""
-        table.add_row(plugin_name, getattr(meta, "description", "")[:50], getattr(meta, "version", ""), tags)
+        table.add_row(plugin_name, getattr(meta, "description", "")[:MAX_DESCRIPTION_LENGTH], getattr(meta, "version", ""), tags)
 
     console.print(table)
 
@@ -315,7 +319,7 @@ def _plugin_search(plugins: dict[str, object], query: str) -> None:
 
     for plugin_name, meta in sorted(results.items()):
         tags = ", ".join(getattr(meta, "tags", [])[:3]) if getattr(meta, "tags", None) else ""
-        table.add_row(plugin_name, getattr(meta, "description", "")[:50], tags)
+        table.add_row(plugin_name, getattr(meta, "description", "")[:MAX_DESCRIPTION_LENGTH], tags)
 
     console.print(table)
 
@@ -482,7 +486,7 @@ def doctor():
 
     table = Table(title="Tool Availability Check")
     table.add_column("Tool")
-    table.add_column("Status", width=12)
+    table.add_column("Status", width=STATUS_COLUMN_WIDTH)
     table.add_column("Purpose")
     table.add_column("Install Command")
 

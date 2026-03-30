@@ -1,0 +1,94 @@
+pipeline:
+  name: multi-gate-full-stack
+
+  # Comprehensive quality gates combining linters, security, testing, and AI validation
+  metrics:
+    # --- Code complexity ---
+    cc_max: 15
+    maintainability_index_min: 65
+
+    # --- Test coverage ---
+    coverage_min: 85
+
+    # --- Linters ---
+    ruff_errors_max: 5
+    ruff_fatal_max: 0
+    pylint_score_min: 8.0
+    flake8_violations_max: 10
+    mypy_errors_max: 0
+
+    # --- Documentation ---
+    docstring_coverage_min: 85
+
+    # --- Security ---
+    bandit_high_max: 0
+    bandit_medium_max: 3
+    vuln_critical_max: 0
+    vuln_high_max: 0
+    secrets_found_max: 0
+
+    # --- AI validation ---
+    vallm_pass_min: 90
+
+  stages:
+    # Phase 1: Analysis
+    - name: analyze
+      run: code2llm ./ -f toon,evolution
+
+    # Phase 2: Linting (parallel-safe, independent outputs)
+    - name: ruff
+      run: ruff check . --output-format=json > .pyqual/ruff.json 2>/dev/null || true
+
+    - name: pylint
+      run: pylint --output-format=json . > .pyqual/pylint.json 2>/dev/null || true
+
+    - name: flake8
+      run: flake8 --format=json . > .pyqual/flake8.json 2>/dev/null || true
+
+    - name: mypy
+      run: mypy --output=json . > .pyqual/mypy.json 2>/dev/null || true
+
+    - name: interrogate
+      run: interrogate --generate-badge=never --format=json . > .pyqual/interrogate.json 2>/dev/null || true
+
+    # Phase 3: Security
+    - name: bandit
+      run: bandit -r . -f json -o .pyqual/bandit.json 2>/dev/null || true
+
+    - name: pip-audit
+      run: pip-audit --format=json --output=.pyqual/vulns.json 2>/dev/null || true
+
+    - name: secrets
+      run: |
+        if command -v trufflehog &> /dev/null; then
+          trufflehog git file://. --json > .pyqual/secrets.json 2>/dev/null || true
+        elif command -v gitleaks &> /dev/null; then
+          gitleaks detect --source . --report-format json --report-path .pyqual/secrets.json 2>/dev/null || true
+        fi
+
+    # Phase 4: AI validation
+    - name: validate
+      run: vallm batch ./ --recursive --errors-json > .pyqual/errors.json
+
+    # Phase 5: AI fix (only on failure)
+    - name: fix
+      run: llx fix . --errors .pyqual/errors.json --verbose
+      when: metrics_fail
+      timeout: 600
+
+    # Phase 6: Testing
+    - name: test
+      run: pytest --cov --cov-report=json:.pyqual/coverage.json -q
+      when: always
+
+    # Phase 7: Complexity check
+    - name: radon
+      run: radon mi . -j > .pyqual/radon.json 2>/dev/null || true
+
+  loop:
+    max_iterations: 3
+    on_fail: create_ticket   # auto-create TODO.md entries for failures
+
+  env:
+    LLM_MODEL: openrouter/qwen/qwen3-coder-next
+    PYTHONDONTWRITEBYTECODE: "1"

@@ -4,29 +4,44 @@ Real-world usage patterns for different project types and CI/CD setups.
 
 ## Available Examples
 
-### Project Structures
+### Basics & API
 
-| Example | Description | Best For |
-|---------|-------------|----------|
-| [python-package](python-package/) | Python package with src-layout | New libraries, PyPI packages |
-| [python-flat](python-flat/) | Flat Python structure (no src/) | Simple scripts, small projects |
-| [monorepo](monorepo/) | Multiple packages in one repo | Large projects, microservices |
+| Example | Description | Files |
+|---------|-------------|-------|
+| [basic](basic/) | Python API usage — Pipeline, GateSet, minimal | 3 scripts + yaml |
+| [python-package](python-package/) | Python package with src-layout | yaml |
+| [python-flat](python-flat/) | Flat Python structure (no src/) | yaml |
+| [monorepo](monorepo/) | Multiple packages in one repo | yaml |
 
-### CI/CD Integrations
+### Quality & Linting
+
+| Example | Description | Tools |
+|---------|-------------|-------|
+| [linters](linters/) | Code quality gates | ruff, pylint, flake8, mypy, interrogate |
+| [security](security/) | Security scanning | bandit, pip-audit, trufflehog, sbom |
+| [custom_gates](custom_gates/) | Dynamic thresholds, composite scoring, metric history | pyqual API |
+| [custom_plugins](custom_plugins/) | Build your own MetricCollector plugins | pyqual plugin system |
+
+### AI & LLM
+
+| Example | Description | Tools |
+|---------|-------------|-------|
+| [llm_fix](llm_fix/) | Docker-backed llx MCP fix workflow | llx, aider, Docker |
+| [llx](llx/) | Standalone llx integration pipeline | llx, code2llm, vallm |
+
+### CI/CD
 
 | Example | Platform | Features |
 |---------|----------|----------|
 | [github-actions](github-actions/) | GitHub Actions | PR checks, artifacts, coverage |
 | [gitlab-ci](gitlab-ci/) | GitLab CI | Coverage reports, caching |
 
-### Specialized Workflows
+### Advanced
 
-| Example | Focus | Tools |
-|---------|-------|-------|
-| [linters](linters/) | Code quality gates | ruff, pylint, flake8, mypy, interrogate |
-| [security](security/) | Security scanning | bandit, pip-audit, trufflehog, sbom |
-| [llm_fix](llm_fix/) | AI auto-fixing | Docker-backed llx MCP integration |
-| [custom_gates](custom_gates/) | Custom metrics | Composite gates, custom collectors |
+| Example | Description | Key Feature |
+|---------|-------------|-------------|
+| [multi_gate_pipeline](multi_gate_pipeline/) | 21-gate production pipeline | Linters + security + AI + testing combined |
+| [ticket_workflow](ticket_workflow/) | Planfile ticket sync on gate failures | Auto TODO.md + GitHub Issues |
 
 ## Quick Reference
 
@@ -51,9 +66,10 @@ pipeline:
   name: with-lint
   metrics:
     coverage_min: 80
+    ruff_errors_max: 5
   stages:
     - name: lint
-      run: ruff check .
+      run: ruff check . --output-format=json > .pyqual/ruff.json || true
     - name: test
       run: pytest --cov
   loop:
@@ -81,6 +97,25 @@ pipeline:
       run: pytest --cov
   loop:
     max_iterations: 3
+    on_fail: create_ticket
+```
+
+### With Custom Plugins
+
+```yaml
+pipeline:
+  name: with-plugins
+  metrics:
+    perf_p99_ms_max: 200
+    health_score_min: 70
+    coverage_min: 80
+  stages:
+    - name: test
+      run: pytest --cov --cov-report=json:.pyqual/coverage.json
+    - name: loadtest
+      run: locust --headless -u 50 --json > .pyqual/performance.json
+  loop:
+    max_iterations: 1
 ```
 
 ## Copy & Paste
@@ -89,7 +124,14 @@ Copy any example to your project:
 
 ```bash
 # From pyqual repo root
-cp examples/python-package/pyqual.yaml /path/to/your/project/
+cp examples/multi_gate_pipeline/pyqual.yaml /path/to/your/project/
 cd /path/to/your/project
 pyqual run
 ```
+
+## Documentation
+
+- [Quick Start](../docs/quickstart.md) — get up and running in 5 minutes
+- [Configuration Reference](../docs/configuration.md) — all pyqual.yaml options
+- [Integrations](../docs/integrations.md) — 13+ supported tools
+- [Python API](../docs/api.md) — Pipeline, GateSet, Plugin system, LLM wrapper

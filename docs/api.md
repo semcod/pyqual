@@ -170,3 +170,95 @@ sync_all_tickets(
 | `sync_todo_tickets()` | Sync TODO.md through planfile markdown backend |
 | `sync_github_tickets()` | Sync GitHub issues through planfile GitHub backend |
 | `sync_all_tickets()` | Sync both TODO.md and GitHub tickets |
+
+## Plugin API
+
+Build custom metric collectors by extending `MetricCollector`:
+
+```python
+from pyqual.plugins import MetricCollector, PluginRegistry, PluginMetadata
+from pathlib import Path
+import json
+
+class MyToolCollector(MetricCollector):
+    """Collect metrics from my custom tool."""
+    name = "my-tool"
+    metadata = PluginMetadata(
+        name="my-tool",
+        description="Custom tool metrics",
+        version="1.0.0",
+        tags=["custom", "quality"],
+    )
+
+    def collect(self, workdir: Path) -> dict[str, float]:
+        result = {}
+        path = workdir / ".pyqual" / "my_tool.json"
+        if path.exists():
+            data = json.loads(path.read_text())
+            if "score" in data:
+                result["my_tool_score"] = float(data["score"])
+            if "errors" in data:
+                result["my_tool_errors"] = float(data["errors"])
+        return result
+
+# Register the plugin
+PluginRegistry.register(MyToolCollector)
+```
+
+Manage plugins via CLI:
+
+```bash
+pyqual plugin list              # list all plugins
+pyqual plugin search security   # search by keyword
+pyqual plugin info llm-bench    # show plugin details
+pyqual plugin add llm-bench     # add plugin config to pyqual.yaml
+pyqual plugin validate          # check plugin config consistency
+pyqual doctor                   # check tool availability
+```
+
+See [examples/custom_plugins/](../examples/custom_plugins/) for a complete working example.
+
+## LLM API
+
+Use the LLM wrapper for code analysis and fixes:
+
+```python
+from pyqual.llm import LLM, get_llm_model, DEFAULT_MAX_TOKENS
+
+# Create LLM instance (reads .env for model/key)
+llm = LLM()
+
+# Complete a prompt
+response = llm.complete(
+    prompt="Explain this function:\ndef foo(): return 42",
+    system="You are a code reviewer.",
+    max_tokens=DEFAULT_MAX_TOKENS,
+)
+print(response.content)
+
+# Fix code with LLM
+fixed = llm.fix_code(
+    code="def add(a, b):\n    return a - b",
+    issue="Function should add, not subtract",
+)
+print(fixed.content)
+```
+
+## Named Constants
+
+| Constant | Module | Default | Description |
+|----------|--------|---------|-------------|
+| `DEFAULT_STAGE_TIMEOUT` | `pyqual.config` | 300 | Stage timeout in seconds |
+| `DEFAULT_MCP_PORT` | `pyqual.cli` | 8000 | MCP service port |
+| `DEFAULT_MAX_TOKENS` | `pyqual.llm` | 2000 | LLM max response tokens |
+| `TIMEOUT_EXIT_CODE` | `pyqual.pipeline` | 124 | Exit code for timed-out stages |
+
+## Examples
+
+For complete working examples, see:
+
+- [Basic API usage](../examples/basic/) — `Pipeline`, `GateSet`, minimal one-liner
+- [Custom gates](../examples/custom_gates/) — dynamic thresholds, composite gates, metric history
+- [Custom plugins](../examples/custom_plugins/) — building your own `MetricCollector`
+- [Multi-gate pipeline](../examples/multi_gate_pipeline/) — combining linters, security, LLM gates
+- [Ticket workflow](../examples/ticket_workflow/) — planfile-backed ticket sync

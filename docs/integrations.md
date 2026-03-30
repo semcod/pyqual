@@ -90,33 +90,140 @@ pyqual reads from `.pyqual/coverage.json` (pytest-cov output):
 
 **Metrics extracted:** `coverage`
 
+## pylint → Code Quality Score
+
+```yaml
+stages:
+  - name: pylint
+    run: pylint --output-format=json . > .pyqual/pylint.json 2>/dev/null || true
+```
+
+pyqual reads `.pyqual/pylint.json` (list of messages or dict with score):
+
+**Metrics extracted:** `pylint_score`, `pylint_errors`, `pylint_fatal`, `pylint_error`, `pylint_warnings`
+
+## ruff → Modern Linting
+
+```yaml
+stages:
+  - name: ruff
+    run: ruff check . --output-format=json > .pyqual/ruff.json 2>/dev/null || true
+```
+
+**Metrics extracted:** `ruff_errors`, `ruff_fatal`, `ruff_warnings`
+
+## flake8 → Style Guide
+
+```yaml
+stages:
+  - name: flake8
+    run: flake8 --format=json . > .pyqual/flake8.json 2>/dev/null || true
+```
+
+**Metrics extracted:** `flake8_violations`, `flake8_errors`, `flake8_warnings`
+
+## bandit → Security Issues
+
+```yaml
+stages:
+  - name: bandit
+    run: bandit -r . -f json -o .pyqual/bandit.json 2>/dev/null || true
+```
+
+**Metrics extracted:** `bandit_high`, `bandit_medium`, `bandit_low`, `bandit_total`
+
+## radon → Maintainability Index
+
+```yaml
+stages:
+  - name: radon
+    run: radon mi . -j > .pyqual/radon.json 2>/dev/null || true
+```
+
+**Metrics extracted:** `maintainability_index`, `radon_cc`
+
+## interrogate → Docstring Coverage
+
+```yaml
+stages:
+  - name: interrogate
+    run: interrogate --generate-badge=never --format=json . > .pyqual/interrogate.json
+```
+
+**Metrics extracted:** `docstring_coverage`, `docstring_missing`
+
+## pip-audit / safety → Vulnerability Scanning
+
+```yaml
+stages:
+  - name: pip-audit
+    run: pip-audit --format=json --output=.pyqual/vulns.json 2>/dev/null || true
+```
+
+**Metrics extracted:** `vuln_critical`, `vuln_high`, `vuln_medium`, `vuln_total`
+
+## llx MCP → AI-Powered Fixes
+
+```yaml
+stages:
+  - name: llx-fix
+    run: pyqual mcp-fix --workdir . --project-path . --issues .pyqual/errors.json
+    when: metrics_fail
+    timeout: 900
+```
+
+The MCP fix workflow:
+1. Analyzes the project via `llx_analyze`
+2. Builds a fix prompt from gate failures or `TODO.md` issues
+3. Calls `aider` through the MCP service
+4. Saves results to `.pyqual/llx_mcp.json`
+
+See [examples/llm_fix/](../examples/llm_fix/) and [examples/llx/](../examples/llx/) for Docker-based and standalone setups.
+
 ## Custom Integrations
 
-Extend `GateSet._collect_metrics()` to add your own sources:
+Extend `GateSet._collect_metrics()` or build a plugin:
 
 ```python
 from pyqual.gates import GateSet
+from pathlib import Path
 
 class MyGateSet(GateSet):
     def _collect_metrics(self, workdir: Path) -> dict[str, float]:
         metrics = super()._collect_metrics(workdir)
-        # Add custom metric source
         metrics.update(self._from_my_tool(workdir))
         return metrics
-    
+
     def _from_my_tool(self, workdir: Path) -> dict[str, float]:
-        # Parse your tool's output
         return {"my_metric": 42.0}
 ```
 
+Or use the plugin system (see [Plugin API](api.md#plugin-api) and [examples/custom_plugins/](../examples/custom_plugins/)).
+
 ## Integration Summary
 
-| Tool | Output File | Metrics / Feature | Optional? |
-|------|-------------|-------------------|-----------|
+| Tool | Output File | Metrics | Optional? |
+|------|-------------|---------|-----------|
 | code2llm | `analysis_toon.yaml` | `cc`, `critical` | Yes |
 | vallm | `validation_toon.yaml` | `vallm_pass`, `error_count` | Yes |
 | pytest | `.pyqual/coverage.json` | `coverage` | Yes |
+| pylint | `.pyqual/pylint.json` | `pylint_score`, `pylint_errors`, `pylint_fatal`, `pylint_warnings` | Yes |
+| ruff | `.pyqual/ruff.json` | `ruff_errors`, `ruff_fatal`, `ruff_warnings` | Yes |
+| flake8 | `.pyqual/flake8.json` | `flake8_violations`, `flake8_errors`, `flake8_warnings` | Yes |
+| bandit | `.pyqual/bandit.json` | `bandit_high`, `bandit_medium`, `bandit_low` | Yes |
+| radon | `.pyqual/radon.json` | `maintainability_index`, `radon_cc` | Yes |
+| interrogate | `.pyqual/interrogate.json` | `docstring_coverage`, `docstring_missing` | Yes |
+| pip-audit | `.pyqual/vulns.json` | `vuln_critical`, `vuln_high`, `vuln_total` | Yes |
 | planfile | `.planfile/` | Ticket management (TODO.md, GitHub) | Yes |
+| llx MCP | `.pyqual/llx_mcp.json` | AI fix results | Yes |
 | custom | any | any | — |
 
 **All integrations are optional.** Stages can be any shell commands.
+
+## Examples
+
+- [Linters pipeline](../examples/linters/) — ruff, pylint, flake8, mypy, interrogate
+- [Security scanning](../examples/security/) — bandit, pip-audit, trufflehog, SBOM
+- [LLM fix (Docker)](../examples/llm_fix/) — Dockerized llx MCP workflow
+- [LLX integration](../examples/llx/) — standalone llx pipeline
+- [Multi-gate pipeline](../examples/multi_gate_pipeline/) — combining all tools

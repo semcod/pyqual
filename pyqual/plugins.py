@@ -25,24 +25,7 @@ class PluginMetadata:
 
 
 class MetricCollector(ABC):
-    """Base class for metric collector plugins.
-    
-    Subclasses should implement collect() to extract metrics from JSON artifacts
-    in the .pyqual/ directory.
-    
-    Example:
-        class HumanEvalCollector(MetricCollector):
-            name = "llm-bench"
-            
-            def collect(self, workdir: Path) -> dict[str, float]:
-                result = {}
-                path = workdir / ".pyqual" / "humaneval.json"
-                if path.exists():
-                    data = json.loads(path.read_text())
-                    if "pass_at_1" in data:
-                        result["pass_at_1"] = float(data["pass_at_1"])
-                return result
-    """
+    """Base class for metric collector plugins."""
     
     name: ClassVar[str] = ""
     metadata: ClassVar[PluginMetadata] = PluginMetadata(
@@ -53,14 +36,7 @@ class MetricCollector(ABC):
     
     @abstractmethod
     def collect(self, workdir: Path) -> dict[str, float]:
-        """Collect metrics from workdir/.pyqual/ artifacts.
-        
-        Args:
-            workdir: Project working directory containing .pyqual/ folder
-            
-        Returns:
-            Dictionary of metric_name -> value
-        """
+        """Collect metrics from workdir/.pyqual/ artifacts."""
         ...
     
     def get_config_example(self) -> str:
@@ -562,11 +538,7 @@ def get_available_plugins() -> dict[str, PluginMetadata]:
 
 
 def install_plugin_config(name: str, workdir: Path = Path(".")) -> str:
-    """Generate configuration snippet for a plugin.
-    
-    Returns:
-        YAML configuration string for the plugin
-    """
+    """Generate YAML configuration snippet for a named plugin."""
     plugin_class = PluginRegistry.get(name)
     if not plugin_class:
         raise ValueError(f"Unknown plugin: {name}")

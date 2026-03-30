@@ -1,7 +1,5 @@
 """Planfile-backed ticket sync helpers for TODO.md and GitHub."""
 
-from __future__ import annotations
-
 from pathlib import Path
 
 PLANFILE_MARKDOWN_SOURCE = "markdown"

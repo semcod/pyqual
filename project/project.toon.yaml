@@ -1,7 +1,7 @@
-# pyqual | 116 func | 8f | 3012L | python | 2026-03-29
+# pyqual | 128 func | 9f | 3498L | python | 2026-03-30
 
 HEALTH:
-  CC̄=4.9  critical=18 (limit:10)  dup=0  cycles=0
+  CC̄=4.7  critical=18 (limit:10)  dup=0  cycles=0
 
 ALERTS[20]:
   !!! high_fan_out     GateSet._collect_metrics = 23 (limit:10)
@@ -15,19 +15,20 @@ ALERTS[20]:
   !   high_fan_out     main = 13 (limit:10)
   !   high_fan_out     plugin = 12 (limit:10)
 
-MODULES[11] (top by size):
-  M[pyqual/gates.py] 588L C:3 F:29 CC↑16 D:0 (python)
+MODULES[12] (top by size):
+  M[pyqual/gates.py] 597L C:3 F:30 CC↑16 D:0 (python)
   M[pyqual/plugins.py] 575L C:11 F:24 CC↑14 D:1 (python)
-  M[pyqual/cli.py] 457L C:0 F:15 CC↑12 D:0 (python)
-  M[pyqual/integrations/llx_mcp.py] 338L C:2 F:13 CC↑15 D:1 (python)
+  M[pyqual/cli.py] 509L C:0 F:18 CC↑13 D:0 (python)
+  M[pyqual/integrations/llx_mcp.py] 394L C:2 F:15 CC↑15 D:1 (python)
   M[pyqual/integrations/llx_mcp_service.py] 241L C:1 F:15 CC↑4 D:0 (python)
   M[pyqual/pipeline.py] 152L C:4 F:7 CC↑6 D:0 (python)
   M[pyqual/config.py] 150L C:4 F:6 CC↑6 D:0 (python)
   M[pyqual/llm.py] 117L C:2 F:7 CC↑6 D:0 (python)
+  M[pyqual/tickets.py] 75L C:0 F:6 CC↑4 D:1 (python)
   M[pyqual/__init__.py] 49L C:0 F:0 CC↑0 D:0 (python)
   M[project.sh] 24L C:0 F:0 CC↑0 D:0 (shell)
   M[pyqual/integrations/__init__.py] 1L C:0 F:0 CC↑0 D:0 (python)
-  LANGS: python:10/shell:1
+  LANGS: python:11/shell:1
 
 HOTSPOTS[10]:
   ★ GateSet._collect_metrics fan=23  // Collect metrics from .pyqual/ artifacts and .toon files.
@@ -36,12 +37,12 @@ HOTSPOTS[10]:
   ★ _plugin_search fan=17  // Orchestrates 17 calls
   ★ mcp_fix fan=16  // Run the llx-backed MCP fix workflow.
 
-REFACTOR[7]:
-  [1] H/H Split god module pyqual/gates.py (588L, 3 classes)
+REFACTOR[8]:
+  [1] H/H Split god module pyqual/gates.py (597L, 3 classes)
   [2] H/H Split god module pyqual/plugins.py (575L, 11 classes)
-  [3] M/L Split _issue_text (CC=15 → target CC<10)
-  [4] M/L Split GateSet._from_pylint (CC=16 → target CC<10)
-  [5] M/M Reduce GateSet._collect_metrics fan-out (currently 23)
+  [3] H/H Split god module pyqual/cli.py (509L, 0 classes)
+  [4] M/L Split _issue_text (CC=15 → target CC<10)
+  [5] M/L Split GateSet._from_pylint (CC=16 → target CC<10)
 
 EVOLUTION:
-  2026-03-29 CC̄=4.9 crit=18 3012L // Automated analysis
+  2026-03-30 CC̄=4.7 crit=18 3498L // Automated analysis

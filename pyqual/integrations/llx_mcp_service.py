@@ -10,6 +10,8 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any
 
+DEFAULT_MCP_PORT = 8000
+
 
 @dataclass
 class McpServiceState:
@@ -119,7 +121,7 @@ class McpServiceState:
             route_label = _escape_label_value(route)
             lines.append(f'pyqual_mcp_route_hits_total{{route="{route_label}"}} {count}')
 
-        return "\n".join(lines) + "\n"
+        return f"{chr(10).join(lines)}\n"
 
 
 def _escape_label_value(value: str) -> str:
@@ -200,7 +202,7 @@ def create_app(state: McpServiceState | None = None, llx_server: Any | None = No
     )
 
 
-def run_server(host: str = "0.0.0.0", port: int = 8000, state: McpServiceState | None = None) -> None:
+def run_server(host: str = "0.0.0.0", port: int = DEFAULT_MCP_PORT, state: McpServiceState | None = None) -> None:
     """Run the persistent MCP service with uvicorn."""
     try:
         import uvicorn
@@ -223,7 +225,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--port",
         type=int,
-        default=int(os.getenv("PYQUAL_LLX_MCP_PORT", "8000")),
+        default=int(os.getenv("PYQUAL_LLX_MCP_PORT", str(DEFAULT_MCP_PORT))),
         help="Port to listen on.",
     )
     return parser

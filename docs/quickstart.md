@@ -74,8 +74,16 @@ pyqual run --dry-run
 - [Set up integrations](integrations.md)
 - [Use the Python API](api.md)
 - Browse [Examples](../examples/) for your use case:
-  - [Python Package (src-layout)](../examples/python-package/) - Standard Python package structure
-  - [Python Flat Layout](../examples/python-flat/) - Simple project without src/
-  - [GitHub Actions](../examples/github-actions/) - CI/CD with GitHub
-  - [GitLab CI](../examples/gitlab-ci/) - CI/CD with GitLab
-  - [Monorepo](../examples/monorepo/) - Multiple packages in one repo
+  - [Basic API usage](../examples/basic/) — Pipeline, GateSet, minimal one-liner
+  - [Python Package (src-layout)](../examples/python-package/) — standard Python package
+  - [Python Flat Layout](../examples/python-flat/) — simple project without src/
+  - [Linters](../examples/linters/) — ruff, pylint, flake8, mypy, interrogate
+  - [Security scanning](../examples/security/) — bandit, pip-audit, trufflehog, SBOM
+  - [Custom gates](../examples/custom_gates/) — dynamic thresholds, composite gates, metric history
+  - [Custom plugins](../examples/custom_plugins/) — build your own MetricCollector
+  - [LLM fix (Docker)](../examples/llm_fix/) — Dockerized llx MCP workflow
+  - [Multi-gate pipeline](../examples/multi_gate_pipeline/) — combining linters + security + LLM
+  - [Ticket workflow](../examples/ticket_workflow/) — planfile-backed ticket sync
+  - [GitHub Actions](../examples/github-actions/) — CI/CD with GitHub
+  - [GitLab CI](../examples/gitlab-ci/) — CI/CD with GitLab
+  - [Monorepo](../examples/monorepo/) — multiple packages in one repo

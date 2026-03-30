@@ -10,6 +10,8 @@ from typing import Any
 import yaml
 from dotenv import load_dotenv
 
+DEFAULT_STAGE_TIMEOUT = 300
+
 
 def _load_env_file() -> None:
     """Load .env file if exists."""
@@ -37,7 +39,7 @@ class StageConfig:
     name: str
     run: str
     when: str = "always"  # always | metrics_fail | metrics_pass
-    timeout: int = 300
+    timeout: int = DEFAULT_STAGE_TIMEOUT
     capture_output: bool = True
 
 

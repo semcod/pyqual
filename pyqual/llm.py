@@ -9,6 +9,8 @@ from typing import Any
 
 from dotenv import load_dotenv
 
+DEFAULT_MAX_TOKENS = 2000
+
 try:
     from litellm import completion
 except ImportError:
@@ -58,7 +60,7 @@ class LLM:
         prompt: str,
         system: str | None = None,
         temperature: float = 0.7,
-        max_tokens: int = 2000,
+        max_tokens: int = DEFAULT_MAX_TOKENS,
         **kwargs: Any,
     ) -> LLMResponse:
         """Send completion request to LLM."""

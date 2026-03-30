@@ -4,17 +4,17 @@
 
 - **Project**: /home/tom/github/semcod/pyqual
 - **Primary Language**: python
-- **Languages**: python: 14, shell: 2
+- **Languages**: python: 15, shell: 2
 - **Analysis Mode**: static
-- **Total Functions**: 117
+- **Total Functions**: 129
 - **Total Classes**: 27
-- **Modules**: 16
-- **Entry Points**: 93
+- **Modules**: 17
+- **Entry Points**: 97
 
 ## Architecture by Module
 
 ### pyqual.gates
-- **Functions**: 30
+- **Functions**: 31
 - **Classes**: 3
 - **File**: `gates.py`
 
@@ -24,18 +24,18 @@
 - **File**: `plugins.py`
 
 ### pyqual.cli
-- **Functions**: 15
+- **Functions**: 18
 - **File**: `cli.py`
+
+### pyqual.integrations.llx_mcp
+- **Functions**: 15
+- **Classes**: 2
+- **File**: `llx_mcp.py`
 
 ### pyqual.integrations.llx_mcp_service
 - **Functions**: 15
 - **Classes**: 1
 - **File**: `llx_mcp_service.py`
-
-### pyqual.integrations.llx_mcp
-- **Functions**: 13
-- **Classes**: 2
-- **File**: `llx_mcp.py`
 
 ### pyqual.llm
 - **Functions**: 7
@@ -51,6 +51,10 @@
 - **Functions**: 6
 - **Classes**: 4
 - **File**: `config.py`
+
+### pyqual.tickets
+- **Functions**: 6
+- **File**: `tickets.py`
 
 ### examples.llx.demo
 - **Functions**: 1
@@ -83,6 +87,10 @@ Main execution flows into the system:
 > Extract ruff linter error counts from JSON output.
 - **Calls**: p.exists, json.loads, isinstance, p.read_text, len, sum, sum, float
 
+### pyqual.cli.run
+> Execute pipeline loop until quality gates pass.
+- **Calls**: app.command, typer.Option, typer.Option, typer.Option, PyqualConfig.load, Pipeline, pipeline.run, console.print
+
 ### pyqual.cli.status
 > Show current metrics and pipeline config.
 - **Calls**: app.command, typer.Option, typer.Option, PyqualConfig.load, GateSet, gate_set._collect_metrics, console.print, console.print
@@ -94,10 +102,6 @@ Main execution flows into the system:
 ### pyqual.gates.GateSet._from_radon
 > Extract maintainability index and complexity from radon JSON.
 - **Calls**: p.exists, json.loads, p.read_text, isinstance, v.get, float, float, isinstance
-
-### pyqual.cli.run
-> Execute pipeline loop until quality gates pass.
-- **Calls**: app.command, typer.Option, typer.Option, typer.Option, PyqualConfig.load, Pipeline, pipeline.run, console.print
 
 ### pyqual.plugins.LLMBenchCollector.collect
 - **Calls**: humaneval_path.exists, codebleu_path.exists, json.loads, json.loads, humaneval_path.read_text, data.get, data.get, float
@@ -165,9 +169,9 @@ Main execution flows into the system:
 ### pyqual.plugins.LlxMcpFixCollector._collect_aider_metrics
 - **Calls**: aider.get, self._assign_float, aider.get, self._count_lines, self._count_lines, isinstance, aider.get, aider.get
 
-### pyqual.gates.GateSet._from_vallm
-> Extract vallm pass rate from validation_toon.yaml or errors.json.
-- **Calls**: errors_path.exists, p.read_text, re.search, p.exists, float, json.loads, isinstance, pass_match.group
+### pyqual.pipeline.Pipeline._run_iteration
+> Run one iteration of all stages + gate check.
+- **Calls**: time.monotonic, IterationResult, self.gate_set.all_passed, self.gate_set.check_all, all, self._should_run_stage, self._execute_stage, iteration.stages.append
 
 ### pyqual.gates.GateSet._from_secrets
 > Extract secrets scan metrics from secrets.json.
@@ -207,32 +211,32 @@ collect [pyqual.plugins.SecurityCollector]
 _from_ruff [pyqual.gates.GateSet]
 ```
 
-### Flow 7: status
+### Flow 7: run
+```
+run [pyqual.cli]
+```
+
+### Flow 8: status
 ```
 status [pyqual.cli]
 ```
 
-### Flow 8: gates
+### Flow 9: gates
 ```
 gates [pyqual.cli]
 ```
 
-### Flow 9: _from_radon
+### Flow 10: _from_radon
 ```
 _from_radon [pyqual.gates.GateSet]
-```
-
-### Flow 10: run
-```
-run [pyqual.cli]
 ```
 
 ## Key Classes
 
 ### pyqual.gates.GateSet
 > Collection of quality gates with metric collection.
-- **Methods**: 28
-- **Key Methods**: pyqual.gates.GateSet.__init__, pyqual.gates.GateSet.check_all, pyqual.gates.GateSet.all_passed, pyqual.gates.GateSet._collect_metrics, pyqual.gates.GateSet._from_toon, pyqual.gates.GateSet._from_vallm, pyqual.gates.GateSet._from_coverage, pyqual.gates.GateSet._from_safety, pyqual.gates.GateSet._from_bandit, pyqual.gates.GateSet._from_secrets
+- **Methods**: 29
+- **Key Methods**: pyqual.gates.GateSet.__init__, pyqual.gates.GateSet._read_artifact_text, pyqual.gates.GateSet.check_all, pyqual.gates.GateSet.all_passed, pyqual.gates.GateSet._collect_metrics, pyqual.gates.GateSet._from_toon, pyqual.gates.GateSet._from_vallm, pyqual.gates.GateSet._from_coverage, pyqual.gates.GateSet._from_safety, pyqual.gates.GateSet._from_bandit
 
 ### pyqual.integrations.llx_mcp_service.McpServiceState
 > Runtime state exposed via health and metrics endpoints.
@@ -330,25 +334,25 @@ Subclasses should implement collect() to extract metrics f
 - **Key Methods**: pyqual.plugins.SecurityCollector.collect
 - **Inherits**: MetricCollector
 
-### pyqual.integrations.llx_mcp.LlxMcpRunResult
-> Result of an llx MCP fix workflow.
+### pyqual.pipeline.StageResult
+> Result of running a single stage.
 - **Methods**: 1
-- **Key Methods**: pyqual.integrations.llx_mcp.LlxMcpRunResult.to_dict
+- **Key Methods**: pyqual.pipeline.StageResult.passed
 
-### pyqual.gates.GateResult
-> Result of a single gate check.
+### pyqual.pipeline.PipelineResult
+> Result of the complete pipeline run (all iterations).
 - **Methods**: 1
-- **Key Methods**: pyqual.gates.GateResult.__str__
+- **Key Methods**: pyqual.pipeline.PipelineResult.iteration_count
 
 ## Data Transformation Functions
 
 Key functions that process and transform data:
 
-### pyqual.config.PyqualConfig._parse
-- **Output to**: raw.get, pipeline.get, cls, StageConfig, GateConfig.from_dict
-
 ### pyqual.cli._plugin_validate
 - **Output to**: config_path.read_text, console.print, console.print, set, set
+
+### pyqual.config.PyqualConfig._parse
+- **Output to**: raw.get, pipeline.get, cls, StageConfig, GateConfig.from_dict
 
 ### pyqual.integrations.llx_mcp.build_parser
 > Build the CLI parser for the llx MCP helper.
@@ -373,9 +377,9 @@ Functions exposed as public API (no underscore prefix):
 - `pyqual.integrations.llx_mcp_service.create_app` - 28 calls
 - `pyqual.integrations.llx_mcp.run_llx_fix_workflow` - 27 calls
 - `pyqual.plugins.SecurityCollector.collect` - 23 calls
+- `pyqual.cli.run` - 21 calls
 - `pyqual.cli.status` - 21 calls
 - `pyqual.cli.gates` - 20 calls
-- `pyqual.cli.run` - 18 calls
 - `pyqual.plugins.LLMBenchCollector.collect` - 18 calls
 - `pyqual.integrations.llx_mcp.main` - 18 calls
 - `pyqual.cli.doctor` - 17 calls
@@ -390,12 +394,16 @@ Functions exposed as public API (no underscore prefix):
 - `pyqual.plugins.LlxMcpFixCollector.collect` - 10 calls
 - `pyqual.plugins.I18nCollector.collect` - 9 calls
 - `pyqual.plugins.A11yCollector.collect` - 9 calls
+- `pyqual.cli.tickets_todo` - 8 calls
+- `pyqual.cli.tickets_github` - 8 calls
+- `pyqual.cli.tickets_all` - 8 calls
 - `pyqual.llm.LLM.complete` - 8 calls
 - `pyqual.config.GateConfig.from_dict` - 7 calls
 - `pyqual.config.PyqualConfig.load` - 7 calls
 - `pyqual.cli.mcp_service` - 6 calls
-- `pyqual.integrations.llx_mcp.LlxMcpClient.call_tool` - 6 calls
+- `pyqual.tickets.sync_planfile_tickets` - 6 calls
 - `pyqual.pipeline.Pipeline.run` - 6 calls
+- `pyqual.integrations.llx_mcp.LlxMcpClient.call_tool` - 6 calls
 - `pyqual.integrations.llx_mcp_service.build_parser` - 6 calls
 - `pyqual.llm.LLM.fix_code` - 5 calls
 - `pyqual.plugins.install_plugin_config` - 5 calls
@@ -405,10 +413,6 @@ Functions exposed as public API (no underscore prefix):
 - `pyqual.gates.GateSet.all_passed` - 3 calls
 - `pyqual.integrations.llx_mcp_service.McpServiceState.health_payload` - 3 calls
 - `pyqual.integrations.llx_mcp_service.run_server` - 3 calls
-- `pyqual.integrations.llx_mcp_service.main` - 3 calls
-- `pyqual.llm.get_api_key` - 2 calls
-- `pyqual.plugins.PluginRegistry.list_plugins` - 2 calls
-- `pyqual.plugins.PluginRegistry.create_instance` - 2 calls
 
 ## System Interactions
 
@@ -437,15 +441,15 @@ graph TD
     _from_ruff --> isinstance
     _from_ruff --> read_text
     _from_ruff --> len
+    run --> command
+    run --> Option
+    run --> load
     status --> command
     status --> Option
     status --> load
     status --> GateSet
     gates --> command
     gates --> Option
-    gates --> load
-    gates --> GateSet
-    _from_radon --> exists
 ```
 
 ## Reverse Engineering Guidelines

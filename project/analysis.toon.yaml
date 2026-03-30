@@ -1,5 +1,5 @@
-# code2llm | 11f 2692L | python:10,shell:1 | 2026-03-29
-# CC̄=4.9 | critical:2/117 | dups:0 | cycles:0
+# code2llm | 12f 2884L | python:11,shell:1 | 2026-03-30
+# CC̄=4.7 | critical:2/129 | dups:0 | cycles:0
 
 HEALTH[3]:
   🔴 GOD   pyqual/plugins.py = 575L, 11 classes, 24m, max CC=14
@@ -10,28 +10,29 @@ REFACTOR[2]:
   1. split pyqual/plugins.py  (god module)
   2. split 2 high-CC methods  (CC>15)
 
-PIPELINES[85]:
-  [1] Src [from_dict]: from_dict
+PIPELINES[89]:
+  [1] Src [init]: init
       PURITY: 100% pure
-  [2] Src [load]: load → _load_env_file
+  [2] Src [run]: run → sync_todo_tickets → sync_planfile_tickets → _load_sync_integration
       PURITY: 100% pure
-  [3] Src [_parse]: _parse → _normalize_env_values
+  [3] Src [gates]: gates
       PURITY: 100% pure
-  [4] Src [__init__]: __init__ → get_llm_model → _ensure_dotenv_loaded
+  [4] Src [status]: status
       PURITY: 100% pure
-  [5] Src [complete]: complete
+  [5] Src [mcp_fix]: mcp_fix → run_llx_fix_workflow → _resolve_issue_source → _load_issue_source → ...(1 more)
       PURITY: 100% pure
 
 LAYERS:
-  pyqual/                         CC̄=4.9    ←in:0  →out:1
-  │ !! gates                      588L  3C   29m  CC=16     ←0
+  pyqual/                         CC̄=4.7    ←in:0  →out:1
+  │ !! gates                      597L  3C   30m  CC=16     ←0
   │ !! plugins                    575L  11C   24m  CC=14     ←2
-  │ cli                        457L  0C   15m  CC=12     ←0
-  │ !! llx_mcp                    338L  2C   13m  CC=15     ←1
+  │ !! cli                        509L  0C   18m  CC=13     ←0
+  │ !! llx_mcp                    394L  2C   15m  CC=15     ←1
   │ llx_mcp_service            241L  1C   15m  CC=4      ←0
   │ pipeline                   152L  4C    7m  CC=6      ←0
   │ config                     150L  4C    6m  CC=6      ←1
   │ llm                        117L  2C    7m  CC=6      ←0
+  │ tickets                     75L  0C    6m  CC=4      ←1
   │ __init__                    49L  0C    0m  CC=0.0    ←0
   │ __init__                     1L  0C    0m  CC=0.0    ←0
   │

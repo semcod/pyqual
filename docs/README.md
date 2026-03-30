@@ -1,7 +1,7 @@
 <!-- code2docs:start --># pyqual
 
-![version](https://img.shields.io/badge/version-0.1.0-blue) ![python](https://img.shields.io/badge/python-%3E%3D3.9-blue) ![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey) ![functions](https://img.shields.io/badge/functions-117-green)
-> **117** functions | **27** classes | **16** files | CC̄ = 4.9
+![version](https://img.shields.io/badge/version-0.1.29-blue) ![python](https://img.shields.io/badge/python-%3E%3D3.9-blue) ![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey) ![functions](https://img.shields.io/badge/functions-129-green)
+> **129** functions | **27** classes | **17** files | CC̄ = 4.7
 
 > Auto-generated project documentation from source code analysis.
 
@@ -40,56 +40,54 @@ pip install pyqual[all]    # all optional features
 ### CLI Usage
 
 ```bash
-# Generate full documentation for your project
-pyqual ./my-project
+# Initialize project with default pyqual.yaml
+pyqual init
 
-# Only regenerate README
-pyqual ./my-project --readme-only
+# Run the quality pipeline loop
+pyqual run
 
-# Preview what would be generated (no file writes)
-pyqual ./my-project --dry-run
+# Check quality gates without running stages
+pyqual gates
 
-# Check documentation health
-pyqual check ./my-project
+# Show current metrics
+pyqual status
 
-# Sync — regenerate only changed modules
-pyqual sync ./my-project
+# Preview without executing
+pyqual run --dry-run
+
+# Manage tickets
+pyqual tickets todo
+pyqual tickets github
+
+# Check tool availability
+pyqual doctor
 ```
 
 ### Python API
 
 ```python
-from pyqual import generate_readme, generate_docs, Code2DocsConfig
+from pyqual import Pipeline, PyqualConfig, GateSet
 
-# Quick: generate README
-generate_readme("./my-project")
+# Run full pipeline
+config = PyqualConfig.load("pyqual.yaml")
+result = Pipeline(config).run()
 
-# Full: generate all documentation
-config = Code2DocsConfig(project_name="mylib", verbose=True)
-docs = generate_docs("./my-project", config=config)
+# Check gates only
+gate_set = GateSet(config.gates)
+results = gate_set.check_all()
 ```
 
-## Generated Output
+## How It Works
 
-When you run `pyqual`, the following files are produced:
+pyqual runs a loop: execute stages → collect metrics → check gates → if fail, fix → repeat.
 
 ```
-<project>/
-├── README.md                 # Main project README (auto-generated sections)
-├── docs/
-│   ├── api.md               # Consolidated API reference
-│   ├── modules.md           # Module documentation with metrics
-│   ├── architecture.md      # Architecture overview with diagrams
-│   ├── dependency-graph.md  # Module dependency graphs
-│   ├── coverage.md          # Docstring coverage report
-│   ├── getting-started.md   # Getting started guide
-│   ├── configuration.md    # Configuration reference
-│   └── api-changelog.md    # API change tracking
-├── examples/
-│   ├── quickstart.py       # Basic usage examples
-│   └── advanced_usage.py   # Advanced usage examples
-├── CONTRIBUTING.md         # Contribution guidelines
-└── mkdocs.yml             # MkDocs site configuration
+pyqual run:
+    Iteration 1 → analyze → validate → fix → test → check gates
+                                                         │
+                                              ┌── PASS ──┴── FAIL ──┐
+                                              │                     │
+                                           Done ✅          Iteration 2...
 ```
 
 ## Configuration
@@ -97,60 +95,44 @@ When you run `pyqual`, the following files are produced:
 Create `pyqual.yaml` in your project root (or run `pyqual init`):
 
 ```yaml
-project:
-  name: my-project
-  source: ./
-  output: ./docs/
-
-readme:
-  sections:
-    - overview
-    - install
-    - quickstart
-    - api
-    - structure
-  badges:
-    - version
-    - python
-    - coverage
-  sync_markers: true
-
-docs:
-  api_reference: true
-  module_docs: true
-  architecture: true
-  changelog: true
-
-examples:
-  auto_generate: true
-  from_entry_points: true
-
-sync:
-  strategy: markers    # markers | full | git-diff
-  watch: false
-  ignore:
-    - "tests/"
-    - "__pycache__"
+pipeline:
+  name: quality-loop
+  metrics:
+    cc_max: 15           # cyclomatic complexity ≤ 15
+    coverage_min: 80     # test coverage ≥ 80%
+    vallm_pass_min: 90   # validation pass rate ≥ 90%
+  stages:
+    - name: analyze
+      run: code2llm ./ -f toon,evolution
+    - name: validate
+      run: vallm batch ./ --recursive --errors-json > .pyqual/errors.json
+    - name: fix
+      run: llx fix . --errors .pyqual/errors.json --verbose
+      when: metrics_fail
+    - name: test
+      run: pytest --cov --cov-report=json:.pyqual/coverage.json
+  loop:
+    max_iterations: 3
+    on_fail: report
+  env:
+    LLM_MODEL: openrouter/qwen/qwen3-coder-next
 ```
-
-## Sync Markers
-
-pyqual can update only specific sections of an existing README using HTML comment markers:
-
-```markdown
-<!-- pyqual:start -->
-# Project Title
-... auto-generated content ...
-<!-- pyqual:end -->
-```
-
-Content outside the markers is preserved when regenerating. Enable this with `sync_markers: true` in your configuration.
 
 ## Architecture
 
 ```
 pyqual/
-    ├── llm    ├── config├── pyqual/    ├── cli    ├── gates    ├── integrations/    ├── pipeline        ├── dynamic_thresholds        ├── minimal        ├── check_gates        ├── run_pipeline├── project        ├── demo    ├── plugins        ├── llx_mcp        ├── llx_mcp_service```
+├── cli.py                  # CLI commands (typer)
+├── config.py               # YAML configuration loader
+├── gates.py                # Quality gate checking + metric collection
+├── pipeline.py             # Pipeline loop executor
+├── plugins.py              # Plugin system (MetricCollector base)
+├── llm.py                  # LiteLLM wrapper
+├── tickets.py              # Planfile ticket sync
+└── integrations/
+    ├── llx_mcp.py          # llx MCP client helpers
+    └── llx_mcp_service.py  # MCP SSE service (ASGI)
+```
 
 ## API Overview
 
@@ -162,13 +144,6 @@ pyqual/
 - **`GateConfig`** — Single quality gate threshold.
 - **`LoopConfig`** — Loop iteration settings.
 - **`PyqualConfig`** — Full pyqual.yaml configuration.
-- **`GateResult`** — Result of a single gate check.
-- **`Gate`** — Single quality gate with metric extraction.
-- **`GateSet`** — Collection of quality gates with metric collection.
-- **`StageResult`** — Result of running a single stage.
-- **`IterationResult`** — Result of one full pipeline iteration.
-- **`PipelineResult`** — Result of the complete pipeline run (all iterations).
-- **`Pipeline`** — Execute pipeline stages in a loop until quality gates pass.
 - **`PluginMetadata`** — Metadata for a pyqual plugin.
 - **`MetricCollector`** — Base class for metric collector plugins.
 - **`PluginRegistry`** — Registry for metric collector plugins.
@@ -180,26 +155,40 @@ pyqual/
 - **`RepoMetricsCollector`** — Advanced repository health metrics (bus factor, diversity).
 - **`SecurityCollector`** — Security scanning metrics from trufflehog, gitleaks, safety.
 - **`LlxMcpFixCollector`** — Dockerized llx MCP fixer workflow results.
+- **`StageResult`** — Result of running a single stage.
+- **`IterationResult`** — Result of one full pipeline iteration.
+- **`PipelineResult`** — Result of the complete pipeline run (all iterations).
+- **`Pipeline`** — Execute pipeline stages in a loop until quality gates pass.
 - **`LlxMcpRunResult`** — Result of an llx MCP fix workflow.
 - **`LlxMcpClient`** — Thin MCP client for the llx SSE service.
+- **`GateResult`** — Result of a single gate check.
+- **`Gate`** — Single quality gate with metric extraction.
+- **`GateSet`** — Collection of quality gates with metric collection.
 - **`McpServiceState`** — Runtime state exposed via health and metrics endpoints.
 
 ### Functions
 
-- `get_llm_model()` — Get LLM model from environment or default.
-- `get_api_key()` — Get OpenRouter API key from environment.
-- `get_llm(model)` — Get configured LLM instance.
 - `init(path)` — Create pyqual.yaml with sensible defaults.
 - `run(config, dry_run, workdir)` — Execute pipeline loop until quality gates pass.
 - `gates(config, workdir)` — Check quality gates without running stages.
 - `status(config, workdir)` — Show current metrics and pipeline config.
 - `mcp_fix(workdir, project_path, issues, output)` — Run the llx-backed MCP fix workflow.
 - `mcp_service(host, port)` — Run the persistent llx MCP service with health and metrics endpoints.
+- `tickets_todo(workdir, dry_run, direction)` — Sync TODO.md tickets using planfile's markdown backend.
+- `tickets_github(workdir, dry_run, direction)` — Sync GitHub Issues using planfile's GitHub backend.
+- `tickets_all(workdir, dry_run, direction)` — Sync TODO.md and GitHub tickets using planfile.
 - `plugin(action, name, workdir, tag)` — Manage pyqual plugins - add, remove, search metric collectors.
 - `doctor()` — Check availability of external tools used by pyqual collectors.
-- `check_tool()` — —
+- `get_llm_model()` — Get LLM model from environment or default.
+- `get_api_key()` — Get OpenRouter API key from environment.
+- `get_llm(model)` — Get configured LLM instance.
+- `sync_planfile_tickets(source, directory, dry_run, direction)` — Sync tickets via planfile backends.
+- `sync_todo_tickets(directory, dry_run, direction)` — Sync TODO.md tickets through planfile's markdown backend.
+- `sync_github_tickets(directory, dry_run, direction)` — Sync GitHub issues through planfile's GitHub backend.
+- `sync_all_tickets(directory, dry_run, direction)` — Sync TODO.md and GitHub tickets through planfile.
 - `get_available_plugins()` — Get metadata for all available built-in plugins.
-- `install_plugin_config(name, workdir)` — Generate configuration snippet for a plugin.
+- `install_plugin_config(name, workdir)` — Generate YAML configuration snippet for a named plugin.
+- `check_tool()` — —
 - `build_fix_prompt(project_path, issues, analysis, prompt_limit)` — Build a concise prompt for llx/aider from gate failures.
 - `run_llx_fix_workflow(workdir, project_path, issues_path, output_path)` — Run the analysis + fix workflow and save a JSON report.
 - `build_parser()` — Build the CLI parser for the llx MCP helper.
@@ -219,20 +208,28 @@ pyqual/
 📄 `examples.llx.demo` (1 functions)
 📄 `project`
 📦 `pyqual`
-📄 `pyqual.cli` (15 functions)
+📄 `pyqual.cli` (18 functions)
 📄 `pyqual.config` (6 functions, 4 classes)
-📄 `pyqual.gates` (30 functions, 3 classes)
+📄 `pyqual.gates` (31 functions, 3 classes)
 📦 `pyqual.integrations`
-📄 `pyqual.integrations.llx_mcp` (13 functions, 2 classes)
+📄 `pyqual.integrations.llx_mcp` (15 functions, 2 classes)
 📄 `pyqual.integrations.llx_mcp_service` (15 functions, 1 classes)
 📄 `pyqual.llm` (7 functions, 2 classes)
 📄 `pyqual.pipeline` (7 functions, 4 classes)
 📄 `pyqual.plugins` (24 functions, 11 classes)
+📄 `pyqual.tickets` (6 functions)
 
 ## Requirements
 
-- Python >= >=3.9
-- pyyaml >=6.0- typer >=0.12- rich >=13.0- litellm >=1.0- python-dotenv >=1.0- mcp >=1.0
+- Python >= 3.9
+- pyyaml >=6.0
+- typer >=0.12
+- rich >=13.0
+- litellm >=1.0
+- python-dotenv >=1.0
+- mcp >=1.0
+- prefact
+- planfile
 
 ## Contributing
 
@@ -258,27 +255,20 @@ pytest
 
 ## Documentation
 
-- 📖 [Full Documentation](https://github.com/semcod/pyqual/tree/main/docs) — API reference, module docs, architecture
-- 🚀 [Getting Started](https://github.com/semcod/pyqual/blob/main/docs/getting-started.md) — Quick start guide
-- 📚 [API Reference](https://github.com/semcod/pyqual/blob/main/docs/api.md) — Complete API documentation
-- 🔧 [Configuration](https://github.com/semcod/pyqual/blob/main/docs/configuration.md) — Configuration options
-- 💡 [Examples](./examples) — Usage examples and code samples
+- [Quick Start](./docs/quickstart.md) — get up and running in 5 minutes
+- [Configuration](./docs/configuration.md) — pyqual.yaml reference
+- [Integrations](./docs/integrations.md) — pylint, ruff, bandit, pytest, llx, planfile…
+- [Python API](./docs/api.md) — Pipeline, GateSet, Plugin system, LLM wrapper
+- [Examples](./examples/) — real-world usage patterns
 
-### Generated Files
+### Documentation Files
 
-| Output | Description | Link |
-|--------|-------------|------|
-| `README.md` | Project overview (this file) | — |
-| `docs/api.md` | Consolidated API reference | [View](./docs/api.md) |
-| `docs/modules.md` | Module reference with metrics | [View](./docs/modules.md) |
-| `docs/architecture.md` | Architecture with diagrams | [View](./docs/architecture.md) |
-| `docs/dependency-graph.md` | Dependency graphs | [View](./docs/dependency-graph.md) |
-| `docs/coverage.md` | Docstring coverage report | [View](./docs/coverage.md) |
-| `docs/getting-started.md` | Getting started guide | [View](./docs/getting-started.md) |
-| `docs/configuration.md` | Configuration reference | [View](./docs/configuration.md) |
-| `docs/api-changelog.md` | API change tracking | [View](./docs/api-changelog.md) |
-| `CONTRIBUTING.md` | Contribution guidelines | [View](./CONTRIBUTING.md) |
-| `examples/` | Usage examples | [Browse](./examples) |
-| `mkdocs.yml` | MkDocs configuration | — |
+| File | Description |
+|------|-------------|
+| `docs/quickstart.md` | Quick start guide |
+| `docs/configuration.md` | Configuration reference |
+| `docs/integrations.md` | Tool integrations (13+ tools) |
+| `docs/api.md` | Python API reference |
+| `docs/index.md` | Documentation index |
 
 <!-- code2docs:end -->

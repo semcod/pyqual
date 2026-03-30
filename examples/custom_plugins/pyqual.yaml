@@ -1,0 +1,43 @@
+pipeline:
+  name: custom-plugins-example
+
+  metrics:
+    # Performance gates (from PerformanceCollector)
+    perf_p99_ms_max: 200
+    perf_error_rate_max: 1.0
+
+    # Code health gates (from CodeHealthCollector)
+    health_score_min: 70
+    health_tech_debt_hours_max: 40
+    health_dead_code_pct_max: 10
+
+    # Standard gates
+    coverage_min: 80
+
+  stages:
+    - name: test
+      run: pytest --cov --cov-report=json:.pyqual/coverage.json
+
+    - name: loadtest
+      run: |
+        # Replace with your actual load test command
+        echo '{"p50_ms": 10, "p99_ms": 85, "requests_per_second": 1200, "error_rate": 0.2}' > .pyqual/performance.json
+      timeout: 120
+
+    - name: health-scan
+      run: |
+        # Replace with your actual code health tooling
+        python -c "
+        import json, pathlib
+        result = {
+            'tech_debt_hours': 20,
+            'todo_count': 8,
+            'dead_code_pct': 5.2,
+            'test_to_code_ratio': 0.85
+        }
+        pathlib.Path('.pyqual/code_health.json').write_text(json.dumps(result))
+        "
+
+  loop:
+    max_iterations: 1
+    on_fail: report

@@ -6,7 +6,6 @@ import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
 
 from pyqual.config import GateConfig
 
@@ -528,30 +527,35 @@ class GateSet:
                 pass
         return result
 
+    @staticmethod
+    def _count_pylint_by_type(messages: list, type_name: str, symbol_prefix: str) -> float:
+        """Count pylint messages matching a type or symbol prefix."""
+        return float(sum(
+            1 for m in messages
+            if m.get("type") == type_name or str(m.get("symbol", "")).startswith(symbol_prefix)
+        ))
+
     def _from_pylint(self, workdir: Path) -> dict[str, float]:
         """Extract pylint score and error counts from JSON output."""
         result: dict[str, float] = {}
         p = workdir / ".pyqual" / "pylint.json"
-        if p.exists():
-            try:
-                data = json.loads(p.read_text())
-                if isinstance(data, list):
-                    errors = len(data)
-                    fatal = sum(1 for m in data if m.get("type") == "fatal" or str(m.get("symbol", "")).startswith("F"))
-                    error = sum(1 for m in data if m.get("type") == "error" or str(m.get("symbol", "")).startswith("E"))
-                    warning = sum(1 for m in data if m.get("type") == "warning" or str(m.get("symbol", "")).startswith("W"))
-                    result["pylint_errors"] = float(errors)
-                    result["pylint_fatal"] = float(fatal)
-                    result["pylint_error"] = float(error)
-                    result["pylint_warnings"] = float(warning)
-                elif isinstance(data, dict):
-                    score = data.get("score") or data.get("rating")
-                    if score:
-                        result["pylint_score"] = float(score)
-                    messages = data.get("messages", [])
-                    result["pylint_errors"] = float(len(messages))
-            except (json.JSONDecodeError, TypeError):
-                pass
+        if not p.exists():
+            return result
+        try:
+            data = json.loads(p.read_text())
+        except (json.JSONDecodeError, TypeError):
+            return result
+        if isinstance(data, list):
+            result["pylint_errors"] = float(len(data))
+            result["pylint_fatal"] = self._count_pylint_by_type(data, "fatal", "F")
+            result["pylint_error"] = self._count_pylint_by_type(data, "error", "E")
+            result["pylint_warnings"] = self._count_pylint_by_type(data, "warning", "W")
+        elif isinstance(data, dict):
+            score = data.get("score") or data.get("rating")
+            if score:
+                result["pylint_score"] = float(score)
+            messages = data.get("messages", [])
+            result["pylint_errors"] = float(len(messages))
         return result
 
     def _from_flake8(self, workdir: Path) -> dict[str, float]:

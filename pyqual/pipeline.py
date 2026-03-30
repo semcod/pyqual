@@ -11,6 +11,8 @@ from pathlib import Path
 from pyqual.config import PyqualConfig, StageConfig
 from pyqual.gates import GateSet, GateResult
 
+TIMEOUT_EXIT_CODE = 124
+
 
 @dataclass
 class StageResult:
@@ -136,7 +138,7 @@ class Pipeline:
             )
         except subprocess.TimeoutExpired:
             return StageResult(
-                name=stage.name, returncode=124,
+                name=stage.name, returncode=TIMEOUT_EXIT_CODE,
                 stdout="", stderr=f"Timeout after {stage.timeout}s",
                 duration=time.monotonic() - start,
             )

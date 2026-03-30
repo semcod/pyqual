@@ -9,7 +9,7 @@ from pyqual.gates import Gate, GateSet
 from pyqual.pipeline import Pipeline
 
 
-def test_default_yaml_parses():
+def test_default_yaml_parses() -> None:
     """Default pyqual.yaml should parse without errors."""
     import yaml
     raw = yaml.safe_load(PyqualConfig.default_yaml())
@@ -20,7 +20,7 @@ def test_default_yaml_parses():
     assert config.loop.max_iterations == 3
 
 
-def test_gate_config_from_dict():
+def test_gate_config_from_dict() -> None:
     """Gate config parses suffixes correctly."""
     g1 = GateConfig.from_dict("cc_max", "15")
     assert g1.metric == "cc"
@@ -33,7 +33,7 @@ def test_gate_config_from_dict():
     assert g2.threshold == 80.0
 
 
-def test_gate_check_pass():
+def test_gate_check_pass() -> None:
     """Gate passes when metric meets threshold."""
     g = Gate(GateConfig(metric="cc", operator="le", threshold=15.0))
     result = g.check({"cc": 3.6})
@@ -97,9 +97,8 @@ def test_gate_set_from_coverage():
         assert results[0].value == 92.5
 
 
-def test_pipeline_dry_run():
+def test_pipeline_dry_run() -> None:
     """Pipeline dry run executes without errors."""
-    import yaml
     with tempfile.TemporaryDirectory() as tmpdir:
         p = Path(tmpdir)
         config_path = p / "pyqual.yaml"
