@@ -9,6 +9,20 @@ from typing import Any
 
 from dotenv import load_dotenv
 
+try:
+    from llx.llm import (
+        DEFAULT_MAX_TOKENS as LLX_DEFAULT_MAX_TOKENS,
+        LLM as LLX_LLM,
+        LLMResponse as LLX_LLMResponse,
+        get_api_key as LLX_get_api_key,
+        get_llm as LLX_get_llm,
+        get_llm_model as LLX_get_llm_model,
+    )
+except Exception:  # pragma: no cover - llx is optional on Python 3.9
+    LLX_AVAILABLE = False
+else:
+    LLX_AVAILABLE = True
+
 DEFAULT_MAX_TOKENS = 2000
 
 try:
@@ -117,3 +131,12 @@ class LLM:
 def get_llm(model: str | None = None) -> LLM:
     """Get configured LLM instance."""
     return LLM(model=model)
+
+
+if LLX_AVAILABLE:
+    DEFAULT_MAX_TOKENS = LLX_DEFAULT_MAX_TOKENS
+    LLM = LLX_LLM
+    LLMResponse = LLX_LLMResponse
+    get_api_key = LLX_get_api_key
+    get_llm_model = LLX_get_llm_model
+    get_llm = LLX_get_llm

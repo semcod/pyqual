@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+import pytest
+
 from pyqual.config import GateConfig
 from pyqual.gates import GateSet
 
@@ -14,6 +16,16 @@ def test_placeholder():
 def test_import():
     """Verify the main package can be imported."""
     import pyqual  # noqa: F401
+
+
+def test_llm_exports_use_llx_when_available():
+    """Verify pyqual re-exports the llx LLM API when llx is installed."""
+    llx = pytest.importorskip("llx")
+    import pyqual
+
+    assert pyqual.LLM is llx.LLM
+    assert pyqual.LLMResponse is llx.LLMResponse
+    assert pyqual.get_llm is llx.get_llm
 
 
 def test_gate_set_reads_project_toon_artifacts(tmp_path: Path):

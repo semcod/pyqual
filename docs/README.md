@@ -123,8 +123,8 @@ pyqual/
 - **`GateConfig`** — Single quality gate threshold.
 - **`LoopConfig`** — Loop iteration settings.
 - **`PyqualConfig`** — Full pyqual.yaml configuration.
-- **`LLMResponse`** — Response from LLM call.
-- **`LLM`** — LiteLLM wrapper with .env configuration.
+- **`LLMResponse`** — Response from LLM call (re-exported from `llx.llm`).
+- **`LLM`** — LiteLLM wrapper with .env configuration (re-exported from `llx.llm`).
 - **`PluginMetadata`** — Metadata for a pyqual plugin.
 - **`MetricCollector`** — Base class for metric collector plugins.
 - **`PluginRegistry`** — Registry for metric collector plugins.
@@ -162,9 +162,9 @@ pyqual/
 - `tickets_all(workdir, dry_run, direction)` — Sync TODO.md and GitHub tickets using planfile.
 - `plugin(action, name, workdir, tag)` — Manage pyqual plugins - add, remove, search metric collectors.
 - `doctor()` — Check availability of external tools used by pyqual collectors.
-- `get_llm_model()` — Get LLM model from environment or default.
-- `get_api_key()` — Get OpenRouter API key from environment.
-- `get_llm(model)` — Get configured LLM instance.
+- `get_llm_model()` — Get LLM model from environment or default (re-exported from `llx.llm`).
+- `get_api_key()` — Get OpenRouter API key from environment (re-exported from `llx.llm`).
+- `get_llm(model)` — Get configured LLM instance (re-exported from `llx.llm`).
 - `sync_planfile_tickets(source, directory, dry_run, direction)` — Sync tickets via planfile backends.
 - `sync_todo_tickets(directory, dry_run, direction)` — Sync TODO.md tickets through planfile's markdown backend.
 - `sync_github_tickets(directory, dry_run, direction)` — Sync GitHub issues through planfile's GitHub backend.

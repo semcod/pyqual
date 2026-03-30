@@ -2,7 +2,6 @@
 
 from pyqual.config import PyqualConfig, GateConfig, StageConfig, LoopConfig
 from pyqual.gates import Gate, GateSet, GateResult
-from pyqual.llm import LLM, LLMResponse, get_llm
 from pyqual.pipeline import Pipeline, PipelineResult, StageResult, IterationResult
 from pyqual.plugins import (
     MetricCollector,
@@ -21,6 +20,12 @@ from pyqual.tools import (
     load_entry_point_presets,
     TOOL_PRESETS,
 )
+
+try:
+    from llx.llm import LLM, LLMResponse, get_llm
+except Exception:  # pragma: no cover - llx is optional in some environments
+    from pyqual.llm import LLM, LLMResponse, get_llm
+
 from pyqual.integrations.llx_mcp import (
     LlxMcpClient,
     LlxMcpRunResult,
@@ -29,7 +34,7 @@ from pyqual.integrations.llx_mcp import (
     run_llx_refactor_workflow,
 )
 
-__version__ = "0.1.35"
+__version__ = "0.1.36"
 
 __all__ = [
     "PyqualConfig",
