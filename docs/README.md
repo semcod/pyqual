@@ -31,8 +31,9 @@ pip install -e .
 pip install pyqual[analysis]    # analysis features
 pip install pyqual[costs]    # costs features
 pip install pyqual[dev]    # development tools
-pip install pyqual[mcp]    # mcp features
-pip install pyqual[all]    # all optional features
+pip install pyqual[llx]     # llx-backed MCP helpers and shared utilities
+pip install pyqual[mcp]     # mcp features (includes llx)
+pip install pyqual[all]     # all optional features (includes llx)
 ```
 
 ## Quick Start
@@ -110,8 +111,8 @@ pyqual/
 ├── llm.py                  # LiteLLM wrapper
 ├── tickets.py              # Planfile ticket sync
 └── integrations/
-    ├── llx_mcp.py          # llx MCP client helpers
-    └── llx_mcp_service.py  # MCP SSE service (ASGI)
+    ├── llx_mcp.py          # thin llx MCP client/wrapper helpers
+    └── llx_mcp_service.py  # thin MCP SSE service wrapper (delegates to llx)
 ```
 
 ## API Overview
@@ -140,13 +141,13 @@ pyqual/
 - **`PipelineResult`** — Result of the complete pipeline run (all iterations).
 - **`Pipeline`** — Execute pipeline stages in a loop until quality gates pass.
 - **`LlxMcpRunResult`** — Result of an llx MCP fix workflow.
-- **`LlxMcpClient`** — Thin MCP client for the llx SSE service.
+- **`LlxMcpClient`** — MCP client re-exported from `llx.mcp.client`.
 - **`PerformanceCollector`** — Collect latency and throughput metrics from load test results.
 - **`CodeHealthCollector`** — Weighted composite health score from multiple code quality signals.
 - **`GateResult`** — Result of a single gate check.
 - **`Gate`** — Single quality gate with metric extraction.
 - **`GateSet`** — Collection of quality gates with metric collection.
-- **`McpServiceState`** — Runtime state exposed via health and metrics endpoints.
+- **`McpServiceState`** — Runtime state re-exported from `llx.mcp.service`.
 
 ### Functions
 
@@ -176,7 +177,7 @@ pyqual/
 - `print_trend_report(analysis)` — Print trend analysis and return True if no regressions found.
 - `compute_composite_score(metrics)` — Compute a weighted quality score (0–100) from available metrics.
 - `run_composite_check(workdir)` — Run individual gates + composite score on a workdir.
-- `build_fix_prompt(project_path, issues, analysis, prompt_limit)` — Build a concise prompt for llx/aider from gate failures.
+- `build_fix_prompt(project_path, issues, analysis, prompt_limit)` — Shared prompt builder re-exported from `llx.utils.issues`.
 - `run_llx_fix_workflow(workdir, project_path, issues_path, output_path)` — Run the analysis + fix workflow and save a JSON report.
 - `build_parser()` — Build the CLI parser for the llx MCP helper.
 - `main(argv)` — CLI entry point used by pyqual pipeline stages.
@@ -186,8 +187,8 @@ pyqual/
 - `sync_from_cli(args)` — Parse CLI args and run the appropriate sync.
 - `tickets_from_gate_failures(workdir, dry_run)` — Check gates and create tickets for any failures.
 - `main()` — —
-- `create_app(state, llx_server)` — Create an ASGI app that exposes the llx MCP server over SSE.
-- `run_server(host, port, state)` — Run the persistent MCP service with uvicorn.
+- `create_app(state, llx_server)` — Create an ASGI app that delegates to `llx.mcp.service`.
+- `run_server(host, port, state)` — Run the persistent MCP service via `llx.mcp.service` and uvicorn.
 - `build_parser()` — Build the CLI parser for the MCP service.
 - `main(argv)` — CLI entry point for the llx MCP service.
 

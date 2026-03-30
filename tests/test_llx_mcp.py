@@ -9,6 +9,7 @@ import pytest
 from typer.testing import CliRunner
 
 import pyqual.cli as cli_module
+import llx.mcp.workflows as llx_workflows_module
 import pyqual.integrations.llx_mcp as llx_module
 from pyqual.cli import app
 from pyqual.integrations.llx_mcp import _load_issue_source
@@ -145,7 +146,7 @@ def test_run_llx_fix_workflow_uses_todo_md_fallback(tmp_path: Path, monkeypatch:
                 "raw": {"mock": True},
             }
 
-    monkeypatch.setattr(llx_module, "LlxMcpClient", FakeClient)
+    monkeypatch.setattr(llx_workflows_module, "LlxMcpClient", FakeClient)
 
     result = asyncio.run(
         run_llx_fix_workflow(
@@ -226,7 +227,7 @@ def test_run_llx_refactor_workflow_uses_refactor_prompt(tmp_path: Path, monkeypa
                 "raw": {"mock": True},
             }
 
-    monkeypatch.setattr(llx_module, "LlxMcpClient", FakeClient)
+    monkeypatch.setattr(llx_workflows_module, "LlxMcpClient", FakeClient)
 
     result = asyncio.run(
         run_llx_refactor_workflow(

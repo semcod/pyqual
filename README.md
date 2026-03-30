@@ -2,7 +2,7 @@
 
 ## AI Cost Tracking
 
-![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.34-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.35-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
 ![AI Cost](https://img.shields.io/badge/AI%20Cost-$1.05-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-5.0h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
 
 - 🤖 **LLM usage:** $1.0500 (7 commits)
@@ -165,6 +165,11 @@ print(f"Cost: ${response.cost:.4f}")
 
 If you want pyqual to delegate automatic fixes or refactors to a Dockerized `llx` MCP service:
 
+The MCP client, service, workflow orchestration (`LlxMcpRunResult`, `run_llx_fix_workflow`,
+`run_llx_refactor_workflow`), issue parsing and prompt building all live in the upstream
+`llx` package (≥ 0.1.47). pyqual re-exports them for backward compatibility.
+Install `pyqual[llx]` or `pyqual[mcp]` so those shared helpers are available.
+
 ```bash
 docker compose -f examples/llm_fix/docker-compose.yml up --build -d
 pyqual plugin add llx-mcp-fixer
@@ -236,7 +241,7 @@ pyqual is intentionally small (~800 lines). It orchestrates, not implements:
 
 - **code2llm** does analysis → pyqual reads the `.toon` output
 - **vallm** does validation → pyqual reads pass rates
-- **llx** does LLM routing → pyqual calls it as a stage
+- **llx** does LLM routing, MCP workflows, issue parsing → pyqual calls it as a stage (requires Python ≥ 3.10)
 - **planfile** manages tickets → pyqual syncs TODO.md and GitHub tickets through planfile
 - **costs** tracks spending → pyqual can gate on budget
 - **algitex** can import pyqual as a dependency for its `go` command

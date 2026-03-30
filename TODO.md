@@ -4,6 +4,14 @@
 **Generated on:** 2026-03-30T08:51:27.084865
 **Total issues:** 61 active, 11 completed
 
+## 🗺️ Plan upstreamu `llx` → `pyqual`
+
+1. ~~Wyciągnąć parsowanie `TODO.md` oraz budowanie promptu fix/refactor do wspólnego modułu `llx`.~~ ✅ `llx.utils.issues`
+2. ~~Ujednolicić format raportu MCP — `LlxMcpRunResult` + workflow do `llx`.~~ ✅ `llx.mcp.workflows`
+3. ~~Przenieść logikę serwera MCP i klienta do `llx`, cienkie wrappery w `pyqual`.~~ ✅ `llx.mcp.client`, `llx.mcp.service`
+4. ~~Zaktualizować testy i dokumentację `pyqual`, aby pokazywały tylko warstwę integracyjną.~~ ✅
+5. ~~Ustalić granicę wsparcia wersji: `llx` dla Pythona 3.10+, `pyqual` core pozostaje 3.9+.~~ ✅ `pyproject.toml` + README
+
 ---
 
 ## ✅ Completed Tasks
