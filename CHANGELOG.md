@@ -107,6 +107,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.41] - 2026-03-30
+
+### Docs
+- Update README.md
+- Update docs/quickstart.md
+
+### Other
+- Update pyqual/_gate_collectors.py
+- Update pyqual/bulk_run.py
+- Update pyqual/cli.py
+- Update pyqual/gates.py
+
 ## [0.1.40] - 2026-03-30
 
 ### Other

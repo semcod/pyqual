@@ -68,22 +68,6 @@ Preview what would happen without executing:
 pyqual run --dry-run
 ```
 
-## Bulk Operations
-
-For workspaces with multiple projects:
-
-```bash
-# Auto-generate pyqual.yaml for all subdirectories
-pyqual bulk-init /path/to/workspace
-pyqual bulk-init /path/to/workspace --dry-run  # preview only
-
-# Run all projects with live dashboard
-pyqual bulk-run /path/to/workspace
-pyqual bulk-run /path/to/workspace --parallel 8   # 8 concurrent
-pyqual bulk-run /path/to/workspace --filter mylib --filter webapp  # selected only
-pyqual bulk-run /path/to/workspace --no-live      # CI mode (no dashboard)
-```
-
 ## Verbose mode & logs
 
 See live pipeline logging during execution:

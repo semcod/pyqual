@@ -851,6 +851,53 @@ def tools() -> None:
     console.print("      optional: true")
 
 
+def _format_log_entry_row(entry: dict) -> tuple:
+    """Return (ts, event_name, name, status, details) for one log entry."""
+    ts = entry.get("_timestamp", "")[:19].replace("T", " ")[11:]
+    event_name = entry.get("event", entry.get("_function_name", ""))
+    ok = entry.get("ok")
+    status = "[green]PASS[/green]" if ok else ("[red]FAIL[/red]" if ok is False else "[dim]—[/dim]")
+    name = ""
+    details = ""
+
+    if event_name == "stage_done":
+        name = entry.get("stage", "")
+        tool_info = f"tool:{entry['tool']}" if entry.get("tool") else ""
+        rc_info = f"rc={entry.get('original_returncode', '?')}"
+        dur = f"{entry.get('duration_s', 0):.1f}s"
+        details = " ".join(filter(None, [tool_info, rc_info, dur]))
+        if entry.get("skipped"):
+            status = "[dim]SKIP[/dim]"
+        if entry.get("stderr_tail"):
+            details += f" err: {entry['stderr_tail'][:80]}"
+    elif event_name == "gate_check":
+        name = entry.get("metric", "")
+        val = entry.get("value")
+        thr = entry.get("threshold")
+        op = {"le": "≤", "ge": "≥", "lt": "<", "gt": ">", "eq": "="}.get(str(entry.get("operator", "")), "?")
+        val_s = f"{val:.1f}" if val is not None else "N/A"
+        details = f"{val_s} {op} {thr}"
+    elif event_name in ("pipeline_start", "pipeline_end"):
+        name = entry.get("pipeline", "")
+        parts: list[str] = []
+        if event_name == "pipeline_start":
+            parts.append(f"stages={entry.get('stages')}")
+            parts.append(f"gates={entry.get('gates')}")
+            parts.append(f"max_iter={entry.get('max_iterations')}")
+            if entry.get("dry_run"):
+                parts.append("DRY-RUN")
+        else:
+            parts.append("PASS" if entry.get("final_ok") else "FAIL")
+            parts.append(f"iter={entry.get('iterations')}")
+            dur_s = entry.get("total_duration_s", 0)
+            parts.append(f"{dur_s:.1f}s" if isinstance(dur_s, (int, float)) else str(dur_s))
+        details = " ".join(parts)
+    else:
+        details = str(entry)[:80]
+
+    return ts, event_name, name, status, details
+
+
 def _query_nfo_db(db_path: Path, event: str = "", failed: bool = False,
                   tail: int = 0, sql: str = "") -> list[dict]:
     """Query the nfo SQLite pipeline log and return structured dicts."""
@@ -978,48 +1025,8 @@ def logs(
     table.add_column("Details")
 
     for entry in entries:
-        ts = entry.get("_timestamp", "")[:19].replace("T", " ")[11:]
-        event_name = entry.get("event", entry.get("_function_name", ""))
-        ok = entry.get("ok")
-        status = "[green]PASS[/green]" if ok else ("[red]FAIL[/red]" if ok is False else "[dim]—[/dim]")
-
-        if event_name == "stage_done":
-            name = entry.get("stage", "")
-            tool_info = f"tool:{entry['tool']}" if entry.get("tool") else ""
-            rc_info = f"rc={entry.get('original_returncode', '?')}"
-            dur = f"{entry.get('duration_s', 0):.1f}s"
-            details = " ".join(filter(None, [tool_info, rc_info, dur]))
-            if entry.get("skipped"):
-                status = "[dim]SKIP[/dim]"
-            if entry.get("stderr_tail"):
-                details += f" err: {entry['stderr_tail'][:80]}"
-            table.add_row(ts, event_name, name, status, details)
-
-        elif event_name == "gate_check":
-            metric = entry.get("metric", "")
-            val = entry.get("value")
-            thr = entry.get("threshold")
-            op = {"le": "≤", "ge": "≥", "lt": "<", "gt": ">", "eq": "="}.get(str(entry.get("operator", "")), "?")
-            val_s = f"{val:.1f}" if val is not None else "N/A"
-            details = f"{val_s} {op} {thr}"
-            table.add_row(ts, event_name, metric, status, details)
-
-        elif event_name in ("pipeline_start", "pipeline_end"):
-            details_parts = []
-            if event_name == "pipeline_start":
-                details_parts.append(f"stages={entry.get('stages')}")
-                details_parts.append(f"gates={entry.get('gates')}")
-                details_parts.append(f"max_iter={entry.get('max_iterations')}")
-                if entry.get("dry_run"):
-                    details_parts.append("DRY-RUN")
-            else:
-                details_parts.append("PASS" if entry.get("final_ok") else "FAIL")
-                details_parts.append(f"iter={entry.get('iterations')}")
-                dur_s = entry.get("total_duration_s", 0)
-                details_parts.append(f"{dur_s:.1f}s" if isinstance(dur_s, (int, float)) else str(dur_s))
-            table.add_row(ts, event_name, entry.get("pipeline", ""), status, " ".join(details_parts))
-        else:
-            table.add_row(ts, event_name, "", status, str(entry)[:80])
+        ts, event_name, name, status, details = _format_log_entry_row(entry)
+        table.add_row(ts, event_name, name, status, details)
 
     console.print(table)
     console.print(f"\n[dim]Log DB: {db_path}[/dim]")

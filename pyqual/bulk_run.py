@@ -239,6 +239,58 @@ def _run_single_project(
 # Dashboard table builder
 # ---------------------------------------------------------------------------
 
+def _build_project_row(s: ProjectRunState, show_last_line: bool) -> list:
+    """Build a single dashboard table row for one project state."""
+    icon = STATUS_ICON.get(s.status, "?")
+    style = STATUS_STYLE.get(s.status, "")
+    status_text = Text(f"{icon} {s.status.value}", style=style)
+
+    if s.max_iterations > 0 and s.status not in (RunStatus.QUEUED, RunStatus.SKIPPED):
+        iter_text = f"{s.iteration}/{s.max_iterations}"
+    else:
+        iter_text = ""
+
+    stage_text = s.current_stage
+
+    pct = s.progress_pct
+    if s.status == RunStatus.PASSED:
+        progress = "[green]100%[/]"
+    elif s.status in (RunStatus.QUEUED, RunStatus.SKIPPED):
+        progress = ""
+    elif s.status in (RunStatus.FAILED, RunStatus.ERROR, RunStatus.TIMEOUT):
+        progress = f"[red]{pct}%[/]"
+    else:
+        filled = pct // 10
+        bar = "█" * filled + "░" * (10 - filled)
+        progress = f"[cyan]{bar}[/]"
+
+    if s.gates_total > 0:
+        if s.gates_passed == s.gates_total:
+            gates_text = f"[green]{s.gates_label}[/]"
+        elif s.gates_passed > 0:
+            gates_text = f"[yellow]{s.gates_label}[/]"
+        else:
+            gates_text = f"[red]{s.gates_label}[/]"
+    else:
+        gates_text = ""
+
+    elapsed = s.elapsed
+    if elapsed > 60:
+        time_text = f"{elapsed / 60:.1f}m"
+    elif elapsed > 0:
+        time_text = f"{elapsed:.1f}s"
+    else:
+        time_text = ""
+
+    if s.error_msg and s.status in (RunStatus.ERROR, RunStatus.TIMEOUT):
+        stage_text = f"[red]{s.error_msg[:30]}[/]"
+
+    row: list = [s.name, status_text, iter_text, stage_text, progress, gates_text, time_text]
+    if show_last_line:
+        row.append(s.last_line[:50] if s.last_line else "")
+    return row
+
+
 def build_dashboard_table(
     states: list[ProjectRunState],
     *,
@@ -273,60 +325,7 @@ def build_dashboard_table(
         table.add_column("Last Output", max_width=50, style="dim")
 
     for s in states:
-        icon = STATUS_ICON.get(s.status, "?")
-        style = STATUS_STYLE.get(s.status, "")
-        status_text = Text(f"{icon} {s.status.value}", style=style)
-
-        # Iteration
-        if s.max_iterations > 0 and s.status not in (RunStatus.QUEUED, RunStatus.SKIPPED):
-            iter_text = f"{s.iteration}/{s.max_iterations}"
-        else:
-            iter_text = ""
-
-        # Stage
-        stage_text = s.current_stage if s.status == RunStatus.RUNNING else s.current_stage
-
-        # Progress bar (text-based)
-        pct = s.progress_pct
-        if s.status == RunStatus.PASSED:
-            progress = "[green]100%[/]"
-        elif s.status in (RunStatus.QUEUED, RunStatus.SKIPPED):
-            progress = ""
-        elif s.status in (RunStatus.FAILED, RunStatus.ERROR, RunStatus.TIMEOUT):
-            progress = f"[red]{pct}%[/]"
-        else:
-            filled = pct // 10
-            bar = "█" * filled + "░" * (10 - filled)
-            progress = f"[cyan]{bar}[/]"
-
-        # Gates
-        if s.gates_total > 0:
-            if s.gates_passed == s.gates_total:
-                gates_text = f"[green]{s.gates_label}[/]"
-            elif s.gates_passed > 0:
-                gates_text = f"[yellow]{s.gates_label}[/]"
-            else:
-                gates_text = f"[red]{s.gates_label}[/]"
-        else:
-            gates_text = ""
-
-        # Time
-        elapsed = s.elapsed
-        if elapsed > 60:
-            time_text = f"{elapsed / 60:.1f}m"
-        elif elapsed > 0:
-            time_text = f"{elapsed:.1f}s"
-        else:
-            time_text = ""
-
-        # Error display
-        if s.error_msg and s.status in (RunStatus.ERROR, RunStatus.TIMEOUT):
-            stage_text = f"[red]{s.error_msg[:30]}[/]"
-
-        row = [s.name, status_text, iter_text, stage_text, progress, gates_text, time_text]
-        if show_last_line:
-            row.append(s.last_line[:50] if s.last_line else "")
-        table.add_row(*row)
+        table.add_row(*_build_project_row(s, show_last_line))
 
     return table
 
