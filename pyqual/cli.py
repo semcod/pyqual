@@ -364,7 +364,7 @@ def _extract_stage_summary(name: str, stdout: str, stderr: str) -> dict[str, str
     """Extract key metrics from stage output as YAML-ready key: value pairs."""
     text = (stdout or "") + "\n" + (stderr or "")
     metrics: dict[str, str] = {}
-    metrics.update(_extract_pytest_stage_summary(name, text))
+    metrics.update(_extract_pytest_stage_summary(text))
     metrics.update(_extract_lint_stage_summary(text))
     metrics.update(_extract_prefact_stage_summary(name, text))
     metrics.update(_extract_code2llm_stage_summary(name, text))
@@ -1255,10 +1255,7 @@ def tools() -> None:
     console.print("      optional: true")
 
 
-def _extract_pytest_stage_summary(name: str, text: str) -> dict[str, Any]:
-    lower = name.lower()
-    if not any(kw in lower for kw in ("test", "pytest", "check")):
-        return {}
+def _extract_pytest_stage_summary(text: str) -> dict[str, Any]:
     out: dict[str, Any] = {}
     m = re.search(r"(\d+) passed", text)
     if m:
@@ -1320,22 +1317,14 @@ def _extract_validation_stage_summary(name: str, text: str) -> dict[str, Any]:
 
 
 def _extract_fix_stage_summary(name: str, text: str) -> dict[str, Any]:
-    if "fix" not in name.lower():
-        return {}
     out: dict[str, Any] = {}
-    # llx model selection
     m = re.search(r"Selected:\s*\S+\s*\u2192\s*(.+)", text)
     if m:
         out["model"] = m.group(1).strip().split()[0]
-    # issues loaded from errors file
-    m_iss = re.search(r"Loaded (\d+) errors", text)
-    if m_iss:
-        out["issues_loaded"] = int(m_iss.group(1))
-    # git-style files changed
     m2 = re.search(r"(\d+)\s+file[s]?\s+changed", text)
     if m2:
         out["files_changed"] = int(m2.group(1))
-    else:
+    elif "fix" in name.lower():
         m3 = re.search(r"(Applied|No changes)[^\n]*", text)
         if m3:
             out["fix_status"] = m3.group(0)[:80]
