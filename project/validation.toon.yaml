@@ -4,18 +4,20 @@ SUMMARY:
   scanned: 96  passed: 56 (58.3%)  warnings: 8  errors: 1  unsupported: 39
 
 WARNINGS[8]{path,score}:
-  pyqual/cli.py,0.83
-    issues[10]{rule,severity,message,line}:
+  pyqual/cli.py,0.80
+    issues[12]{rule,severity,message,line}:
       complexity.cyclomatic,warning,bulk_run_cmd has cyclomatic complexity 19 (max: 15),178
       complexity.cyclomatic,warning,_enrich_from_artifacts has cyclomatic complexity 20 (max: 15),311
-      complexity.cyclomatic,warning,run has cyclomatic complexity 17 (max: 15),397
-      complexity.cyclomatic,warning,logs has cyclomatic complexity 16 (max: 15),1464
+      complexity.cyclomatic,warning,_build_run_summary has cyclomatic complexity 18 (max: 15),393
+      complexity.cyclomatic,warning,run has cyclomatic complexity 19 (max: 15),489
+      complexity.cyclomatic,warning,logs has cyclomatic complexity 16 (max: 15),1574
       complexity.maintainability,warning,Low maintainability index: 0.0 (threshold: 20),
       complexity.lizard_cc,warning,bulk_run_cmd: CC=19 exceeds limit 15,178
       complexity.lizard_cc,warning,_enrich_from_artifacts: CC=20 exceeds limit 15,311
-      complexity.lizard_cc,warning,run._on_stage_error: CC=18 exceeds limit 15,428
-      complexity.lizard_cc,warning,run: CC=17 exceeds limit 15,397
-      complexity.lizard_cc,warning,logs: CC=16 exceeds limit 15,1464
+      complexity.lizard_cc,warning,_build_run_summary: CC=18 exceeds limit 15,393
+      complexity.lizard_cc,warning,run._on_stage_error: CC=18 exceeds limit 15,520
+      complexity.lizard_cc,warning,run: CC=19 exceeds limit 15,489
+      complexity.lizard_cc,warning,logs: CC=16 exceeds limit 15,1574
   pyqual/validation.py,0.87
     issues[7]{rule,severity,message,line}:
       complexity.cyclomatic,warning,_classify_failure has cyclomatic complexity 21 (max: 15),158

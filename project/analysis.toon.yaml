@@ -2,6 +2,11 @@
 # CC̄=6.3 | critical:14/183 | dups:0 | cycles:0
 
 HEALTH[14]:
+  🟡 CC    bulk_run_cmd CC=19 (limit:15)
+  🟡 CC    _enrich_from_artifacts CC=20 (limit:15)
+  🟡 CC    _build_run_summary CC=18 (limit:15)
+  🟡 CC    run CC=19 (limit:15)
+  🟡 CC    logs CC=16 (limit:15)
   🟡 CC    _classify_failure CC=21 (limit:15)
   🟡 CC    validate_config CC=26 (limit:15)
   🟡 CC    detect_project_facts CC=16 (limit:15)
@@ -11,25 +16,20 @@ HEALTH[14]:
   🟡 CC    _classify_heuristic CC=26 (limit:15)
   🟡 CC    bulk_init CC=18 (limit:15)
   🟡 CC    _execute_stage CC=21 (limit:15)
-  🟡 CC    bulk_run_cmd CC=19 (limit:15)
-  🟡 CC    _enrich_from_artifacts CC=20 (limit:15)
-  🟡 CC    _build_run_summary CC=18 (limit:15)
-  🟡 CC    run CC=19 (limit:15)
-  🟡 CC    logs CC=16 (limit:15)
 
 REFACTOR[1]:
   1. split 14 high-CC methods  (CC>15)
 
 PIPELINES[94]:
-  [1] Src [main]: main → run_project
+  [1] Src [from_dict]: from_dict
       PURITY: 100% pure
-  [2] Src [from_dict]: from_dict
+  [2] Src [load]: load → _load_env_file
       PURITY: 100% pure
-  [3] Src [load]: load → _load_env_file
+  [3] Src [_parse]: _parse → load_entry_point_presets → register_preset
       PURITY: 100% pure
-  [4] Src [_parse]: _parse → load_entry_point_presets → register_preset
+  [4] Src [main]: main → run_project
       PURITY: 100% pure
-  [5] Src [is_available]: is_available
+  [5] Src [get]: get
       PURITY: 100% pure
 
 LAYERS:

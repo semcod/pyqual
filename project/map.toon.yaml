@@ -2,7 +2,7 @@
 # stats: 165 func | 0 cls | 19 mod | CC̄=6.3 | critical:14 | cycles:0
 # alerts[5]: fan-out run=43; CC _classify_heuristic=26; CC validate_config=26; fan-out fix_config=23; fan-out _run_single_project=21
 # hotspots[5]: run fan=43; fix_config fan=23; _run_single_project fan=21; validate_config fan=20; bulk_run fan=20
-# evolution: CC̄ 6.2→6.3 (regressed +0.1)
+# evolution: CC̄ 6.3→6.3 (flat 0.0)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
 M[19]:
   project.sh,24
@@ -181,11 +181,6 @@ D:
     e: build_parser,main
     build_parser()
     main(argv)
-  pyqual/gates.py:
-    e: GateResult,Gate,GateSet
-    GateResult: __str__(0)  # Result of a single gate check...
-    Gate: check(1)  # Single quality gate with metric extraction...
-    GateSet: __init__(1),check_all(1),all_passed(1),_collect_metrics(1)  # Collection of quality gates with metric collection...
   pyqual/plugins.py:
     e: PluginMetadata,MetricCollector,PluginRegistry,get_available_plugins,install_plugin_config
     PluginMetadata: __post_init__(0)  # Metadata for a pyqual plugin...
@@ -193,6 +188,11 @@ D:
     PluginRegistry: register(1),get(1),list_plugins(1),create_instance(1)  # Registry for metric collector plugins...
     get_available_plugins()
     install_plugin_config(name;workdir)
+  pyqual/gates.py:
+    e: GateResult,Gate,GateSet
+    GateResult: __str__(0)  # Result of a single gate check...
+    Gate: check(1)  # Single quality gate with metric extraction...
+    GateSet: __init__(1),check_all(1),all_passed(1),_collect_metrics(1)  # Collection of quality gates with metric collection...
   pyqual/tickets.py:
     e: _load_sync_integration,_normalize_sources,sync_planfile_tickets,sync_todo_tickets,sync_github_tickets,sync_all_tickets
     _load_sync_integration()
@@ -207,7 +207,7 @@ D:
     run_server(host;port;state)
     build_parser()
     main(argv)
-  pyqual/__init__.py:
   pyqual/llm.py:
+  pyqual/__init__.py:
   pyqual/integrations/__init__.py:
   project.sh:
