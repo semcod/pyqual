@@ -15,6 +15,7 @@ pipeline:
   stages:
     - name: analyze
       tool: code2llm
+      when: first_iteration
 
     - name: validate
       tool: vallm
@@ -27,13 +28,26 @@ pipeline:
     #   tool: bandit
     #   optional: true
 
+    - name: test
+      tool: pytest
+
+    - name: prefact
+      tool: prefact
+      optional: true
+      when: any_stage_fail
+      timeout: 900
+
     # LLX-powered code fix (no built-in preset — uses run:)
     - name: fix
       run: llx fix . --errors .pyqual/errors.json --verbose
-      when: metrics_fail
+      when: any_stage_fail
+      timeout: 1800
 
-    - name: test
-      tool: pytest
+    - name: verify
+      tool: vallm
+      optional: true
+      when: after_fix
+      timeout: 300
 
   # Loop behavior
   loop:

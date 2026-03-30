@@ -129,7 +129,7 @@ class Pipeline:
         gates_status = self.gate_set.all_passed(self.workdir)
 
         for stage_cfg in self.config.stages:
-            should_run = self._should_run_stage(stage_cfg, gates_status, iteration.stages)
+            should_run = self._should_run_stage(stage_cfg, gates_status, iteration.stages, num)
             if not should_run:
                 iteration.stages.append(StageResult(
                     name=stage_cfg.name, returncode=0,
@@ -154,10 +154,13 @@ class Pipeline:
         stage: StageConfig,
         gates_pass: bool,
         stages_so_far: list[StageResult] | None = None,
+        iteration: int = 1,
     ) -> bool:
         """Determine if a stage should run based on its 'when' condition."""
         if stage.when == "always":
             return True
+        if stage.when == "first_iteration":
+            return iteration == 1
         if stage.when == "metrics_fail":
             return not gates_pass
         if stage.when == "metrics_pass":
@@ -168,6 +171,10 @@ class Pipeline:
             return any(
                 not s.passed and not s.skipped for s in stages_so_far
             )
+        if stage.when == "after_fix":
+            if not stages_so_far:
+                return False
+            return any(s.name == "fix" and not s.skipped for s in stages_so_far)
         return True
 
     def _resolve_tool_stage(self, stage: StageConfig) -> tuple[str, bool]:

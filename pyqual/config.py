@@ -47,7 +47,7 @@ class StageConfig:
     run: str = ""
     tool: str = ""            # built-in tool preset (e.g. "ruff", "pytest")
     optional: bool = False    # skip silently when tool binary is missing
-    when: str = "always"      # always | metrics_fail | metrics_pass
+    when: str = "always"      # always | first_iteration | metrics_fail | metrics_pass | any_stage_fail | after_fix
     timeout: int = DEFAULT_STAGE_TIMEOUT
     capture_output: bool = True
 
@@ -159,8 +159,10 @@ pipeline:
 
   # Pipeline stages — use 'tool:' for built-in presets or 'run:' for custom commands
   # See all presets: pyqual tools
-  # when: any_stage_fail  — run only when a prior stage in this iteration failed
-  # when: metrics_fail    — run only when quality gates are not yet passing
+  # when: any_stage_fail    — run only when a prior stage in this iteration failed
+  # when: metrics_fail      — run only when quality gates are not yet passing
+  # when: first_iteration   — run only on iteration 1 (skip re-runs after fix)
+  # when: after_fix         — run only after the fix stage ran in this iteration
   stages:
     - name: analyze
       tool: code2llm
