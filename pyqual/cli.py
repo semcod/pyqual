@@ -364,7 +364,7 @@ def _extract_stage_summary(name: str, stdout: str, stderr: str) -> dict[str, str
     """Extract key metrics from stage output as YAML-ready key: value pairs."""
     text = (stdout or "") + "\n" + (stderr or "")
     metrics: dict[str, str] = {}
-    metrics.update(_extract_pytest_stage_summary(text))
+    metrics.update(_extract_pytest_stage_summary(name, text))
     metrics.update(_extract_lint_stage_summary(text))
     metrics.update(_extract_prefact_stage_summary(name, text))
     metrics.update(_extract_code2llm_stage_summary(name, text))
@@ -373,6 +373,98 @@ def _extract_stage_summary(name: str, stdout: str, stderr: str) -> dict[str, str
     metrics.update(_extract_mypy_stage_summary(name, text))
     metrics.update(_extract_bandit_stage_summary(text))
     return metrics
+
+
+def _infer_fix_result(stage: dict[str, Any]) -> str:
+    files_changed = stage.get("files_changed")
+    if isinstance(files_changed, (int, float)):
+        return "changed" if float(files_changed) > 0 else "no_changes"
+
+    status = str(stage.get("fix_status", "")).strip().lower()
+    if not status:
+        return "unknown"
+    if "no changes" in status or "no change" in status:
+        return "no_changes"
+    if any(token in status for token in ("applied", "changed", "updated", "modified", "fixed")):
+        return "changed"
+    return "unknown"
+
+
+def _build_run_summary(report: dict[str, Any]) -> dict[str, Any]:
+    summary: dict[str, Any] = {}
+    stages = [
+        stage
+        for iteration in report.get("iterations", [])
+        if isinstance(iteration, dict)
+        for stage in iteration.get("stages", [])
+        if isinstance(stage, dict)
+    ]
+
+    prefact_stage = next((stage for stage in stages if stage.get("name") == "prefact"), None)
+    if prefact_stage:
+        tickets = prefact_stage.get("tickets")
+        tickets_completed = prefact_stage.get("tickets_completed")
+        if isinstance(tickets, (int, float)):
+            summary["todo_active"] = int(tickets)
+        if isinstance(tickets_completed, (int, float)):
+            summary["todo_completed"] = int(tickets_completed)
+        if isinstance(tickets, (int, float)) and isinstance(tickets_completed, (int, float)):
+            summary["todo_total"] = int(tickets) + int(tickets_completed)
+
+    fix_stage = next((stage for stage in stages if stage.get("name") == "fix"), None)
+    if fix_stage:
+        files_changed = fix_stage.get("files_changed")
+        if isinstance(files_changed, (int, float)):
+            summary["fix_files_changed"] = int(files_changed)
+        failed = fix_stage.get("failed")
+        if isinstance(failed, (int, float)):
+            summary["fix_failed"] = int(failed)
+        errors = fix_stage.get("errors")
+        if isinstance(errors, (int, float)):
+            summary["fix_errors"] = int(errors)
+        summary["fix_result"] = _infer_fix_result(fix_stage)
+
+    return summary
+
+
+def _format_run_summary(summary: dict[str, Any]) -> str:
+    if not summary:
+        return ""
+
+    parts: list[str] = []
+
+    todo_bits: list[str] = []
+    if "todo_active" in summary:
+        todo_bits.append(f"{summary['todo_active']} active")
+    if "todo_completed" in summary:
+        todo_bits.append(f"{summary['todo_completed']} completed")
+    if "todo_total" in summary:
+        todo_bits.append(f"{summary['todo_total']} total")
+    if todo_bits:
+        parts.append(f"TODO {', '.join(todo_bits)}")
+
+    fix_bits: list[str] = []
+    if "fix_result" in summary:
+        fix_bits.append(f"result={summary['fix_result']}")
+    if "fix_files_changed" in summary:
+        fix_bits.append(f"{summary['fix_files_changed']} files changed")
+    if "fix_failed" in summary:
+        fix_bits.append(f"{summary['fix_failed']} failed")
+    if "fix_errors" in summary:
+        fix_bits.append(f"{summary['fix_errors']} errors")
+    if fix_bits:
+        parts.append(f"fix {', '.join(fix_bits)}")
+
+    if "fix_result" in summary:
+        if summary["fix_result"] == "changed":
+            outcome = "changes applied"
+        elif summary["fix_result"] == "no_changes":
+            outcome = "no changes applied"
+        else:
+            outcome = "change status unknown"
+        parts.append(f"outcome: {outcome}")
+
+    return f"[bold]Run summary[/bold]: {'; '.join(parts)}"
 
 
 def _get_last_error_line(text: str) -> str:
@@ -570,10 +662,16 @@ def run(
 
     report["result"] = "all_gates_passed" if result.final_passed else "gates_not_met"
     report["total_time"] = round(result.total_duration, 1)
+    summary = _build_run_summary(report)
+    if summary:
+        report["summary"] = summary
 
     yaml_text = _yaml.safe_dump(report, default_flow_style=False, sort_keys=False,
                                  allow_unicode=True)
     console.print(Syntax(yaml_text.rstrip(), "yaml", theme="monokai", background_color="default"))
+    summary_text = _format_run_summary(summary)
+    if summary_text:
+        _sc.print(f"\n{summary_text}")
 
     if not result.final_passed:
         if cfg.loop.on_fail == "create_ticket":
@@ -1261,7 +1359,10 @@ def tools() -> None:
     console.print("      optional: true")
 
 
-def _extract_pytest_stage_summary(text: str) -> dict[str, Any]:
+def _extract_pytest_stage_summary(name: str, text: str) -> dict[str, Any]:
+    lower = name.lower()
+    if not any(kw in lower for kw in ("test", "pytest", "check")):
+        return {}
     out: dict[str, Any] = {}
     m = re.search(r"(\d+) passed", text)
     if m:
@@ -1323,15 +1424,24 @@ def _extract_validation_stage_summary(name: str, text: str) -> dict[str, Any]:
 
 
 def _extract_fix_stage_summary(name: str, text: str) -> dict[str, Any]:
+    if "fix" not in name.lower():
+        return {}
     out: dict[str, Any] = {}
     m = re.search(r"Selected:\s*\S+\s*\u2192\s*(.+)", text)
     if m:
         out["model"] = m.group(1).strip().split()[0]
-    m2 = re.search(r"(\d+)\s+file[s]?\s+changed", text)
+    m_iss = re.search(r"Loaded (\d+) errors?", text)
+    if m_iss:
+        out["issues_loaded"] = int(m_iss.group(1))
+    m2 = re.search(r"(\d+)\s+file[s]?\s+changed", text, re.IGNORECASE)
+    if not m2:
+        m2 = re.search(r"Applied\s+(\d+)\s+changes?", text, re.IGNORECASE)
+    if not m2:
+        m2 = re.search(r"(\d+)\s+file[s]?\s+(?:updated|modified|rewritten)", text, re.IGNORECASE)
     if m2:
         out["files_changed"] = int(m2.group(1))
-    elif "fix" in name.lower():
-        m3 = re.search(r"(Applied|No changes)[^\n]*", text)
+    else:
+        m3 = re.search(r"(Applied|No changes|Updated|Modified|Fixed)[^\n]*", text, re.IGNORECASE)
         if m3:
             out["fix_status"] = m3.group(0)[:80]
     return out

@@ -1,8 +1,8 @@
-# pyqual | 19f 5857L | python:18,shell:1 | 2026-03-30
-# stats: 162 func | 0 cls | 19 mod | CC̄=6.2 | critical:13 | cycles:0
-# alerts[5]: fan-out run=41; CC _classify_heuristic=26; CC validate_config=26; fan-out fix_config=23; fan-out _run_single_project=21
-# hotspots[5]: run fan=41; fix_config fan=23; _run_single_project fan=21; validate_config fan=20; bulk_run fan=20
-# evolution: CC̄ 6.1→6.2 (regressed +0.1)
+# pyqual | 19f 5967L | python:18,shell:1 | 2026-03-30
+# stats: 165 func | 0 cls | 19 mod | CC̄=6.3 | critical:14 | cycles:0
+# alerts[5]: fan-out run=43; CC _classify_heuristic=26; CC validate_config=26; fan-out fix_config=23; fan-out _run_single_project=21
+# hotspots[5]: run fan=43; fix_config fan=23; _run_single_project fan=21; validate_config fan=20; bulk_run fan=20
+# evolution: CC̄ 6.2→6.3 (regressed +0.1)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
 M[19]:
   project.sh,24
@@ -11,7 +11,7 @@ M[19]:
   pyqual/builtin_collectors.py,432
   pyqual/bulk_init.py,713
   pyqual/bulk_run.py,548
-  pyqual/cli.py,1542
+  pyqual/cli.py,1652
   pyqual/config.py,194
   pyqual/gates.py,91
   pyqual/integrations/__init__.py,1
@@ -65,13 +65,16 @@ D:
     PipelineResult:  # Result of the complete pipeline run (all iterations)...
     Pipeline: __init__(6),run(1),check_gates(0),_run_iteration(2),_should_run_stage(3),_resolve_tool_stage(1),_execute_stage(2),_init_nfo(0),_nfo_emit(4),_log_stage(2),_log_gates(2),_log_event(1),_ensure_pyqual_dir(0)  # Execute pipeline stages in a loop until quality gates pass...
   pyqual/cli.py:
-    e: _setup_logging,init,bulk_init_cmd,bulk_run_cmd,_enrich_from_artifacts,_extract_stage_summary,_get_last_error_line,run,gates,validate,fix_config,status,_run_mcp_workflow,mcp_fix,mcp_refactor,mcp_service,tickets_todo,tickets_github,tickets_all,_plugin_list,_plugin_search,_plugin_info,_plugin_add,_plugin_remove,_plugin_validate,_plugin_unknown_action,plugin,doctor,tools,_extract_pytest_stage_summary,_extract_lint_stage_summary,_extract_prefact_stage_summary,_extract_code2llm_stage_summary,_extract_validation_stage_summary,_extract_fix_stage_summary,_extract_mypy_stage_summary,_extract_bandit_stage_summary,_format_log_entry_row,_query_nfo_db,_row_to_event_dict,logs
+    e: _setup_logging,init,bulk_init_cmd,bulk_run_cmd,_enrich_from_artifacts,_extract_stage_summary,_infer_fix_result,_build_run_summary,_format_run_summary,_get_last_error_line,run,gates,validate,fix_config,status,_run_mcp_workflow,mcp_fix,mcp_refactor,mcp_service,tickets_todo,tickets_github,tickets_all,_plugin_list,_plugin_search,_plugin_info,_plugin_add,_plugin_remove,_plugin_validate,_plugin_unknown_action,plugin,doctor,tools,_extract_pytest_stage_summary,_extract_lint_stage_summary,_extract_prefact_stage_summary,_extract_code2llm_stage_summary,_extract_validation_stage_summary,_extract_fix_stage_summary,_extract_mypy_stage_summary,_extract_bandit_stage_summary,_format_log_entry_row,_query_nfo_db,_row_to_event_dict,logs
     _setup_logging(verbose;workdir)
     init(path)
     bulk_init_cmd(path;dry_run;no_llm;model;overwrite;show_schema;json_output)
     bulk_run_cmd(path;parallel;dry_run;timeout;filter_name;no_live;verbose;json_output;log_dir;analyze)
     _enrich_from_artifacts(workdir;stages)
     _extract_stage_summary(name;stdout;stderr)
+    _infer_fix_result(stage)
+    _build_run_summary(report)
+    _format_run_summary(summary)
     _get_last_error_line(text)
     run(config;dry_run;workdir;verbose;auto_fix_config)
     gates(config;workdir)
@@ -95,7 +98,7 @@ D:
     plugin(action;name;workdir;tag)
     doctor()
     tools()
-    _extract_pytest_stage_summary(text)
+    _extract_pytest_stage_summary(name;text)
     _extract_lint_stage_summary(text)
     _extract_prefact_stage_summary(name;text)
     _extract_code2llm_stage_summary(name;text)
@@ -204,7 +207,7 @@ D:
     run_server(host;port;state)
     build_parser()
     main(argv)
-  pyqual/llm.py:
   pyqual/__init__.py:
+  pyqual/llm.py:
   pyqual/integrations/__init__.py:
   project.sh:

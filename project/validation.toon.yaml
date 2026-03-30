@@ -4,37 +4,39 @@ SUMMARY:
   scanned: 96  passed: 56 (58.3%)  warnings: 8  errors: 1  unsupported: 39
 
 WARNINGS[8]{path,score}:
-  pyqual/cli.py,0.87
-    issues[8]{rule,severity,message,line}:
+  pyqual/cli.py,0.83
+    issues[10]{rule,severity,message,line}:
       complexity.cyclomatic,warning,bulk_run_cmd has cyclomatic complexity 19 (max: 15),178
-      complexity.cyclomatic,warning,run has cyclomatic complexity 17 (max: 15),345
-      complexity.cyclomatic,warning,logs has cyclomatic complexity 16 (max: 15),1401
+      complexity.cyclomatic,warning,_enrich_from_artifacts has cyclomatic complexity 20 (max: 15),311
+      complexity.cyclomatic,warning,run has cyclomatic complexity 17 (max: 15),397
+      complexity.cyclomatic,warning,logs has cyclomatic complexity 16 (max: 15),1464
       complexity.maintainability,warning,Low maintainability index: 0.0 (threshold: 20),
       complexity.lizard_cc,warning,bulk_run_cmd: CC=19 exceeds limit 15,178
-      complexity.lizard_cc,warning,run._on_stage_error: CC=18 exceeds limit 15,368
-      complexity.lizard_cc,warning,run: CC=17 exceeds limit 15,345
-      complexity.lizard_cc,warning,logs: CC=16 exceeds limit 15,1401
+      complexity.lizard_cc,warning,_enrich_from_artifacts: CC=20 exceeds limit 15,311
+      complexity.lizard_cc,warning,run._on_stage_error: CC=18 exceeds limit 15,428
+      complexity.lizard_cc,warning,run: CC=17 exceeds limit 15,397
+      complexity.lizard_cc,warning,logs: CC=16 exceeds limit 15,1464
   pyqual/validation.py,0.87
     issues[7]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,_classify_failure has cyclomatic complexity 21 (max: 15),156
-      complexity.cyclomatic,warning,validate_config has cyclomatic complexity 26 (max: 15),283
-      complexity.cyclomatic,warning,detect_project_facts has cyclomatic complexity 16 (max: 15),421
-      complexity.lizard_cc,warning,_classify_failure: CC=21 exceeds limit 15,156
-      complexity.lizard_cc,warning,validate_config: CC=26 exceeds limit 15,283
-      complexity.lizard_length,warning,validate_config: 109 lines exceeds limit 100,283
-      complexity.lizard_cc,warning,detect_project_facts: CC=16 exceeds limit 15,421
+      complexity.cyclomatic,warning,_classify_failure has cyclomatic complexity 21 (max: 15),158
+      complexity.cyclomatic,warning,validate_config has cyclomatic complexity 26 (max: 15),285
+      complexity.cyclomatic,warning,detect_project_facts has cyclomatic complexity 16 (max: 15),424
+      complexity.lizard_cc,warning,_classify_failure: CC=21 exceeds limit 15,158
+      complexity.lizard_cc,warning,validate_config: CC=26 exceeds limit 15,285
+      complexity.lizard_length,warning,validate_config: 110 lines exceeds limit 100,285
+      complexity.lizard_cc,warning,detect_project_facts: CC=16 exceeds limit 15,424
   pyqual/bulk_run.py,0.90
     issues[6]{rule,severity,message,line}:
       complexity.cyclomatic,warning,_run_single_project has cyclomatic complexity 19 (max: 15),220
-      complexity.cyclomatic,warning,_build_project_row has cyclomatic complexity 19 (max: 15),330
-      complexity.cyclomatic,warning,bulk_run has cyclomatic complexity 17 (max: 15),459
+      complexity.cyclomatic,warning,_build_project_row has cyclomatic complexity 19 (max: 15),329
+      complexity.cyclomatic,warning,bulk_run has cyclomatic complexity 17 (max: 15),458
       complexity.lizard_cc,warning,_run_single_project: CC=19 exceeds limit 15,220
-      complexity.lizard_cc,warning,_build_project_row: CC=19 exceeds limit 15,330
-      complexity.lizard_cc,warning,bulk_run: CC=17 exceeds limit 15,459
+      complexity.lizard_cc,warning,_build_project_row: CC=19 exceeds limit 15,329
+      complexity.lizard_cc,warning,bulk_run: CC=17 exceeds limit 15,458
   pyqual/pipeline.py,0.97
     issues[2]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,_execute_stage has cyclomatic complexity 21 (max: 15),197
-      complexity.lizard_cc,warning,_execute_stage: CC=21 exceeds limit 15,197
+      complexity.cyclomatic,warning,_execute_stage has cyclomatic complexity 21 (max: 15),200
+      complexity.lizard_cc,warning,_execute_stage: CC=21 exceeds limit 15,200
   pyqual/_gate_collectors.py,0.98
     issues[1]{rule,severity,message,line}:
       complexity.maintainability,warning,Low maintainability index: 7.2 (threshold: 20),

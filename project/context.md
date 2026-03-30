@@ -6,7 +6,7 @@
 - **Primary Language**: python
 - **Languages**: python: 28, shell: 2
 - **Analysis Mode**: static
-- **Total Functions**: 180
+- **Total Functions**: 183
 - **Total Classes**: 37
 - **Modules**: 30
 - **Entry Points**: 103
@@ -14,7 +14,7 @@
 ## Architecture by Module
 
 ### pyqual.cli
-- **Functions**: 41
+- **Functions**: 44
 - **File**: `cli.py`
 
 ### pyqual._gate_collectors
@@ -90,9 +90,9 @@
 - **Functions**: 2
 - **File**: `llx_mcp.py`
 
-### examples.custom_gates.composite_gates
+### examples.multi_gate_pipeline.run_pipeline
 - **Functions**: 2
-- **File**: `composite_gates.py`
+- **File**: `run_pipeline.py`
 
 ### examples.custom_plugins.performance_collector
 - **Functions**: 2
@@ -161,6 +161,10 @@ heuristics), and ge
 > Extract ruff linter error counts from JSON output.
 - **Calls**: p.exists, json.loads, isinstance, p.read_text, len, sum, sum, float
 
+### pyqual.pipeline.Pipeline._execute_stage
+> Execute a single stage command.
+- **Calls**: log.info, bool, time.monotonic, self._log_stage, self._resolve_tool_stage, StageResult, self._log_stage, self.on_stage_start
+
 ### pyqual.cli.validate
 > Validate pyqual.yaml without running the pipeline.
 
@@ -174,10 +178,6 @@ Checks for:
 > Show current metrics and pipeline config.
 - **Calls**: app.command, typer.Option, typer.Option, PyqualConfig.load, GateSet, gate_set._collect_metrics, console.print, console.print
 
-### pyqual.pipeline.Pipeline._execute_stage
-> Execute a single stage command.
-- **Calls**: log.info, bool, time.monotonic, self._log_stage, self._resolve_tool_stage, StageResult, self._log_stage, self.on_stage_start
-
 ### pyqual.cli.gates
 > Check quality gates without running stages.
 - **Calls**: app.command, typer.Option, typer.Option, PyqualConfig.load, GateSet, gate_set.check_all, Table, table.add_column
@@ -189,10 +189,6 @@ Checks for:
 ### pyqual.builtin_collectors.LLMBenchCollector.collect
 - **Calls**: humaneval_path.exists, codebleu_path.exists, json.loads, json.loads, humaneval_path.read_text, data.get, data.get, float
 
-### pyqual.cli.mcp_fix
-> Run the llx-backed MCP fix workflow.
-- **Calls**: app.command, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option
-
 ### pyqual._gate_collectors._from_vulnerabilities
 > Extract vulnerability metrics from vulns.json.
 - **Calls**: vuln_path.exists, json.loads, isinstance, vuln_path.read_text, sum, float, float, isinstance
@@ -200,6 +196,10 @@ Checks for:
 ### pyqual.integrations.llx_mcp.main
 > CLI entry point used by pyqual pipeline stages.
 - **Calls**: pyqual.integrations.llx_mcp.build_parser, parser.parse_args, None.resolve, Path, Path, asyncio.run, print, str
+
+### pyqual.cli.mcp_fix
+> Run the llx-backed MCP fix workflow.
+- **Calls**: app.command, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option
 
 ### pyqual.cli.mcp_refactor
 > Run the llx-backed MCP refactor workflow.
@@ -231,13 +231,13 @@ Checks for:
 > Run the full pipeline loop.
 - **Calls**: PipelineResult, time.monotonic, self._log_event, log.info, range, self._log_event, log.info, len
 
-### pyqual.cli.plugin
-> Manage pyqual plugins - add, remove, search metric collectors.
-- **Calls**: app.command, typer.Argument, typer.Argument, typer.Option, typer.Option, pyqual.plugins.get_available_plugins, Path, pyqual.cli._plugin_list
-
 ### pyqual.pipeline.Pipeline._run_iteration
 > Run one iteration of all stages + gate check.
 - **Calls**: time.monotonic, IterationResult, self.gate_set.all_passed, self.gate_set.check_all, all, self._log_gates, self.on_iteration_start, self._should_run_stage
+
+### pyqual.cli.plugin
+> Manage pyqual plugins - add, remove, search metric collectors.
+- **Calls**: app.command, typer.Argument, typer.Argument, typer.Option, typer.Option, pyqual.plugins.get_available_plugins, Path, pyqual.cli._plugin_list
 
 ## Process Flows
 
@@ -411,6 +411,27 @@ Key functions that process and transform data:
 ### pyqual.config.PyqualConfig._parse
 - **Output to**: raw.get, pyqual.tools.load_entry_point_presets, pipeline.get, pipeline.get, pipeline.get
 
+### pyqual.validation.validate_config
+> Validate a pyqual.yaml file and return structured issues.
+
+Does NOT run any stages — this is a stati
+- **Output to**: ValidationResult, raw.get, pipeline.get, pipeline.get, metrics_raw.items
+
+### pyqual.bulk_run._parse_output_line
+> Parse a line of pyqual run output and update state.
+- **Output to**: line.strip, clean.startswith, clean.startswith, None.strip, None.strip
+
+### pyqual.integrations.llx_mcp_service.build_parser
+> Build the CLI parser for the MCP service.
+- **Output to**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, os.getenv, int
+
+### pyqual.integrations.llx_mcp.build_parser
+> Build the CLI parser for the llx MCP helper.
+- **Output to**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument
+
+### pyqual.cli._format_run_summary
+- **Output to**: todo_bits.append, todo_bits.append, todo_bits.append, parts.append, fix_bits.append
+
 ### pyqual.cli.validate
 > Validate pyqual.yaml without running the pipeline.
 
@@ -426,24 +447,6 @@ Checks for:
 > Return (ts, event_name, name, status, details) for one log entry.
 - **Output to**: entry.get, entry.get, None.replace, entry.get, entry.get
 
-### pyqual.validation.validate_config
-> Validate a pyqual.yaml file and return structured issues.
-
-Does NOT run any stages — this is a stati
-- **Output to**: ValidationResult, raw.get, pipeline.get, pipeline.get, metrics_raw.items
-
-### pyqual.integrations.llx_mcp_service.build_parser
-> Build the CLI parser for the MCP service.
-- **Output to**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, os.getenv, int
-
-### pyqual.integrations.llx_mcp.build_parser
-> Build the CLI parser for the llx MCP helper.
-- **Output to**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument
-
-### pyqual.bulk_run._parse_output_line
-> Parse a line of pyqual run output and update state.
-- **Output to**: line.strip, clean.startswith, clean.startswith, None.strip, None.strip
-
 ## Behavioral Patterns
 
 ### state_machine_ProjectRunState
@@ -455,7 +458,7 @@ Does NOT run any stages — this is a stati
 
 Functions exposed as public API (no underscore prefix):
 
-- `pyqual.cli.run` - 87 calls
+- `pyqual.cli.run` - 90 calls
 - `pyqual.bulk_init.generate_pyqual_yaml` - 77 calls
 - `pyqual.cli.bulk_run_cmd` - 56 calls
 - `pyqual.cli.fix_config` - 46 calls
@@ -474,9 +477,9 @@ Functions exposed as public API (no underscore prefix):
 - `pyqual.cli.gates` - 20 calls
 - `pyqual.cli.tools` - 19 calls
 - `pyqual.builtin_collectors.LLMBenchCollector.collect` - 18 calls
-- `pyqual.cli.mcp_fix` - 18 calls
-- `pyqual.integrations.llx_mcp.main` - 18 calls
 - `pyqual.bulk_run.build_dashboard_table` - 18 calls
+- `pyqual.integrations.llx_mcp.main` - 18 calls
+- `pyqual.cli.mcp_fix` - 18 calls
 - `pyqual.cli.mcp_refactor` - 17 calls
 - `pyqual.cli.doctor` - 17 calls
 - `examples.custom_gates.composite_gates.run_composite_check` - 17 calls
@@ -488,8 +491,8 @@ Functions exposed as public API (no underscore prefix):
 - `pyqual.cli.plugin` - 14 calls
 - `pyqual.bulk_init.collect_fingerprint` - 13 calls
 - `pyqual.builtin_collectors.RepoMetricsCollector.collect` - 12 calls
-- `examples.custom_gates.composite_gates.compute_composite_score` - 12 calls
 - `examples.ticket_workflow.sync_tickets.tickets_from_gate_failures` - 12 calls
+- `examples.custom_gates.composite_gates.compute_composite_score` - 12 calls
 - `pyqual.cli.init` - 11 calls
 - `examples.custom_gates.dynamic_thresholds.main` - 11 calls
 - `pyqual.tools.register_custom_tools_from_yaml` - 10 calls

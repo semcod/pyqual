@@ -1,23 +1,24 @@
-# code2llm | 19f 5857L | python:18,shell:1 | 2026-03-30
-# CC̄=6.2 | critical:13/180 | dups:0 | cycles:0
+# code2llm | 19f 5967L | python:18,shell:1 | 2026-03-30
+# CC̄=6.3 | critical:14/183 | dups:0 | cycles:0
 
-HEALTH[13]:
-  🟡 CC    bulk_run_cmd CC=19 (limit:15)
-  🟡 CC    _enrich_from_artifacts CC=20 (limit:15)
-  🟡 CC    run CC=17 (limit:15)
-  🟡 CC    logs CC=16 (limit:15)
+HEALTH[14]:
   🟡 CC    _classify_failure CC=21 (limit:15)
   🟡 CC    validate_config CC=26 (limit:15)
   🟡 CC    detect_project_facts CC=16 (limit:15)
-  🟡 CC    _execute_stage CC=21 (limit:15)
   🟡 CC    _run_single_project CC=19 (limit:15)
   🟡 CC    _build_project_row CC=19 (limit:15)
   🟡 CC    bulk_run CC=17 (limit:15)
   🟡 CC    _classify_heuristic CC=26 (limit:15)
   🟡 CC    bulk_init CC=18 (limit:15)
+  🟡 CC    _execute_stage CC=21 (limit:15)
+  🟡 CC    bulk_run_cmd CC=19 (limit:15)
+  🟡 CC    _enrich_from_artifacts CC=20 (limit:15)
+  🟡 CC    _build_run_summary CC=18 (limit:15)
+  🟡 CC    run CC=19 (limit:15)
+  🟡 CC    logs CC=16 (limit:15)
 
 REFACTOR[1]:
-  1. split 13 high-CC methods  (CC>15)
+  1. split 14 high-CC methods  (CC>15)
 
 PIPELINES[94]:
   [1] Src [main]: main → run_project
@@ -36,8 +37,8 @@ LAYERS:
   │ run_analysis                88L  0C    2m  CC=11     ←0
   │ project.sh                  24L  0C    0m  CC=0.0    ←0
   │
-  pyqual/                         CC̄=6.2    ←in:1  →out:0
-  │ !! cli                       1542L  0C   41m  CC=20     ←0
+  pyqual/                         CC̄=6.3    ←in:1  →out:0
+  │ !! cli                       1652L  0C   44m  CC=20     ←0
   │ !! bulk_init                  713L  3C   15m  CC=26     ←1
   │ !! bulk_run                   548L  3C    7m  CC=19     ←1
   │ !! validation                 463L  6C    6m  CC=26     ←2
