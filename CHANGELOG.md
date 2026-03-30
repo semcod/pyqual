@@ -76,6 +76,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.38] - 2026-03-30
+
+### Test
+- Update tests/test_bulk_init.py
+- Update tests/test_bulk_run.py
+
+### Other
+- Update pyqual/bulk_init.py
+- Update pyqual/bulk_run.py
+- Update pyqual/cli.py
+
 ## [0.1.37] - 2026-03-30
 
 ### Docs

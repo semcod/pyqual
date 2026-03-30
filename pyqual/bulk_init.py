@@ -364,6 +364,21 @@ def _classify_heuristic(fp: ProjectFingerprint) -> ProjectConfig:
     if not fp.manifests and not fp.file_extensions:
         return ProjectConfig(skip=True, skip_reason="empty or data-only directory")
 
+    # Skip directories that have no code manifests and only data/doc/config files
+    _DATA_EXTS = {
+        ".md", ".rst", ".txt", ".csv", ".json", ".yaml", ".yml", ".xml",
+        ".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".ico",
+        ".wav", ".mp3", ".mp4", ".pdf", ".toon", ".log", ".bak",
+        ".iml", ".ini", ".cfg", ".conf", ".lock", ".toml",
+        ".html", ".css",
+    }
+    if not fp.manifests and set(fp.file_extensions) <= _DATA_EXTS:
+        return ProjectConfig(skip=True, skip_reason="data/documentation-only directory")
+
+    # Skip year-named archive directories (e.g. "2025") without manifests
+    if fp.name.isdigit() and not fp.manifests:
+        return ProjectConfig(skip=True, skip_reason="archive directory")
+
     has_python = "pyproject.toml" in fp.manifests or "setup.py" in fp.manifests
     has_node = "package.json" in fp.manifests
     has_composer = "composer.json" in fp.manifests

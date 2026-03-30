@@ -348,9 +348,36 @@ class TestBulkInit:
         result = bulk_init(workspace, use_llm=False, dry_run=False)
         assert "existing" in result.skipped_existing
 
+    def test_existing_file_content_preserved(self, workspace: Path) -> None:
+        original = (workspace / "existing" / "pyqual.yaml").read_text()
+        bulk_init(workspace, use_llm=False, dry_run=False)
+        after = (workspace / "existing" / "pyqual.yaml").read_text()
+        assert after == original
+
+    def test_existing_not_in_created(self, workspace: Path) -> None:
+        result = bulk_init(workspace, use_llm=False, dry_run=False)
+        assert "existing" not in result.created
+        assert "existing" in result.skipped_existing
+
+    def test_second_run_skips_already_generated(self, workspace: Path) -> None:
+        """Running bulk_init twice should skip projects that got a pyqual.yaml in the first run."""
+        r1 = bulk_init(workspace, use_llm=False, dry_run=False)
+        assert "mylib" in r1.created
+        r2 = bulk_init(workspace, use_llm=False, dry_run=False)
+        assert "mylib" not in r2.created
+        assert "mylib" in r2.skipped_existing
+
     def test_overwrite_regenerates(self, workspace: Path) -> None:
         result = bulk_init(workspace, use_llm=False, dry_run=False, overwrite=True)
         assert "existing" in result.created
+
+    def test_overwrite_replaces_content(self, workspace: Path) -> None:
+        original = (workspace / "existing" / "pyqual.yaml").read_text()
+        bulk_init(workspace, use_llm=False, dry_run=False, overwrite=True)
+        after = (workspace / "existing" / "pyqual.yaml").read_text()
+        assert after != original
+        data = yaml.safe_load(after)
+        assert data["pipeline"]["name"] == "existing-quality"
 
     def test_hidden_dirs_ignored(self, workspace: Path) -> None:
         result = bulk_init(workspace, use_llm=False, dry_run=True)

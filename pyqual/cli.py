@@ -15,9 +15,17 @@ from rich.table import Table
 
 from pyqual.config import PyqualConfig
 from pyqual.gates import GateSet
-from pyqual.integrations.llx_mcp import run_llx_fix_workflow
-from pyqual.integrations.llx_mcp import run_llx_refactor_workflow
-from pyqual.integrations.llx_mcp_service import run_server as run_llx_mcp_service
+try:
+    from pyqual.integrations.llx_mcp import run_llx_fix_workflow
+    from pyqual.integrations.llx_mcp import run_llx_refactor_workflow
+except Exception:  # pragma: no cover - llx MCP modules are optional
+    run_llx_fix_workflow = None  # type: ignore[assignment]
+    run_llx_refactor_workflow = None  # type: ignore[assignment]
+
+try:
+    from pyqual.integrations.llx_mcp_service import run_server as run_llx_mcp_service
+except Exception:  # pragma: no cover
+    run_llx_mcp_service = None  # type: ignore[assignment]
 from pyqual.pipeline import Pipeline
 from pyqual.plugins import (
     get_available_plugins,
@@ -161,6 +169,123 @@ def bulk_init_cmd(
                   f"existing: {len(result.skipped_existing)}, "
                   f"skipped: {len(result.skipped_nonproject)}, "
                   f"errors: {len(result.errors)})")
+
+
+@app.command("bulk-run")
+def bulk_run_cmd(
+    path: Path = typer.Argument(..., help="Parent directory whose subdirectories are projects."),
+    parallel: int = typer.Option(4, "--parallel", "-p", help="Max concurrent pyqual processes."),
+    dry_run: bool = typer.Option(False, "--dry-run", "-n", help="Pass --dry-run to each pyqual run."),
+    timeout: int = typer.Option(0, "--timeout", "-t", help="Per-project timeout in seconds (0 = no limit)."),
+    filter_name: list[str] = typer.Option([], "--filter", "-f", help="Only run these project names (repeatable)."),
+    no_live: bool = typer.Option(False, "--no-live", help="Disable live dashboard, print final summary only."),
+    verbose: bool = typer.Option(False, "--verbose", "-v", help="Show last output line per project in dashboard."),
+    json_output: bool = typer.Option(False, "--json", "-j", help="Output final results as JSON."),
+) -> None:
+    """Run pyqual across all projects with a real-time dashboard.
+
+    Discovers all subdirectories of PATH that contain pyqual.yaml and runs
+    ``pyqual run`` in each one, up to --parallel at a time.  A live-updating
+    table shows status, iteration, current stage, gates, and elapsed time.
+
+    Examples:
+        pyqual bulk-run /path/to/workspace
+        pyqual bulk-run /path/to/workspace --parallel 8
+        pyqual bulk-run /path/to/workspace --dry-run
+        pyqual bulk-run /path/to/workspace --filter mylib --filter webapp
+        pyqual bulk-run /path/to/workspace --timeout 600
+    """
+    from rich.live import Live
+
+    from pyqual.bulk_run import (
+        BulkRunResult,
+        RunStatus,
+        build_dashboard_table,
+        bulk_run,
+        discover_projects,
+    )
+
+    if not path.is_dir():
+        console.print(f"[red]Not a directory: {path}[/red]")
+        raise typer.Exit(1)
+
+    # Discover projects
+    all_states = discover_projects(path)
+    if not all_states:
+        console.print(f"[yellow]No projects with pyqual.yaml found in {path}[/yellow]")
+        raise typer.Exit(1)
+
+    console.print(f"[bold]Bulk run[/bold]: {len(all_states)} projects in [cyan]{path}[/cyan]"
+                  f" (parallel={parallel})")
+    if dry_run:
+        console.print("[yellow]DRY RUN mode[/yellow]")
+    console.print()
+
+    if no_live:
+        # No live dashboard — just run and print summary
+        result = bulk_run(
+            root=path,
+            parallel=parallel,
+            dry_run=dry_run,
+            timeout=timeout,
+            filter_names=filter_name or None,
+        )
+    else:
+        # Live dashboard
+        _live_result: list[BulkRunResult] = []
+
+        def _run_with_live(live: Live, states_ref: list) -> BulkRunResult:
+            def _refresh(states):
+                states_ref.clear()
+                states_ref.extend(states)
+                live.update(build_dashboard_table(states, show_last_line=verbose))
+
+            return bulk_run(
+                root=path,
+                parallel=parallel,
+                dry_run=dry_run,
+                timeout=timeout,
+                filter_names=filter_name or None,
+                live_callback=_refresh,
+            )
+
+        states_ref: list = []
+        with Live(build_dashboard_table(all_states, show_last_line=verbose),
+                  console=console, refresh_per_second=2) as live:
+            result = _run_with_live(live, states_ref)
+            # Final update
+            if states_ref:
+                live.update(build_dashboard_table(states_ref, show_last_line=verbose))
+
+    if json_output:
+        console.print(json.dumps({
+            "passed": result.passed,
+            "failed": result.failed,
+            "errors": result.errors,
+            "skipped": result.skipped,
+            "total_duration": round(result.total_duration, 1),
+        }, indent=2, ensure_ascii=False))
+        return
+
+    # Final summary
+    console.print()
+    if result.passed:
+        console.print(f"[green]✅ Passed ({len(result.passed)}):[/green] {', '.join(result.passed[:20])}"
+                      + (f" +{len(result.passed)-20} more" if len(result.passed) > 20 else ""))
+    if result.failed:
+        console.print(f"[red]❌ Failed ({len(result.failed)}):[/red] {', '.join(result.failed)}")
+    if result.errors:
+        console.print(f"[red]💥 Errors ({len(result.errors)}):[/red]")
+        for name, err in result.errors:
+            console.print(f"  {name}: {err}")
+    if result.skipped:
+        console.print(f"[dim]⏭ Skipped ({len(result.skipped)}): {', '.join(result.skipped[:10])}"
+                      + (f" +{len(result.skipped)-10} more" if len(result.skipped) > 10 else "") + "[/dim]")
+
+    console.print(f"\n[bold]Total time: {result.total_duration:.1f}s[/bold]")
+
+    if result.failed or result.errors:
+        raise typer.Exit(1)
 
 
 @app.command()
@@ -341,6 +466,9 @@ def mcp_fix(
     json_output: bool = typer.Option(False, "--json", help="Print the full JSON result."),
 ) -> None:
     """Run the llx-backed MCP fix workflow."""
+    if run_llx_fix_workflow is None:
+        console.print("[red]llx MCP modules not installed. Install: pip install pyqual[mcp][/red]")
+        raise typer.Exit(1)
     _run_mcp_workflow(
         title="llx MCP fix",
         runner=run_llx_fix_workflow,
@@ -372,6 +500,9 @@ def mcp_refactor(
     json_output: bool = typer.Option(False, "--json", help="Print the full JSON result."),
 ) -> None:
     """Run the llx-backed MCP refactor workflow."""
+    if run_llx_refactor_workflow is None:
+        console.print("[red]llx MCP modules not installed. Install: pip install pyqual[mcp][/red]")
+        raise typer.Exit(1)
     _run_mcp_workflow(
         title="llx MCP refactor",
         runner=run_llx_refactor_workflow,
@@ -394,6 +525,9 @@ def mcp_service(
     port: int = typer.Option(DEFAULT_MCP_PORT, "--port", help="Port to listen on."),
 ) -> None:
     """Run the persistent llx MCP service with health and metrics endpoints."""
+    if run_llx_mcp_service is None:
+        console.print("[red]llx MCP modules not installed. Install: pip install pyqual[mcp][/red]")
+        raise typer.Exit(1)
     try:
         run_llx_mcp_service(host=host, port=port)
     except RuntimeError as exc:
