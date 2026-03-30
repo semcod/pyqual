@@ -157,7 +157,7 @@ def _classify_failure(f: StageFailure) -> str:
     if f.timed_out:
         return EC.PIPELINE_TIMEOUT
 
-    combined = (f.stderr + "\n" + f.stdout).strip()
+    combined = f"{f.stderr}\n{f.stdout}".strip()
 
     # LLM fix stage failures are their own domain
     if f.is_fix_stage:
@@ -358,7 +358,8 @@ def validate_config(config_path: Path) -> ValidationResult:
         if tool:
             preset = get_preset(tool)
             if preset is None:
-                available = ", ".join(list_presets()[:8]) + "…"
+                top = ", ".join(list_presets()[:8])
+                available = f"{top}…"
                 result.add(Severity.ERROR, EC.CONFIG_UNKNOWN_PRESET,
                            f"Stage '{name}': unknown tool preset '{tool}'.",
                            stage=name,

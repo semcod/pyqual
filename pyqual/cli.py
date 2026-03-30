@@ -290,8 +290,8 @@ def bulk_run_cmd(
     # Final summary
     console.print()
     if result.passed:
-        console.print(f"[green]✅ Passed ({len(result.passed)}):[/green] {', '.join(result.passed[:20])}"
-                      + (f" +{len(result.passed)-20} more" if len(result.passed) > 20 else ""))
+        more = f" +{len(result.passed)-20} more" if len(result.passed) > 20 else ""
+        console.print(f"[green]✅ Passed ({len(result.passed)}):[/green] {', '.join(result.passed[:20])}{more}")
     if result.failed:
         console.print(f"[red]❌ Failed ({len(result.failed)}):[/red] {', '.join(result.failed)}")
     if result.errors:
@@ -299,8 +299,8 @@ def bulk_run_cmd(
         for name, err in result.errors:
             console.print(f"  {name}: {err}")
     if result.skipped:
-        console.print(f"[dim]⏭ Skipped ({len(result.skipped)}): {', '.join(result.skipped[:10])}"
-                      + (f" +{len(result.skipped)-10} more" if len(result.skipped) > 10 else "") + "[/dim]")
+        more_s = f" +{len(result.skipped)-10} more" if len(result.skipped) > 10 else ""
+        console.print(f"[dim]⏭ Skipped ({len(result.skipped)}): {', '.join(result.skipped[:10])}{more_s}[/dim]")
 
     console.print(f"\n[bold]Total time: {result.total_duration:.1f}s[/bold]")
 
@@ -660,9 +660,8 @@ def validate(
     nerr = len(result.errors)
     nwarn = len(result.warnings)
     if nerr:
-        console.print(f"[bold red]{nerr} error(s)[/bold red]"
-                      + (f", {nwarn} warning(s)" if nwarn else "")
-                      + " — pipeline cannot start.")
+        suffix = f", {nwarn} warning(s)" if nwarn else ""
+        console.print(f"[bold red]{nerr} error(s)[/bold red]{suffix} — pipeline cannot start.")
         raise typer.Exit(1)
     if nwarn:
         console.print(f"[yellow]{nwarn} warning(s)[/yellow] — pipeline may behave unexpectedly.")

@@ -20,6 +20,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
+import yaml
 from rich.table import Table
 from rich.text import Text
 
@@ -160,7 +161,6 @@ def _analyze_project(state: ProjectRunState, log_dir: Path | None = None) -> Non
     """Call LLM to produce a 1-line failure diagnosis. Updates state.analysis."""
     try:
         from pyqual.llm import LLM  # type: ignore[import]
-        import yaml
 
         model: str | None = None
         config_path = state.path / "pyqual.yaml"
@@ -252,7 +252,6 @@ def _run_single_project(
 
     # Parse config to get stage/iteration counts
     try:
-        import yaml
         data = yaml.safe_load(config_path.read_text())
         pipe = data.get("pipeline", data)
         state.stages_total = len(pipe.get("stages", []))

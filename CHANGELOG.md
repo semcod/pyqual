@@ -123,6 +123,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.53] - 2026-03-30
+
+### Other
+- Update pyqual/bulk_run.py
+- Update pyqual/cli.py
+- Update pyqual/pipeline.py
+- Update pyqual/validation.py
+
 ## [0.1.52] - 2026-03-30
 
 ### Other
