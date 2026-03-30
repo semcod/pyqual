@@ -25,19 +25,6 @@ M[19]:
   pyqual/validation.py,463
   run_analysis.py,88
 D:
-  pyqual/validation.py:
-    e: ErrorDomain,EC,StageFailure,Severity,ValidationIssue,ValidationResult,error_domain,_classify_failure,_resolve_gate_metric,validate_config,detect_project_facts
-    ErrorDomain(str,Enum):
-    EC:  # Namespace for standardised error-code string constants...
-    StageFailure:  # Runtime failure description from a completed stage...
-    Severity(str,Enum):
-    ValidationIssue:  # Single validation finding...
-    ValidationResult: add(5)  # Aggregated result of validating one pyqual.yaml...
-    error_domain(code)
-    _classify_failure(f)
-    _resolve_gate_metric(gate_key)
-    validate_config(config_path)
-    detect_project_facts(workdir)
   pyqual/bulk_init.py:
     e: ProjectFingerprint,ProjectConfig,BulkInitResult,_collect_top_level_entries,_collect_manifests,_collect_file_extensions,_load_json_object,_collect_json_scripts,_collect_makefile_targets,_collect_pyproject_metadata,_collect_readme_excerpt,collect_fingerprint,_build_llm_prompt,classify_with_llm,_classify_heuristic,_safe_name,generate_pyqual_yaml,bulk_init
     ProjectFingerprint:  # Lightweight summary of a project directory sent to LLM for c...
@@ -58,6 +45,19 @@ D:
     _safe_name(name)
     generate_pyqual_yaml(project_name;cfg)
     bulk_init(root)
+  pyqual/validation.py:
+    e: ErrorDomain,EC,StageFailure,Severity,ValidationIssue,ValidationResult,error_domain,_classify_failure,_resolve_gate_metric,validate_config,detect_project_facts
+    ErrorDomain(str,Enum):
+    EC:  # Namespace for standardised error-code string constants...
+    StageFailure:  # Runtime failure description from a completed stage...
+    Severity(str,Enum):
+    ValidationIssue:  # Single validation finding...
+    ValidationResult: add(5)  # Aggregated result of validating one pyqual.yaml...
+    error_domain(code)
+    _classify_failure(f)
+    _resolve_gate_metric(gate_key)
+    validate_config(config_path)
+    detect_project_facts(workdir)
   pyqual/pipeline.py:
     e: StageResult,IterationResult,PipelineResult,Pipeline
     StageResult:  # Result of running a single stage...
@@ -181,6 +181,11 @@ D:
     e: build_parser,main
     build_parser()
     main(argv)
+  pyqual/gates.py:
+    e: GateResult,Gate,GateSet
+    GateResult: __str__(0)  # Result of a single gate check...
+    Gate: check(1)  # Single quality gate with metric extraction...
+    GateSet: __init__(1),check_all(1),all_passed(1),_collect_metrics(1)  # Collection of quality gates with metric collection...
   pyqual/plugins.py:
     e: PluginMetadata,MetricCollector,PluginRegistry,get_available_plugins,install_plugin_config
     PluginMetadata: __post_init__(0)  # Metadata for a pyqual plugin...
@@ -188,11 +193,6 @@ D:
     PluginRegistry: register(1),get(1),list_plugins(1),create_instance(1)  # Registry for metric collector plugins...
     get_available_plugins()
     install_plugin_config(name;workdir)
-  pyqual/gates.py:
-    e: GateResult,Gate,GateSet
-    GateResult: __str__(0)  # Result of a single gate check...
-    Gate: check(1)  # Single quality gate with metric extraction...
-    GateSet: __init__(1),check_all(1),all_passed(1),_collect_metrics(1)  # Collection of quality gates with metric collection...
   pyqual/tickets.py:
     e: _load_sync_integration,_normalize_sources,sync_planfile_tickets,sync_todo_tickets,sync_github_tickets,sync_all_tickets
     _load_sync_integration()

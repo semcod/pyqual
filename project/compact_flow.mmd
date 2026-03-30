@@ -24,6 +24,6 @@ flowchart TD
     run_analysis -->|1| pyqual__config
     pyqual__gates -->|1| pyqual__plugins
     pyqual__cli -->|1| pyqual__bulk_init
-    pyqual__bulk_run -->|1| pyqual__validation
     examples__multi_gate_pipeline -->|1| pyqual__config
     examples__ticket_workflow -->|1| pyqual__config
+    pyqual__bulk_run -->|1| pyqual__validation

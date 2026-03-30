@@ -1443,7 +1443,8 @@ def _extract_fix_stage_summary(name: str, text: str) -> dict[str, Any]:
     else:
         m3 = re.search(r"(Applied|No changes|Updated|Modified|Fixed)[^\n]*", text, re.IGNORECASE)
         if m3:
-            out["fix_status"] = m3.group(0)[:80]
+            raw = m3.group(0)[:80]
+            out["fix_status"] = re.sub(r"[^\x20-\x7e]", "", raw).strip()
     return out
 
 

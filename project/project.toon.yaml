@@ -5,8 +5,8 @@ HEALTH:
 
 ALERTS[20]:
   !!! high_fan_out     run = 43 (limit:10)
-  !!! cc_exceeded      validate_config = 26 (limit:15)
   !!! cc_exceeded      _classify_heuristic = 26 (limit:15)
+  !!! cc_exceeded      validate_config = 26 (limit:15)
   !!! high_fan_out     fix_config = 23 (limit:10)
   !!! high_fan_out     _run_single_project = 21 (limit:10)
   !!! high_fan_out     validate_config = 20 (limit:10)
@@ -49,8 +49,8 @@ Parameters
 r
 
 REFACTOR[15]:
-  [1] H/L Split validate_config (CC=26 → target CC<10)
-  [2] H/L Split _classify_heuristic (CC=26 → target CC<10)
+  [1] H/L Split _classify_heuristic (CC=26 → target CC<10)
+  [2] H/L Split validate_config (CC=26 → target CC<10)
   [3] H/H Split god module pyqual/bulk_init.py (713L, 3 classes)
   [4] H/H Split god module pyqual/cli.py (1652L, 0 classes)
   [5] H/H Split god module pyqual/bulk_run.py (548L, 3 classes)

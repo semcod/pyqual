@@ -23,22 +23,22 @@ flowchart TD
     end
 
     subgraph Core
-        pyqual__config__GateConfig__from_dict["from_dict"]
-        pyqual__config__PyqualConfig__load["load"]
-        pyqual__config__PyqualConfig___parse["_parse"]
-        pyqual__config__PyqualConfig__default_yaml["default_yaml"]
         run_analysis__main["main"]
-        pyqual__plugins__PluginMetadata____post_init__["__post_init__"]
-        pyqual__plugins__MetricCollector__collect["collect"]
-        pyqual__plugins__MetricCollector__get_config_example["get_config_example"]
-        pyqual__plugins__PluginRegistry__register["register"]
-        pyqual__plugins__PluginRegistry__get["get"]
-        pyqual__plugins__PluginRegistry__list_plugins["list_plugins"]
-        pyqual__plugins__PluginRegistry__create_instance["create_instance"]
+        pyqual__tools__ToolPreset__is_available["is_available"]
+        pyqual__tools__ToolPreset__shell_command["shell_command"]
+        pyqual__tools__is_builtin["is_builtin"]
+        pyqual__tools__register_preset["register_preset"]
+        pyqual__tools__load_entry_point_presets("load_entry_point_presets CC=8")
+        pyqual__tools__resolve_stage_command["resolve_stage_command"]
         pyqual__gates__GateResult____str__["__str__"]
         pyqual__gates__Gate__check["check"]
         pyqual__gates__GateSet__check_all["check_all"]
+        pyqual__gates__GateSet__all_passed["all_passed"]
+        pyqual__gates__GateSet___collect_metrics["_collect_metrics"]
+        pyqual__config__GateConfig__from_dict["from_dict"]
+        pyqual__config__PyqualConfig__load["load"]
+        pyqual__config__PyqualConfig___parse["_parse"]
         ...["+67 more"]
     end
 
-    class pyqual__config__GateConfig__from_dict,pyqual__config__PyqualConfig__load,pyqual__config__PyqualConfig___parse,pyqual__config__PyqualConfig__default_yaml,run_analysis__main,pyqual__plugins__PluginMetadata____post_init__,pyqual__plugins__MetricCollector__collect,pyqual__plugins__MetricCollector__get_config_example,pyqual__plugins__PluginRegistry__register,pyqual__plugins__PluginRegistry__get entry
+    class run_analysis__main,pyqual__tools__ToolPreset__is_available,pyqual__tools__ToolPreset__shell_command,pyqual__tools__is_builtin,pyqual__tools__resolve_stage_command,pyqual__gates__GateResult____str__,pyqual__gates__Gate__check,pyqual__gates__GateSet__check_all,pyqual__gates__GateSet__all_passed,pyqual__gates__GateSet___collect_metrics entry
