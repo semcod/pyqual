@@ -41,7 +41,7 @@ except Exception:  # pragma: no cover - llx MCP modules are optional
     run_llx_fix_workflow = None  # type: ignore[assignment]
     run_llx_refactor_workflow = None  # type: ignore[assignment]
 
-__version__ = "0.1.39"
+__version__ = "0.1.40"
 
 __all__ = [
     "PyqualConfig",
