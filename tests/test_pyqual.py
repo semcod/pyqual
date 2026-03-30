@@ -23,9 +23,12 @@ def test_llm_exports_use_llx_when_available():
     llx = pytest.importorskip("llx")
     import pyqual
 
+    assert pyqual.DEFAULT_MAX_TOKENS == llx.DEFAULT_MAX_TOKENS
     assert pyqual.LLM is llx.LLM
     assert pyqual.LLMResponse is llx.LLMResponse
+    assert pyqual.get_api_key is llx.get_api_key
     assert pyqual.get_llm is llx.get_llm
+    assert pyqual.get_llm_model is llx.get_llm_model
 
 
 def test_gate_set_reads_project_toon_artifacts(tmp_path: Path):

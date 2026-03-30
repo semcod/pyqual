@@ -22,19 +22,26 @@ from pyqual.tools import (
 )
 
 try:
-    from llx.llm import LLM, LLMResponse, get_llm
+    from llx.llm import DEFAULT_MAX_TOKENS, LLM, LLMResponse, get_api_key, get_llm, get_llm_model
 except Exception:  # pragma: no cover - llx is optional in some environments
-    from pyqual.llm import LLM, LLMResponse, get_llm
+    from pyqual.llm import DEFAULT_MAX_TOKENS, LLM, LLMResponse, get_api_key, get_llm, get_llm_model
 
-from pyqual.integrations.llx_mcp import (
-    LlxMcpClient,
-    LlxMcpRunResult,
-    build_fix_prompt,
-    run_llx_fix_workflow,
-    run_llx_refactor_workflow,
-)
+try:
+    from pyqual.integrations.llx_mcp import (
+        LlxMcpClient,
+        LlxMcpRunResult,
+        build_fix_prompt,
+        run_llx_fix_workflow,
+        run_llx_refactor_workflow,
+    )
+except Exception:  # pragma: no cover - llx MCP modules are optional
+    LlxMcpClient = None  # type: ignore[assignment,misc]
+    LlxMcpRunResult = None  # type: ignore[assignment,misc]
+    build_fix_prompt = None  # type: ignore[assignment]
+    run_llx_fix_workflow = None  # type: ignore[assignment]
+    run_llx_refactor_workflow = None  # type: ignore[assignment]
 
-__version__ = "0.1.36"
+__version__ = "0.1.37"
 
 __all__ = [
     "PyqualConfig",
@@ -48,9 +55,12 @@ __all__ = [
     "PipelineResult",
     "StageResult",
     "IterationResult",
+    "DEFAULT_MAX_TOKENS",
     "LLM",
     "LLMResponse",
+    "get_api_key",
     "get_llm",
+    "get_llm_model",
     # Plugin system
     "MetricCollector",
     "PluginRegistry",

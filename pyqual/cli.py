@@ -73,6 +73,96 @@ def init(path: Path = typer.Argument(Path("."), help="Project directory")) -> No
     console.print("Edit metrics thresholds and stages, then run: [bold]pyqual run[/bold]")
 
 
+@app.command("bulk-init")
+def bulk_init_cmd(
+    path: Path = typer.Argument(..., help="Parent directory whose subdirectories are projects."),
+    dry_run: bool = typer.Option(False, "--dry-run", "-n", help="Show what would be generated without writing files."),
+    no_llm: bool = typer.Option(False, "--no-llm", help="Use heuristic classification only (no LLM calls)."),
+    model: str | None = typer.Option(None, "--model", "-m", help="Override LLM model for classification."),
+    overwrite: bool = typer.Option(False, "--overwrite", help="Regenerate pyqual.yaml even if one already exists."),
+    show_schema: bool = typer.Option(False, "--show-schema", help="Print the JSON schema used for LLM classification and exit."),
+    json_output: bool = typer.Option(False, "--json", "-j", help="Output results as JSON."),
+) -> None:
+    """Bulk-generate pyqual.yaml for every project in a directory.
+
+    Scans each subdirectory of PATH, detects the project type (via LLM or
+    heuristics), and generates a tailored pyqual.yaml with appropriate stages,
+    tools, and metrics.
+
+    Examples:
+        pyqual bulk-init /path/to/workspace
+        pyqual bulk-init /path/to/workspace --dry-run
+        pyqual bulk-init /path/to/workspace --no-llm
+        pyqual bulk-init /path/to/workspace --show-schema
+    """
+    from pyqual.bulk_init import (
+        PROJECT_CONFIG_SCHEMA,
+        BulkInitResult,
+        bulk_init,
+    )
+
+    if show_schema:
+        console.print(json.dumps(PROJECT_CONFIG_SCHEMA, indent=2))
+        return
+
+    if not path.is_dir():
+        console.print(f"[red]Not a directory: {path}[/red]")
+        raise typer.Exit(1)
+
+    mode = "heuristic" if no_llm else "LLM"
+    console.print(f"[bold]Bulk init[/bold]: scanning [cyan]{path}[/cyan] ({mode} classification)")
+    if dry_run:
+        console.print("[yellow]DRY RUN — no files will be written[/yellow]")
+    console.print()
+
+    result = bulk_init(
+        root=path,
+        use_llm=not no_llm,
+        model=model,
+        dry_run=dry_run,
+        overwrite=overwrite,
+    )
+
+    if json_output:
+        console.print(json.dumps({
+            "created": result.created,
+            "skipped_existing": result.skipped_existing,
+            "skipped_nonproject": result.skipped_nonproject,
+            "errors": result.errors,
+        }, indent=2, ensure_ascii=False))
+        return
+
+    # Created
+    if result.created:
+        table = Table(title=f"{'Would create' if dry_run else 'Created'} ({len(result.created)})")
+        table.add_column("Project")
+        for name in result.created:
+            table.add_row(name)
+        console.print(table)
+
+    # Skipped (existing)
+    if result.skipped_existing:
+        console.print(f"\n[dim]Skipped (existing pyqual.yaml): {', '.join(result.skipped_existing)}[/dim]")
+
+    # Skipped (non-project)
+    if result.skipped_nonproject:
+        console.print(f"\n[dim]Skipped (non-project):[/dim]")
+        for name, reason in result.skipped_nonproject:
+            console.print(f"  [dim]{name}: {reason}[/dim]")
+
+    # Errors
+    if result.errors:
+        console.print()
+        for name, err in result.errors:
+            console.print(f"  [red]✗ {name}: {err}[/red]")
+
+    console.print(f"\n[bold]Total: {result.total}[/bold] "
+                  f"(created: {len(result.created)}, "
+                  f"existing: {len(result.skipped_existing)}, "
+                  f"skipped: {len(result.skipped_nonproject)}, "
+                  f"errors: {len(result.errors)})")
+
+
 @app.command()
 def run(
     config: Path = typer.Option("pyqual.yaml", "--config", "-c"),

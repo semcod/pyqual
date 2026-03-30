@@ -218,7 +218,7 @@ pyqual uses named constants for all default values. Override them in `pyqual.yam
 |----------|--------|---------|-------------|
 | `DEFAULT_STAGE_TIMEOUT` | `pyqual.config` | 300 | Stage timeout in seconds |
 | `DEFAULT_MCP_PORT` | `pyqual.cli` | 8000 | MCP service port |
-| `DEFAULT_MAX_TOKENS` | `pyqual.llm` | 2000 | LLM max response tokens |
+| `DEFAULT_MAX_TOKENS` | `llx.llm` (re-exported by `pyqual.llm`) | 2000 | LLM max response tokens |
 | `TIMEOUT_EXIT_CODE` | `pyqual.pipeline` | 124 | Exit code for timed-out stages |
 
 ## Plugin Configuration

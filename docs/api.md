@@ -220,9 +220,15 @@ See [examples/custom_plugins/](../examples/custom_plugins/) for a complete worki
 
 ## LLM API
 
-Use the LLM wrapper for code analysis and fixes:
+The LLM convenience wrapper now lives upstream in `llx.llm`.
+`pyqual.llm` re-exports it for backward compatibility (with a local fallback
+on Python 3.9 or when `llx` is not installed).
 
 ```python
+# Preferred — use llx directly (Python >= 3.10)
+from llx.llm import LLM, get_llm_model, DEFAULT_MAX_TOKENS
+
+# Also works — pyqual re-export
 from pyqual.llm import LLM, get_llm_model, DEFAULT_MAX_TOKENS
 
 # Create LLM instance (reads .env for model/key)
@@ -250,7 +256,7 @@ print(fixed.content)
 |----------|--------|---------|-------------|
 | `DEFAULT_STAGE_TIMEOUT` | `pyqual.config` | 300 | Stage timeout in seconds |
 | `DEFAULT_MCP_PORT` | `pyqual.cli` | 8000 | MCP service port |
-| `DEFAULT_MAX_TOKENS` | `pyqual.llm` | 2000 | LLM max response tokens |
+| `DEFAULT_MAX_TOKENS` | `llx.llm` (re-exported by `pyqual.llm`) | 2000 | LLM max response tokens |
 | `TIMEOUT_EXIT_CODE` | `pyqual.pipeline` | 124 | Exit code for timed-out stages |
 
 ## Examples
