@@ -29,7 +29,7 @@ from pyqual.integrations.llx_mcp import (
     run_llx_refactor_workflow,
 )
 
-__version__ = "0.1.32"
+__version__ = "0.1.33"
 
 __all__ = [
     "PyqualConfig",

@@ -14,16 +14,27 @@ Usage:
 from __future__ import annotations
 
 import json
-import sys
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
-from pyqual.config import GateConfig
-from pyqual.gates import GateSet
-
 HISTORY_FILE = ".pyqual/metric_history.json"
 REGRESSION_TOLERANCE = 2.0  # allow up to 2% regression without failing
+EXPECTED_HISTORY_LENGTH = 2
+
+RUN_1_METRICS = {
+    "coverage": 85.0,
+    "cc": 4.2,
+    "ruff_errors": 8.0,
+    "pylint_score": 8.5,
+}
+
+RUN_2_METRICS = {
+    "coverage": 82.0,  # regression (-3%)
+    "cc": 3.8,  # improved
+    "ruff_errors": 12.0,  # regression (+4)
+    "pylint_score": 8.7,  # improved
+}
 
 
 def load_history(workdir: Path) -> list[dict]:
@@ -126,46 +137,27 @@ def print_trend_report(analysis: dict[str, dict]) -> bool:
     return not any_regression
 
 
-# ---------------------------------------------------------------------------
-# Self-test with synthetic history
-# ---------------------------------------------------------------------------
-if __name__ == "__main__":
+def main() -> int:
+    """Run the metric history self-test with synthetic history."""
     with tempfile.TemporaryDirectory() as tmpdir:
         p = Path(tmpdir)
         pyqual_dir = p / ".pyqual"
         pyqual_dir.mkdir()
 
-        # Simulate two runs
-        run1_metrics = {
-            "coverage": 85.0,
-            "cc": 4.2,
-            "ruff_errors": 8.0,
-            "pylint_score": 8.5,
-        }
-        run2_metrics = {
-            "coverage": 82.0,  # regression (-3%)
-            "cc": 3.8,         # improved
-            "ruff_errors": 12.0,  # regression (+4)
-            "pylint_score": 8.7,  # improved
-        }
-
         print("=" * 60)
         print("METRIC HISTORY & REGRESSION DETECTION")
         print("=" * 60)
 
-        # Save first run
         print("\nRun 1 (baseline):")
-        for k, v in sorted(run1_metrics.items()):
+        for k, v in sorted(RUN_1_METRICS.items()):
             print(f"  {k}: {v}")
-        save_snapshot(p, run1_metrics)
+        save_snapshot(p, RUN_1_METRICS)
 
-        # Save second run
         print("\nRun 2 (current):")
-        for k, v in sorted(run2_metrics.items()):
+        for k, v in sorted(RUN_2_METRICS.items()):
             print(f"  {k}: {v}")
-        history = save_snapshot(p, run2_metrics)
+        history = save_snapshot(p, RUN_2_METRICS)
 
-        # Detect regressions
         print(f"\nTrend analysis (tolerance: ±{REGRESSION_TOLERANCE}):")
         analysis = detect_regressions(history)
         no_regressions = print_trend_report(analysis)
@@ -177,9 +169,13 @@ if __name__ == "__main__":
             regressed = [k for k, v in analysis.items() if v["regressed"]]
             print(f"❌ Regressions in: {', '.join(regressed)}")
 
-        # Verify history file
         saved = json.loads((pyqual_dir / "metric_history.json").read_text())
-        assert len(saved) == 2
-        assert saved[1]["metrics"]["coverage"] == 82.0
+        assert len(saved) == EXPECTED_HISTORY_LENGTH
+        assert saved[1]["metrics"]["coverage"] == RUN_2_METRICS["coverage"]
         print(f"\n✅ History file has {len(saved)} snapshots")
-        sys.exit(0 if no_regressions else 1)
+
+        return 0 if no_regressions else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

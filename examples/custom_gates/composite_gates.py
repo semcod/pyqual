@@ -11,28 +11,35 @@ Usage:
     python composite_gates.py
 """
 
-from __future__ import annotations
-
 import json
 import sys
 import tempfile
 from pathlib import Path
 
 from pyqual.config import GateConfig
-from pyqual.gates import Gate, GateSet
+from pyqual.gates import GateSet
 
 # ---------------------------------------------------------------------------
 # Named thresholds for composite scoring
 # ---------------------------------------------------------------------------
+MAX_SCORE = 100.0
+MIN_SCORE = 0.0
 WEIGHT_COVERAGE = 0.35
 WEIGHT_COMPLEXITY = 0.25
 WEIGHT_LINT = 0.20
 WEIGHT_SECURITY = 0.20
 
-COVERAGE_TARGET = 90.0
 CC_TARGET = 10.0
-LINT_TARGET = 0.0
-SECURITY_TARGET = 0.0
+COMPOSITE_PASS_THRESHOLD = 75.0
+
+COVERAGE_GATE_THRESHOLD = 80.0
+CC_GATE_THRESHOLD = 15.0
+LINT_GATE_THRESHOLD = 10.0
+SECURITY_GATE_THRESHOLD = 0.0
+
+CC_BASELINE = 1.0
+LINT_ERROR_PENALTY = 5.0
+SECURITY_HIGH_PENALTY = 25.0
 
 
 def compute_composite_score(metrics: dict[str, float]) -> float:
@@ -44,25 +51,25 @@ def compute_composite_score(metrics: dict[str, float]) -> float:
 
     if "coverage" in metrics:
         # Coverage: 0–100 maps directly
-        score = min(100.0, max(0.0, metrics["coverage"]))
+        score = min(MAX_SCORE, max(MIN_SCORE, metrics["coverage"]))
         components.append((WEIGHT_COVERAGE, score))
 
     if "cc" in metrics:
         # CC: lower is better. CC=1 → 100, CC≥CC_TARGET → 0
         cc = metrics["cc"]
-        score = max(0.0, 100.0 - ((cc - 1.0) / (CC_TARGET - 1.0)) * 100.0)
+        score = max(MIN_SCORE, MAX_SCORE - ((cc - CC_BASELINE) / (CC_TARGET - CC_BASELINE)) * MAX_SCORE)
         components.append((WEIGHT_COMPLEXITY, score))
 
     if "ruff_errors" in metrics:
         # Lint errors: 0 → 100, ≥20 → 0
         errors = metrics["ruff_errors"]
-        score = max(0.0, 100.0 - errors * 5.0)
+        score = max(MIN_SCORE, MAX_SCORE - errors * LINT_ERROR_PENALTY)
         components.append((WEIGHT_LINT, score))
 
     if "bandit_high" in metrics:
         # Security: 0 high issues → 100, any → penalty
         high = metrics["bandit_high"]
-        score = 100.0 if high == 0 else max(0.0, 100.0 - high * 25.0)
+        score = MAX_SCORE if high == 0 else max(MIN_SCORE, MAX_SCORE - high * SECURITY_HIGH_PENALTY)
         components.append((WEIGHT_SECURITY, score))
 
     if not components:
@@ -73,14 +80,14 @@ def compute_composite_score(metrics: dict[str, float]) -> float:
     return round(weighted_sum / total_weight, 2)
 
 
-def run_composite_check(workdir: Path) -> None:
+def run_composite_check(workdir: Path) -> bool:
     """Run individual gates + composite score on a workdir."""
     # Define individual gates
     gate_configs = [
-        GateConfig(metric="coverage", operator="ge", threshold=80.0),
-        GateConfig(metric="cc", operator="le", threshold=15.0),
-        GateConfig(metric="ruff_errors", operator="le", threshold=10.0),
-        GateConfig(metric="bandit_high", operator="le", threshold=0.0),
+        GateConfig(metric="coverage", operator="ge", threshold=COVERAGE_GATE_THRESHOLD),
+        GateConfig(metric="cc", operator="le", threshold=CC_GATE_THRESHOLD),
+        GateConfig(metric="ruff_errors", operator="le", threshold=LINT_GATE_THRESHOLD),
+        GateConfig(metric="bandit_high", operator="le", threshold=SECURITY_GATE_THRESHOLD),
     ]
 
     gate_set = GateSet(gate_configs)
@@ -100,9 +107,9 @@ def run_composite_check(workdir: Path) -> None:
         print(f"  {icon} {r.metric}: {val} (threshold: {r.threshold})")
 
     print("-" * 60)
-    composite_passed = composite >= 75.0
+    composite_passed = composite >= COMPOSITE_PASS_THRESHOLD
     icon = "✅" if composite_passed else "❌"
-    print(f"  {icon} composite_score: {composite} (threshold: 75.0)")
+    print(f"  {icon} composite_score: {composite} (threshold: {COMPOSITE_PASS_THRESHOLD})")
     print("=" * 60)
 
     all_individual = all(r.passed for r in results)
