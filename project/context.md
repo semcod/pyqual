@@ -94,15 +94,15 @@
 - **Functions**: 2
 - **File**: `composite_gates.py`
 
-### examples.custom_plugins.performance_collector
-- **Functions**: 2
-- **Classes**: 1
-- **File**: `performance_collector.py`
-
 ### examples.custom_plugins.code_health_collector
 - **Functions**: 2
 - **Classes**: 1
 - **File**: `code_health_collector.py`
+
+### examples.custom_plugins.performance_collector
+- **Functions**: 2
+- **Classes**: 1
+- **File**: `performance_collector.py`
 
 ## Key Entry Points
 
@@ -189,13 +189,13 @@ Checks for:
 ### pyqual.builtin_collectors.LLMBenchCollector.collect
 - **Calls**: humaneval_path.exists, codebleu_path.exists, json.loads, json.loads, humaneval_path.read_text, data.get, data.get, float
 
-### pyqual._gate_collectors._from_vulnerabilities
-> Extract vulnerability metrics from vulns.json.
-- **Calls**: vuln_path.exists, json.loads, isinstance, vuln_path.read_text, sum, float, float, isinstance
-
 ### pyqual.cli.mcp_fix
 > Run the llx-backed MCP fix workflow.
 - **Calls**: app.command, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option
+
+### pyqual._gate_collectors._from_vulnerabilities
+> Extract vulnerability metrics from vulns.json.
+- **Calls**: vuln_path.exists, json.loads, isinstance, vuln_path.read_text, sum, float, float, isinstance
 
 ### pyqual.integrations.llx_mcp.main
 > CLI entry point used by pyqual pipeline stages.
@@ -312,15 +312,15 @@ _from_ruff [pyqual._gate_collectors]
 - **Methods**: 4
 - **Key Methods**: pyqual.config.PyqualConfig.load, pyqual.config.PyqualConfig.llm_model, pyqual.config.PyqualConfig._parse, pyqual.config.PyqualConfig.default_yaml
 
-### pyqual.plugins.PluginRegistry
-> Registry for metric collector plugins.
-- **Methods**: 4
-- **Key Methods**: pyqual.plugins.PluginRegistry.register, pyqual.plugins.PluginRegistry.get, pyqual.plugins.PluginRegistry.list_plugins, pyqual.plugins.PluginRegistry.create_instance
-
 ### pyqual.gates.GateSet
 > Collection of quality gates with metric collection.
 - **Methods**: 4
 - **Key Methods**: pyqual.gates.GateSet.__init__, pyqual.gates.GateSet.check_all, pyqual.gates.GateSet.all_passed, pyqual.gates.GateSet._collect_metrics
+
+### pyqual.plugins.PluginRegistry
+> Registry for metric collector plugins.
+- **Methods**: 4
+- **Key Methods**: pyqual.plugins.PluginRegistry.register, pyqual.plugins.PluginRegistry.get, pyqual.plugins.PluginRegistry.list_plugins, pyqual.plugins.PluginRegistry.create_instance
 
 ### pyqual.validation.ValidationResult
 > Aggregated result of validating one pyqual.yaml.
@@ -348,27 +348,22 @@ _from_ruff [pyqual._gate_collectors]
 - **Methods**: 2
 - **Key Methods**: pyqual.validation.StageFailure.error_code, pyqual.validation.StageFailure.domain
 
-### examples.custom_plugins.performance_collector.PerformanceCollector
-> Collect latency and throughput metrics from load test results.
-- **Methods**: 2
-- **Key Methods**: examples.custom_plugins.performance_collector.PerformanceCollector.collect, examples.custom_plugins.performance_collector.PerformanceCollector.get_config_example
-- **Inherits**: MetricCollector
-
 ### examples.custom_plugins.code_health_collector.CodeHealthCollector
 > Weighted composite health score from multiple code quality signals.
 - **Methods**: 2
 - **Key Methods**: examples.custom_plugins.code_health_collector.CodeHealthCollector.collect, examples.custom_plugins.code_health_collector.CodeHealthCollector.get_config_example
 - **Inherits**: MetricCollector
 
+### examples.custom_plugins.performance_collector.PerformanceCollector
+> Collect latency and throughput metrics from load test results.
+- **Methods**: 2
+- **Key Methods**: examples.custom_plugins.performance_collector.PerformanceCollector.collect, examples.custom_plugins.performance_collector.PerformanceCollector.get_config_example
+- **Inherits**: MetricCollector
+
 ### pyqual.config.GateConfig
 > Single quality gate threshold.
 - **Methods**: 1
 - **Key Methods**: pyqual.config.GateConfig.from_dict
-
-### pyqual.plugins.PluginMetadata
-> Metadata for a pyqual plugin.
-- **Methods**: 1
-- **Key Methods**: pyqual.plugins.PluginMetadata.__post_init__
 
 ### pyqual.gates.GateResult
 > Result of a single gate check.
@@ -379,6 +374,11 @@ _from_ruff [pyqual._gate_collectors]
 > Single quality gate with metric extraction.
 - **Methods**: 1
 - **Key Methods**: pyqual.gates.Gate.check
+
+### pyqual.plugins.PluginMetadata
+> Metadata for a pyqual plugin.
+- **Methods**: 1
+- **Key Methods**: pyqual.plugins.PluginMetadata.__post_init__
 
 ### pyqual.builtin_collectors.LLMBenchCollector
 > LLM code generation quality metrics from human-eval and CodeBLEU.
@@ -411,12 +411,6 @@ Key functions that process and transform data:
 ### pyqual.config.PyqualConfig._parse
 - **Output to**: raw.get, pyqual.tools.load_entry_point_presets, pipeline.get, pipeline.get, pipeline.get
 
-### pyqual.validation.validate_config
-> Validate a pyqual.yaml file and return structured issues.
-
-Does NOT run any stages — this is a stati
-- **Output to**: ValidationResult, raw.get, pipeline.get, pipeline.get, metrics_raw.items
-
 ### pyqual.cli.validate
 > Validate pyqual.yaml without running the pipeline.
 
@@ -431,6 +425,12 @@ Checks for:
 ### pyqual.cli._format_log_entry_row
 > Return (ts, event_name, name, status, details) for one log entry.
 - **Output to**: entry.get, entry.get, None.replace, entry.get, entry.get
+
+### pyqual.validation.validate_config
+> Validate a pyqual.yaml file and return structured issues.
+
+Does NOT run any stages — this is a stati
+- **Output to**: ValidationResult, raw.get, pipeline.get, pipeline.get, metrics_raw.items
 
 ### pyqual.integrations.llx_mcp_service.build_parser
 > Build the CLI parser for the MCP service.

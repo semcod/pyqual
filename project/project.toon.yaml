@@ -1,4 +1,4 @@
-# pyqual | 143 func | 15f | 7343L | python | 2026-03-30
+# pyqual | 143 func | 15f | 7824L | python | 2026-03-30
 
 HEALTH:
   CC̄=6.4  critical=35 (limit:10)  dup=0  cycles=0
@@ -18,13 +18,13 @@ ALERTS[20]:
 MODULES[19] (top by size):
   M[pyqual/cli.py] 1307L C:0 F:30 CC↑19 D:0 (python)
   M[pyqual/bulk_init.py] 697L C:3 F:7 CC↑37 D:1 (python)
-  M[pyqual/bulk_run.py] 548L C:3 F:7 CC↑19 D:1 (python)
+  M[pyqual/bulk_run.py] 549L C:3 F:7 CC↑19 D:1 (python)
   M[pyqual/validation.py] 460L C:6 F:6 CC↑26 D:2 (python)
   M[pyqual/_gate_collectors.py] 441L C:0 F:21 CC↑13 D:0 (python)
   M[pyqual/builtin_collectors.py] 432L C:8 F:15 CC↑14 D:0 (python)
-  M[pyqual/pipeline.py] 366L C:4 F:13 CC↑19 D:0 (python)
-  M[pyqual/tools.py] 322L C:1 F:9 CC↑8 D:3 (python)
-  M[pyqual/config.py] 184L C:4 F:6 CC↑12 D:0 (python)
+  M[pyqual/pipeline.py] 378L C:4 F:13 CC↑21 D:0 (python)
+  M[pyqual/tools.py] 338L C:1 F:9 CC↑8 D:3 (python)
+  M[pyqual/config.py] 194L C:4 F:6 CC↑12 D:0 (python)
   M[pyqual/plugins.py] 138L C:3 F:9 CC↑5 D:1 (python)
   M[pyqual/llm.py] 126L C:0 F:0 CC↑0 D:0 (python)
   M[pyqual/integrations/llx_mcp.py] 102L C:0 F:2 CC↑6 D:0 (python)
@@ -49,7 +49,7 @@ REFACTOR[15]:
   [2] H/L Split collect_fingerprint (CC=37 → target CC<10)
   [3] H/L Split _classify_heuristic (CC=26 → target CC<10)
   [4] H/H Split god module pyqual/bulk_init.py (697L, 3 classes)
-  [5] H/H Split god module pyqual/bulk_run.py (548L, 3 classes)
+  [5] H/H Split god module pyqual/bulk_run.py (549L, 3 classes)
 
 EVOLUTION:
-  2026-03-30 CC̄=6.4 crit=35 7343L // Automated analysis
+  2026-03-30 CC̄=6.4 crit=35 7824L // Automated analysis

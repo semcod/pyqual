@@ -10,8 +10,8 @@ NEXT[10] (ranked by impact):
       EFFORT: ~4h  IMPACT: 24833
 
   [3] !! SPLIT           pyqual/bulk_run.py
-      WHY: 548L, 3 classes, max CC=19
-      EFFORT: ~4h  IMPACT: 10412
+      WHY: 549L, 3 classes, max CC=19
+      EFFORT: ~4h  IMPACT: 10431
 
   [4] !! SPLIT-FUNC      collect_fingerprint  CC=37  fan=35
       WHY: CC=37 exceeds 15
@@ -79,4 +79,4 @@ PATTERNS (language parser shared logic):
     - Standardized FunctionInfo/ClassInfo models
 
 HISTORY:
-  prev CC̄=6.3 → now CC̄=6.4
+  prev CC̄=6.4 → now CC̄=6.4

@@ -332,10 +332,9 @@ def run(
         code = failure.error_code
         domain = failure.domain
 
-        console.print(f"\n  [bold red]{code}[/bold red]  stage=[cyan]{failure.stage_name}[/cyan]"
-                      f"  rc={failure.returncode}")
-
         if domain == ErrorDomain.CONFIG or domain == ErrorDomain.ENV:
+            console.print(f"\n  [bold red]{code}[/bold red]  stage=[cyan]{failure.stage_name}[/cyan]"
+                          f"  rc={failure.returncode}")
             console.print("  [yellow]→ Detected CONFIG/ENV problem — running pre-flight diagnostics…[/yellow]")
             diag = validate_config(_config_path)
             if diag.issues:
@@ -351,8 +350,11 @@ def run(
                 console.print("  [dim]Pre-flight: config looks valid — problem is runtime environment.[/dim]")
                 if failure.stderr:
                     console.print(f"  [dim]stderr: {failure.stderr[:200]}[/dim]")
+            print("", flush=True)
 
         elif domain == ErrorDomain.LLM:
+            console.print(f"\n  [bold red]{code}[/bold red]  stage=[cyan]{failure.stage_name}[/cyan]"
+                          f"  rc={failure.returncode}")
             console.print("  [yellow]→ LLM/fix-stage problem.[/yellow]")
             if code == EC.LLM_API_KEY_MISSING:
                 console.print("  [red]API key missing.[/red] Set OPENROUTER_API_KEY in .env or environment.")
@@ -362,18 +364,20 @@ def run(
                 console.print("  [dim]Fix stage failed — project code may be too complex for one pass.[/dim]")
             if failure.stderr:
                 console.print(f"  [dim]{failure.stderr[:200]}[/dim]")
+            print("", flush=True)
 
         elif domain == ErrorDomain.PIPELINE:
+            console.print(f"\n  [bold red]{code}[/bold red]  stage=[cyan]{failure.stage_name}[/cyan]"
+                          f"  rc={failure.returncode}")
             if code == EC.PIPELINE_TIMEOUT:
                 console.print(f"  [red]Stage timed out[/red] after {failure.duration:.0f}s."
                               " Increase 'timeout:' in the stage config.")
             else:
                 console.print(f"  [red]Pipeline execution error.[/red]  {failure.stderr[:200]}")
+            print("", flush=True)
 
         elif domain == ErrorDomain.PROJECT:
-            console.print(f"  [dim]→ Project code issue ({code}) — fix stage will handle this.[/dim]")
-
-        print("", flush=True)
+            console.print(f"  [dim][{failure.stage_name}] {code}  → fix stage will handle this.[/dim]")
 
     def _run_auto_fix_config(cfg_path: Path, wd: Path, diag: Any) -> None:
         from pyqual.validation import detect_project_facts

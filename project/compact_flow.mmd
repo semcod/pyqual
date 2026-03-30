@@ -16,9 +16,9 @@ flowchart TD
     pyqual__cli ==>|6| pyqual__validation
     pyqual__cli ==>|5| pyqual__plugins
     pyqual__config ==>|4| pyqual__tools
-    pyqual__validation ==>|4| pyqual__tools
     pyqual__cli ==>|4| pyqual__config
     pyqual__cli ==>|4| pyqual__tickets
+    pyqual__validation ==>|4| pyqual__tools
     examples__ticket_workflow ==>|4| pyqual__tickets
     pyqual__pipeline -->|2| pyqual__tools
     run_analysis -->|1| pyqual__config

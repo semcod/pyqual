@@ -34,11 +34,11 @@ flowchart TD
         pyqual__tools__register_preset["register_preset"]
         pyqual__tools__load_entry_point_presets("load_entry_point_presets CC=8")
         pyqual__tools__resolve_stage_command["resolve_stage_command"]
-        pyqual__plugins__PluginMetadata____post_init__["__post_init__"]
-        pyqual__plugins__MetricCollector__collect["collect"]
-        pyqual__plugins__MetricCollector__get_config_example["get_config_example"]
-        pyqual__plugins__PluginRegistry__register["register"]
+        pyqual__gates__GateResult____str__["__str__"]
+        pyqual__gates__Gate__check["check"]
+        pyqual__gates__GateSet__check_all["check_all"]
+        pyqual__gates__GateSet__all_passed["all_passed"]
         ...["+68 more"]
     end
 
-    class run_analysis__main,pyqual__config__GateConfig__from_dict,pyqual__config__PyqualConfig__load,pyqual__config__PyqualConfig___parse,pyqual__config__PyqualConfig__default_yaml,pyqual__tools__ToolPreset__is_available,pyqual__tools__ToolPreset__shell_command,pyqual__tools__is_builtin,pyqual__tools__resolve_stage_command,pyqual__plugins__PluginMetadata____post_init__ entry
+    class run_analysis__main,pyqual__config__GateConfig__from_dict,pyqual__config__PyqualConfig__load,pyqual__config__PyqualConfig___parse,pyqual__config__PyqualConfig__default_yaml,pyqual__tools__ToolPreset__is_available,pyqual__tools__ToolPreset__shell_command,pyqual__tools__is_builtin,pyqual__tools__resolve_stage_command,pyqual__gates__GateResult____str__ entry

@@ -409,4 +409,5 @@ class TestDetectProjectFacts:
     def test_nonexistent_dir_returns_facts(self) -> None:
         facts = detect_project_facts(Path("/tmp/pyqual_nonexistent_xyz"))
         assert "workdir" in facts
-        assert facts["available_tools"] == []
+        assert isinstance(facts["available_tools"], list)  # PATH-based, not dir-based
+        assert facts.get("lang") == "unknown"  # no files to detect

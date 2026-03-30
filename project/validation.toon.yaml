@@ -1,7 +1,7 @@
-# vallm batch | 95f | 55✓ 8⚠ 1✗ | 2026-03-30
+# vallm batch | 96f | 56✓ 8⚠ 1✗ | 2026-03-30
 
 SUMMARY:
-  scanned: 95  passed: 55 (57.9%)  warnings: 8  errors: 1  unsupported: 39
+  scanned: 96  passed: 56 (58.3%)  warnings: 8  errors: 1  unsupported: 39
 
 WARNINGS[8]{path,score}:
   pyqual/validation.py,0.87

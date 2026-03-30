@@ -123,6 +123,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.45] - 2026-03-30
+
+### Docs
+- Update TODO.md
+- Update docs/README.md
+- Update project/context.md
+
+### Test
+- Update tests/test_validation.py
+
+### Other
+- Update project/analysis.toon.yaml
+- Update project/calls.mmd
+- Update project/calls.png
+- Update project/compact_flow.mmd
+- Update project/duplication.toon.yaml
+- Update project/evolution.toon.yaml
+- Update project/flow.mmd
+- Update project/flow.png
+- Update project/index.html
+- Update project/map.toon.yaml
+- ... and 3 more files
+
 ## [0.1.44] - 2026-03-30
 
 ### Docs

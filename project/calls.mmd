@@ -1,104 +1,104 @@
 flowchart LR
     subgraph examples__custom_gates
+        examples__custom_gates__metric_history__load_history["load_history"]
+        examples__custom_gates__metric_history__save_snapshot["save_snapshot"]
+        examples__custom_gates__composite_gates__run_composite_check["run_composite_check"]
         examples__custom_gates__metric_history__main["main"]
         examples__custom_gates__composite_gates__compute_composite_score["compute_composite_score"]
-        examples__custom_gates__metric_history__save_snapshot["save_snapshot"]
-        examples__custom_gates__metric_history__load_history["load_history"]
-        examples__custom_gates__composite_gates__run_composite_check["run_composite_check"]
     end
     subgraph examples__multi_gate_pipeline
         examples__multi_gate_pipeline__run_pipeline__main["main"]
     end
     subgraph examples__ticket_workflow
         examples__ticket_workflow__sync_tickets__main["main"]
-        examples__ticket_workflow__sync_tickets__sync_from_cli["sync_from_cli"]
         examples__ticket_workflow__sync_tickets__tickets_from_gate_failures["tickets_from_gate_failures"]
+        examples__ticket_workflow__sync_tickets__sync_from_cli["sync_from_cli"]
     end
     subgraph pyqual___gate_collectors
         pyqual___gate_collectors___count_pylint_by_type["_count_pylint_by_type"]
-        pyqual___gate_collectors___from_pylint["_from_pylint"]
-        pyqual___gate_collectors___read_artifact_text["_read_artifact_text"]
         pyqual___gate_collectors___from_vallm["_from_vallm"]
         pyqual___gate_collectors___from_toon["_from_toon"]
+        pyqual___gate_collectors___read_artifact_text["_read_artifact_text"]
+        pyqual___gate_collectors___from_pylint["_from_pylint"]
     end
     subgraph pyqual__bulk_init
-        pyqual__bulk_init___build_llm_prompt["_build_llm_prompt"]
-        pyqual__bulk_init___safe_name["_safe_name"]
-        pyqual__bulk_init__bulk_init["bulk_init"]
+        pyqual__bulk_init__classify_with_llm["classify_with_llm"]
         pyqual__bulk_init__collect_fingerprint["collect_fingerprint"]
         pyqual__bulk_init__generate_pyqual_yaml["generate_pyqual_yaml"]
-        pyqual__bulk_init__classify_with_llm["classify_with_llm"]
+        pyqual__bulk_init__bulk_init["bulk_init"]
+        pyqual__bulk_init___build_llm_prompt["_build_llm_prompt"]
+        pyqual__bulk_init___safe_name["_safe_name"]
     end
     subgraph pyqual__bulk_run
-        pyqual__bulk_run__discover_projects["discover_projects"]
         pyqual__bulk_run__bulk_run["bulk_run"]
+        pyqual__bulk_run__discover_projects["discover_projects"]
         pyqual__bulk_run___run_single_project["_run_single_project"]
     end
     subgraph pyqual__cli
-        pyqual__cli___plugin_add["_plugin_add"]
-        pyqual__cli___plugin_list["_plugin_list"]
-        pyqual__cli__plugin["plugin"]
-        pyqual__cli__gates["gates"]
-        pyqual__cli___plugin_search["_plugin_search"]
-        pyqual__cli__init["init"]
-        pyqual__cli___setup_logging["_setup_logging"]
         pyqual__cli__fix_config["fix_config"]
-        pyqual__cli__logs["logs"]
         pyqual__cli__validate["validate"]
-        pyqual__cli__status["status"]
+        pyqual__cli__plugin["plugin"]
+        pyqual__cli___plugin_add["_plugin_add"]
         pyqual__cli___plugin_info["_plugin_info"]
-        pyqual__cli__run["run"]
-        pyqual__cli__tickets_all["tickets_all"]
-        pyqual__cli___query_nfo_db["_query_nfo_db"]
-        pyqual__cli__tickets_github["tickets_github"]
+        pyqual__cli__status["status"]
+        pyqual__cli__gates["gates"]
         pyqual__cli__tickets_todo["tickets_todo"]
+        pyqual__cli__tickets_all["tickets_all"]
+        pyqual__cli__logs["logs"]
+        pyqual__cli__run["run"]
+        pyqual__cli___plugin_search["_plugin_search"]
+        pyqual__cli___query_nfo_db["_query_nfo_db"]
+        pyqual__cli__init["init"]
+        pyqual__cli__tickets_github["tickets_github"]
+        pyqual__cli___plugin_list["_plugin_list"]
+        pyqual__cli___setup_logging["_setup_logging"]
     end
     subgraph pyqual__config
-        pyqual__config__GateConfig__from_dict["from_dict"]
         pyqual__config__PyqualConfig__load["load"]
+        pyqual__config___load_env_file["_load_env_file"]
         pyqual__config__PyqualConfig___parse["_parse"]
         pyqual__config__PyqualConfig__default_yaml["default_yaml"]
-        pyqual__config___load_env_file["_load_env_file"]
+        pyqual__config__GateConfig__from_dict["from_dict"]
     end
     subgraph pyqual__gates
         pyqual__gates__GateSet___collect_metrics["_collect_metrics"]
     end
     subgraph pyqual__integrations
-        pyqual__integrations__llx_mcp_service__main["main"]
-        pyqual__integrations__llx_mcp__main["main"]
         pyqual__integrations__llx_mcp_service__run_server["run_server"]
-        pyqual__integrations__llx_mcp_service__build_parser["build_parser"]
+        pyqual__integrations__llx_mcp__main["main"]
         pyqual__integrations__llx_mcp__build_parser["build_parser"]
+        pyqual__integrations__llx_mcp_service__main["main"]
+        pyqual__integrations__llx_mcp_service__build_parser["build_parser"]
     end
     subgraph pyqual__pipeline
         pyqual__pipeline__Pipeline___log_stage["_log_stage"]
         pyqual__pipeline__Pipeline___resolve_tool_stage["_resolve_tool_stage"]
     end
     subgraph pyqual__plugins
-        pyqual__plugins__install_plugin_config["install_plugin_config"]
         pyqual__plugins__PluginRegistry__list_plugins["list_plugins"]
         pyqual__plugins__get_available_plugins["get_available_plugins"]
+        pyqual__plugins__install_plugin_config["install_plugin_config"]
         pyqual__plugins__PluginRegistry__get["get"]
     end
     subgraph pyqual__tickets
+        pyqual__tickets__sync_planfile_tickets["sync_planfile_tickets"]
+        pyqual__tickets___normalize_sources["_normalize_sources"]
         pyqual__tickets__sync_todo_tickets["sync_todo_tickets"]
+        pyqual__tickets__sync_all_tickets["sync_all_tickets"]
         pyqual__tickets__sync_github_tickets["sync_github_tickets"]
         pyqual__tickets___load_sync_integration["_load_sync_integration"]
-        pyqual__tickets___normalize_sources["_normalize_sources"]
-        pyqual__tickets__sync_all_tickets["sync_all_tickets"]
-        pyqual__tickets__sync_planfile_tickets["sync_planfile_tickets"]
     end
     subgraph pyqual__tools
-        pyqual__tools__list_presets["list_presets"]
         pyqual__tools__register_custom_tools_from_yaml["register_custom_tools_from_yam"]
-        pyqual__tools__load_entry_point_presets["load_entry_point_presets"]
         pyqual__tools__get_preset["get_preset"]
-        pyqual__tools__register_preset["register_preset"]
         pyqual__tools__resolve_stage_command["resolve_stage_command"]
+        pyqual__tools__register_preset["register_preset"]
+        pyqual__tools__load_entry_point_presets["load_entry_point_presets"]
+        pyqual__tools__list_presets["list_presets"]
     end
     subgraph pyqual__validation
-        pyqual__validation__validate_config["validate_config"]
         pyqual__validation__detect_project_facts["detect_project_facts"]
+        pyqual__validation__validate_config["validate_config"]
     end
     subgraph run_analysis
         run_analysis__main["main"]
@@ -114,16 +114,13 @@ flowchart LR
     pyqual__tools__load_entry_point_presets --> pyqual__tools__register_preset
     pyqual__tools__resolve_stage_command --> pyqual__tools__get_preset
     pyqual__tools__resolve_stage_command --> pyqual__tools__list_presets
-    pyqual__plugins__install_plugin_config --> pyqual__plugins__PluginRegistry__get
     pyqual__gates__GateSet___collect_metrics --> pyqual__plugins__PluginRegistry__list_plugins
+    pyqual__plugins__install_plugin_config --> pyqual__plugins__PluginRegistry__get
     pyqual__tickets__sync_planfile_tickets --> pyqual__tickets___load_sync_integration
     pyqual__tickets__sync_planfile_tickets --> pyqual__tickets___normalize_sources
     pyqual__tickets__sync_todo_tickets --> pyqual__tickets__sync_planfile_tickets
     pyqual__tickets__sync_github_tickets --> pyqual__tickets__sync_planfile_tickets
     pyqual__tickets__sync_all_tickets --> pyqual__tickets__sync_planfile_tickets
-    pyqual___gate_collectors___from_toon --> pyqual___gate_collectors___read_artifact_text
-    pyqual___gate_collectors___from_vallm --> pyqual___gate_collectors___read_artifact_text
-    pyqual___gate_collectors___from_pylint --> pyqual___gate_collectors___count_pylint_by_type
     pyqual__cli__init --> pyqual__config__PyqualConfig__default_yaml
     pyqual__cli__run --> pyqual__cli___setup_logging
     pyqual__cli__run --> pyqual__config__PyqualConfig__load
@@ -141,18 +138,21 @@ flowchart LR
     pyqual__cli__plugin --> pyqual__cli___plugin_search
     pyqual__cli__plugin --> pyqual__cli___plugin_info
     pyqual__cli__logs --> pyqual__cli___query_nfo_db
+    pyqual___gate_collectors___from_toon --> pyqual___gate_collectors___read_artifact_text
+    pyqual___gate_collectors___from_vallm --> pyqual___gate_collectors___read_artifact_text
+    pyqual___gate_collectors___from_pylint --> pyqual___gate_collectors___count_pylint_by_type
     pyqual__integrations__llx_mcp_service__main --> pyqual__integrations__llx_mcp_service__build_parser
     pyqual__integrations__llx_mcp_service__main --> pyqual__integrations__llx_mcp_service__run_server
     pyqual__integrations__llx_mcp__main --> pyqual__integrations__llx_mcp__build_parser
+    examples__custom_gates__metric_history__save_snapshot --> examples__custom_gates__metric_history__load_history
+    examples__custom_gates__metric_history__main --> examples__custom_gates__metric_history__save_snapshot
+    pyqual__pipeline__Pipeline___resolve_tool_stage --> pyqual__tools__get_preset
+    pyqual__pipeline__Pipeline___log_stage --> pyqual__tools__get_preset
+    examples__custom_gates__composite_gates__run_composite_check --> examples__custom_gates__composite_gates__compute_composite_score
     pyqual__bulk_init__classify_with_llm --> pyqual__bulk_init___build_llm_prompt
     pyqual__bulk_init__generate_pyqual_yaml --> pyqual__bulk_init___safe_name
     pyqual__bulk_init__bulk_init --> pyqual__bulk_init__collect_fingerprint
     pyqual__bulk_init__bulk_init --> pyqual__bulk_init__generate_pyqual_yaml
-    examples__custom_gates__composite_gates__run_composite_check --> examples__custom_gates__composite_gates__compute_composite_score
-    pyqual__pipeline__Pipeline___resolve_tool_stage --> pyqual__tools__get_preset
-    pyqual__pipeline__Pipeline___log_stage --> pyqual__tools__get_preset
-    examples__custom_gates__metric_history__save_snapshot --> examples__custom_gates__metric_history__load_history
-    examples__custom_gates__metric_history__main --> examples__custom_gates__metric_history__save_snapshot
     examples__ticket_workflow__sync_tickets__sync_from_cli --> pyqual__tickets__sync_github_tickets
     examples__ticket_workflow__sync_tickets__sync_from_cli --> pyqual__tickets__sync_all_tickets
     examples__ticket_workflow__sync_tickets__sync_from_cli --> pyqual__tickets__sync_todo_tickets
