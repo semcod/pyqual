@@ -4,9 +4,6 @@
 HEALTH[19]:
   🔴 GOD   pyqual/pipeline.py = 561L, 4 classes, 18m, max CC=21
   🟡 CC    _parse CC=18 (limit:15)
-  🟡 CC    _classify_failure CC=21 (limit:15)
-  🟡 CC    validate_config CC=26 (limit:15)
-  🟡 CC    detect_project_facts CC=16 (limit:15)
   🟡 CC    bulk_run_cmd CC=19 (limit:15)
   🟡 CC    _enrich_from_artifacts CC=20 (limit:15)
   🟡 CC    _build_run_summary CC=18 (limit:15)
@@ -14,26 +11,29 @@ HEALTH[19]:
   🟡 CC    logs CC=22 (limit:15)
   🟡 CC    watch CC=29 (limit:15)
   🟡 CC    history CC=29 (limit:15)
+  🟡 CC    _classify_failure CC=21 (limit:15)
+  🟡 CC    validate_config CC=26 (limit:15)
+  🟡 CC    detect_project_facts CC=16 (limit:15)
   🟡 CC    _classify_heuristic CC=26 (limit:15)
   🟡 CC    bulk_init CC=18 (limit:15)
-  🟡 CC    _should_run_stage CC=17 (limit:15)
-  🟡 CC    _execute_stage CC=21 (limit:15)
   🟡 CC    _run_single_project CC=19 (limit:15)
   🟡 CC    _build_project_row CC=19 (limit:15)
   🟡 CC    bulk_run CC=17 (limit:15)
+  🟡 CC    _should_run_stage CC=17 (limit:15)
+  🟡 CC    _execute_stage CC=21 (limit:15)
 
 REFACTOR[2]:
   1. split pyqual/pipeline.py  (god module)
   2. split 18 high-CC methods  (CC>15)
 
 PIPELINES[102]:
-  [1] Src [main]: main
+  [1] Src [main]: main → save_snapshot → load_history
       PURITY: 100% pure
-  [2] Src [main]: main → run_project
+  [2] Src [main]: main
       PURITY: 100% pure
-  [3] Src [run_composite_check]: run_composite_check → compute_composite_score
+  [3] Src [main]: main → run_project
       PURITY: 100% pure
-  [4] Src [main]: main → save_snapshot → load_history
+  [4] Src [run_composite_check]: run_composite_check → compute_composite_score
       PURITY: 100% pure
   [5] Src [main]: main → sync_from_cli → sync_github_tickets → sync_planfile_tickets → ...(1 more)
       PURITY: 100% pure

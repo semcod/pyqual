@@ -51,10 +51,10 @@ Logs are w
 Watche
 
 REFACTOR[15]:
-  [1] H/L Split validate_config (CC=26 → target CC<10)
-  [2] H/L Split run (CC=25 → target CC<10)
-  [3] H/L Split watch (CC=29 → target CC<10)
-  [4] H/L Split history (CC=29 → target CC<10)
+  [1] H/L Split run (CC=25 → target CC<10)
+  [2] H/L Split watch (CC=29 → target CC<10)
+  [3] H/L Split history (CC=29 → target CC<10)
+  [4] H/L Split validate_config (CC=26 → target CC<10)
   [5] H/L Split _classify_heuristic (CC=26 → target CC<10)
 
 EVOLUTION:

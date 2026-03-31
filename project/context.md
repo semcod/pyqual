@@ -94,15 +94,15 @@
 - **Functions**: 2
 - **File**: `run_pipeline.py`
 
-### examples.custom_plugins.code_health_collector
-- **Functions**: 2
-- **Classes**: 1
-- **File**: `code_health_collector.py`
-
 ### examples.custom_plugins.performance_collector
 - **Functions**: 2
 - **Classes**: 1
 - **File**: `performance_collector.py`
+
+### examples.custom_plugins.code_health_collector
+- **Functions**: 2
+- **Classes**: 1
+- **File**: `code_health_collector.py`
 
 ## Key Entry Points
 
@@ -343,16 +343,16 @@ _from_flake8 [pyqual._gate_collectors]
 - **Methods**: 3
 - **Key Methods**: pyqual.bulk_run.ProjectRunState.progress_pct, pyqual.bulk_run.ProjectRunState.elapsed, pyqual.bulk_run.ProjectRunState.gates_label
 
-### examples.custom_plugins.code_health_collector.CodeHealthCollector
-> Weighted composite health score from multiple code quality signals.
-- **Methods**: 2
-- **Key Methods**: examples.custom_plugins.code_health_collector.CodeHealthCollector.collect, examples.custom_plugins.code_health_collector.CodeHealthCollector.get_config_example
-- **Inherits**: MetricCollector
-
 ### examples.custom_plugins.performance_collector.PerformanceCollector
 > Collect latency and throughput metrics from load test results.
 - **Methods**: 2
 - **Key Methods**: examples.custom_plugins.performance_collector.PerformanceCollector.collect, examples.custom_plugins.performance_collector.PerformanceCollector.get_config_example
+- **Inherits**: MetricCollector
+
+### examples.custom_plugins.code_health_collector.CodeHealthCollector
+> Weighted composite health score from multiple code quality signals.
+- **Methods**: 2
+- **Key Methods**: examples.custom_plugins.code_health_collector.CodeHealthCollector.collect, examples.custom_plugins.code_health_collector.CodeHealthCollector.get_config_example
 - **Inherits**: MetricCollector
 
 ### pyqual.plugins.MetricCollector
@@ -421,12 +421,6 @@ Key functions that process and transform data:
 ### pyqual.config.PyqualConfig._parse
 - **Output to**: raw.get, pyqual.tools.load_entry_point_presets, pipeline.get, pipeline.get, pipeline.get
 
-### pyqual.validation.validate_config
-> Validate a pyqual.yaml file and return structured issues.
-
-Does NOT run any stages — this is a stati
-- **Output to**: ValidationResult, raw.get, pipeline.get, pipeline.get, metrics_raw.items
-
 ### pyqual.cli._format_run_summary
 - **Output to**: todo_bits.append, todo_bits.append, todo_bits.append, parts.append, fix_bits.append
 
@@ -444,6 +438,12 @@ Checks for:
 ### pyqual.cli._format_log_entry_row
 > Return (ts, event_name, name, status, details) for one log entry.
 - **Output to**: entry.get, entry.get, None.replace, entry.get, entry.get
+
+### pyqual.validation.validate_config
+> Validate a pyqual.yaml file and return structured issues.
+
+Does NOT run any stages — this is a stati
+- **Output to**: ValidationResult, raw.get, pipeline.get, pipeline.get, metrics_raw.items
 
 ### pyqual.integrations.llx_mcp_service.build_parser
 > Build the CLI parser for the MCP service.
