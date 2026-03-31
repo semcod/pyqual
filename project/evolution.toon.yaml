@@ -10,8 +10,8 @@ NEXT[10] (ranked by impact):
       EFFORT: ~4h  IMPACT: 18616
 
   [3] !! SPLIT           pyqual/pipeline.py
-      WHY: 611L, 10 classes, max CC=26
-      EFFORT: ~4h  IMPACT: 15886
+      WHY: 616L, 10 classes, max CC=29
+      EFFORT: ~4h  IMPACT: 17864
 
   [4] !! SPLIT-FUNC      run  CC=25  fan=50
       WHY: CC=25 exceeds 15
@@ -21,13 +21,13 @@ NEXT[10] (ranked by impact):
       WHY: CC=29 exceeds 15
       EFFORT: ~1h  IMPACT: 783
 
-  [6] !! SPLIT-FUNC      watch  CC=29  fan=21
+  [6] !! SPLIT-FUNC      Pipeline._execute_stage  CC=29  fan=23
+      WHY: CC=29 exceeds 15
+      EFFORT: ~1h  IMPACT: 667
+
+  [7] !! SPLIT-FUNC      watch  CC=29  fan=21
       WHY: CC=29 exceeds 15
       EFFORT: ~1h  IMPACT: 609
-
-  [7] !! SPLIT-FUNC      Pipeline._execute_stage  CC=26  fan=23
-      WHY: CC=26 exceeds 15
-      EFFORT: ~1h  IMPACT: 598
 
   [8] !  SPLIT-FUNC      PyqualConfig._parse  CC=23  fan=24
       WHY: CC=23 exceeds 15

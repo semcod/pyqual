@@ -293,18 +293,23 @@ class Pipeline:
         elif stage.optional and command:
             # Extract the main binary, handling pipes (e.g. "yes | goal push ...")
             # and env-var prefixes. Check the last pipe segment's first word.
+            # Skip check for multi-line scripts (shell scripts don't need binary check).
             cmd_stripped = command.strip()
-            if "|" in cmd_stripped:
-                cmd_stripped = cmd_stripped.rsplit("|", 1)[-1].strip()
-            binary = cmd_stripped.split()[0] if cmd_stripped else ""
-            if binary and not shutil.which(binary):
-                result = StageResult(
-                    name=stage.name, returncode=0,
-                    stdout=f"[skipped] '{binary}' not found on PATH (optional)",
-                    stderr="", duration=0.0, skipped=True,
-                )
-                self._log_stage(stage, result)
-                return result
+            is_multiline = "\n" in cmd_stripped
+            if not is_multiline:
+                if "|" in cmd_stripped:
+                    cmd_stripped = cmd_stripped.rsplit("|", 1)[-1].strip()
+                binary = cmd_stripped.split()[0] if cmd_stripped else ""
+                # Skip shell builtins and assignment-like tokens
+                shell_builtins = {"set", "export", "cd", "source", ".", "exec", "eval", "true", "false", "test", "[", "[["}
+                if binary and binary not in shell_builtins and "=" not in binary and not shutil.which(binary):
+                    result = StageResult(
+                        name=stage.name, returncode=0,
+                        stdout=f"[skipped] '{binary}' not found on PATH (optional)",
+                        stderr="", duration=0.0, skipped=True,
+                    )
+                    self._log_stage(stage, result)
+                    return result
 
         if dry_run:
             label = f"tool:{stage.tool}" if stage.tool else stage.run

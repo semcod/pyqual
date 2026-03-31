@@ -1,8 +1,8 @@
-# code2llm | 25f 7460L | python:24,shell:1 | 2026-03-31
+# code2llm | 25f 7465L | python:24,shell:1 | 2026-03-31
 # CC̄=6.6 | critical:20/224 | dups:0 | cycles:0
 
 HEALTH[20]:
-  🔴 GOD   pyqual/pipeline.py = 611L, 10 classes, 24m, max CC=26
+  🔴 GOD   pyqual/pipeline.py = 616L, 10 classes, 24m, max CC=29
   🟡 CC    _parse CC=23 (limit:15)
   🟡 CC    bulk_run_cmd CC=19 (limit:15)
   🟡 CC    run CC=25 (limit:15)
@@ -13,13 +13,13 @@ HEALTH[20]:
   🟡 CC    _classify_failure CC=21 (limit:15)
   🟡 CC    validate_config CC=26 (limit:15)
   🟡 CC    detect_project_facts CC=16 (limit:15)
+  🟡 CC    _classify_heuristic CC=26 (limit:15)
+  🟡 CC    bulk_init CC=18 (limit:15)
   🟡 CC    enrich_from_artifacts CC=20 (limit:15)
   🟡 CC    build_run_summary CC=20 (limit:15)
   🟡 CC    _run_single_project CC=19 (limit:15)
   🟡 CC    _build_project_row CC=19 (limit:15)
   🟡 CC    bulk_run CC=17 (limit:15)
-  🟡 CC    _classify_heuristic CC=26 (limit:15)
-  🟡 CC    bulk_init CC=18 (limit:15)
   🟡 CC    _read_costs_data CC=22 (limit:15)
   🟡 CC    _should_run_stage CC=17 (limit:15)
 
@@ -28,11 +28,11 @@ REFACTOR[2]:
   2. split 19 high-CC methods  (CC>15)
 
 PIPELINES[116]:
-  [1] Src [main]: main
+  [1] Src [main]: main → run_project
       PURITY: 100% pure
   [2] Src [main]: main → save_snapshot → load_history
       PURITY: 100% pure
-  [3] Src [main]: main → run_project
+  [3] Src [main]: main
       PURITY: 100% pure
   [4] Src [run_composite_check]: run_composite_check → compute_composite_score
       PURITY: 100% pure
@@ -47,7 +47,7 @@ LAYERS:
   pyqual/                         CC̄=6.6    ←in:1  →out:0
   │ !! cli                       1466L  0C   24m  CC=29     ←0
   │ !! bulk_init                  716L  3C   15m  CC=26     ←1
-  │ !! pipeline                   611L  10C   24m  CC=26     ←0
+  │ !! pipeline                   616L  10C   24m  CC=29     ←0
   │ !! bulk_run                   550L  3C    7m  CC=19     ←1
   │ !! report                     544L  0C   16m  CC=22     ←0
   │ !! _gate_collectors           499L  0C   22m  CC=17     ←0

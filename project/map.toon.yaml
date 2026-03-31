@@ -1,6 +1,6 @@
-# pyqual | 25f 7460L | shell:1,python:24 | 2026-03-31
+# pyqual | 25f 7465L | shell:1,python:24 | 2026-03-31
 # stats: 206 func | 0 cls | 25 mod | CC̄=6.6 | critical:20 | cycles:0
-# alerts[5]: fan-out run=50; CC history=29; CC watch=29; fan-out history=27; CC Pipeline._execute_stage=26
+# alerts[5]: fan-out run=50; CC Pipeline._execute_stage=29; CC history=29; CC watch=29; fan-out history=27
 # hotspots[5]: run fan=50; history fan=27; PyqualConfig._parse fan=24; fix_config fan=23; logs fan=23
 # evolution: CC̄ 6.6→6.6 (flat 0.0)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
@@ -22,7 +22,7 @@ M[25]:
   pyqual/integrations/llx_mcp.py,102
   pyqual/integrations/llx_mcp_service.py,70
   pyqual/llm.py,126
-  pyqual/pipeline.py,611
+  pyqual/pipeline.py,616
   pyqual/plugins.py,130
   pyqual/profiles.py,124
   pyqual/report.py,544
@@ -57,6 +57,18 @@ D:
     logs(workdir;tail;level;stage;failed;show_output;json_output;sql)
     watch(workdir;interval;show_output;show_prompts)
     history(workdir;tail;prompts;json_output;verbose)
+  pyqual/pipeline.py:
+    e: OnStageStart,OnIterationStart,OnStageError,OnStageDone,OnStageOutput,OnIterationDone,StageResult,IterationResult,PipelineResult,Pipeline
+    OnStageStart(Protocol): __call__(1)
+    OnIterationStart(Protocol): __call__(1)
+    OnStageError(Protocol): __call__(1)
+    OnStageDone(Protocol): __call__(1)  # Called after each stage completes. Receives the full StageRe...
+    OnStageOutput(Protocol): __call__(3)  # Called with each line of streaming output from a stage...
+    OnIterationDone(Protocol): __call__(1)  # Called after each iteration completes. Receives the full Ite...
+    StageResult:  # Result of running a single stage...
+    IterationResult:  # Result of one full pipeline iteration...
+    PipelineResult:  # Result of the complete pipeline run (all iterations)...
+    Pipeline: __init__(9),run(1),check_gates(0),_run_iteration(2),_iteration_stagnated(0),_should_run_stage(4),_resolve_tool_stage(1),_execute_stage(2),_execute_captured(5),_execute_streaming(5),_init_nfo(0),_nfo_emit(4),_is_fix_stage(1),_log_stage(2),_archive_llx_report(2),_log_gates(2),_log_event(1),_ensure_pyqual_dir(0)  # Execute pipeline stages in a loop until quality gates pass...
   pyqual/validation.py:
     e: ErrorDomain,EC,StageFailure,Severity,ValidationIssue,ValidationResult,error_domain,_classify_failure,_resolve_gate_metric,validate_config,detect_project_facts
     ErrorDomain(str,Enum):
@@ -90,18 +102,6 @@ D:
     _safe_name(name)
     generate_pyqual_yaml(project_name;cfg)
     bulk_init(root)
-  pyqual/pipeline.py:
-    e: OnStageStart,OnIterationStart,OnStageError,OnStageDone,OnStageOutput,OnIterationDone,StageResult,IterationResult,PipelineResult,Pipeline
-    OnStageStart(Protocol): __call__(1)
-    OnIterationStart(Protocol): __call__(1)
-    OnStageError(Protocol): __call__(1)
-    OnStageDone(Protocol): __call__(1)  # Called after each stage completes. Receives the full StageRe...
-    OnStageOutput(Protocol): __call__(3)  # Called with each line of streaming output from a stage...
-    OnIterationDone(Protocol): __call__(1)  # Called after each iteration completes. Receives the full Ite...
-    StageResult:  # Result of running a single stage...
-    IterationResult:  # Result of one full pipeline iteration...
-    PipelineResult:  # Result of the complete pipeline run (all iterations)...
-    Pipeline: __init__(9),run(1),check_gates(0),_run_iteration(2),_iteration_stagnated(0),_should_run_stage(4),_resolve_tool_stage(1),_execute_stage(2),_execute_captured(5),_execute_streaming(5),_init_nfo(0),_nfo_emit(4),_is_fix_stage(1),_log_stage(2),_archive_llx_report(2),_log_gates(2),_log_event(1),_ensure_pyqual_dir(0)  # Execute pipeline stages in a loop until quality gates pass...
   pyqual/config.py:
     e: StageConfig,GateConfig,LoopConfig,PyqualConfig,_load_env_file,_normalize_env_values
     StageConfig: __post_init__(0)  # Single pipeline stage...

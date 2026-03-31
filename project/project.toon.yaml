@@ -1,4 +1,4 @@
-# pyqual | 206 func | 20f | 10947L | python | 2026-03-31
+# pyqual | 206 func | 20f | 10952L | python | 2026-03-31
 
 HEALTH:
   CC̄=6.6  critical=49 (limit:10)  dup=0  cycles=0
@@ -7,10 +7,10 @@ ALERTS[20]:
   !!! high_fan_out     run = 50 (limit:10)
   !!! cc_exceeded      watch = 29 (limit:15)
   !!! cc_exceeded      history = 29 (limit:15)
+  !!! cc_exceeded      Pipeline._execute_stage = 29 (limit:15)
   !!! high_fan_out     history = 27 (limit:10)
   !!! cc_exceeded      validate_config = 26 (limit:15)
   !!! cc_exceeded      _classify_heuristic = 26 (limit:15)
-  !!! cc_exceeded      Pipeline._execute_stage = 26 (limit:15)
   !!! cc_exceeded      run = 25 (limit:15)
   !!! high_fan_out     PyqualConfig._parse = 24 (limit:10)
   !!! high_fan_out     fix_config = 23 (limit:10)
@@ -18,7 +18,7 @@ ALERTS[20]:
 MODULES[25] (top by size):
   M[pyqual/cli.py] 1466L C:0 F:24 CC↑29 D:0 (python)
   M[pyqual/bulk_init.py] 716L C:3 F:15 CC↑26 D:1 (python)
-  M[pyqual/pipeline.py] 611L C:10 F:24 CC↑26 D:0 (python)
+  M[pyqual/pipeline.py] 616L C:10 F:24 CC↑29 D:0 (python)
   M[pyqual/bulk_run.py] 550L C:3 F:7 CC↑19 D:1 (python)
   M[pyqual/report.py] 544L C:0 F:16 CC↑22 D:0 (python)
   M[pyqual/_gate_collectors.py] 499L C:0 F:22 CC↑17 D:0 (python)
@@ -56,4 +56,4 @@ REFACTOR[15]:
   [5] H/L Split _classify_heuristic (CC=26 → target CC<10)
 
 EVOLUTION:
-  2026-03-31 CC̄=6.6 crit=49 10947L // Automated analysis
+  2026-03-31 CC̄=6.6 crit=49 10952L // Automated analysis
