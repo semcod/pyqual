@@ -120,9 +120,12 @@ pipeline:
       optional: true
       timeout: 1800
 
-    # Goal-powered push, Makefile-based publish (run only when all gates pass)
+    # Simple git push (goal push had "Argument list too long" issue with many files)
     - name: push
-      run: yes | goal push --bump patch --no-publish --todo --model ${LLM_MODEL}
+      run: |
+        git add -A
+        git commit -m "chore: pyqual auto-commit [skip ci]" || true
+        git push origin HEAD
       when: metrics_pass
       optional: true
       timeout: 120
