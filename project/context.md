@@ -68,14 +68,14 @@
 - **Classes**: 3
 - **File**: `bulk_run.py`
 
-### pyqual.tickets
-- **Functions**: 6
-- **File**: `tickets.py`
-
 ### pyqual.gates
 - **Functions**: 6
 - **Classes**: 3
 - **File**: `gates.py`
+
+### pyqual.tickets
+- **Functions**: 6
+- **File**: `tickets.py`
 
 ### pyqual.validation
 - **Functions**: 6
@@ -98,9 +98,9 @@
 - **Functions**: 3
 - **File**: `cli_log_helpers.py`
 
-### examples.custom_gates.composite_gates
+### run_analysis
 - **Functions**: 2
-- **File**: `composite_gates.py`
+- **File**: `run_analysis.py`
 
 ## Key Entry Points
 
@@ -450,6 +450,10 @@ Does NOT run any stages — this is a stati
 > Return (ts, event_name, name, status, details) for one log entry.
 - **Output to**: entry.get, entry.get, None.replace, entry.get, entry.get
 
+### pyqual.bulk_run._parse_output_line
+> Parse a line of pyqual run output and update state.
+- **Output to**: line.strip, clean.startswith, clean.startswith, None.strip, None.strip
+
 ### pyqual.integrations.llx_mcp_service.build_parser
 > Build the CLI parser for the MCP service.
 - **Output to**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, os.getenv, int
@@ -457,10 +461,6 @@ Does NOT run any stages — this is a stati
 ### pyqual.integrations.llx_mcp.build_parser
 > Build the CLI parser for the llx MCP helper.
 - **Output to**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument
-
-### pyqual.bulk_run._parse_output_line
-> Parse a line of pyqual run output and update state.
-- **Output to**: line.strip, clean.startswith, clean.startswith, None.strip, None.strip
 
 ### pyqual.report._parse_pyproject_fallback
 > Minimal regex parser for pyproject.toml when tomllib is unavailable.
@@ -507,8 +507,8 @@ Functions exposed as public API (no underscore prefix):
 - `pyqual.cli_plugin_helpers.plugin_add` - 19 calls
 - `pyqual.builtin_collectors.LLMBenchCollector.collect` - 18 calls
 - `pyqual.cli.mcp_fix` - 18 calls
-- `pyqual.integrations.llx_mcp.main` - 18 calls
 - `pyqual.bulk_run.build_dashboard_table` - 18 calls
+- `pyqual.integrations.llx_mcp.main` - 18 calls
 - `examples.custom_gates.composite_gates.run_composite_check` - 17 calls
 - `pyqual.cli.mcp_refactor` - 17 calls
 - `pyqual.cli.doctor` - 17 calls
