@@ -155,10 +155,42 @@ stages:
 
 ## Stage Conditions
 
-- `when: always` — run every iteration
-- `when: metrics_fail` — only run if gates failed
-- `when: metrics_pass` — only run if gates passed (rarely used)
-- `when: any_stage_fail` — run only if a prior stage in this iteration failed
+| Condition | Triggers when | Typical stages |
+|-----------|--------------|----------------|
+| `always` | every iteration (default) | validate, test, benchmark |
+| `first_iteration` | only iteration 1 | analyze, baseline, code2llm |
+| `metrics_fail` | quality gates failed | prefact, fix, fix_regression |
+| `metrics_pass` | all quality gates pass | push, publish, deploy |
+| `after_fix` | any stage with "fix" in name ran (not skipped) | verify, verify_fix |
+| `after_verify_fix` | any stage with "verify" in name ran (not skipped) | regression_report |
+| `any_stage_fail` | a prior stage in this iteration failed | prefact, fix |
+
+### Smart Defaults
+
+pyqual **auto-infers** the `when:` condition from the stage name, so you often don't need to set it:
+
+```yaml
+stages:
+  # These two are equivalent:
+  - name: fix_regression
+    run: llx fix . --apply
+    when: metrics_fail        # explicit
+
+  - name: fix_regression
+    run: llx fix . --apply
+    # when: is auto-set to metrics_fail because name contains "fix"
+```
+
+| Stage name pattern | Auto `when:` |
+|---|---|
+| `analyze`, `baseline`, `code2llm` | `first_iteration` |
+| `fix`, `fix_regression`, `auto_fix`, `repair`, `prefact` | `metrics_fail` |
+| `verify`, `verify_fix` | `after_fix` |
+| `regression_report` | `after_verify_fix` |
+| `push`, `publish`, `deploy` | `metrics_pass` |
+| anything else | `always` |
+
+You can always override with an explicit `when:` in your YAML.
 
 ## Stage Options
 
@@ -178,6 +210,50 @@ stages:
     timeout: 600          # seconds (default: 300)
     when: always
 ```
+
+## Goal Integration (Push & Publish)
+
+pyqual can automatically push changes and publish packages when all quality gates pass using the **goal** tool:
+
+```yaml
+stages:
+  # ... existing stages ...
+
+  # Run only when all gates pass
+  - name: push
+    run: goal push --bump patch --no-publish --todo --model ${LLM_MODEL}
+    when: metrics_pass
+    optional: true
+    timeout: 120
+
+  - name: publish
+    run: goal publish
+    when: metrics_pass
+    optional: true
+    timeout: 300
+```
+
+### Goal options
+
+- `--bump patch` — automatically bump version (patch/minor/major)
+- `--no-publish` — skip publishing during push (handled by separate publish stage)
+- `--todo` — create TODO.md with detected issues
+- `--model ${LLM_MODEL}` — use same LLM model for commit message generation
+- `optional: true` — skip gracefully if goal isn't installed
+
+### What goal does
+
+1. **push stage**:
+   - Runs tests (if configured)
+   - Generates a conventional commit message with AI
+   - Updates CHANGELOG.md
+   - Syncs version across files
+   - Creates git tag
+   - Pushes to remote
+
+2. **publish stage**:
+   - Publishes to package registry (PyPI, npm, etc.)
+   - Can use Makefile publish target if available
 
 ## Loop Behavior
 
@@ -276,18 +352,41 @@ pipeline_logs table:
 | `event` | `pipeline_start`, `stage_done`, `gate_check`, `pipeline_end` |
 | `returncode` | Normalized (0 for allow_failure linters) |
 | `original_returncode` | Raw tool exit code (preserved for diagnosis) |
-| `stderr_tail` | Last 500 chars of stderr (only on failure) |
+| `stdout_tail` | Last 500 chars of stdout (2000 for fix stages) |
+| `stderr_tail` | Last 500 chars of stderr |
 | `tool` | Preset name if used, null for `run:` commands |
 | `ok` | Whether stage/gate passed |
 
 ### Viewing logs
 
 ```bash
-pyqual logs                    # table view
-pyqual logs --failed           # only failures (level=WARNING)
-pyqual logs --json --failed    # JSON for llx/litellm auto-diagnosis
-pyqual logs --tail 10          # last 10 entries
-pyqual run --verbose           # live log output to stderr
+pyqual logs                        # table view of all entries
+pyqual logs --failed               # only failures (level=WARNING)
+pyqual logs --stage fix --output   # fix stage with captured stdout/stderr
+pyqual logs --json --failed        # JSON for llx/litellm auto-diagnosis
+pyqual logs --tail 10              # last 10 entries
+pyqual run --verbose               # live log output to stderr
+pyqual run --stream                # real-time stdout/stderr streaming per stage
+```
+
+### Viewing LLX fix history
+
+```bash
+pyqual history                     # summary table of all LLX fix runs
+pyqual history --prompts           # include full LLX prompts sent to the model
+pyqual history --verbose           # include aider/llx stdout
+pyqual history --json              # raw JSONL for LLM consumption
+```
+
+### Live log tailing (`pyqual watch`)
+
+Monitor pipeline execution in real-time from a second terminal while `pyqual run` is active:
+
+```bash
+pyqual watch                       # live tail of pipeline.db events
+pyqual watch --output              # include captured stage stdout/stderr
+pyqual watch --prompts             # show LLX fix prompts as they appear
+pyqual watch --interval 0.5        # faster polling (default: 1s)
 ```
 
 ### SQL access

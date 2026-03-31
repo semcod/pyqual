@@ -117,7 +117,8 @@ def test_run_on_fail_create_ticket_syncs_todo_tickets(tmp_path: Path, monkeypatc
     class FakePipeline:
         def __init__(self, config: object, workdir: Path, on_stage_start=None,
                      on_iteration_start=None, on_stage_error=None,
-                     on_stage_done=None):
+                     on_stage_done=None, on_stage_output=None, stream=False,
+                     on_iteration_done=None):
             self.config = config
             self.workdir = workdir
 
@@ -180,7 +181,8 @@ def test_run_report_includes_todo_and_fix_summary(tmp_path: Path, monkeypatch: p
     class FakePipeline:
         def __init__(self, config: object, workdir: Path, on_stage_start=None,
                      on_iteration_start=None, on_stage_error=None,
-                     on_stage_done=None):
+                     on_stage_done=None, on_stage_output=None, stream=False,
+                     on_iteration_done=None):
             self.config = config
             self.workdir = workdir
 

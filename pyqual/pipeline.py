@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import json as _json
 import logging
 import os
+import shutil
 import subprocess
 import time
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -22,9 +25,12 @@ log = logging.getLogger("pyqual.pipeline")
 
 PIPELINE_DB = ".pyqual/pipeline.db"
 PIPELINE_TABLE = "pipeline_logs"
+LLX_MCP_REPORT = ".pyqual/llx_mcp.json"
+LLX_HISTORY_FILE = ".pyqual/llx_history.jsonl"
 
 TIMEOUT_EXIT_CODE = 124
 STDERR_TAIL_CHARS = 500
+STDOUT_TAIL_CHARS = 2000
 
 
 @dataclass
@@ -72,7 +78,9 @@ class Pipeline:
 
     def __init__(self, config: PyqualConfig, workdir: str | Path = ".",
                  on_stage_start: Any = None, on_iteration_start: Any = None,
-                 on_stage_error: Any = None, on_stage_done: Any = None):
+                 on_stage_error: Any = None, on_stage_done: Any = None,
+                 on_stage_output: Any = None, stream: bool = False,
+                 on_iteration_done: Any = None):
         self.config = config
         self.workdir = Path(workdir).resolve()
         self.gate_set = GateSet(config.gates)
@@ -80,6 +88,9 @@ class Pipeline:
         self.on_iteration_start = on_iteration_start
         self.on_stage_error = on_stage_error
         self.on_stage_done = on_stage_done
+        self.on_stage_output = on_stage_output
+        self.stream = stream
+        self.on_iteration_done = on_iteration_done
         self._ensure_pyqual_dir()
         self._nfo = self._init_nfo()
 
@@ -103,6 +114,11 @@ class Pipeline:
 
             if iteration.all_gates_passed:
                 result.final_passed = True
+                break
+
+            if i > 1 and self._iteration_stagnated(iteration):
+                log.info("pipeline=%s status=stagnated iteration=%d reason=fix_no_changes",
+                         self.config.name, i)
                 break
 
         result.total_duration = time.monotonic() - start
@@ -131,23 +147,37 @@ class Pipeline:
         for stage_cfg in self.config.stages:
             should_run = self._should_run_stage(stage_cfg, gates_status, iteration.stages, num)
             if not should_run:
-                iteration.stages.append(StageResult(
+                skipped_result = StageResult(
                     name=stage_cfg.name, returncode=0,
                     stdout="", stderr="", duration=0.0, skipped=True,
-                ))
+                )
+                iteration.stages.append(skipped_result)
+                if self.on_stage_done:
+                    self.on_stage_done(skipped_result)
                 continue
 
             stage_result = self._execute_stage(stage_cfg, dry_run)
             iteration.stages.append(stage_result)
             if self.on_stage_done:
-                self.on_stage_done(stage_result.name, stage_result.passed,
-                                   stage_result.duration, stage_result.skipped)
+                self.on_stage_done(stage_result)
 
         iteration.gates = self.gate_set.check_all(self.workdir)
         iteration.all_gates_passed = all(g.passed for g in iteration.gates)
         iteration.duration = time.monotonic() - start
         self._log_gates(num, iteration.gates)
+        if self.on_iteration_done:
+            self.on_iteration_done(iteration)
         return iteration
+
+    @staticmethod
+    def _iteration_stagnated(iteration: IterationResult) -> bool:
+        """Return True if a fix stage ran but produced no changes (no diff output)."""
+        for stage in iteration.stages:
+            if "fix" in stage.name.lower() and not stage.skipped:
+                combined = (stage.stdout or "") + (stage.stderr or "")
+                if combined and "+++ b/" not in combined:
+                    return True
+        return False
 
     def _should_run_stage(
         self,
@@ -174,7 +204,11 @@ class Pipeline:
         if stage.when == "after_fix":
             if not stages_so_far:
                 return False
-            return any(s.name == "fix" and not s.skipped for s in stages_so_far)
+            return any("fix" in s.name.lower() and not s.skipped for s in stages_so_far)
+        if stage.when == "after_verify_fix":
+            if not stages_so_far:
+                return False
+            return any("verify" in s.name.lower() and not s.skipped for s in stages_so_far)
         return True
 
     def _resolve_tool_stage(self, stage: StageConfig) -> tuple[str, bool]:
@@ -221,6 +255,21 @@ class Pipeline:
                 )
                 self._log_stage(stage, result)
                 return result
+        elif stage.optional and command:
+            # Extract the main binary, handling pipes (e.g. "yes | goal push ...")
+            # and env-var prefixes. Check the last pipe segment's first word.
+            cmd_stripped = command.strip()
+            if "|" in cmd_stripped:
+                cmd_stripped = cmd_stripped.rsplit("|", 1)[-1].strip()
+            binary = cmd_stripped.split()[0] if cmd_stripped else ""
+            if binary and not shutil.which(binary):
+                result = StageResult(
+                    name=stage.name, returncode=0,
+                    stdout=f"[skipped] '{binary}' not found on PATH (optional)",
+                    stderr="", duration=0.0, skipped=True,
+                )
+                self._log_stage(stage, result)
+                return result
 
         if dry_run:
             label = f"tool:{stage.tool}" if stage.tool else stage.run
@@ -245,38 +294,10 @@ class Pipeline:
         env = {**os.environ, **self.config.env}
         start = time.monotonic()
 
-        try:
-            effective_timeout = stage.timeout if stage.timeout > 0 else None
-            proc = subprocess.run(
-                command, shell=True, cwd=self.workdir,
-                capture_output=stage.capture_output, text=True,
-                timeout=effective_timeout, env=env,
-            )
-            raw_rc = proc.returncode
-            rc = 0 if (allow_failure and raw_rc != 0) else raw_rc
-            result = StageResult(
-                name=stage.name, returncode=rc,
-                stdout=proc.stdout or "", stderr=proc.stderr or "",
-                duration=time.monotonic() - start,
-                original_returncode=raw_rc,
-                command=command, tool=stage.tool,
-            )
-        except subprocess.TimeoutExpired:
-            result = StageResult(
-                name=stage.name, returncode=TIMEOUT_EXIT_CODE,
-                stdout="", stderr=f"Timeout after {stage.timeout}s",
-                duration=time.monotonic() - start,
-                original_returncode=TIMEOUT_EXIT_CODE,
-                command=command, tool=stage.tool,
-            )
-        except Exception as e:
-            result = StageResult(
-                name=stage.name, returncode=1,
-                stdout="", stderr=str(e),
-                duration=time.monotonic() - start,
-                original_returncode=1,
-                command=command, tool=stage.tool,
-            )
+        if self.stream:
+            result = self._execute_streaming(stage, command, allow_failure, env, start)
+        else:
+            result = self._execute_captured(stage, command, allow_failure, env, start)
 
         self._log_stage(stage, result)
 
@@ -294,6 +315,106 @@ class Pipeline:
             self.on_stage_error(failure)
 
         return result
+
+    def _execute_captured(self, stage: StageConfig, command: str,
+                          allow_failure: bool, env: dict, start: float) -> StageResult:
+        """Execute stage with captured output (default mode)."""
+        try:
+            effective_timeout = stage.timeout if stage.timeout > 0 else None
+            proc = subprocess.run(
+                command, shell=True, cwd=self.workdir,
+                capture_output=stage.capture_output, text=True,
+                timeout=effective_timeout, env=env,
+            )
+            raw_rc = proc.returncode
+            rc = 0 if (allow_failure and raw_rc != 0) else raw_rc
+            return StageResult(
+                name=stage.name, returncode=rc,
+                stdout=proc.stdout or "", stderr=proc.stderr or "",
+                duration=time.monotonic() - start,
+                original_returncode=raw_rc,
+                command=command, tool=stage.tool,
+            )
+        except subprocess.TimeoutExpired:
+            return StageResult(
+                name=stage.name, returncode=TIMEOUT_EXIT_CODE,
+                stdout="", stderr=f"Timeout after {stage.timeout}s",
+                duration=time.monotonic() - start,
+                original_returncode=TIMEOUT_EXIT_CODE,
+                command=command, tool=stage.tool,
+            )
+        except Exception as e:
+            return StageResult(
+                name=stage.name, returncode=1,
+                stdout="", stderr=str(e),
+                duration=time.monotonic() - start,
+                original_returncode=1,
+                command=command, tool=stage.tool,
+            )
+
+    def _execute_streaming(self, stage: StageConfig, command: str,
+                           allow_failure: bool, env: dict, start: float) -> StageResult:
+        """Execute stage with real-time output streaming via Popen."""
+        stdout_lines: list[str] = []
+        stderr_lines: list[str] = []
+        effective_timeout = stage.timeout if stage.timeout > 0 else None
+        try:
+            proc = subprocess.Popen(
+                command, shell=True, cwd=self.workdir,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                text=True, env=env, bufsize=1,
+            )
+            import select
+            readable = [proc.stdout, proc.stderr]
+            while readable:
+                if effective_timeout:
+                    elapsed = time.monotonic() - start
+                    remaining = effective_timeout - elapsed
+                    if remaining <= 0:
+                        proc.kill()
+                        proc.wait()
+                        return StageResult(
+                            name=stage.name, returncode=TIMEOUT_EXIT_CODE,
+                            stdout="".join(stdout_lines),
+                            stderr=f"Timeout after {stage.timeout}s",
+                            duration=time.monotonic() - start,
+                            original_returncode=TIMEOUT_EXIT_CODE,
+                            command=command, tool=stage.tool,
+                        )
+                else:
+                    remaining = 1.0
+                try:
+                    ready, _, _ = select.select(readable, [], [], min(remaining, 1.0))
+                except (ValueError, OSError):
+                    break
+                for fd in ready:
+                    line = fd.readline()
+                    if not line:
+                        readable.remove(fd)
+                        continue
+                    is_stderr = fd is proc.stderr
+                    (stderr_lines if is_stderr else stdout_lines).append(line)
+                    if self.on_stage_output:
+                        self.on_stage_output(stage.name, line.rstrip(), is_stderr)
+
+            proc.wait()
+            raw_rc = proc.returncode
+            rc = 0 if (allow_failure and raw_rc != 0) else raw_rc
+            return StageResult(
+                name=stage.name, returncode=rc,
+                stdout="".join(stdout_lines), stderr="".join(stderr_lines),
+                duration=time.monotonic() - start,
+                original_returncode=raw_rc,
+                command=command, tool=stage.tool,
+            )
+        except Exception as e:
+            return StageResult(
+                name=stage.name, returncode=1,
+                stdout="".join(stdout_lines), stderr=str(e),
+                duration=time.monotonic() - start,
+                original_returncode=1,
+                command=command, tool=stage.tool,
+            )
 
     # ------------------------------------------------------------------
     # nfo structured logging
@@ -327,9 +448,17 @@ class Pipeline:
         except Exception:
             pass
 
+    def _is_fix_stage(self, stage: StageConfig) -> bool:
+        """Return True if *stage* is a fix/repair stage (llx, aider, etc.)."""
+        if stage.tool and stage.tool in ("llx-fix", "aider"):
+            return True
+        run_cmd = stage.run or ""
+        return any(kw in run_cmd for kw in ("llx", "aider", "fix", "repair"))
+
     def _log_stage(self, stage: StageConfig, result: StageResult) -> None:
         """Write structured nfo log entry for a stage execution."""
         preset = get_preset(stage.tool) if stage.tool else None
+        is_fix = self._is_fix_stage(stage)
         kwargs: dict[str, Any] = {
             "event": "stage_done",
             "pipeline": self.config.name,
@@ -346,6 +475,8 @@ class Pipeline:
         }
         if result.stderr:
             kwargs["stderr_tail"] = result.stderr[-STDERR_TAIL_CHARS:]
+        if is_fix and result.stdout:
+            kwargs["stdout_tail"] = result.stdout[-STDOUT_TAIL_CHARS:]
 
         level_str = "INFO" if result.passed else "WARNING"
         log.log(logging.INFO if result.passed else logging.WARNING,
@@ -355,6 +486,48 @@ class Pipeline:
 
         self._nfo_emit("stage_done", level_str, kwargs,
                        duration_ms=round(result.duration * 1000, 1))
+
+        if is_fix and not result.skipped:
+            self._archive_llx_report(stage, result)
+
+    def _archive_llx_report(self, stage: StageConfig, result: StageResult) -> None:
+        """Append the current llx_mcp.json report to llx_history.jsonl.
+
+        Each line is a JSON object with a timestamp, stage name, duration,
+        return code, and the full llx_mcp.json content (if present).
+        """
+        history_path = self.workdir / LLX_HISTORY_FILE
+        report_path = self.workdir / LLX_MCP_REPORT
+
+        entry: dict[str, Any] = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "stage": stage.name,
+            "command": result.command or stage.run,
+            "returncode": result.returncode,
+            "duration_s": round(result.duration, 3),
+            "ok": result.passed,
+        }
+
+        if report_path.exists():
+            try:
+                report = _json.loads(report_path.read_text())
+                entry["llx_report"] = report
+                entry["prompt"] = report.get("prompt", "")
+                entry["model"] = report.get("model", "")
+                entry["issues_count"] = len(report.get("issues", []))
+                entry["success"] = report.get("success")
+            except Exception:
+                pass
+
+        if result.stdout:
+            entry["stdout_tail"] = result.stdout[-STDOUT_TAIL_CHARS:]
+
+        try:
+            with open(history_path, "a") as f:
+                f.write(_json.dumps(entry, ensure_ascii=False, default=str) + "\n")
+            log.info("llx_history: archived fix run to %s", history_path)
+        except Exception as exc:
+            log.warning("llx_history: failed to archive: %s", exc)
 
     def _log_gates(self, iteration: int, gates: list[GateResult]) -> None:
         """Write structured nfo log entries for gate check results."""

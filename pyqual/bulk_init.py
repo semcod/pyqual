@@ -223,7 +223,8 @@ def _collect_pyproject_metadata(project_dir: Path, fp: ProjectFingerprint) -> No
         import tomllib
     except ImportError:
         try:
-            import tomli as tomllib  # type: ignore[no-redef]
+            import importlib as _il
+            tomllib = _il.import_module("tomli")  # type: ignore[assignment]
         except ImportError:
             tomllib = None  # type: ignore[assignment]
     if tomllib is None:

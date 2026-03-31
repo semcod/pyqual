@@ -491,31 +491,95 @@ def run(
     dry_run: bool = typer.Option(False, "--dry-run", "-n"),
     workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Show live pipeline log output."),
+    stream: bool = typer.Option(False, "--stream", "-s",
+                                help="Stream stage stdout/stderr in real-time (shows llx prompts, vallm output, etc)."),
     auto_fix_config: bool = typer.Option(False, "--auto-fix-config",
                                          help="Auto-repair pyqual.yaml when ENV/CONFIG errors are detected."),
 ) -> None:
-    """Execute pipeline loop until quality gates pass."""
+    """Execute pipeline loop until quality gates pass.
+
+    Output is streamed as YAML to stdout as each stage completes.
+    Diagnostic messages go to stderr.
+    """
+    import sys
     _setup_logging(verbose, workdir)
     cfg = PyqualConfig.load(config)
 
     _workdir = Path(workdir).resolve()
     _config_path = (_workdir / config) if not Path(config).is_absolute() else Path(config)
 
-    _sc = stderr_console  # live progress → stderr (keeps stdout clean YAML)
+    _sc = stderr_console
+    import pyqual as _pq
+    import yaml as _yaml
+    _ver = getattr(_pq, "__version__", "?")
+    op_sym = {"le": "<=", "ge": ">=", "lt": "<", "gt": ">", "eq": "=="}
+
+    # ── Streaming state ──
+    _iter_stages: list[dict[str, Any]] = []
+    _all_iterations: list[dict[str, Any]] = []
+
+    def _emit(text: str) -> None:
+        sys.stdout.write(text)
+        sys.stdout.flush()
+
+    def _emit_yaml_items(items: list[dict], indent: int = 0) -> None:
+        fragment = _yaml.safe_dump(items, default_flow_style=False,
+                                    sort_keys=False, allow_unicode=True)
+        prefix = " " * indent
+        for line in fragment.rstrip().splitlines():
+            _emit(prefix + line + "\n")
+
+    # ── Emit YAML preamble ──
+    _emit(f"pyqual: {_ver}\n")
+    _emit(f"config: {config}\n")
+    _emit(f"workdir: {_workdir}\n")
+    _emit("iterations:\n")
 
     def _on_iter_start(num: int) -> None:
-        _sc.print(f"[dim]─── Iteration {num} ───[/dim]")
+        _iter_stages.clear()
+        _emit(f"- iteration: {num}\n")
+        _emit("  stages:\n")
 
     def _on_stage_start(name: str) -> None:
-        _sc.print(f"[dim]▶ {name}[/dim]")
+        pass  # YAML streaming is the progress indicator; use `pyqual watch` for live logs
 
-    def _on_stage_done(name: str, passed: bool, duration: float, skipped: bool) -> None:
-        if skipped:
-            _sc.print(f"[dim]  ⏭ {name} (skipped)[/dim]")
-        elif passed:
-            _sc.print(f"[dim]  ✅ {name} ({duration:.1f}s)[/dim]")
+    def _on_stage_done(result: Any) -> None:
+        sd: dict[str, Any] = {"name": result.name}
+        if result.skipped:
+            sd["status"] = "skipped"
         else:
-            _sc.print(f"[dim]  ❌ {name} ({duration:.1f}s)[/dim]")
+            sd["status"] = "passed" if result.passed else "failed"
+            sd["duration"] = round(result.duration, 1)
+            metrics = _extract_stage_summary(result.name, result.stdout, result.stderr)
+            sd.update(metrics)
+            if not result.passed:
+                sd["rc"] = result.returncode
+                err = _get_last_error_line(result.stderr or result.stdout or "")
+                if err:
+                    sd["stderr"] = err
+        _enrich_from_artifacts(_workdir, [sd])
+        _iter_stages.append(sd)
+        _emit_yaml_items([sd], indent=2)
+
+    def _on_iteration_done(iteration: Any) -> None:
+        gate_dicts: list[dict[str, Any]] = []
+        for gate in iteration.gates:
+            gate_dicts.append({
+                "metric": gate.metric,
+                "value": round(gate.value, 1) if gate.value is not None else None,
+                "threshold": gate.threshold,
+                "operator": op_sym.get(gate.operator, gate.operator),
+                "passed": gate.passed,
+            })
+        _emit("  gates:\n")
+        _emit_yaml_items(gate_dicts, indent=2)
+        _emit(f"  all_gates_passed: {'true' if iteration.all_gates_passed else 'false'}\n")
+        _all_iterations.append({
+            "iteration": iteration.iteration,
+            "stages": list(_iter_stages),
+            "gates": gate_dicts,
+            "all_gates_passed": iteration.all_gates_passed,
+        })
 
     def _on_stage_error(failure: Any) -> None:  # failure: StageFailure
         from pyqual.validation import EC, ErrorDomain, validate_config
@@ -567,7 +631,7 @@ def run(
             _sc.print()
 
         elif domain == ErrorDomain.PROJECT:
-            _sc.print(f"  [dim][{failure.stage_name}] {code}  → fix stage will handle this.[/dim]")
+            pass  # expected — fix stage handles project issues; visible in YAML as status: failed
 
     def _run_auto_fix_config(cfg_path: Path, wd: Path, diag: Any) -> None:
         from pyqual.validation import detect_project_facts
@@ -601,74 +665,69 @@ def run(
         except Exception as exc:
             _sc.print(f"  [red]Auto-fix failed: {exc}[/red]")
 
-    import pyqual as _pq
-    import yaml as _yaml
-    _ver = getattr(_pq, "__version__", "?")
+    def _on_stage_output(name: str, line: str, is_stderr: bool) -> None:
+        tag = "err" if is_stderr else "out"
+        _sc.print(f"  [dim][{name}:{tag}][/dim] {line}")
 
     pipeline = Pipeline(cfg, workdir,
                         on_stage_start=_on_stage_start,
                         on_iteration_start=_on_iter_start,
                         on_stage_error=_on_stage_error,
-                        on_stage_done=_on_stage_done)
+                        on_stage_done=_on_stage_done,
+                        on_stage_output=_on_stage_output if (stream or verbose) else None,
+                        stream=stream or verbose,
+                        on_iteration_done=_on_iteration_done)
     result = pipeline.run(dry_run=dry_run)
 
-    # ── Build structured report and emit as YAML to stdout ──
-    op_sym = {"le": "<=", "ge": ">=", "lt": "<", "gt": ">", "eq": "=="}
-    report: dict[str, Any] = {
-        "pyqual": _ver,
-        "config": str(config),
-        "workdir": str(_workdir),
-        "iterations": [],
-    }
+    # ── Emit final YAML fields ──
+    # If callbacks weren't fired (e.g. no iterations), rebuild from result
+    if not _all_iterations and result.iterations:
+        for iteration in result.iterations:
+            iter_stages = []
+            for stage in iteration.stages:
+                sd: dict[str, Any] = {"name": stage.name}
+                if stage.skipped:
+                    sd["status"] = "skipped"
+                else:
+                    sd["status"] = "passed" if stage.passed else "failed"
+                    sd["duration"] = round(stage.duration, 1)
+                    metrics = _extract_stage_summary(stage.name, stage.stdout, stage.stderr)
+                    sd.update(metrics)
+                    if not stage.passed:
+                        sd["rc"] = stage.returncode
+                        err = _get_last_error_line(stage.stderr or stage.stdout or "")
+                        if err:
+                            sd["stderr"] = err
+                _enrich_from_artifacts(_workdir, [sd])
+                iter_stages.append(sd)
+                _emit_yaml_items([sd], indent=2)
+            gate_dicts = [{
+                "metric": g.metric,
+                "value": round(g.value, 1) if g.value is not None else None,
+                "threshold": g.threshold,
+                "operator": op_sym.get(g.operator, g.operator),
+                "passed": g.passed,
+            } for g in iteration.gates]
+            if gate_dicts:
+                _emit("  gates:\n")
+                _emit_yaml_items(gate_dicts, indent=2)
+            _emit(f"  all_gates_passed: {'true' if iteration.all_gates_passed else 'false'}\n")
+            _all_iterations.append({
+                "iteration": iteration.iteration,
+                "stages": iter_stages,
+                "gates": gate_dicts,
+                "all_gates_passed": iteration.all_gates_passed,
+            })
 
-    for iteration in result.iterations:
-        iter_data: dict[str, Any] = {
-            "iteration": iteration.iteration,
-            "stages": [],
-            "gates": [],
-            "all_gates_passed": iteration.all_gates_passed,
-        }
-        for stage in iteration.stages:
-            sd: dict[str, Any] = {"name": stage.name}
-            if stage.skipped:
-                sd["status"] = "skipped"
-            else:
-                sd["status"] = "passed" if stage.passed else "failed"
-                sd["duration"] = round(stage.duration, 1)
-                metrics = _extract_stage_summary(stage.name, stage.stdout, stage.stderr)
-                sd.update(metrics)
-                if not stage.passed:
-                    sd["rc"] = stage.returncode
-                    err = _get_last_error_line(stage.stderr or stage.stdout or "")
-                    if err:
-                        sd["stderr"] = err
-            iter_data["stages"].append(sd)
+    _emit(f"result: {'all_gates_passed' if result.final_passed else 'gates_not_met'}\n")
+    _emit(f"total_time: {round(result.total_duration, 1)}\n")
 
-        _enrich_from_artifacts(_workdir, iter_data["stages"])
-
-        for gate in iteration.gates:
-            gd: dict[str, Any] = {
-                "metric": gate.metric,
-                "value": round(gate.value, 1) if gate.value is not None else None,
-                "threshold": gate.threshold,
-                "operator": op_sym.get(gate.operator, gate.operator),
-                "passed": gate.passed,
-            }
-            iter_data["gates"].append(gd)
-
-        report["iterations"].append(iter_data)
-        if iteration.all_gates_passed:
-            break
-
-    report["result"] = "all_gates_passed" if result.final_passed else "gates_not_met"
-    report["total_time"] = round(result.total_duration, 1)
+    report = {"iterations": _all_iterations}
     summary = _build_run_summary(report)
     if summary:
-        report["summary"] = summary
+        _emit(_yaml.safe_dump({"summary": summary}, default_flow_style=False,
+                               sort_keys=False, allow_unicode=True))
 
-    yaml_text = _yaml.safe_dump(report, default_flow_style=False, sort_keys=False,
-                                 allow_unicode=True)
-    console.print(Syntax(yaml_text.rstrip(), "yaml", theme="monokai", background_color="default"))
     summary_text = _format_run_summary(summary)
     if summary_text:
         _sc.print(f"\n{summary_text}")
@@ -1441,10 +1500,14 @@ def _extract_fix_stage_summary(name: str, text: str) -> dict[str, Any]:
     if m2:
         out["files_changed"] = int(m2.group(1))
     else:
-        m3 = re.search(r"(Applied|No changes|Updated|Modified|Fixed)[^\n]*", text, re.IGNORECASE)
-        if m3:
-            raw = m3.group(0)[:80]
-            out["fix_status"] = re.sub(r"[^\x20-\x7e]", "", raw).strip()
+        changed_files = set(re.findall(r"^\+\+\+ b/(.+)$", text, re.MULTILINE))
+        if changed_files:
+            out["files_changed"] = len(changed_files)
+        else:
+            m3 = re.search(r"(Applied|No changes|Updated|Modified|Fixed)[^\n]*", text, re.IGNORECASE)
+            if m3:
+                raw = m3.group(0)[:80]
+                out["fix_status"] = re.sub(r"[^\x20-\x7e]", "", raw).strip()
     return out
 
 
@@ -1514,7 +1577,7 @@ def _format_log_entry_row(entry: dict) -> tuple:
 
 
 def _query_nfo_db(db_path: Path, event: str = "", failed: bool = False,
-                  tail: int = 0, sql: str = "") -> list[dict]:
+                  tail: int = 0, sql: str = "", stage: str = "") -> list[dict]:
     """Query the nfo SQLite pipeline log and return structured dicts."""
     import sqlite3
     from pyqual.pipeline import PIPELINE_TABLE
@@ -1534,6 +1597,10 @@ def _query_nfo_db(db_path: Path, event: str = "", failed: bool = False,
     if event:
         where_clauses.append("function_name = ?")
         params.append(event)
+
+    if stage:
+        where_clauses.append("kwargs LIKE ?")
+        params.append(f"%'stage': '{stage}%")
 
     if failed:
         where_clauses.append("level = 'WARNING'")
@@ -1576,13 +1643,16 @@ def logs(
     workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
     tail: int = typer.Option(0, "--tail", "-n", help="Show last N entries (0 = all)."),
     level: str = typer.Option("", "--level", "-l", help="Filter by event type (stage_done, gate_check, pipeline_start, pipeline_end)."),
+    stage: str = typer.Option("", "--stage", help="Filter by stage name (e.g. fix, validate)."),
     failed: bool = typer.Option(False, "--failed", "-f", help="Show only failed stages/gates."),
+    show_output: bool = typer.Option(False, "--output", "-o", help="Show captured stdout/stderr for each stage."),
     json_output: bool = typer.Option(False, "--json", "-j", help="Raw JSON lines (for LLM/llx consumption)."),
     sql: str = typer.Option("", "--sql", help="Run raw SQL query against pipeline.db (advanced)."),
 ) -> None:
     """View structured pipeline logs from .pyqual/pipeline.db (nfo SQLite).
 
     Logs are written via nfo to SQLite during every pipeline run.
+    Use --output to see captured stdout/stderr (llx prompts, vallm results, etc).
     Use --json for machine-readable output (ideal for llx auto-diagnosis).
     Use --sql for arbitrary SQL queries against the log database.
 
@@ -1590,6 +1660,7 @@ def logs(
         pyqual logs                    # show all entries
         pyqual logs --tail 20          # last 20 entries
         pyqual logs --failed           # only failures
+        pyqual logs --stage fix --output  # fix stage with full output
         pyqual logs --json --failed    # JSON failures for LLM consumption
         pyqual logs --level gate_check # only gate results
         pyqual logs --sql "SELECT * FROM pipeline_logs WHERE function_name='stage_done' AND level='WARNING'"
@@ -1618,7 +1689,8 @@ def logs(
             console.print(table)
         return
 
-    rows = _query_nfo_db(db_path, event=level, failed=failed, tail=tail)
+    rows = _query_nfo_db(db_path, event=level, failed=failed, tail=tail,
+                          stage=stage)
     entries = [_row_to_event_dict(r) for r in rows]
 
     if not entries:
@@ -1631,22 +1703,240 @@ def logs(
             console.print(json.dumps(clean, default=str))
         return
 
-    # Human-readable table output
-    table = Table(title=f"Pipeline Log ({len(entries)} entries)")
-    table.add_column("Time", style="dim", width=12)
-    table.add_column("Event", width=14)
-    table.add_column("Stage/Metric")
-    table.add_column("Status", width=8)
-    table.add_column("Details")
+    # Human-readable output (works in both TTY and non-TTY)
+    _lc = Console(force_terminal=True, width=120)
+    _lc.print(f"[bold]Pipeline Log[/bold] ({len(entries)} entries)\n")
 
     for entry in entries:
-        ts, event_name, name, status, details = _format_log_entry_row(entry)
-        table.add_row(ts, event_name, name, status, details)
+        ts, event_name, name, status_col, details = _format_log_entry_row(entry)
+        _lc.print(f"  {ts}  {event_name:<14} {name:<20} {status_col:<8} {details}")
+
+        if show_output and entry.get("_function_name") == "stage_done":
+            stdout = entry.get("stdout_tail", "")
+            stderr = entry.get("stderr_tail", "")
+            if stdout:
+                for line in str(stdout).splitlines()[-15:]:
+                    _lc.print(f"    [dim][out][/dim] {line}")
+            if stderr:
+                for line in str(stderr).splitlines()[-10:]:
+                    _lc.print(f"    [red][err][/red] {line}")
+
+    _lc.print(f"\n[dim]Log DB: {db_path}[/dim]")
+    _lc.print("[dim]Tip: pyqual logs --stage fix --output   # see llx prompts/output[/dim]")
+    _lc.print("[dim]Tip: pyqual history --prompts            # see full LLX fix prompts[/dim]")
+
+
+@app.command()
+def watch(
+    workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
+    interval: float = typer.Option(1.0, "--interval", "-i", help="Poll interval in seconds."),
+    show_output: bool = typer.Option(False, "--output", "-o", help="Show captured stdout/stderr."),
+    show_prompts: bool = typer.Option(False, "--prompts", "-p", help="Show LLX fix prompts as they appear."),
+) -> None:
+    """Live-tail pipeline logs while 'pyqual run' executes in another terminal.
+
+    Watches .pyqual/pipeline.db and .pyqual/llx_history.jsonl for new entries.
+
+    Examples:
+        pyqual watch                    # live tail in another terminal
+        pyqual watch --output           # include stage stdout/stderr
+        pyqual watch --prompts          # show llx prompts as they appear
+        pyqual watch --interval 0.5     # faster polling
+    """
+    import time as _time
+    from rich.console import Console as _WatchConsole
+
+    _wc = _WatchConsole(stderr=True, force_terminal=True)
+    _wd = Path(workdir).resolve()
+    db_path = _wd / ".pyqual" / "pipeline.db"
+    history_path = _wd / ".pyqual" / "llx_history.jsonl"
+
+    _wc.print(f"[bold]pyqual watch[/bold]  workdir={_wd}")
+    _wc.print(f"[dim]Watching: {db_path}[/dim]")
+    _wc.print(f"[dim]Press Ctrl+C to stop.[/dim]\n")
+
+    last_db_count = 0
+    last_history_lines = 0
+
+    if db_path.exists():
+        try:
+            entries = _query_nfo_db(db_path)
+            last_db_count = len(entries)
+            _wc.print(f"[dim]({last_db_count} existing log entries)[/dim]")
+        except Exception:
+            pass
+
+    if history_path.exists():
+        last_history_lines = len(history_path.read_text().splitlines())
+
+    try:
+        while True:
+            _time.sleep(interval)
+
+            # Poll pipeline.db for new entries
+            if db_path.exists():
+                try:
+                    entries = _query_nfo_db(db_path)
+                    if len(entries) > last_db_count:
+                        new_entries = entries[last_db_count:]
+                        last_db_count = len(entries)
+                        for entry in new_entries:
+                            ts, event_name, name, status_col, details = _format_log_entry_row(entry)
+                            icon = "✅" if "PASS" in status_col or status_col.strip() == "" else "❌"
+                            if "SKIP" in status_col:
+                                icon = "⏭"
+                            _wc.print(f"  {ts}  [bold]{event_name:<14}[/bold] {name:<20} {status_col:<8} {details}")
+
+                            if show_output and entry.get("_function_name") == "stage_done":
+                                stdout = entry.get("stdout_tail", "")
+                                stderr = entry.get("stderr_tail", "")
+                                if stdout:
+                                    for line in str(stdout).splitlines()[-10:]:
+                                        _wc.print(f"    [dim][out][/dim] {line}")
+                                if stderr:
+                                    for line in str(stderr).splitlines()[-5:]:
+                                        _wc.print(f"    [red][err][/red] {line}")
+                except Exception:
+                    pass
+
+            # Poll llx_history.jsonl for new fix runs
+            if show_prompts and history_path.exists():
+                try:
+                    lines = history_path.read_text().splitlines()
+                    if len(lines) > last_history_lines:
+                        new_lines = lines[last_history_lines:]
+                        last_history_lines = len(lines)
+                        for line in new_lines:
+                            line = line.strip()
+                            if not line:
+                                continue
+                            try:
+                                entry = json.loads(line)
+                                ts = entry.get("timestamp", "")[:19].replace("T", " ")
+                                model = entry.get("model", "?")
+                                issues = entry.get("issues_count", "?")
+                                _wc.print(f"\n  [bold cyan]── LLX Fix ({ts}) ──[/bold cyan]")
+                                _wc.print(f"  model={model}  issues={issues}")
+                                prompt = entry.get("prompt", "")
+                                if prompt:
+                                    for pline in prompt.splitlines()[:20]:
+                                        _wc.print(f"    [dim]{pline}[/dim]")
+                                    if len(prompt.splitlines()) > 20:
+                                        _wc.print(f"    [dim]... ({len(prompt.splitlines())} lines total)[/dim]")
+                            except json.JSONDecodeError:
+                                continue
+                except Exception:
+                    pass
+
+    except KeyboardInterrupt:
+        _wc.print("\n[dim]watch stopped.[/dim]")
+
+
+@app.command()
+def history(
+    workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
+    tail: int = typer.Option(0, "--tail", "-n", help="Show last N fix runs (0 = all)."),
+    prompts: bool = typer.Option(False, "--prompts", "-p", help="Show full LLX prompts."),
+    json_output: bool = typer.Option(False, "--json", "-j", help="Output raw JSON lines."),
+    verbose: bool = typer.Option(False, "--verbose", "-v", help="Show stdout/aider output."),
+) -> None:
+    """View history of LLX/LLM fix runs from .pyqual/llx_history.jsonl.
+
+    Each time a fix stage runs during 'pyqual run', the LLX prompt, model,
+    issues, result, and aider output are archived to llx_history.jsonl.
+
+    Examples:
+        pyqual history                  # summary table of all fix runs
+        pyqual history --tail 5         # last 5 runs
+        pyqual history --prompts        # include full LLX prompts
+        pyqual history --json           # raw JSONL for LLM consumption
+        pyqual history --verbose        # include aider stdout
+    """
+    from pyqual.pipeline import LLX_HISTORY_FILE
+
+    history_path = Path(workdir) / LLX_HISTORY_FILE
+    if not history_path.exists():
+        console.print("[yellow]No fix history found.[/yellow]")
+        console.print("[dim]Run 'pyqual run' with a fix stage to start recording history.[/dim]")
+        raise typer.Exit(1)
+
+    entries: list[dict] = []
+    for line in history_path.read_text().splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            entries.append(json.loads(line))
+        except json.JSONDecodeError:
+            continue
+
+    if not entries:
+        console.print("[dim]History file is empty.[/dim]")
+        raise typer.Exit(1)
+
+    if tail > 0:
+        entries = entries[-tail:]
+
+    if json_output:
+        for entry in entries:
+            console.print(json.dumps(entry, default=str, ensure_ascii=False))
+        return
+
+    # Human-readable table
+    table = Table(title=f"LLX Fix History ({len(entries)} runs)")
+    table.add_column("Time", style="dim", width=19)
+    table.add_column("Stage", width=10)
+    table.add_column("Model", width=28)
+    table.add_column("Issues", justify="right", width=6)
+    table.add_column("Result", width=10)
+    table.add_column("Duration", justify="right", width=8)
+
+    for entry in entries:
+        ts = entry.get("timestamp", "")[:19].replace("T", " ")
+        stage = entry.get("stage", "")
+        model = entry.get("model", "")
+        issues = str(entry.get("issues_count", "?"))
+        ok = entry.get("ok") if entry.get("ok") is not None else entry.get("success")
+        if ok is True:
+            result = "[green]✅ pass[/green]"
+        elif ok is False:
+            result = "[red]❌ fail[/red]"
+        else:
+            result = "[dim]?[/dim]"
+        dur = entry.get("duration_s")
+        dur_s = f"{dur:.1f}s" if isinstance(dur, (int, float)) else "?"
+        table.add_row(ts, stage, model, issues, result, dur_s)
 
     console.print(table)
-    console.print(f"\n[dim]Log DB: {db_path}[/dim]")
-    console.print("[dim]For LLM consumption: pyqual logs --json --failed[/dim]")
-    console.print("[dim]SQL access: pyqual logs --sql \"SELECT * FROM pipeline_logs WHERE level='WARNING'\"[/dim]")
+
+    if prompts:
+        console.print()
+        for i, entry in enumerate(entries):
+            prompt = entry.get("prompt", "")
+            if prompt:
+                ts = entry.get("timestamp", "")[:19].replace("T", " ")
+                console.print(f"\n[bold]── Run {i+1} ({ts}) ──[/bold]")
+                console.print(Syntax(prompt, "text", theme="monokai", background_color="default",
+                                     word_wrap=True))
+
+    if verbose:
+        console.print()
+        for i, entry in enumerate(entries):
+            stdout = entry.get("stdout_tail", "")
+            if stdout:
+                ts = entry.get("timestamp", "")[:19].replace("T", " ")
+                console.print(f"\n[bold]── Stdout {i+1} ({ts}) ──[/bold]")
+                console.print(Syntax(stdout, "text", theme="monokai", background_color="default",
+                                     word_wrap=True))
+
+    # Summary line
+    total = len(entries)
+    passed = sum(1 for e in entries if e.get("ok") is True or e.get("success") is True)
+    failed = sum(1 for e in entries if e.get("ok") is False or e.get("success") is False)
+    models = set(e.get("model", "") for e in entries if e.get("model"))
+    console.print(f"\n[bold]Summary:[/bold] {total} runs, {passed} passed, {failed} failed"
+                  f" | Models: {', '.join(sorted(models)) or '?'}")
+    console.print(f"[dim]History: {history_path}[/dim]")
 
 
 if __name__ == "__main__":

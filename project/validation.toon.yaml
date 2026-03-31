@@ -1,23 +1,27 @@
-# vallm batch | 96f | 56✓ 8⚠ 1✗ | 2026-03-30
+# vallm batch | 24f | 23✓ 10⚠ 0✗ | 2026-03-31
 
 SUMMARY:
-  scanned: 96  passed: 56 (58.3%)  warnings: 8  errors: 1  unsupported: 39
+  scanned: 24  passed: 23 (95.8%)  warnings: 10  errors: 0  unsupported: 0
 
-WARNINGS[8]{path,score}:
-  pyqual/cli.py,0.80
-    issues[12]{rule,severity,message,line}:
+WARNINGS[10]{path,score}:
+  pyqual/cli.py,0.78
+    issues[16]{rule,severity,message,line}:
       complexity.cyclomatic,warning,bulk_run_cmd has cyclomatic complexity 19 (max: 15),178
       complexity.cyclomatic,warning,_enrich_from_artifacts has cyclomatic complexity 20 (max: 15),311
       complexity.cyclomatic,warning,_build_run_summary has cyclomatic complexity 18 (max: 15),393
-      complexity.cyclomatic,warning,run has cyclomatic complexity 19 (max: 15),489
-      complexity.cyclomatic,warning,logs has cyclomatic complexity 16 (max: 15),1574
+      complexity.cyclomatic,warning,run has cyclomatic complexity 25 (max: 15),489
+      complexity.cyclomatic,warning,logs has cyclomatic complexity 22 (max: 15),1642
+      complexity.cyclomatic,warning,watch has cyclomatic complexity 29 (max: 15),1730
+      complexity.cyclomatic,warning,history has cyclomatic complexity 29 (max: 15),1836
       complexity.maintainability,warning,Low maintainability index: 0.0 (threshold: 20),
       complexity.lizard_cc,warning,bulk_run_cmd: CC=19 exceeds limit 15,178
       complexity.lizard_cc,warning,_enrich_from_artifacts: CC=20 exceeds limit 15,311
       complexity.lizard_cc,warning,_build_run_summary: CC=18 exceeds limit 15,393
-      complexity.lizard_cc,warning,run._on_stage_error: CC=18 exceeds limit 15,520
-      complexity.lizard_cc,warning,run: CC=19 exceeds limit 15,489
-      complexity.lizard_cc,warning,logs: CC=16 exceeds limit 15,1574
+      complexity.lizard_cc,warning,run._on_stage_error: CC=18 exceeds limit 15,584
+      complexity.lizard_cc,warning,run: CC=23 exceeds limit 15,489
+      complexity.lizard_cc,warning,logs: CC=22 exceeds limit 15,1642
+      complexity.lizard_cc,warning,watch: CC=29 exceeds limit 15,1730
+      complexity.lizard_cc,warning,history: CC=28 exceeds limit 15,1836
   pyqual/validation.py,0.87
     issues[7]{rule,severity,message,line}:
       complexity.cyclomatic,warning,_classify_failure has cyclomatic complexity 21 (max: 15),158
@@ -35,31 +39,33 @@ WARNINGS[8]{path,score}:
       complexity.lizard_cc,warning,_run_single_project: CC=19 exceeds limit 15,220
       complexity.lizard_cc,warning,_build_project_row: CC=19 exceeds limit 15,329
       complexity.lizard_cc,warning,bulk_run: CC=17 exceeds limit 15,458
-  pyqual/pipeline.py,0.97
+  pyqual/bulk_init.py,0.93
+    issues[4]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,_classify_heuristic has cyclomatic complexity 26 (max: 15),375
+      complexity.cyclomatic,warning,bulk_init has cyclomatic complexity 18 (max: 15),626
+      complexity.lizard_cc,warning,_classify_heuristic: CC=26 exceeds limit 15,375
+      complexity.lizard_cc,warning,bulk_init: CC=18 exceeds limit 15,626
+  pyqual/pipeline.py,0.93
+    issues[5]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,_should_run_stage has cyclomatic complexity 17 (max: 15),182
+      complexity.cyclomatic,warning,_execute_stage has cyclomatic complexity 21 (max: 15),241
+      complexity.maintainability,warning,Low maintainability index: 11.1 (threshold: 20),
+      complexity.lizard_cc,warning,_should_run_stage: CC=17 exceeds limit 15,182
+      complexity.lizard_cc,warning,_execute_stage: CC=21 exceeds limit 15,241
+  pyqual/config.py,0.97
     issues[2]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,_execute_stage has cyclomatic complexity 21 (max: 15),200
-      complexity.lizard_cc,warning,_execute_stage: CC=21 exceeds limit 15,200
+      complexity.cyclomatic,warning,_parse has cyclomatic complexity 18 (max: 15),132
+      complexity.lizard_cc,warning,_parse: CC=18 exceeds limit 15,132
   pyqual/_gate_collectors.py,0.98
     issues[1]{rule,severity,message,line}:
-      complexity.maintainability,warning,Low maintainability index: 7.2 (threshold: 20),
+      complexity.maintainability,warning,Low maintainability index: 6.0 (threshold: 20),
   pyqual/builtin_collectors.py,0.98
     issues[1]{rule,severity,message,line}:
       complexity.maintainability,warning,Low maintainability index: 12.4 (threshold: 20),
-  test_pyqual.py,0.98
-    issues[1]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,test_pipeline_writes_nfo_sqlite_log has cyclomatic complexity 17 (max: 15),325
   tests/test_bulk_init.py,0.98
     issues[1]{rule,severity,message,line}:
       complexity.maintainability,warning,Low maintainability index: 19.2 (threshold: 20),
-
-ERRORS[1]{path,score}:
-  pyqual/bulk_init.py,0.96
+  tests/test_pipeline_stages.py,0.98
     issues[1]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'tomli' not found,226
+      complexity.maintainability,warning,Low maintainability index: 4.0 (threshold: 20),
 
-UNSUPPORTED[5]{bucket,count}:
-  *.md,28
-  Dockerfile*,1
-  *.txt,2
-  *.yml,1
-  other,7

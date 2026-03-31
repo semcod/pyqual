@@ -42,7 +42,7 @@ except Exception:  # pragma: no cover — llx is optional on Python 3.9
     def get_llm_model() -> str:
         """Get LLM model from environment or default."""
         _ensure_dotenv_loaded()
-        return os.getenv("LLM_MODEL", os.getenv("PFIX_MODEL", "openrouter/qwen/qwen3-coder-next"))
+        return os.getenv("LLM_MODEL", "openrouter/qwen/qwen3-coder-next")
 
     def get_api_key() -> str | None:
         """Get OpenRouter API key from environment."""

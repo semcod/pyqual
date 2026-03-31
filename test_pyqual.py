@@ -151,6 +151,63 @@ pipeline:
         assert result.iteration_count == 1
 
 
+def test_pipeline_runs_fix_chain_when_gates_fail() -> None:
+    """metrics_fail should trigger prefact/fix and after_fix should trigger verify."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        p = Path(tmpdir)
+        (p / ".pyqual").mkdir()
+        (p / "analysis_toon.yaml").write_text("CC̄=2.0 critical=0")
+        (p / "validation_toon.yaml").write_text(
+            "SUMMARY:\n  scanned: 100  passed: 95 (95.0%)"
+        )
+        (p / ".pyqual" / "coverage.json").write_text(
+            json.dumps({"totals": {"percent_covered": 90.0}})
+        )
+
+        config_yaml = p / "pyqual.yaml"
+        config_yaml.write_text("""\
+pipeline:
+  name: metrics-fail-flow
+  metrics:
+    cc_max: 1
+    vallm_pass_min: 90
+    coverage_min: 80
+  stages:
+    - name: analyze
+      run: python3 -c "print('analyze')"
+    - name: validate
+      run: python3 -c "print('validate')"
+    - name: test
+      run: python3 -c "print('test')"
+    - name: prefact
+      run: python3 -c "print('prefact')"
+      when: metrics_fail
+    - name: fix
+      run: python3 -c "print('fix')"
+      when: metrics_fail
+    - name: verify
+      run: python3 -c "print('verify')"
+      when: after_fix
+  loop:
+    max_iterations: 1
+""")
+
+        config = PyqualConfig.load(config_yaml)
+        pipeline = Pipeline(config, workdir=p)
+        result = pipeline.run()
+
+        assert result.iteration_count == 1
+        assert result.final_passed is False
+
+        stages = {stage.name: stage for stage in result.iterations[0].stages}
+        assert stages["prefact"].stdout.strip() == "prefact"
+        assert stages["fix"].stdout.strip() == "fix"
+        assert stages["verify"].stdout.strip() == "verify"
+        assert stages["prefact"].skipped is False
+        assert stages["fix"].skipped is False
+        assert stages["verify"].skipped is False
+
+
 def test_timeout_zero_means_no_timeout() -> None:
     """timeout: 0 should be treated as no timeout, not an immediate timeout."""
     with tempfile.TemporaryDirectory() as tmpdir:
