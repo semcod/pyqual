@@ -31,14 +31,14 @@ flowchart TD
         pyqual__plugins__PluginRegistry__get["get"]
         pyqual__plugins__PluginRegistry__list_plugins["list_plugins"]
         pyqual__plugins__PluginRegistry__create_instance["create_instance"]
-        pyqual__config__StageConfig____post_init__["__post_init__"]
-        pyqual__config__GateConfig__from_dict["from_dict"]
-        pyqual__config__PyqualConfig__load["load"]
-        pyqual__config__PyqualConfig___parse["_parse"]
-        pyqual__config__PyqualConfig__default_yaml["default_yaml"]
         pyqual__tools__ToolPreset__is_available["is_available"]
         pyqual__tools__ToolPreset__shell_command["shell_command"]
-        ...["+82 more"]
+        pyqual__tools__is_builtin["is_builtin"]
+        pyqual__tools__register_preset["register_preset"]
+        pyqual__tools__load_entry_point_presets("load_entry_point_presets CC=8")
+        pyqual__tools__resolve_stage_command["resolve_stage_command"]
+        pyqual__gates__GateResult____str__["__str__"]
+        ...["+83 more"]
     end
 
-    class run_analysis__main,pyqual__plugins__PluginMetadata____post_init__,pyqual__plugins__MetricCollector__collect,pyqual__plugins__MetricCollector__get_config_example,pyqual__plugins__PluginRegistry__register,pyqual__plugins__PluginRegistry__get,pyqual__plugins__PluginRegistry__list_plugins,pyqual__plugins__PluginRegistry__create_instance,pyqual__config__StageConfig____post_init__,pyqual__config__GateConfig__from_dict entry
+    class run_analysis__main,pyqual__plugins__PluginMetadata____post_init__,pyqual__plugins__MetricCollector__collect,pyqual__plugins__MetricCollector__get_config_example,pyqual__plugins__PluginRegistry__register,pyqual__plugins__PluginRegistry__get,pyqual__plugins__PluginRegistry__list_plugins,pyqual__plugins__PluginRegistry__create_instance,pyqual__tools__ToolPreset__is_available,pyqual__tools__ToolPreset__shell_command entry

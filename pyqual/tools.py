@@ -201,8 +201,8 @@ TOOL_PRESETS: dict[str, ToolPreset] = {
 
     # -- Reporting / badges --
     "report": ToolPreset(
-        binary="python",
-        command="python -m pyqual.report --workdir {workdir}",
+        binary="python3",
+        command="python3 -m pyqual.report --workdir {workdir}",
         output="",
         allow_failure=True,
     ),

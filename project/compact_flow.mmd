@@ -9,7 +9,7 @@ flowchart TD
     pyqual__pipeline["pyqual.pipeline<br/>24 funcs"]
     pyqual__plugins["pyqual.plugins<br/>9 funcs"]
     pyqual__profiles["pyqual.profiles<br/>2 funcs"]
-    pyqual__report["pyqual.report<br/>8 funcs"]
+    pyqual__report["pyqual.report<br/>16 funcs"]
     pyqual__tickets["pyqual.tickets<br/>6 funcs"]
     pyqual__tools["pyqual.tools<br/>9 funcs"]
     pyqual__validation["pyqual.validation<br/>6 funcs"]
@@ -30,6 +30,6 @@ flowchart TD
     examples__multi_gate_pipeline -->|1| pyqual__config
     pyqual__gates -->|1| pyqual__plugins
     pyqual__cli -->|1| pyqual__bulk_init
+    pyqual__bulk_run -->|1| pyqual__validation
     pyqual__report -->|1| pyqual__plugins
     pyqual__report -->|1| pyqual__config
-    pyqual__bulk_run -->|1| pyqual__validation

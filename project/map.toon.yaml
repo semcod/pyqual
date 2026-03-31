@@ -1,8 +1,8 @@
-# pyqual | 24f 7200L | shell:1,python:23 | 2026-03-31
-# stats: 192 func | 0 cls | 24 mod | CC̄=6.6 | critical:19 | cycles:0
+# pyqual | 24f 7468L | shell:1,python:23 | 2026-03-31
+# stats: 200 func | 0 cls | 24 mod | CC̄=6.7 | critical:20 | cycles:0
 # alerts[5]: fan-out run=50; CC history=29; CC watch=29; fan-out history=27; CC _classify_heuristic=26
 # hotspots[5]: run fan=50; history fan=27; PyqualConfig._parse fan=23; fix_config fan=23; logs fan=23
-# evolution: CC̄ 6.7→6.6 (improved -0.1)
+# evolution: CC̄ 6.6→6.7 (regressed +0.1)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
 M[24]:
   project.sh,36
@@ -24,7 +24,7 @@ M[24]:
   pyqual/pipeline.py,598
   pyqual/plugins.py,138
   pyqual/profiles.py,124
-  pyqual/report.py,276
+  pyqual/report.py,544
   pyqual/tickets.py,73
   pyqual/tools.py,353
   pyqual/validation.py,463
@@ -104,6 +104,24 @@ D:
     PyqualConfig: load(1),_parse(1),default_yaml(-1)  # Full pyqual.yaml configuration...
     _load_env_file()
     _normalize_env_values(env)
+  pyqual/report.py:
+    e: _read_pyproject,_parse_pyproject_fallback,_read_version,_read_git_commit_count,_read_costs_data,collect_project_metadata,collect_all_metrics,evaluate_gates,generate_report,_badge_url,_build_project_badges,_build_quality_badges,build_badges,update_readme_badges,run,main
+    _read_pyproject(workdir)
+    _parse_pyproject_fallback(path)
+    _read_version(workdir;pyproject)
+    _read_git_commit_count(workdir)
+    _read_costs_data(workdir)
+    collect_project_metadata(workdir;config)
+    collect_all_metrics(workdir)
+    evaluate_gates(config;workdir)
+    generate_report(config;workdir;output)
+    _badge_url(label;value;color)
+    _build_project_badges(meta)
+    _build_quality_badges(metrics;gates_passed;gates_passed_count;gates_total)
+    build_badges(metrics;gates_passed;project_meta;gates_passed_count;gates_total)
+    update_readme_badges(readme_path;metrics;gates_passed;project_meta;gates_passed_count;gates_total)
+    run(workdir;config_path;readme_path)
+    main()
   pyqual/pipeline.py:
     e: OnStageStart,OnIterationStart,OnStageError,OnStageDone,OnStageOutput,OnIterationDone,StageResult,IterationResult,PipelineResult,Pipeline
     OnStageStart(Protocol): __call__(1)
@@ -186,16 +204,6 @@ D:
   run_analysis.py:
     e: run_project,main
     run_project(project_path)
-    main()
-  pyqual/report.py:
-    e: collect_all_metrics,evaluate_gates,generate_report,_badge_url,build_badges,update_readme_badges,run,main
-    collect_all_metrics(workdir)
-    evaluate_gates(config;workdir)
-    generate_report(config;workdir;output)
-    _badge_url(label;value;color)
-    build_badges(metrics;gates_passed)
-    update_readme_badges(readme_path;metrics;gates_passed)
-    run(workdir;config_path;readme_path)
     main()
   pyqual/tools.py:
     e: ToolPreset,get_preset,list_presets,is_builtin,register_preset,register_custom_tools_from_yaml,load_entry_point_presets,resolve_stage_command

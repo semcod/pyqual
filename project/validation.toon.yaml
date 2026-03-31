@@ -1,7 +1,7 @@
-# vallm batch | 31f | 31✓ 11⚠ 0✗ | 2026-03-31
+# vallm batch | 31f | 30✓ 11⚠ 1✗ | 2026-03-31
 
 SUMMARY:
-  scanned: 31  passed: 31 (100.0%)  warnings: 11  errors: 0  unsupported: 0
+  scanned: 31  passed: 30 (96.8%)  warnings: 11  errors: 1  unsupported: 0
 
 WARNINGS[11]{path,score}:
   pyqual/cli.py,0.80
@@ -72,4 +72,9 @@ WARNINGS[11]{path,score}:
   tests/test_pipeline_stages.py,0.98
     issues[1]{rule,severity,message,line}:
       complexity.maintainability,warning,Low maintainability index: 3.9 (threshold: 20),
+
+ERRORS[1]{path,score}:
+  pyqual/report.py,0.98
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'tomli' not found,68
 

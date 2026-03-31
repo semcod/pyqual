@@ -490,7 +490,7 @@ class Pipeline:
         if stage.tool and stage.tool in ("llx-fix", "aider"):
             return True
         run_cmd = stage.run or ""
-        return any(kw in run_cmd for kw in ("llx", "aider", "fix", "repair"))
+        return any(kw in run_cmd for kw in ("llx", "aider", "fix", "repair", "claude"))
 
     def _log_stage(self, stage: StageConfig, result: StageResult) -> None:
         """Write structured nfo log entry for a stage execution."""

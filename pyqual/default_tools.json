@@ -1,0 +1,115 @@
+{
+  "ruff": {
+    "binary": "ruff",
+    "command": "ruff check {workdir} --output-format=json",
+    "output": ".pyqual/ruff.json"
+  },
+  "pylint": {
+    "binary": "pylint",
+    "command": "pylint --output-format=json {workdir}",
+    "output": ".pyqual/pylint.json"
+  },
+  "flake8": {
+    "binary": "flake8",
+    "command": "flake8 --format=json {workdir}",
+    "output": ".pyqual/flake8.json"
+  },
+  "mypy": {
+    "binary": "mypy",
+    "command": "mypy --output=json {workdir}",
+    "output": ".pyqual/mypy.json"
+  },
+  "interrogate": {
+    "binary": "interrogate",
+    "command": "interrogate --generate-badge=never --format=json {workdir}",
+    "output": ".pyqual/interrogate.json"
+  },
+  "radon": {
+    "binary": "radon",
+    "command": "radon mi {workdir} -j",
+    "output": ".pyqual/radon.json"
+  },
+  "bandit": {
+    "binary": "bandit",
+    "command": "bandit -r {workdir} -f json -o .pyqual/bandit.json",
+    "output": ""
+  },
+  "pip-audit": {
+    "binary": "pip-audit",
+    "command": "pip-audit --format=json --output=.pyqual/vulns.json",
+    "output": ""
+  },
+  "trufflehog": {
+    "binary": "trufflehog",
+    "command": "trufflehog git file://{workdir} --json",
+    "output": ".pyqual/secrets.json"
+  },
+  "gitleaks": {
+    "binary": "gitleaks",
+    "command": "gitleaks detect --source {workdir} --report-format json --report-path .pyqual/secrets.json",
+    "output": ""
+  },
+  "safety": {
+    "binary": "safety",
+    "command": "safety check --json",
+    "output": ".pyqual/safety.json"
+  },
+  "pytest": {
+    "binary": "pytest",
+    "command": "pytest --cov-report=json:.pyqual/coverage.json -q",
+    "output": "",
+    "allow_failure": false
+  },
+  "code2llm": {
+    "binary": "code2llm",
+    "command": "code2llm {workdir} -f all -o ./project --no-chunk",
+    "output": "",
+    "allow_failure": false
+  },
+  "vallm": {
+    "binary": "vallm",
+    "command": "vallm batch {workdir} --recursive --format toon --output ./project",
+    "output": "",
+    "allow_failure": false
+  },
+  "code2docs": {
+    "binary": "code2docs",
+    "command": "code2docs {workdir} --readme-only",
+    "output": ""
+  },
+  "redup": {
+    "binary": "redup",
+    "command": "redup scan {workdir} --format toon --output ./project",
+    "output": ""
+  },
+  "prefact": {
+    "binary": "prefact",
+    "command": "prefact -a",
+    "output": ""
+  },
+  "llx-fix": {
+    "binary": "llx",
+    "command": "llx fix . --apply $([ -f TODO.md ] && echo '--errors TODO.md')",
+    "output": ""
+  },
+  "llx-fix-json": {
+    "binary": "llx",
+    "command": "llx fix . --apply $([ -f .pyqual/errors.json ] && echo '--errors .pyqual/errors.json')",
+    "output": ""
+  },
+  "aider": {
+    "binary": "aider",
+    "command": "aider --yes-always --message \"$(cat TODO.md 2>/dev/null || echo 'Fix all issues')\"",
+    "output": ""
+  },
+  "cyclonedx": {
+    "binary": "cyclonedx-py",
+    "command": "cyclonedx-py -r -o .pyqual/sbom.json",
+    "output": ""
+  },
+  "report": {
+    "binary": "python3",
+    "command": "python3 -m pyqual.report --workdir {workdir}",
+    "output": ""
+  }
+}
