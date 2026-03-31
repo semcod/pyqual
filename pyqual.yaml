@@ -100,6 +100,12 @@ pipeline:
       when: after_fix
       timeout: 300
 
+    # Generate metrics report (YAML) and update README.md badges
+    - name: report
+      tool: report
+      when: metrics_pass
+      optional: true
+
     # Goal-powered push & publish (run only when all gates pass)
     - name: push
       run: yes | goal push --bump patch --no-publish --todo --model ${LLM_MODEL}

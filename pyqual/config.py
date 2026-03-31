@@ -51,6 +51,7 @@ _STAGE_WHEN_DEFAULTS: dict[str, str] = {
     "verify": "after_fix",
     "verify_fix": "after_fix",
     "regression_report": "after_verify_fix",
+    "report": "metrics_pass",
     "push": "metrics_pass",
     "publish": "metrics_pass",
     "deploy": "metrics_pass",

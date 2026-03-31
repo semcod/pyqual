@@ -1,23 +1,23 @@
-# vallm batch | 29f | 29✓ 11⚠ 0✗ | 2026-03-31
+# vallm batch | 31f | 31✓ 11⚠ 0✗ | 2026-03-31
 
 SUMMARY:
-  scanned: 29  passed: 29 (100.0%)  warnings: 11  errors: 0  unsupported: 0
+  scanned: 31  passed: 31 (100.0%)  warnings: 11  errors: 0  unsupported: 0
 
 WARNINGS[11]{path,score}:
   pyqual/cli.py,0.80
     issues[12]{rule,severity,message,line}:
       complexity.cyclomatic,warning,bulk_run_cmd has cyclomatic complexity 19 (max: 15),255
       complexity.cyclomatic,warning,run has cyclomatic complexity 25 (max: 15),389
-      complexity.cyclomatic,warning,logs has cyclomatic complexity 22 (max: 15),1322
-      complexity.cyclomatic,warning,watch has cyclomatic complexity 29 (max: 15),1410
-      complexity.cyclomatic,warning,history has cyclomatic complexity 29 (max: 15),1516
+      complexity.cyclomatic,warning,logs has cyclomatic complexity 22 (max: 15),1341
+      complexity.cyclomatic,warning,watch has cyclomatic complexity 29 (max: 15),1429
+      complexity.cyclomatic,warning,history has cyclomatic complexity 29 (max: 15),1535
       complexity.maintainability,warning,Low maintainability index: 0.0 (threshold: 20),
       complexity.lizard_cc,warning,bulk_run_cmd: CC=19 exceeds limit 15,255
       complexity.lizard_cc,warning,run._on_stage_error: CC=18 exceeds limit 15,484
       complexity.lizard_cc,warning,run: CC=23 exceeds limit 15,389
-      complexity.lizard_cc,warning,logs: CC=22 exceeds limit 15,1322
-      complexity.lizard_cc,warning,watch: CC=29 exceeds limit 15,1410
-      complexity.lizard_cc,warning,history: CC=28 exceeds limit 15,1516
+      complexity.lizard_cc,warning,logs: CC=22 exceeds limit 15,1341
+      complexity.lizard_cc,warning,watch: CC=29 exceeds limit 15,1429
+      complexity.lizard_cc,warning,history: CC=28 exceeds limit 15,1535
   pyqual/validation.py,0.87
     issues[7]{rule,severity,message,line}:
       complexity.cyclomatic,warning,_classify_failure has cyclomatic complexity 21 (max: 15),158
@@ -61,8 +61,8 @@ WARNINGS[11]{path,score}:
       complexity.lizard_cc,warning,_from_vulnerabilities: CC=17 exceeds limit 15,121
   pyqual/config.py,0.97
     issues[2]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,_parse has cyclomatic complexity 23 (max: 15),131
-      complexity.lizard_cc,warning,_parse: CC=23 exceeds limit 15,131
+      complexity.cyclomatic,warning,_parse has cyclomatic complexity 23 (max: 15),132
+      complexity.lizard_cc,warning,_parse: CC=23 exceeds limit 15,132
   pyqual/builtin_collectors.py,0.98
     issues[1]{rule,severity,message,line}:
       complexity.maintainability,warning,Low maintainability index: 12.4 (threshold: 20),

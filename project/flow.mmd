@@ -14,12 +14,12 @@ flowchart TD
         pyqual__cli__validate["validate"]
         pyqual__cli__fix_config["fix_config"]
         pyqual__cli__status["status"]
+        pyqual__cli__report["report"]
         pyqual__cli___run_mcp_workflow["_run_mcp_workflow"]
         pyqual__cli__mcp_fix["mcp_fix"]
         pyqual__cli__mcp_refactor["mcp_refactor"]
         pyqual__cli__mcp_service["mcp_service"]
-        pyqual__cli__tickets_todo["tickets_todo"]
-        ...["+32 more"]
+        ...["+33 more"]
     end
 
     subgraph Core
@@ -38,7 +38,7 @@ flowchart TD
         pyqual__config__PyqualConfig__default_yaml["default_yaml"]
         pyqual__tools__ToolPreset__is_available["is_available"]
         pyqual__tools__ToolPreset__shell_command["shell_command"]
-        ...["+80 more"]
+        ...["+82 more"]
     end
 
     class run_analysis__main,pyqual__plugins__PluginMetadata____post_init__,pyqual__plugins__MetricCollector__collect,pyqual__plugins__MetricCollector__get_config_example,pyqual__plugins__PluginRegistry__register,pyqual__plugins__PluginRegistry__get,pyqual__plugins__PluginRegistry__list_plugins,pyqual__plugins__PluginRegistry__create_instance,pyqual__config__StageConfig____post_init__,pyqual__config__GateConfig__from_dict entry

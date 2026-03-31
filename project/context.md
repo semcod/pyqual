@@ -4,17 +4,17 @@
 
 - **Project**: /home/tom/github/semcod/pyqual
 - **Primary Language**: python
-- **Languages**: python: 32, shell: 2
+- **Languages**: python: 33, shell: 2
 - **Analysis Mode**: static
-- **Total Functions**: 201
+- **Total Functions**: 210
 - **Total Classes**: 44
-- **Modules**: 34
-- **Entry Points**: 127
+- **Modules**: 35
+- **Entry Points**: 129
 
 ## Architecture by Module
 
 ### pyqual.cli
-- **Functions**: 30
+- **Functions**: 31
 - **File**: `cli.py`
 
 ### pyqual.pipeline
@@ -49,6 +49,10 @@
 - **Functions**: 9
 - **Classes**: 1
 - **File**: `tools.py`
+
+### pyqual.report
+- **Functions**: 8
+- **File**: `report.py`
 
 ### pyqual.config
 - **Functions**: 7
@@ -90,17 +94,13 @@
 - **Functions**: 3
 - **File**: `cli_log_helpers.py`
 
-### examples.custom_gates.composite_gates
-- **Functions**: 2
-- **File**: `composite_gates.py`
-
 ### run_analysis
 - **Functions**: 2
 - **File**: `run_analysis.py`
 
-### examples.multi_gate_pipeline.run_pipeline
+### examples.custom_gates.composite_gates
 - **Functions**: 2
-- **File**: `run_pipeline.py`
+- **File**: `composite_gates.py`
 
 ## Key Entry Points
 
@@ -443,13 +443,13 @@ Does NOT run any stages — this is a stati
 ### pyqual.cli_run_helpers.format_run_summary
 - **Output to**: todo_bits.append, todo_bits.append, todo_bits.append, parts.append, fix_bits.append
 
-### pyqual.integrations.llx_mcp_service.build_parser
-> Build the CLI parser for the MCP service.
-- **Output to**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, os.getenv, int
-
 ### pyqual.cli_log_helpers.format_log_entry_row
 > Return (ts, event_name, name, status, details) for one log entry.
 - **Output to**: entry.get, entry.get, None.replace, entry.get, entry.get
+
+### pyqual.integrations.llx_mcp_service.build_parser
+> Build the CLI parser for the MCP service.
+- **Output to**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, os.getenv, int
 
 ### pyqual.integrations.llx_mcp.build_parser
 > Build the CLI parser for the llx MCP helper.
@@ -503,13 +503,13 @@ Functions exposed as public API (no underscore prefix):
 - `pyqual.cli.mcp_refactor` - 17 calls
 - `pyqual.cli.doctor` - 17 calls
 - `pyqual.cli_log_helpers.query_nfo_db` - 17 calls
+- `pyqual.report.update_readme_badges` - 17 calls
 - `pyqual.pipeline.Pipeline.run` - 17 calls
 - `examples.custom_plugins.code_health_collector.CodeHealthCollector.collect` - 16 calls
 - `pyqual.cli_run_helpers.extract_stage_summary` - 16 calls
 - `pyqual.integrations.llx_mcp.build_parser` - 16 calls
 - `pyqual.tools.load_entry_point_presets` - 15 calls
 - `pyqual.builtin_collectors.HallucinationCollector.collect` - 15 calls
-- `pyqual.cli.profiles` - 14 calls
 
 ## System Interactions
 

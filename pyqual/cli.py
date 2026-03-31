@@ -856,6 +856,25 @@ def status(
         console.print("[yellow]No metrics found. Run 'pyqual run' first.[/yellow]")
 
 
+@app.command()
+def report(
+    config: Path = typer.Option("pyqual.yaml", "--config", "-c"),
+    workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
+    readme: Path = typer.Option(None, "--readme", "-r", help="README file to update badges in."),
+) -> None:
+    """Generate metrics report (YAML) and update README.md badges."""
+    from pyqual.report import run as run_report
+
+    rc = run_report(
+        workdir=Path(workdir),
+        config_path=config,
+        readme_path=readme,
+    )
+    if rc != 0:
+        raise typer.Exit(rc)
+    console.print("[bold green]✅ Report generated.[/bold green]")
+
+
 def _run_mcp_workflow(
     *,
     title: str,

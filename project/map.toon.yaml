@@ -1,20 +1,20 @@
-# pyqual | 23f 6896L | shell:1,python:22 | 2026-03-31
-# stats: 183 func | 0 cls | 23 mod | CC̄=6.7 | critical:19 | cycles:0
+# pyqual | 24f 7200L | shell:1,python:23 | 2026-03-31
+# stats: 192 func | 0 cls | 24 mod | CC̄=6.6 | critical:19 | cycles:0
 # alerts[5]: fan-out run=50; CC history=29; CC watch=29; fan-out history=27; CC _classify_heuristic=26
 # hotspots[5]: run fan=50; history fan=27; PyqualConfig._parse fan=23; fix_config fan=23; logs fan=23
-# evolution: CC̄ 6.7→6.7 (flat 0.0)
+# evolution: CC̄ 6.7→6.6 (improved -0.1)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[23]:
+M[24]:
   project.sh,36
   pyqual/__init__.py,85
   pyqual/_gate_collectors.py,499
   pyqual/builtin_collectors.py,432
   pyqual/bulk_init.py,716
   pyqual/bulk_run.py,550
-  pyqual/cli.py,1623
+  pyqual/cli.py,1642
   pyqual/cli_log_helpers.py,120
   pyqual/cli_run_helpers.py,315
-  pyqual/config.py,260
+  pyqual/config.py,261
   pyqual/constants.py,41
   pyqual/gates.py,91
   pyqual/integrations/__init__.py,1
@@ -24,13 +24,14 @@ M[23]:
   pyqual/pipeline.py,598
   pyqual/plugins.py,138
   pyqual/profiles.py,124
+  pyqual/report.py,276
   pyqual/tickets.py,73
-  pyqual/tools.py,345
+  pyqual/tools.py,353
   pyqual/validation.py,463
   run_analysis.py,88
 D:
   pyqual/cli.py:
-    e: _setup_logging,init,profiles,bulk_init_cmd,bulk_run_cmd,run,gates,validate,fix_config,status,_run_mcp_workflow,mcp_fix,mcp_refactor,mcp_service,tickets_todo,tickets_github,tickets_all,_plugin_list,_plugin_search,_plugin_info,_plugin_add,_plugin_remove,_plugin_validate,_plugin_unknown_action,plugin,doctor,tools,logs,watch,history
+    e: _setup_logging,init,profiles,bulk_init_cmd,bulk_run_cmd,run,gates,validate,fix_config,status,report,_run_mcp_workflow,mcp_fix,mcp_refactor,mcp_service,tickets_todo,tickets_github,tickets_all,_plugin_list,_plugin_search,_plugin_info,_plugin_add,_plugin_remove,_plugin_validate,_plugin_unknown_action,plugin,doctor,tools,logs,watch,history
     _setup_logging(verbose;workdir)
     init(path;profile)
     profiles()
@@ -41,6 +42,7 @@ D:
     validate(config;workdir;strict)
     fix_config(config;workdir;dry_run;model)
     status(config;workdir)
+    report(config;workdir;readme)
     _run_mcp_workflow()
     mcp_fix(workdir;project_path;issues;output;endpoint;model;file;use_docker;docker_arg;task;json_output)
     mcp_refactor(workdir;project_path;issues;output;endpoint;model;file;use_docker;docker_arg;json_output)
@@ -184,6 +186,16 @@ D:
   run_analysis.py:
     e: run_project,main
     run_project(project_path)
+    main()
+  pyqual/report.py:
+    e: collect_all_metrics,evaluate_gates,generate_report,_badge_url,build_badges,update_readme_badges,run,main
+    collect_all_metrics(workdir)
+    evaluate_gates(config;workdir)
+    generate_report(config;workdir;output)
+    _badge_url(label;value;color)
+    build_badges(metrics;gates_passed)
+    update_readme_badges(readme_path;metrics;gates_passed)
+    run(workdir;config_path;readme_path)
     main()
   pyqual/tools.py:
     e: ToolPreset,get_preset,list_presets,is_builtin,register_preset,register_custom_tools_from_yaml,load_entry_point_presets,resolve_stage_command

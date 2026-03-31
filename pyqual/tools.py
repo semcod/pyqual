@@ -198,6 +198,14 @@ TOOL_PRESETS: dict[str, ToolPreset] = {
         command="cyclonedx-py -r -o .pyqual/sbom.json",
         output="",
     ),
+
+    # -- Reporting / badges --
+    "report": ToolPreset(
+        binary="python",
+        command="python -m pyqual.report --workdir {workdir}",
+        output="",
+        allow_failure=True,
+    ),
 }
 
 
