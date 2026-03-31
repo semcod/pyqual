@@ -168,12 +168,13 @@ def main() -> int:
     # llx - processes TODO.md with LLM-driven fixes
     try:
         import llx  # noqa: F401
+        llm_model = os.environ.get("LLM_MODEL", "openrouter/qwen/qwen3-coder-next")
         tool_configs.append({
             "name": "llx",
-            "command": "llx fix . --apply --errors TODO.md --verbose",
+            "command": f"LLM_MODEL={llm_model} llx fix . --apply --errors TODO.md --verbose",
             "timeout": 600,
         })
-        print("✓ llx available")
+        print(f"✓ llx available (model={llm_model})")
     except ImportError:
         print("✗ llx not found")
     

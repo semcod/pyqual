@@ -107,12 +107,12 @@
 - [ ] pyqual/report.py:340 - boilerplate copyright
 - [ ] pyqual/report.py:453 - String concatenation can be converted to f-string
 - [ ] pyqual/report.py:543 - module execution block
-- [ ] pyqual/run_parallel_fix.py:8 - Unused import: 'annotations'
-- [ ] pyqual/run_parallel_fix.py:71 - String concatenation can be converted to f-string
-- [ ] pyqual/run_parallel_fix.py:162 - Magic number: 900 - use named constant
-- [ ] pyqual/run_parallel_fix.py:174 - Magic number: 600 - use named constant
-- [ ] pyqual/run_parallel_fix.py:207 - Magic number: 900 - use named constant
-- [ ] pyqual/run_parallel_fix.py:340 - module execution block
+- [x] pyqual/run_parallel_fix.py:8 - Unused import: 'annotations'
+- [x] pyqual/run_parallel_fix.py:71 - String concatenation can be converted to f-string
+- [x] pyqual/run_parallel_fix.py:162 - Magic number: 900 - use named constant
+- [x] pyqual/run_parallel_fix.py:174 - Magic number: 600 - use named constant
+- [x] pyqual/run_parallel_fix.py:207 - Magic number: 900 - use named constant
+- [x] pyqual/run_parallel_fix.py:340 - module execution block
 - [ ] pyqual/tools.py:42 - Unused import: 'annotations'
 - [ ] pyqual/validation.py:25 - Unused import: 'annotations'
 - [ ] run_analysis.py:7 - Unused import: 'ast'
