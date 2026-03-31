@@ -1,14 +1,12 @@
 """CLI for pyqual — declarative quality gate loops."""
 
-from __future__ import annotations
-
 import asyncio
-import re
 import json
 import logging
 import shutil
 
 from pathlib import Path
+from typing import Any
 
 import typer
 from rich.console import Console
@@ -30,8 +28,8 @@ from pyqual.cli_run_helpers import (
 )
 from pyqual.config import PyqualConfig
 from pyqual.constants import (
+    BULK_LINE_TRUNCATE,
     DEFAULT_MCP_PORT,
-    MAX_DESCRIPTION_LENGTH,
     STATUS_COLUMN_WIDTH,
 )
 from pyqual.gates import GateSet
@@ -47,15 +45,15 @@ try:
 except Exception:  # pragma: no cover
     run_llx_mcp_service = None  # type: ignore[assignment]
 from pyqual.pipeline import Pipeline
-from pyqual.plugins import (
-    get_available_plugins,
-    install_plugin_config,
-)
+from pyqual.plugins import get_available_plugins
 from pyqual.tickets import sync_all_tickets
 from pyqual.tickets import sync_github_tickets
 from pyqual.tickets import sync_todo_tickets
+from pyqual.validation import EC, ErrorDomain, Severity, detect_project_facts, validate_config
 
 LOG_FORMAT = "%(asctime)s %(levelname)s %(name)s — %(message)s"
+_TIMESTAMP_COL_WIDTH = 19  # "YYYY-MM-DD HH:MM:SS"
+_BULK_PASS_PREVIEW = 20    # max passed-gate names to show inline
 
 app = typer.Typer(help="Declarative quality gate loops for AI-assisted development.")
 console = Console()
@@ -367,8 +365,8 @@ def bulk_run_cmd(
     # Final summary
     console.print()
     if result.passed:
-        more = f" +{len(result.passed)-20} more" if len(result.passed) > 20 else ""
-        console.print(f"[green]✅ Passed ({len(result.passed)}):[/green] {', '.join(result.passed[:20])}{more}")
+        more = f" +{len(result.passed)-_BULK_PASS_PREVIEW} more" if len(result.passed) > _BULK_PASS_PREVIEW else ""
+        console.print(f"[green]✅ Passed ({len(result.passed)}):[/green] {', '.join(result.passed[:_BULK_PASS_PREVIEW])}{more}")
     if result.failed:
         console.print(f"[red]❌ Failed ({len(result.failed)}):[/red] {', '.join(result.failed)}")
     if result.errors:
@@ -427,7 +425,7 @@ def run(
                                     sort_keys=False, allow_unicode=True)
         prefix = " " * indent
         for line in fragment.rstrip().splitlines():
-            _emit(prefix + line + "\n")
+            _emit(f"{prefix}{line}\n")
 
     # ── Emit YAML preamble ──
     _emit(f"pyqual: {_ver}\n")
@@ -482,7 +480,6 @@ def run(
         })
 
     def _on_stage_error(failure: Any) -> None:  # failure: StageFailure
-        from pyqual.validation import EC, ErrorDomain, validate_config
         code = failure.error_code
         domain = failure.domain
 
@@ -534,7 +531,6 @@ def run(
             pass  # expected — fix stage handles project issues; visible in YAML as status: failed
 
     def _run_auto_fix_config(cfg_path: Path, wd: Path, diag: Any) -> None:
-        from pyqual.validation import detect_project_facts
         from pyqual.llm import LLM
         facts = detect_project_facts(wd)
         issues_text = "\n".join(
@@ -694,8 +690,6 @@ def validate(
         pyqual validate --config path/to/pyqual.yaml
         pyqual validate --strict
     """
-    from pyqual.validation import Severity, validate_config
-
     cfg_path = Path(workdir) / config if not Path(config).is_absolute() else Path(config)
     result = validate_config(cfg_path)
 
@@ -751,7 +745,6 @@ def fix_config(
         pyqual fix-config --dry-run
         pyqual fix-config --workdir /path/to/project
     """
-    from pyqual.validation import Severity, detect_project_facts, validate_config
     from pyqual.llm import LLM
 
     workdir_path = Path(workdir).resolve()
@@ -1063,179 +1056,6 @@ def tickets_all(
         raise typer.Exit(1)
 
 
-def _plugin_list(plugins: dict[str, object], tag: str | None) -> None:
-    if tag:
-        plugins = {k: v for k, v in plugins.items() if tag in getattr(v, "tags", [])}
-
-    if not plugins:
-        console.print(
-            "[yellow]No plugins available.[/yellow]"
-            if not tag
-            else f"[yellow]No plugins with tag '{tag}' found.[/yellow]"
-        )
-        return
-
-    table = Table(
-        title=f"Available Plugins ({len(plugins)} total)" if not tag else f"Plugins with tag '{tag}' ({len(plugins)})"
-    )
-    table.add_column("Name")
-    table.add_column("Description")
-    table.add_column("Version")
-    table.add_column("Tags")
-
-    for plugin_name, meta in sorted(plugins.items()):
-        tags = ", ".join(getattr(meta, "tags", [])[:3]) if getattr(meta, "tags", None) else ""
-        table.add_row(plugin_name, getattr(meta, "description", "")[:MAX_DESCRIPTION_LENGTH], getattr(meta, "version", ""), tags)
-
-    console.print(table)
-
-
-def _plugin_search(plugins: dict[str, object], query: str) -> None:
-    if not query:
-        console.print("[red]Search query required. Usage: pyqual plugin search <query>[/red]")
-        raise typer.Exit(1)
-
-    results = {}
-    normalized_query = query.lower()
-    for plugin_name, meta in plugins.items():
-        description = getattr(meta, "description", "")
-        tags = getattr(meta, "tags", []) or []
-        if (
-            normalized_query in plugin_name.lower()
-            or normalized_query in description.lower()
-            or any(normalized_query in str(tag).lower() for tag in tags)
-        ):
-            results[plugin_name] = meta
-
-    if not results:
-        console.print(f"[yellow]No plugins found matching '{query}'[/yellow]")
-        return
-
-    table = Table(title=f"Search results for '{query}' ({len(results)} found)")
-    table.add_column("Name")
-    table.add_column("Description")
-    table.add_column("Tags")
-
-    for plugin_name, meta in sorted(results.items()):
-        tags = ", ".join(getattr(meta, "tags", [])[:3]) if getattr(meta, "tags", None) else ""
-        table.add_row(plugin_name, getattr(meta, "description", "")[:MAX_DESCRIPTION_LENGTH], tags)
-
-    console.print(table)
-
-
-def _plugin_info(name: str | None, workdir: Path) -> None:
-    if not name:
-        console.print("[red]Plugin name required. Usage: pyqual plugin info <name>[/red]")
-        raise typer.Exit(1)
-
-    meta = get_available_plugins().get(name)
-    if not meta:
-        console.print(f"[red]Unknown plugin: {name}[/red]")
-        console.print("Run 'pyqual plugin list' to see available plugins.")
-        raise typer.Exit(1)
-
-    console.print(f"[bold]{meta.name}[/bold] v{meta.version}")
-    console.print(f"Description: {meta.description}")
-    if meta.author:
-        console.print(f"Author: {meta.author}")
-    if meta.tags:
-        console.print(f"Tags: {', '.join(meta.tags)}")
-    console.print()
-    console.print("[bold]Configuration example:[/bold]")
-    console.print(install_plugin_config(name, workdir))
-
-
-def _plugin_add(name: str | None, workdir: Path) -> None:
-    if not name:
-        console.print("[red]Plugin name required. Usage: pyqual plugin add <name>[/red]")
-        raise typer.Exit(1)
-
-    meta = get_available_plugins().get(name)
-    if not meta:
-        console.print(f"[red]Unknown plugin: {name}[/red]")
-        console.print("Run 'pyqual plugin list' to see available plugins.")
-        raise typer.Exit(1)
-
-    config_path = workdir / "pyqual.yaml"
-    if not config_path.exists():
-        console.print(f"[red]pyqual.yaml not found in {workdir}[/red]")
-        console.print("Run 'pyqual init' first.")
-        raise typer.Exit(1)
-
-    plugin_config = install_plugin_config(name, workdir)
-    existing = config_path.read_text()
-    if f"# {name} plugin" in existing:
-        console.print(f"[yellow]Plugin {name} already appears in pyqual.yaml[/yellow]")
-        return
-
-    with open(config_path, "a") as f:
-        f.write(f"\n# {name} plugin configuration\n")
-        f.write(plugin_config)
-
-    console.print(f"[green]Added {name} plugin configuration to pyqual.yaml[/green]")
-    console.print("Review and customize the added metrics and stages.")
-
-
-def _plugin_remove(name: str | None, workdir: Path) -> None:
-    if not name:
-        console.print("[red]Plugin name required. Usage: pyqual plugin remove <name>[/red]")
-        raise typer.Exit(1)
-
-    config_path = workdir / "pyqual.yaml"
-    if not config_path.exists():
-        console.print(f"[red]pyqual.yaml not found in {workdir}[/red]")
-        raise typer.Exit(1)
-
-    existing = config_path.read_text()
-    marker = f"# {name} plugin configuration"
-    if marker not in existing:
-        console.print(f"[yellow]Plugin {name} not found in pyqual.yaml[/yellow]")
-        raise typer.Exit(1)
-
-    lines = existing.split("\n")
-    new_lines = []
-    skip = False
-    for line in lines:
-        if marker in line:
-            skip = True
-            continue
-        if skip and line.startswith("# ") and "plugin" in line:
-            skip = False
-        if not skip:
-            new_lines.append(line)
-
-    config_path.write_text("\n".join(new_lines))
-    console.print(f"[green]Removed {name} plugin configuration from pyqual.yaml[/green]")
-
-
-def _plugin_validate(plugins: dict[str, object], workdir: Path) -> None:
-    config_path = workdir / "pyqual.yaml"
-    if not config_path.exists():
-        console.print(f"[red]pyqual.yaml not found in {workdir}[/red]")
-        raise typer.Exit(1)
-
-    existing = config_path.read_text()
-    found_plugins = [plugin_name for plugin_name in plugins if f"# {plugin_name} plugin" in existing]
-
-    console.print("[bold]Validation Results[/bold]")
-    console.print(f"Found {len(found_plugins)} configured plugins: {', '.join(found_plugins)}")
-
-    available = set(plugins.keys())
-    configured = set(found_plugins)
-    missing = available - configured
-
-    if missing:
-        console.print(f"\n[yellow]Available but not configured:[/yellow] {', '.join(sorted(missing))}")
-
-    console.print("\n[green]✓ Configuration is valid[/green]")
-
-
-def _plugin_unknown_action(action: str) -> None:
-    console.print(f"[red]Unknown action: {action}[/red]")
-    console.print("Supported actions: list, add, remove, info, search, validate")
-    raise typer.Exit(1)
-
-
 @app.command()
 def plugin(
     action: str = typer.Argument(..., help="Action: list, add, remove, info, search, validate"),
@@ -1244,21 +1064,25 @@ def plugin(
     tag: str | None = typer.Option(None, "--tag", "-t", help="Filter by tag (for list/search)"),
 ) -> None:
     """Manage pyqual plugins - add, remove, search metric collectors."""
+    from pyqual.cli_plugin_helpers import (
+        plugin_add, plugin_info, plugin_list, plugin_remove,
+        plugin_search, plugin_unknown_action, plugin_validate,
+    )
     plugins = get_available_plugins()
     if action == "list":
-        _plugin_list(plugins, tag)
+        plugin_list(plugins, tag)
     elif action == "search":
-        _plugin_search(plugins, name or "")
+        plugin_search(plugins, name or "")
     elif action == "info":
-        _plugin_info(name, workdir)
+        plugin_info(name, workdir)
     elif action == "add":
-        _plugin_add(name, workdir)
+        plugin_add(name, workdir)
     elif action == "remove":
-        _plugin_remove(name, workdir)
+        plugin_remove(name, workdir)
     elif action == "validate":
-        _plugin_validate(plugins, workdir)
+        plugin_validate(plugins, workdir)
     else:
-        _plugin_unknown_action(action)
+        plugin_unknown_action(action)
 
 
 @app.command()
@@ -1403,7 +1227,7 @@ def logs(
         return
 
     # Human-readable output (works in both TTY and non-TTY)
-    _lc = Console(force_terminal=True, width=120)
+    _lc = Console(force_terminal=True, width=BULK_LINE_TRUNCATE)
     _lc.print(f"[bold]Pipeline Log[/bold] ({len(entries)} entries)\n")
 
     for entry in entries:
@@ -1583,7 +1407,7 @@ def history(
 
     # Human-readable table
     table = Table(title=f"LLX Fix History ({len(entries)} runs)")
-    table.add_column("Time", style="dim", width=19)
+    table.add_column("Time", style="dim", width=_TIMESTAMP_COL_WIDTH)
     table.add_column("Stage", width=10)
     table.add_column("Model", width=28)
     table.add_column("Issues", justify="right", width=6)

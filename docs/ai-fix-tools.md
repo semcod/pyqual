@@ -69,7 +69,7 @@ pipeline:
         [ -f .pyqual/errors.json ] && PROMPT="$PROMPT\n\nGate errors:\n$(cat .pyqual/errors.json)"
         [ -f TODO.md ] && PROMPT="$PROMPT\n\nTODO items:\n$(cat TODO.md)"
         claude -p "$PROMPT" \
-          --model claude-sonnet-4-5-20250514 \
+          --model sonnet \
           --allowedTools "Edit,Read,Write,Bash(git diff),Bash(python),Bash(pytest)" \
           --output-format text
       when: metrics_fail
@@ -92,7 +92,7 @@ pipeline:
 | Flag | Purpose |
 |------|---------|
 | `-p "..."` | Non-interactive prompt mode (required for CI) |
-| `--model` | Model selection (`claude-sonnet-4-5-20250514`, `claude-opus-4-0-20250514`) |
+| `--model` | Model selection (`sonnet`, `opus`, or the alias supported by your Claude Code account) |
 | `--allowedTools` | Restrict which tools Claude Code can use |
 | `--output-format text` | Machine-friendly output |
 | `--max-turns N` | Limit agentic turns (cost control) |
@@ -103,13 +103,19 @@ pipeline:
     - name: fix
       run: |
         claude -p "Fix the failing tests and quality issues in $(cat .pyqual/errors.json)" \
-          --model claude-sonnet-4-5-20250514 \
+          --model sonnet \
           --allowedTools "Edit,Read,Bash(pytest)" \
           --max-turns 10 \
           --output-format text
       when: metrics_fail
       timeout: 900
 ```
+
+### Fallback Behavior
+
+If Claude Code exits non-zero or hits a usage limit, the example `pyqual.yaml`
+falls back to `llx fix . --apply --errors .pyqual/errors.json --verbose` so the
+pipeline still attempts an automated repair instead of failing immediately.
 
 ---
 

@@ -3,7 +3,8 @@ flowchart TD
     examples__ticket_workflow["examples.ticket_workflow<br/>3 funcs"]
     pyqual__bulk_init["pyqual.bulk_init<br/>15 funcs"]
     pyqual__bulk_run["pyqual.bulk_run<br/>7 funcs"]
-    pyqual__cli["pyqual.cli<br/>31 funcs"]
+    pyqual__cli["pyqual.cli<br/>24 funcs"]
+    pyqual__cli_plugin_helpers["pyqual.cli_plugin_helpers<br/>7 funcs"]
     pyqual__config["pyqual.config<br/>7 funcs"]
     pyqual__gates["pyqual.gates<br/>6 funcs"]
     pyqual__pipeline["pyqual.pipeline<br/>24 funcs"]
@@ -11,16 +12,17 @@ flowchart TD
     pyqual__profiles["pyqual.profiles<br/>2 funcs"]
     pyqual__report["pyqual.report<br/>16 funcs"]
     pyqual__tickets["pyqual.tickets<br/>6 funcs"]
-    pyqual__tools["pyqual.tools<br/>9 funcs"]
+    pyqual__tools["pyqual.tools<br/>15 funcs"]
     pyqual__validation["pyqual.validation<br/>6 funcs"]
     run_analysis["run_analysis<br/>2 funcs"]
+    pyqual__cli ==>|7| pyqual__cli_plugin_helpers
     pyqual__cli ==>|6| pyqual__bulk_run
     pyqual__cli ==>|6| pyqual__validation
-    pyqual__cli ==>|5| pyqual__plugins
+    pyqual__config ==>|5| pyqual__tools
     examples__ticket_workflow ==>|4| pyqual__tickets
-    pyqual__config ==>|4| pyqual__tools
     pyqual__cli ==>|4| pyqual__config
     pyqual__cli ==>|4| pyqual__tickets
+    pyqual__cli_plugin_helpers ==>|4| pyqual__plugins
     pyqual__validation ==>|4| pyqual__tools
     pyqual__config -->|2| pyqual__profiles
     pyqual__cli -->|2| pyqual__profiles
@@ -30,6 +32,7 @@ flowchart TD
     examples__multi_gate_pipeline -->|1| pyqual__config
     pyqual__gates -->|1| pyqual__plugins
     pyqual__cli -->|1| pyqual__bulk_init
-    pyqual__bulk_run -->|1| pyqual__validation
+    pyqual__cli -->|1| pyqual__plugins
     pyqual__report -->|1| pyqual__plugins
     pyqual__report -->|1| pyqual__config
+    pyqual__bulk_run -->|1| pyqual__validation

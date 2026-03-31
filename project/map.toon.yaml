@@ -1,37 +1,38 @@
-# pyqual | 24f 7468L | shell:1,python:23 | 2026-03-31
-# stats: 200 func | 0 cls | 24 mod | CC̄=6.7 | critical:20 | cycles:0
-# alerts[5]: fan-out run=50; CC history=29; CC watch=29; fan-out history=27; CC _classify_heuristic=26
-# hotspots[5]: run fan=50; history fan=27; PyqualConfig._parse fan=23; fix_config fan=23; logs fan=23
-# evolution: CC̄ 6.6→6.7 (regressed +0.1)
+# pyqual | 25f 7460L | shell:1,python:24 | 2026-03-31
+# stats: 206 func | 0 cls | 25 mod | CC̄=6.6 | critical:20 | cycles:0
+# alerts[5]: fan-out run=50; CC history=29; CC watch=29; fan-out history=27; CC Pipeline._execute_stage=26
+# hotspots[5]: run fan=50; history fan=27; PyqualConfig._parse fan=24; fix_config fan=23; logs fan=23
+# evolution: CC̄ 6.6→6.6 (flat 0.0)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[24]:
+M[25]:
   project.sh,36
   pyqual/__init__.py,85
   pyqual/_gate_collectors.py,499
   pyqual/builtin_collectors.py,432
   pyqual/bulk_init.py,716
   pyqual/bulk_run.py,550
-  pyqual/cli.py,1642
+  pyqual/cli.py,1466
   pyqual/cli_log_helpers.py,120
+  pyqual/cli_plugin_helpers.py,191
   pyqual/cli_run_helpers.py,315
-  pyqual/config.py,261
+  pyqual/config.py,263
   pyqual/constants.py,41
-  pyqual/gates.py,91
+  pyqual/gates.py,89
   pyqual/integrations/__init__.py,1
   pyqual/integrations/llx_mcp.py,102
   pyqual/integrations/llx_mcp_service.py,70
   pyqual/llm.py,126
-  pyqual/pipeline.py,598
-  pyqual/plugins.py,138
+  pyqual/pipeline.py,611
+  pyqual/plugins.py,130
   pyqual/profiles.py,124
   pyqual/report.py,544
   pyqual/tickets.py,73
-  pyqual/tools.py,353
+  pyqual/tools.py,325
   pyqual/validation.py,463
   run_analysis.py,88
 D:
   pyqual/cli.py:
-    e: _setup_logging,init,profiles,bulk_init_cmd,bulk_run_cmd,run,gates,validate,fix_config,status,report,_run_mcp_workflow,mcp_fix,mcp_refactor,mcp_service,tickets_todo,tickets_github,tickets_all,_plugin_list,_plugin_search,_plugin_info,_plugin_add,_plugin_remove,_plugin_validate,_plugin_unknown_action,plugin,doctor,tools,logs,watch,history
+    e: _setup_logging,init,profiles,bulk_init_cmd,bulk_run_cmd,run,gates,validate,fix_config,status,report,_run_mcp_workflow,mcp_fix,mcp_refactor,mcp_service,tickets_todo,tickets_github,tickets_all,plugin,doctor,tools,logs,watch,history
     _setup_logging(verbose;workdir)
     init(path;profile)
     profiles()
@@ -50,13 +51,6 @@ D:
     tickets_todo(workdir;dry_run;direction)
     tickets_github(workdir;dry_run;direction)
     tickets_all(workdir;dry_run;direction)
-    _plugin_list(plugins;tag)
-    _plugin_search(plugins;query)
-    _plugin_info(name;workdir)
-    _plugin_add(name;workdir)
-    _plugin_remove(name;workdir)
-    _plugin_validate(plugins;workdir)
-    _plugin_unknown_action(action)
     plugin(action;name;workdir;tag)
     doctor()
     tools()
@@ -96,6 +90,18 @@ D:
     _safe_name(name)
     generate_pyqual_yaml(project_name;cfg)
     bulk_init(root)
+  pyqual/pipeline.py:
+    e: OnStageStart,OnIterationStart,OnStageError,OnStageDone,OnStageOutput,OnIterationDone,StageResult,IterationResult,PipelineResult,Pipeline
+    OnStageStart(Protocol): __call__(1)
+    OnIterationStart(Protocol): __call__(1)
+    OnStageError(Protocol): __call__(1)
+    OnStageDone(Protocol): __call__(1)  # Called after each stage completes. Receives the full StageRe...
+    OnStageOutput(Protocol): __call__(3)  # Called with each line of streaming output from a stage...
+    OnIterationDone(Protocol): __call__(1)  # Called after each iteration completes. Receives the full Ite...
+    StageResult:  # Result of running a single stage...
+    IterationResult:  # Result of one full pipeline iteration...
+    PipelineResult:  # Result of the complete pipeline run (all iterations)...
+    Pipeline: __init__(9),run(1),check_gates(0),_run_iteration(2),_iteration_stagnated(0),_should_run_stage(4),_resolve_tool_stage(1),_execute_stage(2),_execute_captured(5),_execute_streaming(5),_init_nfo(0),_nfo_emit(4),_is_fix_stage(1),_log_stage(2),_archive_llx_report(2),_log_gates(2),_log_event(1),_ensure_pyqual_dir(0)  # Execute pipeline stages in a loop until quality gates pass...
   pyqual/config.py:
     e: StageConfig,GateConfig,LoopConfig,PyqualConfig,_load_env_file,_normalize_env_values
     StageConfig: __post_init__(0)  # Single pipeline stage...
@@ -122,18 +128,6 @@ D:
     update_readme_badges(readme_path;metrics;gates_passed;project_meta;gates_passed_count;gates_total)
     run(workdir;config_path;readme_path)
     main()
-  pyqual/pipeline.py:
-    e: OnStageStart,OnIterationStart,OnStageError,OnStageDone,OnStageOutput,OnIterationDone,StageResult,IterationResult,PipelineResult,Pipeline
-    OnStageStart(Protocol): __call__(1)
-    OnIterationStart(Protocol): __call__(1)
-    OnStageError(Protocol): __call__(1)
-    OnStageDone(Protocol): __call__(1)  # Called after each stage completes. Receives the full StageRe...
-    OnStageOutput(Protocol): __call__(3)  # Called with each line of streaming output from a stage...
-    OnIterationDone(Protocol): __call__(1)  # Called after each iteration completes. Receives the full Ite...
-    StageResult:  # Result of running a single stage...
-    IterationResult:  # Result of one full pipeline iteration...
-    PipelineResult:  # Result of the complete pipeline run (all iterations)...
-    Pipeline: __init__(9),run(1),check_gates(0),_run_iteration(2),_iteration_stagnated(0),_should_run_stage(4),_resolve_tool_stage(1),_execute_stage(2),_execute_captured(5),_execute_streaming(5),_init_nfo(0),_nfo_emit(4),_is_fix_stage(1),_log_stage(2),_archive_llx_report(2),_log_gates(2),_log_event(1),_ensure_pyqual_dir(0)  # Execute pipeline stages in a loop until quality gates pass...
   pyqual/cli_run_helpers.py:
     e: extract_pytest_stage_summary,extract_lint_stage_summary,extract_prefact_stage_summary,extract_code2llm_stage_summary,extract_validation_stage_summary,extract_fix_stage_summary,extract_mypy_stage_summary,extract_bandit_stage_summary,extract_stage_summary,enrich_from_artifacts,infer_fix_result,build_run_summary,format_run_summary,get_last_error_line
     extract_pytest_stage_summary(name;text)
@@ -205,13 +199,28 @@ D:
     e: run_project,main
     run_project(project_path)
     main()
+  pyqual/cli_plugin_helpers.py:
+    e: plugin_list,plugin_search,plugin_info,plugin_add,plugin_remove,plugin_validate,plugin_unknown_action
+    plugin_list(plugins;tag)
+    plugin_search(plugins;query)
+    plugin_info(name;workdir)
+    plugin_add(name;workdir)
+    plugin_remove(name;workdir)
+    plugin_validate(plugins;workdir)
+    plugin_unknown_action(action)
   pyqual/tools.py:
-    e: ToolPreset,get_preset,list_presets,is_builtin,register_preset,register_custom_tools_from_yaml,load_entry_point_presets,resolve_stage_command
+    e: ToolPreset,_preset_from_dict,_load_json_presets,_load_default_presets,get_preset,list_presets,is_builtin,register_preset,load_user_tools,preset_to_dict,dump_presets_json,register_custom_tools_from_yaml,load_entry_point_presets,resolve_stage_command
     ToolPreset: is_available(0),shell_command(1)  # Definition of a built-in tool invocation preset...
+    _preset_from_dict(d)
+    _load_json_presets(path)
+    _load_default_presets()
     get_preset(name)
     list_presets()
     is_builtin(name)
     register_preset(name;preset)
+    load_user_tools(workdir)
+    preset_to_dict(preset)
+    dump_presets_json(names)
     register_custom_tools_from_yaml(custom_tools)
     load_entry_point_presets()
     resolve_stage_command(tool_name;workdir)

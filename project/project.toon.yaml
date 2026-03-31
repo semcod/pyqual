@@ -1,7 +1,7 @@
-# pyqual | 200 func | 19f | 10873L | python | 2026-03-31
+# pyqual | 206 func | 20f | 10947L | python | 2026-03-31
 
 HEALTH:
-  CC̄=6.7  critical=49 (limit:10)  dup=0  cycles=0
+  CC̄=6.6  critical=49 (limit:10)  dup=0  cycles=0
 
 ALERTS[20]:
   !!! high_fan_out     run = 50 (limit:10)
@@ -10,28 +10,28 @@ ALERTS[20]:
   !!! high_fan_out     history = 27 (limit:10)
   !!! cc_exceeded      validate_config = 26 (limit:15)
   !!! cc_exceeded      _classify_heuristic = 26 (limit:15)
+  !!! cc_exceeded      Pipeline._execute_stage = 26 (limit:15)
   !!! cc_exceeded      run = 25 (limit:15)
-  !!! high_fan_out     PyqualConfig._parse = 23 (limit:10)
+  !!! high_fan_out     PyqualConfig._parse = 24 (limit:10)
   !!! high_fan_out     fix_config = 23 (limit:10)
-  !!! high_fan_out     logs = 23 (limit:10)
 
-MODULES[24] (top by size):
-  M[pyqual/cli.py] 1642L C:0 F:31 CC↑29 D:0 (python)
+MODULES[25] (top by size):
+  M[pyqual/cli.py] 1466L C:0 F:24 CC↑29 D:0 (python)
   M[pyqual/bulk_init.py] 716L C:3 F:15 CC↑26 D:1 (python)
-  M[pyqual/pipeline.py] 598L C:10 F:24 CC↑21 D:0 (python)
+  M[pyqual/pipeline.py] 611L C:10 F:24 CC↑26 D:0 (python)
   M[pyqual/bulk_run.py] 550L C:3 F:7 CC↑19 D:1 (python)
   M[pyqual/report.py] 544L C:0 F:16 CC↑22 D:0 (python)
   M[pyqual/_gate_collectors.py] 499L C:0 F:22 CC↑17 D:0 (python)
   M[pyqual/validation.py] 463L C:6 F:6 CC↑26 D:2 (python)
   M[pyqual/builtin_collectors.py] 432L C:8 F:15 CC↑14 D:0 (python)
-  M[pyqual/tools.py] 353L C:1 F:9 CC↑8 D:3 (python)
+  M[pyqual/tools.py] 325L C:1 F:15 CC↑8 D:3 (python)
   M[pyqual/cli_run_helpers.py] 315L C:0 F:14 CC↑20 D:0 (python)
-  M[pyqual/config.py] 261L C:4 F:7 CC↑23 D:0 (python)
-  M[pyqual/plugins.py] 138L C:3 F:9 CC↑5 D:1 (python)
+  M[pyqual/config.py] 263L C:4 F:7 CC↑23 D:0 (python)
+  M[pyqual/cli_plugin_helpers.py] 191L C:0 F:7 CC↑11 D:1 (python)
+  M[pyqual/plugins.py] 130L C:3 F:9 CC↑5 D:2 (python)
   M[pyqual/llm.py] 126L C:0 F:0 CC↑0 D:0 (python)
   M[pyqual/profiles.py] 124L C:1 F:2 CC↑1 D:2 (python)
-  M[pyqual/cli_log_helpers.py] 120L C:0 F:3 CC↑14 D:0 (python)
-  LANGS: python:23/shell:1
+  LANGS: python:24/shell:1
 
 HOTSPOTS[10]:
   ★ run fan=50  // Execute pipeline loop until quality gates pass.
@@ -40,7 +40,7 @@ Output is streamed as YAML to s
   ★ history fan=27  // View history of LLX/LLM fix runs from .pyqual/llx_history.jsonl.
 
 Each time a fi
-  ★ PyqualConfig._parse fan=23  // Orchestrates 23 calls
+  ★ PyqualConfig._parse fan=24  // Orchestrates 24 calls
   ★ fix_config fan=23  // Use LLM to auto-repair pyqual.yaml based on project structure.
 
 Scans the projec
@@ -56,4 +56,4 @@ REFACTOR[15]:
   [5] H/L Split _classify_heuristic (CC=26 → target CC<10)
 
 EVOLUTION:
-  2026-03-31 CC̄=6.7 crit=49 10873L // Automated analysis
+  2026-03-31 CC̄=6.6 crit=49 10947L // Automated analysis

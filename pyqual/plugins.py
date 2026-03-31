@@ -1,7 +1,5 @@
 """Plugin system for pyqual - extensible metric collectors."""
 
-from __future__ import annotations
-
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
@@ -58,13 +56,7 @@ class PluginRegistry:
 
     @classmethod
     def register(cls, plugin_class: Type[MetricCollector]) -> Type[MetricCollector]:
-        """Register a plugin class. Can be used as a decorator.
-
-        Example:
-            @PluginRegistry.register
-            class MyCollector(MetricCollector):
-                name = "my-collector"
-        """
+        """Register a plugin class. Can be used as a decorator."""
         cls._plugins[plugin_class.name] = plugin_class
         return plugin_class
 

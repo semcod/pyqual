@@ -4,17 +4,17 @@
 
 - **Project**: /home/tom/github/semcod/pyqual
 - **Primary Language**: python
-- **Languages**: python: 33, shell: 2
+- **Languages**: python: 34, shell: 2
 - **Analysis Mode**: static
-- **Total Functions**: 218
+- **Total Functions**: 224
 - **Total Classes**: 44
-- **Modules**: 35
-- **Entry Points**: 129
+- **Modules**: 36
+- **Entry Points**: 131
 
 ## Architecture by Module
 
 ### pyqual.cli
-- **Functions**: 31
+- **Functions**: 24
 - **File**: `cli.py`
 
 ### pyqual.pipeline
@@ -29,6 +29,11 @@
 ### pyqual.report
 - **Functions**: 16
 - **File**: `report.py`
+
+### pyqual.tools
+- **Functions**: 15
+- **Classes**: 1
+- **File**: `tools.py`
 
 ### pyqual.builtin_collectors
 - **Functions**: 15
@@ -49,15 +54,14 @@
 - **Classes**: 3
 - **File**: `plugins.py`
 
-### pyqual.tools
-- **Functions**: 9
-- **Classes**: 1
-- **File**: `tools.py`
-
 ### pyqual.config
 - **Functions**: 7
 - **Classes**: 4
 - **File**: `config.py`
+
+### pyqual.cli_plugin_helpers
+- **Functions**: 7
+- **File**: `cli_plugin_helpers.py`
 
 ### pyqual.bulk_run
 - **Functions**: 7
@@ -93,10 +97,6 @@
 ### pyqual.cli_log_helpers
 - **Functions**: 3
 - **File**: `cli_log_helpers.py`
-
-### examples.custom_gates.composite_gates
-- **Functions**: 2
-- **File**: `composite_gates.py`
 
 ### run_analysis
 - **Functions**: 2
@@ -158,7 +158,7 @@ LLM to prod
 - **Calls**: entry.get, entry.get, None.replace, entry.get, entry.get, None.join, entry.get, entry.get
 
 ### pyqual.config.PyqualConfig._parse
-- **Calls**: raw.get, pyqual.tools.load_entry_point_presets, pipeline.get, pipeline.get, pipeline.get, cls, pyqual.tools.register_custom_tools_from_yaml, pyqual.profiles.get_profile
+- **Calls**: raw.get, pyqual.tools.load_entry_point_presets, pyqual.tools.load_user_tools, pipeline.get, pipeline.get, pipeline.get, cls, pyqual.tools.register_custom_tools_from_yaml
 
 ### pyqual.cli.bulk_init_cmd
 > Bulk-generate pyqual.yaml for every project in a directory.
@@ -180,6 +180,10 @@ heuristics), and ge
 ### examples.custom_gates.metric_history.main
 > Run the metric history self-test with synthetic history.
 - **Calls**: tempfile.TemporaryDirectory, Path, pyqual_dir.mkdir, print, print, print, print, sorted
+
+### pyqual.pipeline.Pipeline._execute_stage
+> Execute a single stage command.
+- **Calls**: log.info, bool, self.config.env.items, time.monotonic, self._log_stage, self._resolve_tool_stage, StageResult, self._log_stage
 
 ### pyqual._gate_collectors._from_flake8
 > Extract flake8 violation count from JSON output.
@@ -204,10 +208,6 @@ Use --profile for a minimal config based on a built-in profile:
     pyqual init --profile python         
 - **Calls**: app.command, typer.Argument, typer.Option, target.exists, None.mkdir, console.print, console.print, Path
 
-### pyqual.pipeline.Pipeline._execute_stage
-> Execute a single stage command.
-- **Calls**: log.info, bool, time.monotonic, self._log_stage, self._resolve_tool_stage, StageResult, self._log_stage, self.on_stage_start
-
 ### pyqual.cli.validate
 > Validate pyqual.yaml without running the pipeline.
 
@@ -229,12 +229,12 @@ Checks for:
 > List built-in tool presets for pipeline stages.
 - **Calls**: app.command, Table, table.add_column, table.add_column, table.add_column, table.add_column, table.add_column, sorted
 
-### pyqual.builtin_collectors.LLMBenchCollector.collect
-- **Calls**: humaneval_path.exists, codebleu_path.exists, json.loads, json.loads, humaneval_path.read_text, data.get, data.get, float
-
 ### pyqual.cli.mcp_fix
 > Run the llx-backed MCP fix workflow.
 - **Calls**: app.command, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option
+
+### pyqual.builtin_collectors.LLMBenchCollector.collect
+- **Calls**: humaneval_path.exists, codebleu_path.exists, json.loads, json.loads, humaneval_path.read_text, data.get, data.get, float
 
 ### pyqual.integrations.llx_mcp.main
 > CLI entry point used by pyqual pipeline stages.
@@ -300,6 +300,8 @@ format_log_entry_row [pyqual.cli_log_helpers]
 ```
 _parse [pyqual.config.PyqualConfig]
   └─ →> load_entry_point_presets
+  └─ →> load_user_tools
+      └─> _load_json_presets
 ```
 
 ### Flow 10: bulk_init_cmd
@@ -325,15 +327,15 @@ bulk_init_cmd [pyqual.cli]
 - **Methods**: 4
 - **Key Methods**: pyqual.plugins.PluginRegistry.register, pyqual.plugins.PluginRegistry.get, pyqual.plugins.PluginRegistry.list_plugins, pyqual.plugins.PluginRegistry.create_instance
 
-### pyqual.gates.GateSet
-> Collection of quality gates with metric collection.
-- **Methods**: 4
-- **Key Methods**: pyqual.gates.GateSet.__init__, pyqual.gates.GateSet.check_all, pyqual.gates.GateSet.all_passed, pyqual.gates.GateSet._collect_metrics
-
 ### pyqual.config.PyqualConfig
 > Full pyqual.yaml configuration.
 - **Methods**: 4
 - **Key Methods**: pyqual.config.PyqualConfig.load, pyqual.config.PyqualConfig.llm_model, pyqual.config.PyqualConfig._parse, pyqual.config.PyqualConfig.default_yaml
+
+### pyqual.gates.GateSet
+> Collection of quality gates with metric collection.
+- **Methods**: 4
+- **Key Methods**: pyqual.gates.GateSet.__init__, pyqual.gates.GateSet.check_all, pyqual.gates.GateSet.all_passed, pyqual.gates.GateSet._collect_metrics
 
 ### pyqual.validation.ValidationResult
 > Aggregated result of validating one pyqual.yaml.
@@ -345,16 +347,16 @@ bulk_init_cmd [pyqual.cli]
 - **Methods**: 3
 - **Key Methods**: pyqual.bulk_run.ProjectRunState.progress_pct, pyqual.bulk_run.ProjectRunState.elapsed, pyqual.bulk_run.ProjectRunState.gates_label
 
-### examples.custom_plugins.code_health_collector.CodeHealthCollector
-> Weighted composite health score from multiple code quality signals.
-- **Methods**: 2
-- **Key Methods**: examples.custom_plugins.code_health_collector.CodeHealthCollector.collect, examples.custom_plugins.code_health_collector.CodeHealthCollector.get_config_example
-- **Inherits**: MetricCollector
-
 ### examples.custom_plugins.performance_collector.PerformanceCollector
 > Collect latency and throughput metrics from load test results.
 - **Methods**: 2
 - **Key Methods**: examples.custom_plugins.performance_collector.PerformanceCollector.collect, examples.custom_plugins.performance_collector.PerformanceCollector.get_config_example
+- **Inherits**: MetricCollector
+
+### examples.custom_plugins.code_health_collector.CodeHealthCollector
+> Weighted composite health score from multiple code quality signals.
+- **Methods**: 2
+- **Key Methods**: examples.custom_plugins.code_health_collector.CodeHealthCollector.collect, examples.custom_plugins.code_health_collector.CodeHealthCollector.get_config_example
 - **Inherits**: MetricCollector
 
 ### pyqual.plugins.MetricCollector
@@ -378,16 +380,6 @@ bulk_init_cmd [pyqual.cli]
 - **Methods**: 1
 - **Key Methods**: pyqual.plugins.PluginMetadata.__post_init__
 
-### pyqual.gates.GateResult
-> Result of a single gate check.
-- **Methods**: 1
-- **Key Methods**: pyqual.gates.GateResult.__str__
-
-### pyqual.gates.Gate
-> Single quality gate with metric extraction.
-- **Methods**: 1
-- **Key Methods**: pyqual.gates.Gate.check
-
 ### pyqual.config.StageConfig
 > Single pipeline stage.
 - **Methods**: 1
@@ -397,6 +389,16 @@ bulk_init_cmd [pyqual.cli]
 > Single quality gate threshold.
 - **Methods**: 1
 - **Key Methods**: pyqual.config.GateConfig.from_dict
+
+### pyqual.gates.GateResult
+> Result of a single gate check.
+- **Methods**: 1
+- **Key Methods**: pyqual.gates.GateResult.__str__
+
+### pyqual.gates.Gate
+> Single quality gate with metric extraction.
+- **Methods**: 1
+- **Key Methods**: pyqual.gates.Gate.check
 
 ### pyqual.builtin_collectors.LLMBenchCollector
 > LLM code generation quality metrics from human-eval and CodeBLEU.
@@ -421,7 +423,7 @@ bulk_init_cmd [pyqual.cli]
 Key functions that process and transform data:
 
 ### pyqual.config.PyqualConfig._parse
-- **Output to**: raw.get, pyqual.tools.load_entry_point_presets, pipeline.get, pipeline.get, pipeline.get
+- **Output to**: raw.get, pyqual.tools.load_entry_point_presets, pyqual.tools.load_user_tools, pipeline.get, pipeline.get
 
 ### pyqual.cli.validate
 > Validate pyqual.yaml without running the pipeline.
@@ -431,7 +433,8 @@ Checks for:
 - Unknown or mis
 - **Output to**: app.command, typer.Option, typer.Option, typer.Option, pyqual.validation.validate_config
 
-### pyqual.cli._plugin_validate
+### pyqual.cli_plugin_helpers.plugin_validate
+> Validate that configured plugins in pyqual.yaml are available.
 - **Output to**: config_path.read_text, console.print, console.print, set, set
 
 ### pyqual.validation.validate_config
@@ -442,10 +445,6 @@ Does NOT run any stages — this is a stati
 
 ### pyqual.cli_run_helpers.format_run_summary
 - **Output to**: todo_bits.append, todo_bits.append, todo_bits.append, parts.append, fix_bits.append
-
-### pyqual.bulk_run._parse_output_line
-> Parse a line of pyqual run output and update state.
-- **Output to**: line.strip, clean.startswith, clean.startswith, None.strip, None.strip
 
 ### pyqual.cli_log_helpers.format_log_entry_row
 > Return (ts, event_name, name, status, details) for one log entry.
@@ -462,6 +461,10 @@ Does NOT run any stages — this is a stati
 ### pyqual.report._parse_pyproject_fallback
 > Minimal regex parser for pyproject.toml when tomllib is unavailable.
 - **Output to**: path.read_text, re.search, re.search, m.group, m.group
+
+### pyqual.bulk_run._parse_output_line
+> Parse a line of pyqual run output and update state.
+- **Output to**: line.strip, clean.startswith, clean.startswith, None.strip, None.strip
 
 ## Behavioral Patterns
 
@@ -490,19 +493,22 @@ Functions exposed as public API (no underscore prefix):
 - `pyqual.cli_run_helpers.build_run_summary` - 30 calls
 - `examples.custom_gates.metric_history.main` - 29 calls
 - `pyqual.bulk_init.classify_with_llm` - 26 calls
+- `pyqual.cli_plugin_helpers.plugin_search` - 25 calls
 - `pyqual.builtin_collectors.SecurityCollector.collect` - 23 calls
 - `pyqual.cli.init` - 22 calls
-- `pyqual.bulk_run.bulk_run` - 22 calls
 - `pyqual.bulk_init.bulk_init` - 22 calls
+- `pyqual.bulk_run.bulk_run` - 22 calls
 - `pyqual.cli.validate` - 21 calls
 - `pyqual.cli.status` - 21 calls
 - `pyqual.cli.gates` - 20 calls
 - `pyqual.cli_run_helpers.extract_fix_stage_summary` - 20 calls
 - `pyqual.cli.tools` - 19 calls
-- `pyqual.builtin_collectors.LLMBenchCollector.collect` - 18 calls
+- `pyqual.cli_plugin_helpers.plugin_list` - 19 calls
+- `pyqual.cli_plugin_helpers.plugin_add` - 19 calls
 - `pyqual.cli.mcp_fix` - 18 calls
-- `pyqual.bulk_run.build_dashboard_table` - 18 calls
+- `pyqual.builtin_collectors.LLMBenchCollector.collect` - 18 calls
 - `pyqual.integrations.llx_mcp.main` - 18 calls
+- `pyqual.bulk_run.build_dashboard_table` - 18 calls
 - `examples.custom_gates.composite_gates.run_composite_check` - 17 calls
 - `pyqual.cli.mcp_refactor` - 17 calls
 - `pyqual.cli.doctor` - 17 calls
@@ -511,9 +517,6 @@ Functions exposed as public API (no underscore prefix):
 - `pyqual.report.update_readme_badges` - 17 calls
 - `pyqual.report.run` - 17 calls
 - `pyqual.pipeline.Pipeline.run` - 17 calls
-- `examples.custom_plugins.code_health_collector.CodeHealthCollector.collect` - 16 calls
-- `pyqual.cli_run_helpers.extract_stage_summary` - 16 calls
-- `pyqual.integrations.llx_mcp.build_parser` - 16 calls
 
 ## System Interactions
 
@@ -541,6 +544,7 @@ graph TD
     format_log_entry_row --> replace
     _parse --> get
     _parse --> load_entry_point_pre
+    _parse --> load_user_tools
     bulk_init_cmd --> command
     bulk_init_cmd --> Argument
     bulk_init_cmd --> Option
@@ -550,7 +554,6 @@ graph TD
     _from_vulnerabilitie --> read_text
     _from_vulnerabilitie --> sum
     main --> Path
-    main --> load
 ```
 
 ## Reverse Engineering Guidelines

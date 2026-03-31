@@ -123,6 +123,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.64] - 2026-03-31
+
+### Docs
+- Update README.md
+- Update TODO.md
+- Update docs/ai-fix-tools.md
+- Update project/README.md
+- Update project/context.md
+
+### Test
+- Update test_pyqual.py
+
+### Other
+- Update .pyqual/llx_history.jsonl
+- Update .pyqual/pipeline.db
+- Update planfile.yaml
+- Update project/analysis.toon.yaml
+- Update project/calls.mmd
+- Update project/calls.png
+- Update project/compact_flow.mmd
+- Update project/compact_flow.png
+- Update project/evolution.toon.yaml
+- Update project/flow.mmd
+- ... and 14 more files
+
 ## [0.1.63] - 2026-03-31
 
 ### Docs

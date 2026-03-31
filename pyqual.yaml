@@ -36,12 +36,10 @@ pipeline:
             && echo "  ✓ claude installed" \
             || echo "  ⚠ claude install failed (fix stage will use llx fallback)"
         fi
-        # Verify ANTHROPIC_API_KEY for Claude Code
-        if [ -n "$ANTHROPIC_API_KEY" ]; then
-          echo "  ✓ ANTHROPIC_API_KEY is set"
-        else
-          echo "  ⚠ ANTHROPIC_API_KEY not set — Claude Code fix stage will not work"
-        fi
+        # Claude Code auth can be either:
+        # - local OAuth session via `claude auth login`
+        # - ANTHROPIC_API_KEY in CI/GitHub Actions
+        # We only verify the CLI is available here.
         echo "=== setup done ==="
       when: first_iteration
       timeout: 300
@@ -81,12 +79,18 @@ pipeline:
         [ -f .pyqual/errors.json ] && ERRORS=$(cat .pyqual/errors.json)
         [ -f TODO.md ] && ERRORS="$ERRORS
         $(cat TODO.md)"
-        claude -p "Fix all quality gate failures in this Python project. Apply changes directly.
+        if claude -p "Fix all quality gate failures in this Python project. Apply changes directly.
 
         $ERRORS" \
-          --model claude-sonnet-4-5-20250514 \
+          --model sonnet \
           --allowedTools "Edit,Read,Write,Bash(git diff),Bash(python),Bash(pytest -x)" \
-          --output-format text
+          --output-format text; then
+          echo "Claude Code fix completed."
+        else
+          rc=$?
+          echo "Claude Code exited with $rc; falling back to llx fix."
+          llx fix . --apply --errors .pyqual/errors.json --verbose
+        fi
       when: metrics_fail
       timeout: 1800
 
@@ -131,7 +135,3 @@ pipeline:
     LLM_MODEL: openrouter/qwen/qwen3-coder-next
     LLX_DEFAULT_TIER: balanced
     LLX_VERBOSE: true
-    # Claude Code — set ANTHROPIC_API_KEY in .env or CI secrets
-    # Local:  echo 'ANTHROPIC_API_KEY=sk-ant-...' >> .env
-    # GitHub: Settings → Secrets → ANTHROPIC_API_KEY
-    ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}

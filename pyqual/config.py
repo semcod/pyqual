@@ -15,6 +15,7 @@ from pyqual.tools import (
     get_preset,
     list_presets,
     load_entry_point_presets,
+    load_user_tools,
     register_custom_tools_from_yaml,
 )
 
@@ -134,6 +135,7 @@ class PyqualConfig:
 
         # Register external tool presets before validating stages
         load_entry_point_presets()
+        load_user_tools()
         custom_tools = pipeline.get("custom_tools", [])
         if custom_tools:
             register_custom_tools_from_yaml(custom_tools)

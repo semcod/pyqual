@@ -14,20 +14,43 @@ pyqual will:
 4. Capture output to ``.pyqual/<tool>.json`` automatically
 5. Never fail the pipeline on a non-zero exit code from a lint/scan tool
 
-External packages can register presets via:
-- ``register_preset(name, preset)`` at runtime
-- ``pyqual.tools`` entry point group (auto-discovered)
-- ``custom_tools:`` section in ``pyqual.yaml``
+Presets are loaded from:
+1. ``pyqual/default_tools.json`` — built-in defaults (shipped with pyqual)
+2. ``pyqual.tools.json`` — user overrides in the project directory
+3. ``custom_tools:`` section in ``pyqual.yaml``
+4. ``register_preset()`` calls at runtime
+5. ``pyqual.tools`` entry point group (auto-discovered)
+
+To override a built-in preset, create ``pyqual.tools.json`` next to your
+``pyqual.yaml`` with the same key::
+
+    {
+      "pytest": {
+        "binary": "pytest",
+        "command": "pytest --cov=mypackage -q",
+        "output": "",
+        "allow_failure": false
+      },
+      "my-custom-tool": {
+        "binary": "my-tool",
+        "command": "my-tool check {workdir}",
+        "output": ".pyqual/my-tool.json"
+      }
+    }
 """
 
 from __future__ import annotations
 
+import json
 import logging
 import shutil
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 log = logging.getLogger("pyqual.tools")
+
+USER_TOOLS_FILE = "pyqual.tools.json"
 
 # ---------------------------------------------------------------------------
 # Tool preset definition
@@ -57,157 +80,56 @@ class ToolPreset:
 
 
 # ---------------------------------------------------------------------------
+# JSON → ToolPreset loader
+# ---------------------------------------------------------------------------
+
+_DEFAULT_TOOLS_PATH = Path(__file__).parent / "default_tools.json"
+
+
+def _preset_from_dict(d: dict[str, Any]) -> ToolPreset:
+    """Create a ToolPreset from a JSON dict."""
+    return ToolPreset(
+        binary=d["binary"],
+        command=d["command"],
+        output=d.get("output", ""),
+        allow_failure=d.get("allow_failure", True),
+    )
+
+
+def _load_json_presets(path: Path) -> dict[str, ToolPreset]:
+    """Load tool presets from a JSON file. Returns empty dict on error."""
+    if not path.exists():
+        return {}
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(raw, dict):
+            log.warning("tools JSON %s: expected object at top level", path)
+            return {}
+        result: dict[str, ToolPreset] = {}
+        for name, entry in raw.items():
+            try:
+                result[name.lower()] = _preset_from_dict(entry)
+            except (KeyError, TypeError) as exc:
+                log.warning("tools JSON %s: skipping '%s': %s", path, name, exc)
+        return result
+    except (json.JSONDecodeError, OSError) as exc:
+        log.warning("Failed to load tools JSON %s: %s", path, exc)
+        return {}
+
+
+def _load_default_presets() -> dict[str, ToolPreset]:
+    """Load built-in presets from default_tools.json."""
+    presets = _load_json_presets(_DEFAULT_TOOLS_PATH)
+    if not presets:
+        log.warning("No built-in tool presets loaded from %s", _DEFAULT_TOOLS_PATH)
+    return presets
+
+
+# ---------------------------------------------------------------------------
 # Preset registry
 # ---------------------------------------------------------------------------
 
-TOOL_PRESETS: dict[str, ToolPreset] = {
-    # -- Linters --
-    "ruff": ToolPreset(
-        binary="ruff",
-        command="ruff check {workdir} --output-format=json",
-        output=".pyqual/ruff.json",
-    ),
-    "pylint": ToolPreset(
-        binary="pylint",
-        command="pylint --output-format=json {workdir}",
-        output=".pyqual/pylint.json",
-    ),
-    "flake8": ToolPreset(
-        binary="flake8",
-        command="flake8 --format=json {workdir}",
-        output=".pyqual/flake8.json",
-    ),
-    "mypy": ToolPreset(
-        binary="mypy",
-        command="mypy --output=json {workdir}",
-        output=".pyqual/mypy.json",
-    ),
-
-    # -- Documentation --
-    "interrogate": ToolPreset(
-        binary="interrogate",
-        command="interrogate --generate-badge=never --format=json {workdir}",
-        output=".pyqual/interrogate.json",
-    ),
-
-    # -- Complexity / maintainability --
-    "radon": ToolPreset(
-        binary="radon",
-        command="radon mi {workdir} -j",
-        output=".pyqual/radon.json",
-    ),
-
-    # -- Security --
-    "bandit": ToolPreset(
-        binary="bandit",
-        command="bandit -r {workdir} -f json -o .pyqual/bandit.json",
-        output="",
-    ),
-    "pip-audit": ToolPreset(
-        binary="pip-audit",
-        command="pip-audit --format=json --output=.pyqual/vulns.json",
-        output="",
-    ),
-    "trufflehog": ToolPreset(
-        binary="trufflehog",
-        command="trufflehog git file://{workdir} --json",
-        output=".pyqual/secrets.json",
-    ),
-    "gitleaks": ToolPreset(
-        binary="gitleaks",
-        command="gitleaks detect --source {workdir} --report-format json --report-path .pyqual/secrets.json",
-        output="",
-    ),
-    "safety": ToolPreset(
-        binary="safety",
-        command="safety check --json",
-        output=".pyqual/safety.json",
-    ),
-
-    # -- Testing --
-    "pytest": ToolPreset(
-        binary="pytest",
-        command="pytest --cov-report=json:.pyqual/coverage.json -q",
-        output="",
-        allow_failure=False,
-    ),
-    # -- Analysis --
-    "code2llm": ToolPreset(
-        binary="code2llm",
-        command="code2llm {workdir} -f all -o ./project --no-chunk",
-        output="",
-        allow_failure=False,
-    ),
-    "vallm": ToolPreset(
-        binary="vallm",
-        command="vallm batch {workdir} --recursive --format toon --output ./project",
-        output="",
-        allow_failure=False,
-    ),
-
-    # -- Documentation --
-    "code2docs": ToolPreset(
-        binary="code2docs",
-        command="code2docs {workdir} --readme-only",
-        output="",
-        allow_failure=True,
-    ),
-
-    # -- Duplication detection --
-    "redup": ToolPreset(
-        binary="redup",
-        command="redup scan {workdir} --format toon --output ./project",
-        output="",
-        allow_failure=True,
-    ),
-
-    # -- Prefactoring / refactoring suggestions --
-    "prefact": ToolPreset(
-        binary="prefact",
-        command="prefact -a",
-        output="",
-        allow_failure=True,
-    ),
-
-    # -- LLX-driven code fixing (reads TODO.md generated by prefact) --
-    "llx-fix": ToolPreset(
-        binary="llx",
-        command="llx fix . --apply $([ -f TODO.md ] && echo '--errors TODO.md')",
-        output="",
-        allow_failure=True,
-    ),
-    # -- LLX-driven code fixing (reads .pyqual/errors.json gate failures) --
-    "llx-fix-json": ToolPreset(
-        binary="llx",
-        command="llx fix . --apply $([ -f .pyqual/errors.json ] && echo '--errors .pyqual/errors.json')",
-        output="",
-        allow_failure=True,
-    ),
-
-    # -- Aider AI pair-programmer --
-    "aider": ToolPreset(
-        binary="aider",
-        command="aider --yes-always --message \"$(cat TODO.md 2>/dev/null || echo 'Fix all issues')\"",
-        output="",
-        allow_failure=True,
-    ),
-
-    # -- SBOM --
-    "cyclonedx": ToolPreset(
-        binary="cyclonedx-py",
-        command="cyclonedx-py -r -o .pyqual/sbom.json",
-        output="",
-    ),
-
-    # -- Reporting / badges --
-    "report": ToolPreset(
-        binary="python3",
-        command="python3 -m pyqual.report --workdir {workdir}",
-        output="",
-        allow_failure=True,
-    ),
-}
-
+TOOL_PRESETS: dict[str, ToolPreset] = _load_default_presets()
 
 _BUILTIN_NAMES: frozenset[str] = frozenset(TOOL_PRESETS.keys())
 
@@ -260,6 +182,56 @@ def register_preset(name: str, preset: ToolPreset, *, override: bool = False) ->
         )
     TOOL_PRESETS[key] = preset
     log.info("registered tool preset: %s (binary=%s)", key, preset.binary)
+
+
+def load_user_tools(workdir: Path | str = ".") -> int:
+    """Load user tool overrides from ``pyqual.tools.json`` in *workdir*.
+
+    Merges into ``TOOL_PRESETS``, overriding built-in presets with the same name.
+    Returns the number of presets loaded/overridden.
+    """
+    user_file = Path(workdir) / USER_TOOLS_FILE
+    if not user_file.exists():
+        return 0
+    user_presets = _load_json_presets(user_file)
+    count = 0
+    for name, preset in user_presets.items():
+        was_override = name in TOOL_PRESETS
+        TOOL_PRESETS[name] = preset
+        action = "override" if was_override else "add"
+        log.info("user tools: %s preset '%s' (binary=%s)", action, name, preset.binary)
+        count += 1
+    if count:
+        log.info("Loaded %d tool preset(s) from %s", count, user_file)
+    return count
+
+
+def preset_to_dict(preset: ToolPreset) -> dict[str, Any]:
+    """Serialize a ToolPreset to a JSON-compatible dict."""
+    d: dict[str, Any] = {
+        "binary": preset.binary,
+        "command": preset.command,
+        "output": preset.output,
+    }
+    if not preset.allow_failure:
+        d["allow_failure"] = False
+    return d
+
+
+def dump_presets_json(names: list[str] | None = None) -> str:
+    """Serialize current presets (or a subset) to JSON string.
+
+    Useful for ``pyqual tools --json`` or generating a starter
+    ``pyqual.tools.json`` file.
+    """
+    presets = TOOL_PRESETS if names is None else {
+        k: v for k, v in TOOL_PRESETS.items() if k in names
+    }
+    return json.dumps(
+        {k: preset_to_dict(v) for k, v in sorted(presets.items())},
+        indent=2,
+        ensure_ascii=False,
+    )
 
 
 def register_custom_tools_from_yaml(custom_tools: list[dict[str, Any]]) -> int:

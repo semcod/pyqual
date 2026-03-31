@@ -326,7 +326,20 @@ class Pipeline:
             or (stage.tool and stage.tool in ("llx-fix", "aider"))
         )
 
-        env = {**os.environ, **self.config.env}
+        # Resolve ${VAR} references in config env values against os.environ.
+        # Drop entries whose value is an unresolvable ${VAR} so they don't
+        # overwrite real env vars (e.g. OAuth session tokens).
+        resolved_env: dict[str, str] = {}
+        for k, v in self.config.env.items():
+            if isinstance(v, str) and v.startswith("${") and v.endswith("}"):
+                ref = v[2:-1]
+                real = os.environ.get(ref)
+                if real:
+                    resolved_env[k] = real
+                # else: drop — don't overwrite os.environ with literal "${…}"
+            else:
+                resolved_env[k] = str(v)
+        env = {**os.environ, **resolved_env}
         start = time.monotonic()
 
         if self.stream:

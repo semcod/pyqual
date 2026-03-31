@@ -454,6 +454,88 @@ def test_stage_result_preserves_original_returncode() -> None:
     assert result.original_returncode == 1  # raw rc preserved
 
 
+def test_default_tools_json_loads_all_presets() -> None:
+    """Built-in default_tools.json loads and populates TOOL_PRESETS."""
+    from pyqual.tools import TOOL_PRESETS, _BUILTIN_NAMES
+    assert len(TOOL_PRESETS) >= 20, f"Expected >=20 presets, got {len(TOOL_PRESETS)}"
+    assert "ruff" in TOOL_PRESETS
+    assert "pytest" in TOOL_PRESETS
+    assert "report" in TOOL_PRESETS
+    assert _BUILTIN_NAMES == frozenset(TOOL_PRESETS.keys()) or len(_BUILTIN_NAMES) > 0
+
+
+def test_preset_from_dict() -> None:
+    """_preset_from_dict creates ToolPreset from JSON dict."""
+    from pyqual.tools import _preset_from_dict
+    d = {"binary": "echo", "command": "echo {workdir}", "output": ".pyqual/out.json"}
+    p = _preset_from_dict(d)
+    assert p.binary == "echo"
+    assert p.allow_failure is True  # default
+
+    d2 = {"binary": "pytest", "command": "pytest -q", "output": "", "allow_failure": False}
+    p2 = _preset_from_dict(d2)
+    assert p2.allow_failure is False
+
+
+def test_load_user_tools_from_json() -> None:
+    """load_user_tools() loads pyqual.tools.json and overrides/adds presets."""
+    import json
+    from pyqual.tools import TOOL_PRESETS, load_user_tools, get_preset
+
+    with tempfile.TemporaryDirectory() as td:
+        user_file = Path(td) / "pyqual.tools.json"
+        user_file.write_text(json.dumps({
+            "_test_user_tool": {
+                "binary": "echo",
+                "command": "echo user {workdir}",
+                "output": ".pyqual/user.json"
+            },
+            "ruff": {
+                "binary": "ruff",
+                "command": "ruff check {workdir} --fix --output-format=json",
+                "output": ".pyqual/ruff.json"
+            }
+        }))
+        # Save original ruff preset
+        original_ruff = TOOL_PRESETS.get("ruff")
+        try:
+            count = load_user_tools(td)
+            assert count == 2
+            assert get_preset("_test_user_tool") is not None
+            assert get_preset("_test_user_tool").binary == "echo"
+            # ruff should be overridden
+            assert "--fix" in get_preset("ruff").command
+        finally:
+            TOOL_PRESETS.pop("_test_user_tool", None)
+            if original_ruff:
+                TOOL_PRESETS["ruff"] = original_ruff
+
+
+def test_load_user_tools_no_file() -> None:
+    """load_user_tools() returns 0 when no pyqual.tools.json exists."""
+    from pyqual.tools import load_user_tools
+
+    with tempfile.TemporaryDirectory() as td:
+        assert load_user_tools(td) == 0
+
+
+def test_dump_presets_json() -> None:
+    """dump_presets_json() produces valid JSON with all presets."""
+    import json as json_mod
+    from pyqual.tools import dump_presets_json
+    output = dump_presets_json()
+    data = json_mod.loads(output)
+    assert isinstance(data, dict)
+    assert "ruff" in data
+    assert "binary" in data["ruff"]
+    assert "command" in data["ruff"]
+
+    # Subset dump
+    subset = dump_presets_json(["ruff", "pytest"])
+    subset_data = json_mod.loads(subset)
+    assert set(subset_data.keys()) == {"ruff", "pytest"}
+
+
 def test_register_custom_preset() -> None:
     """register_preset() adds a new tool preset at runtime."""
     from pyqual.tools import ToolPreset, register_preset, get_preset, TOOL_PRESETS
