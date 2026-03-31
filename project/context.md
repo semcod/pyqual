@@ -328,15 +328,15 @@ _parse [pyqual.config.PyqualConfig]
 - **Key Methods**: pyqual.builtin_collectors.LlxMcpFixCollector._tier_rank, pyqual.builtin_collectors.LlxMcpFixCollector._load_report, pyqual.builtin_collectors.LlxMcpFixCollector._assign_float, pyqual.builtin_collectors.LlxMcpFixCollector._count_lines, pyqual.builtin_collectors.LlxMcpFixCollector._collect_analysis_metrics, pyqual.builtin_collectors.LlxMcpFixCollector._collect_aider_metrics, pyqual.builtin_collectors.LlxMcpFixCollector.get_config_example, pyqual.builtin_collectors.LlxMcpFixCollector.collect
 - **Inherits**: MetricCollector
 
-### pyqual.config.PyqualConfig
-> Full pyqual.yaml configuration.
-- **Methods**: 4
-- **Key Methods**: pyqual.config.PyqualConfig.load, pyqual.config.PyqualConfig.llm_model, pyqual.config.PyqualConfig._parse, pyqual.config.PyqualConfig.default_yaml
-
 ### pyqual.plugins.PluginRegistry
 > Registry for metric collector plugins.
 - **Methods**: 4
 - **Key Methods**: pyqual.plugins.PluginRegistry.register, pyqual.plugins.PluginRegistry.get, pyqual.plugins.PluginRegistry.list_plugins, pyqual.plugins.PluginRegistry.create_instance
+
+### pyqual.config.PyqualConfig
+> Full pyqual.yaml configuration.
+- **Methods**: 4
+- **Key Methods**: pyqual.config.PyqualConfig.load, pyqual.config.PyqualConfig.llm_model, pyqual.config.PyqualConfig._parse, pyqual.config.PyqualConfig.default_yaml
 
 ### pyqual.gates.GateSet
 > Collection of quality gates with metric collection.
@@ -364,17 +364,17 @@ _parse [pyqual.config.PyqualConfig]
 - **Key Methods**: examples.custom_plugins.performance_collector.PerformanceCollector.collect, examples.custom_plugins.performance_collector.PerformanceCollector.get_config_example
 - **Inherits**: MetricCollector
 
-### pyqual.plugins.MetricCollector
-> Base class for metric collector plugins.
-- **Methods**: 2
-- **Key Methods**: pyqual.plugins.MetricCollector.collect, pyqual.plugins.MetricCollector.get_config_example
-- **Inherits**: ABC
-
 ### examples.custom_plugins.code_health_collector.CodeHealthCollector
 > Weighted composite health score from multiple code quality signals.
 - **Methods**: 2
 - **Key Methods**: examples.custom_plugins.code_health_collector.CodeHealthCollector.collect, examples.custom_plugins.code_health_collector.CodeHealthCollector.get_config_example
 - **Inherits**: MetricCollector
+
+### pyqual.plugins.MetricCollector
+> Base class for metric collector plugins.
+- **Methods**: 2
+- **Key Methods**: pyqual.plugins.MetricCollector.collect, pyqual.plugins.MetricCollector.get_config_example
+- **Inherits**: ABC
 
 ### pyqual.tools.ToolPreset
 > Definition of a built-in tool invocation preset.
@@ -386,6 +386,11 @@ _parse [pyqual.config.PyqualConfig]
 - **Methods**: 2
 - **Key Methods**: pyqual.validation.StageFailure.error_code, pyqual.validation.StageFailure.domain
 
+### pyqual.plugins.PluginMetadata
+> Metadata for a pyqual plugin.
+- **Methods**: 1
+- **Key Methods**: pyqual.plugins.PluginMetadata.__post_init__
+
 ### pyqual.config.StageConfig
 > Single pipeline stage.
 - **Methods**: 1
@@ -395,11 +400,6 @@ _parse [pyqual.config.PyqualConfig]
 > Single quality gate threshold.
 - **Methods**: 1
 - **Key Methods**: pyqual.config.GateConfig.from_dict
-
-### pyqual.plugins.PluginMetadata
-> Metadata for a pyqual plugin.
-- **Methods**: 1
-- **Key Methods**: pyqual.plugins.PluginMetadata.__post_init__
 
 ### pyqual.gates.GateResult
 > Result of a single gate check.
@@ -455,10 +455,6 @@ Does NOT run any stages — this is a stati
 ### pyqual.cli_run_helpers.format_run_summary
 - **Output to**: todo_bits.append, todo_bits.append, todo_bits.append, parts.append, fix_bits.append
 
-### pyqual.bulk_run._parse_output_line
-> Parse a line of pyqual run output and update state.
-- **Output to**: line.strip, clean.startswith, clean.startswith, None.strip, None.strip
-
 ### pyqual.cli_log_helpers.format_log_entry_row
 > Return (ts, event_name, name, status, details) for one log entry.
 - **Output to**: entry.get, entry.get, None.replace, entry.get, entry.get
@@ -466,6 +462,10 @@ Does NOT run any stages — this is a stati
 ### pyqual.integrations.llx_mcp_service.build_parser
 > Build the CLI parser for the MCP service.
 - **Output to**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, os.getenv, int
+
+### pyqual.bulk_run._parse_output_line
+> Parse a line of pyqual run output and update state.
+- **Output to**: line.strip, clean.startswith, clean.startswith, None.strip, None.strip
 
 ### pyqual.integrations.llx_mcp.build_parser
 > Build the CLI parser for the llx MCP helper.
@@ -507,8 +507,8 @@ Functions exposed as public API (no underscore prefix):
 - `pyqual.cli_plugin_helpers.plugin_search` - 25 calls
 - `pyqual.builtin_collectors.SecurityCollector.collect` - 23 calls
 - `pyqual.cli.init` - 22 calls
-- `pyqual.bulk_run.bulk_run` - 22 calls
 - `pyqual.bulk_init.bulk_init` - 22 calls
+- `pyqual.bulk_run.bulk_run` - 22 calls
 - `pyqual.cli.validate` - 21 calls
 - `pyqual.cli.status` - 21 calls
 - `pyqual.cli.gates` - 20 calls

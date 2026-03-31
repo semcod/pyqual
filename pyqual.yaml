@@ -123,9 +123,13 @@ pipeline:
     # Simple git push (goal push had "Argument list too long" issue with many files)
     - name: push
       run: |
-        git add -A
-        git commit -m "chore: pyqual auto-commit [skip ci]" || true
-        git push origin HEAD
+        if [ -n "$(git status --porcelain)" ]; then
+          git add -A
+          git commit -m "chore: pyqual auto-commit [skip ci]" 2>/dev/null || true
+          git push origin HEAD
+        else
+          echo "No changes to push"
+        fi
       when: metrics_pass
       optional: true
       timeout: 120

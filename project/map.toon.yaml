@@ -389,12 +389,12 @@ D:
     build_parser()
     main(argv)
   project.sh:
-  dashboard/postcss.config.js:
+  dashboard/tailwind.config.js:
   dashboard/vite.config.ts:
     i: @vitejs/plugin-react,vite
   dashboard/src/main.tsx:
     i: ./App,react,react-dom/client
-  dashboard/tailwind.config.js:
+  dashboard/postcss.config.js:
   dashboard/src/types/index.ts:
     e: PyqualMetric,PyqualStage,PyqualSummary,Repository,DashboardConfig,MetricHistory,MetricTrend
     PyqualMetric:

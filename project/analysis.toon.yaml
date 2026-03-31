@@ -12,16 +12,16 @@ HEALTH[20]:
   🟡 CC    watch CC=29 (limit:15)
   🟡 CC    history CC=29 (limit:15)
   🟡 CC    main CC=37 (limit:15)
+  🟡 CC    _from_vulnerabilities CC=17 (limit:15)
   🟡 CC    _classify_failure CC=21 (limit:15)
   🟡 CC    validate_config CC=26 (limit:15)
   🟡 CC    detect_project_facts CC=16 (limit:15)
-  🟡 CC    _from_vulnerabilities CC=17 (limit:15)
   🟡 CC    enrich_from_artifacts CC=20 (limit:15)
   🟡 CC    build_run_summary CC=20 (limit:15)
+  🟡 CC    _classify_heuristic CC=26 (limit:15)
+  🟡 CC    bulk_init CC=18 (limit:15)
   🟡 CC    _run_single_project CC=19 (limit:15)
   🟡 CC    _build_project_row CC=19 (limit:15)
-  🟡 CC    bulk_run CC=17 (limit:15)
-  🟡 CC    _classify_heuristic CC=26 (limit:15)
 
 REFACTOR[2]:
   1. split pyqual/pipeline.py  (god module)
@@ -36,7 +36,7 @@ PIPELINES[160]:
       PURITY: 100% pure
   [4] Src [data]: data
       PURITY: 100% pure
-  [5] Src [App]: App → loadRepositories
+  [5] Src [Settings]: Settings
       PURITY: 100% pure
 
 LAYERS:
