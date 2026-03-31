@@ -123,6 +123,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.69] - 2026-03-31
+
+### Docs
+- Update README.md
+- Update project/context.md
+
+### Other
+- Update .pyqual/llx_history.jsonl
+- Update .pyqual/pipeline.db
+- Update project/analysis.toon.yaml
+- Update project/calls.mmd
+- Update project/calls.png
+- Update project/flow.mmd
+- Update project/flow.png
+- Update project/index.html
+- Update pyqual.yaml
+
 ## [0.1.68] - 2026-03-31
 
 ### Docs
