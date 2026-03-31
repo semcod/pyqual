@@ -27,7 +27,7 @@ pipeline:
     - name: health-scan
       run: |
         # Replace with your actual code health tooling
-        python -c "
+        python3 -c "
         import json, pathlib
         result = {
             'tech_debt_hours': 20,

@@ -29,6 +29,9 @@ Real-world usage patterns for different project types and CI/CD setups.
 | [llm_fix](llm_fix/) | Docker-backed llx MCP fix workflow | llx, aider, Docker |
 | [llx](llx/) | Standalone llx integration pipeline | llx, code2llm, vallm |
 
+> **📖 pyqual supports any AI coding agent with a CLI as a fix stage — Claude Code, Codex CLI, Gemini CLI, aider, llx, Cursor, Windsurf, Cline.
+> See [AI Fix Tools](../docs/ai-fix-tools.md) for complete `pyqual.yaml` examples for each tool.**
+
 ### CI/CD
 
 | Example | Platform | Features |

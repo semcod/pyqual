@@ -1,0 +1,8 @@
+flowchart LR
+    subgraph sync_tickets
+        sync_tickets__sync_from_cli["sync_from_cli"]
+        sync_tickets__tickets_from_gate_failures["tickets_from_gate_failures"]
+        sync_tickets__main["main"]
+    end
+    sync_tickets__main --> sync_tickets__sync_from_cli
+    sync_tickets__main --> sync_tickets__tickets_from_gate_failures

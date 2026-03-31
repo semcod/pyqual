@@ -21,7 +21,7 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from pyqual.config import PyqualConfig, GateConfig
+from pyqual.config import PyqualConfig
 from pyqual.gates import GateSet
 from pyqual.tickets import sync_todo_tickets, sync_github_tickets, sync_all_tickets
 
@@ -33,13 +33,13 @@ def sync_from_cli(args: list[str]) -> int:
 
     if "--github" in args:
         print(f"Syncing GitHub Issues (dry_run={dry_run}, direction={direction})...")
-        sync_github_tickets(directory=Path("."), dry_run=dry_run, direction=direction)
+        sync_github_tickets(workdir=Path("."), dry_run=dry_run, direction=direction)
     elif "--all" in args:
         print(f"Syncing TODO.md + GitHub (dry_run={dry_run}, direction={direction})...")
-        sync_all_tickets(directory=Path("."), dry_run=dry_run, direction=direction)
+        sync_all_tickets(workdir=Path("."), dry_run=dry_run, direction=direction)
     else:
         print(f"Syncing TODO.md (dry_run={dry_run}, direction={direction})...")
-        sync_todo_tickets(directory=Path("."), dry_run=dry_run, direction=direction)
+        sync_todo_tickets(workdir=Path("."), dry_run=dry_run, direction=direction)
 
     print("Done.")
     return 0
@@ -72,7 +72,7 @@ def tickets_from_gate_failures(workdir: Path, dry_run: bool = False) -> int:
         print(f"  - {f.metric}: {val} (threshold: {f.threshold})")
 
     print(f"\nSyncing TODO.md tickets (dry_run={dry_run})...")
-    sync_todo_tickets(directory=workdir, dry_run=dry_run, direction="both")
+    sync_todo_tickets(workdir=workdir, dry_run=dry_run, direction="both")
     print("Tickets synced.")
     return 1
 

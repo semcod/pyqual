@@ -68,12 +68,13 @@ Preview what would happen without executing:
 pyqual run --dry-run
 ```
 
-## Verbose mode & logs
+## Verbose mode, Streaming & Logs
 
 See live pipeline logging during execution:
 
 ```bash
-pyqual run --verbose
+pyqual run --verbose       # live progress to stderr
+pyqual run --stream        # real-time stdout/stderr per stage (see llx prompts)
 ```
 
 View structured logs after a run:
@@ -82,11 +83,30 @@ View structured logs after a run:
 pyqual logs                    # all entries (table view)
 pyqual logs --tail 20          # last 20 entries
 pyqual logs --failed           # only failures
+pyqual logs --stage fix --output   # fix stage with captured stdout/stderr
 pyqual logs --json --failed    # JSON for LLM/llx consumption
 pyqual logs --level gate_check # only gate results
 ```
 
-Logs are written as JSON lines to `.pyqual/pipeline.log` — readable by LLM tools like llx for auto-diagnosis and repair.
+View LLX fix history (prompts, models, results):
+
+```bash
+pyqual history               # summary table of all LLX fix runs
+pyqual history --prompts     # include full LLX prompts
+pyqual history --verbose     # include aider/llx stdout
+pyqual history --json        # raw JSONL for LLM consumption
+```
+
+Live-tail pipeline execution in another terminal:
+
+```bash
+pyqual watch                 # live tail of pipeline.db events
+pyqual watch --output        # include stage stdout/stderr
+pyqual watch --prompts       # show LLX fix prompts as they appear
+pyqual watch --interval 0.5  # faster polling
+```
+
+Logs are written to `.pyqual/pipeline.db` (SQLite) and `.pyqual/llx_history.jsonl` for LLX runs.
 
 ## Next steps
 

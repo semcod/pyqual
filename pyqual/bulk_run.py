@@ -18,6 +18,8 @@ import time
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
+
+from pyqual.constants import BULK_LINE_TRUNCATE, BULK_TABLE_PROJECT_MAX_WIDTH, BULK_TABLE_PROJECT_MIN_WIDTH
 from typing import Any
 
 import yaml
@@ -113,7 +115,7 @@ def _parse_output_line(state: ProjectRunState, line: str) -> None:
     if not line:
         return
 
-    state.last_line = line[:120]
+    state.last_line = line[:BULK_LINE_TRUNCATE]
     clean = line
 
     # Detect stage START: "▶ lint" (emitted before stage executes)
@@ -411,7 +413,7 @@ def build_dashboard_table(
     )
 
     table = Table(title=title, expand=True, show_lines=False, pad_edge=False)
-    table.add_column("Project", style="bold", min_width=20, max_width=28)
+    table.add_column("Project", style="bold", min_width=BULK_TABLE_PROJECT_MIN_WIDTH, max_width=BULK_TABLE_PROJECT_MAX_WIDTH)
     table.add_column("Status", width=10, justify="center")
     table.add_column("Iter", width=7, justify="center")
     table.add_column("Stage", min_width=12, max_width=20)

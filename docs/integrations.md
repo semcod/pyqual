@@ -200,6 +200,8 @@ Use `pyqual mcp-refactor` when you want the same flow framed as a refactor task 
 
 See [examples/llm_fix/](../examples/llm_fix/) and [examples/llx/](../examples/llx/) for Docker-based and standalone setups.
 
+> **📖 pyqual works with many other AI coding agents too — Claude Code, Codex CLI, Gemini CLI, Cursor, Windsurf, Cline. See [AI Fix Tools](ai-fix-tools.md) for complete examples.**
+
 ## Custom Integrations
 
 Extend `GateSet._collect_metrics()` or build a plugin:

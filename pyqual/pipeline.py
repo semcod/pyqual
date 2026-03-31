@@ -11,26 +11,58 @@ import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol, runtime_checkable
 
 from nfo import Logger as NfoLogger
 from nfo.models import LogEntry
 from nfo.sinks import SQLiteSink
 
 from pyqual.config import PyqualConfig, StageConfig
+from pyqual.constants import (
+    LLX_HISTORY_FILE,
+    LLX_MCP_REPORT,
+    PIPELINE_DB,
+    PIPELINE_TABLE,
+    STDERR_TAIL_CHARS,
+    STDOUT_TAIL_CHARS,
+    TIMEOUT_EXIT_CODE,
+)
 from pyqual.gates import GateSet, GateResult
 from pyqual.tools import get_preset
 
 log = logging.getLogger("pyqual.pipeline")
 
-PIPELINE_DB = ".pyqual/pipeline.db"
-PIPELINE_TABLE = "pipeline_logs"
-LLX_MCP_REPORT = ".pyqual/llx_mcp.json"
-LLX_HISTORY_FILE = ".pyqual/llx_history.jsonl"
 
-TIMEOUT_EXIT_CODE = 124
-STDERR_TAIL_CHARS = 500
-STDOUT_TAIL_CHARS = 2000
+# ---------------------------------------------------------------------------
+# Callback protocols — used by Pipeline.__init__ for type safety
+# ---------------------------------------------------------------------------
+
+@runtime_checkable
+class OnStageStart(Protocol):
+    def __call__(self, name: str) -> None: ...
+
+@runtime_checkable
+class OnIterationStart(Protocol):
+    def __call__(self, iteration: int) -> None: ...
+
+@runtime_checkable
+class OnStageError(Protocol):
+    def __call__(self, failure: Any) -> None: ...
+
+@runtime_checkable
+class OnStageDone(Protocol):
+    """Called after each stage completes. Receives the full StageResult."""
+    def __call__(self, result: "StageResult") -> None: ...
+
+@runtime_checkable
+class OnStageOutput(Protocol):
+    """Called with each line of streaming output from a stage."""
+    def __call__(self, stage_name: str, stream: str, line: str) -> None: ...
+
+@runtime_checkable
+class OnIterationDone(Protocol):
+    """Called after each iteration completes. Receives the full IterationResult."""
+    def __call__(self, result: "IterationResult") -> None: ...
 
 
 @dataclass
@@ -77,10 +109,13 @@ class Pipeline:
     """Execute pipeline stages in a loop until quality gates pass."""
 
     def __init__(self, config: PyqualConfig, workdir: str | Path = ".",
-                 on_stage_start: Any = None, on_iteration_start: Any = None,
-                 on_stage_error: Any = None, on_stage_done: Any = None,
-                 on_stage_output: Any = None, stream: bool = False,
-                 on_iteration_done: Any = None):
+                 on_stage_start: OnStageStart | None = None,
+                 on_iteration_start: OnIterationStart | None = None,
+                 on_stage_error: OnStageError | None = None,
+                 on_stage_done: OnStageDone | None = None,
+                 on_stage_output: OnStageOutput | None = None,
+                 stream: bool = False,
+                 on_iteration_done: OnIterationDone | None = None):
         self.config = config
         self.workdir = Path(workdir).resolve()
         self.gate_set = GateSet(config.gates)
@@ -325,6 +360,7 @@ class Pipeline:
                 command, shell=True, cwd=self.workdir,
                 capture_output=stage.capture_output, text=True,
                 timeout=effective_timeout, env=env,
+                stdin=subprocess.DEVNULL,
             )
             raw_rc = proc.returncode
             rc = 0 if (allow_failure and raw_rc != 0) else raw_rc
@@ -363,6 +399,7 @@ class Pipeline:
                 command, shell=True, cwd=self.workdir,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                 text=True, env=env, bufsize=1,
+                stdin=subprocess.DEVNULL,
             )
             import select
             readable = [proc.stdout, proc.stderr]

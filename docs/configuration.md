@@ -2,7 +2,34 @@
 
 Everything pyqual does is defined in `pyqual.yaml`.
 
-## Full Example
+## Quick Start with Profiles
+
+The easiest way to get started — use a built-in profile:
+
+```yaml
+pipeline:
+  profile: python        # analyze → validate → test → fix → verify
+  metrics:
+    coverage_min: 55     # override only what you need
+  env:
+    LLM_MODEL: openrouter/qwen/qwen3-coder-next
+```
+
+Generate with: `pyqual init --profile python`
+
+Available profiles:
+
+| Profile | Stages | Description |
+|---------|--------|-------------|
+| `python` | analyze, validate, test, prefact, fix, verify | Standard Python quality loop |
+| `python-full` | + push, publish | Full pipeline with goal push & publish |
+| `ci` | analyze, validate, test | Report-only, no fix, single iteration |
+| `lint-only` | lint, typecheck, test | Ruff + mypy, no LLM |
+| `security` | analyze, audit, bandit, test | Security-focused scans |
+
+Run `pyqual profiles` to see details. Profiles provide default stages, metrics, and loop settings — all overridable in your YAML.
+
+## Full Example (without profile)
 
 ```yaml
 pipeline:
@@ -23,13 +50,17 @@ pipeline:
 
     - name: prefact
       tool: prefact
-      when: any_stage_fail   # run when validate fails
+      when: metrics_fail   # run when quality gates fail
       optional: true
 
     - name: fix
       tool: llx-fix         # reads TODO.md from prefact
-      when: any_stage_fail
+      when: metrics_fail
       optional: true
+
+    - name: verify
+      tool: pytest
+      when: after_fix       # run after fix stage completes
 
     - name: test
       tool: pytest
@@ -188,6 +219,7 @@ stages:
 | `verify`, `verify_fix` | `after_fix` |
 | `regression_report` | `after_verify_fix` |
 | `push`, `publish`, `deploy` | `metrics_pass` |
+| `test`, `lint`, `validate` | `always` |
 | anything else | `always` |
 
 You can always override with an explicit `when:` in your YAML.
@@ -338,10 +370,10 @@ pipeline_logs table:
 ┌─────────────────────────┬──────────┬─────────────────┬──────────┬───────────────────────────────┐
 │ timestamp               │ level    │ function_name   │ module   │ kwargs (structured data)      │
 ├─────────────────────────┼──────────┼─────────────────┼──────────┼───────────────────────────────┤
-│ 2026-03-30T07:19:01+00  │ INFO     │ pipeline_start  │ pyqual…  │ {stages: 4, gates: 3, ...}   │
-│ 2026-03-30T07:19:02+00  │ INFO     │ stage_done      │ pyqual…  │ {stage: ruff, rc: 0, ...}    │
+│ 2026-03-30T07:19:01+00  │ INFO     │ pipeline_start  │ pyqual…  │ {stages: 4, gates: 3, ...}    │
+│ 2026-03-30T07:19:02+00  │ INFO     │ stage_done      │ pyqual…  │ {stage: ruff, rc: 0, ...}     │
 │ 2026-03-30T07:19:03+00  │ WARNING  │ gate_check      │ pyqual…  │ {metric: coverage, ok: false} │
-│ 2026-03-30T07:19:03+00  │ INFO     │ pipeline_end    │ pyqual…  │ {final_ok: true, iter: 1}    │
+│ 2026-03-30T07:19:03+00  │ INFO     │ pipeline_end    │ pyqual…  │ {final_ok: true, iter: 1}     │
 └─────────────────────────┴──────────┴─────────────────┴──────────┴───────────────────────────────┘
 ```
 
@@ -389,6 +421,8 @@ pyqual watch --prompts             # show LLX fix prompts as they appear
 pyqual watch --interval 0.5        # faster polling (default: 1s)
 ```
 
+> **📖 For comprehensive documentation on the database schema, all event types, SQL queries, and Python API — see [Logs & Data Access](logs-and-data.md).**
+
 ### SQL access
 
 Query the nfo SQLite DB directly for advanced analysis:
@@ -418,6 +452,12 @@ pyqual logs --json --failed > .pyqual/failures.json
 # 3. Feed to llx for auto-fix
 llx fix . --errors .pyqual/failures.json --verbose
 ```
+
+## AI Fix Tools
+
+pyqual works with **any AI coding agent** that has a CLI: Claude Code, Codex CLI, Gemini CLI, aider, llx, Cursor, Windsurf, Cline, and more.
+
+**→ See [AI Fix Tools](ai-fix-tools.md) for complete `pyqual.yaml` examples for each tool.**
 
 ## Examples
 

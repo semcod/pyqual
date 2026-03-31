@@ -15,7 +15,25 @@ from rich.console import Console
 from rich.syntax import Syntax
 from rich.table import Table
 
+from pyqual.cli_log_helpers import (
+    format_log_entry_row as _format_log_entry_row,
+    query_nfo_db as _query_nfo_db,
+    row_to_event_dict as _row_to_event_dict,
+)
+from pyqual.cli_run_helpers import (
+    build_run_summary as _build_run_summary,
+    enrich_from_artifacts as _enrich_from_artifacts,
+    extract_stage_summary as _extract_stage_summary,
+    format_run_summary as _format_run_summary,
+    get_last_error_line as _get_last_error_line,
+    infer_fix_result as _infer_fix_result,
+)
 from pyqual.config import PyqualConfig
+from pyqual.constants import (
+    DEFAULT_MCP_PORT,
+    MAX_DESCRIPTION_LENGTH,
+    STATUS_COLUMN_WIDTH,
+)
 from pyqual.gates import GateSet
 try:
     from pyqual.integrations.llx_mcp import run_llx_fix_workflow
@@ -36,10 +54,6 @@ from pyqual.plugins import (
 from pyqual.tickets import sync_all_tickets
 from pyqual.tickets import sync_github_tickets
 from pyqual.tickets import sync_todo_tickets
-
-DEFAULT_MCP_PORT = 8000
-STATUS_COLUMN_WIDTH = 12
-MAX_DESCRIPTION_LENGTH = 50
 
 LOG_FORMAT = "%(asctime)s %(levelname)s %(name)s — %(message)s"
 
@@ -70,18 +84,81 @@ def _setup_logging(verbose: bool, workdir: Path = Path(".")) -> None:
 
 
 @app.command()
-def init(path: Path = typer.Argument(Path("."), help="Project directory")) -> None:
-    """Create pyqual.yaml with sensible defaults."""
+def init(
+    path: Path = typer.Argument(Path("."), help="Project directory"),
+    profile: str | None = typer.Option(None, "--profile", "-p", help="Use a built-in profile (e.g. python, python-full, ci, lint-only, security). See 'pyqual profiles'."),
+) -> None:
+    """Create pyqual.yaml with sensible defaults.
+
+    Use --profile for a minimal config based on a built-in profile:
+
+        pyqual init --profile python          # 6-line YAML
+        pyqual init --profile python-full     # includes push & publish
+        pyqual init --profile ci              # report-only, no fix
+    """
     target = path / "pyqual.yaml"
     if target.exists():
         overwrite = typer.confirm(f"{target} already exists. Overwrite?")
         if not overwrite:
             raise typer.Abort()
 
-    target.write_text(PyqualConfig.default_yaml())
+    if profile:
+        from pyqual.profiles import get_profile, list_profiles
+        prof = get_profile(profile)
+        if prof is None:
+            console.print(f"[red]Unknown profile '{profile}'.[/red]")
+            console.print(f"Available: {', '.join(list_profiles())}")
+            raise typer.Exit(1)
+        yaml_content = f"""\
+pipeline:
+  profile: {profile}
+
+  # Override metrics (profile defaults: {', '.join(f'{k}={v}' for k, v in prof.metrics.items())}):
+  # metrics:
+  #   coverage_min: 55
+
+  # Environment (optional)
+  env:
+    LLM_MODEL: openrouter/qwen/qwen3-coder-next
+"""
+        target.write_text(yaml_content)
+    else:
+        target.write_text(PyqualConfig.default_yaml())
+
     (path / ".pyqual").mkdir(exist_ok=True)
     console.print(f"[green]Created {target}[/green]")
-    console.print("Edit metrics thresholds and stages, then run: [bold]pyqual run[/bold]")
+    if profile:
+        console.print(f"Using profile [bold]{profile}[/bold]: {prof.description}")
+    console.print("Run: [bold]pyqual run[/bold]")
+
+
+@app.command()
+def profiles() -> None:
+    """List available pipeline profiles for pyqual.yaml.
+
+    Profiles provide pre-configured stage lists and metrics so you can write
+    a minimal pyqual.yaml:
+
+        pipeline:
+          profile: python
+          metrics:
+            coverage_min: 55    # override only what you need
+    """
+    from pyqual.profiles import PROFILES
+
+    table = Table(title="Available Profiles", show_lines=True)
+    table.add_column("Profile", style="bold cyan")
+    table.add_column("Description")
+    table.add_column("Stages", style="dim")
+    table.add_column("Gates", style="dim")
+
+    for name, prof in sorted(PROFILES.items()):
+        stage_names = ", ".join(s["name"] for s in prof.stages)
+        gate_names = ", ".join(prof.metrics.keys()) if prof.metrics else "—"
+        table.add_row(name, prof.description, stage_names, gate_names)
+
+    console.print(table)
+    console.print("\n[dim]Usage: set 'profile: <name>' in pyqual.yaml under pipeline:[/dim]")
 
 
 @app.command("bulk-init")
@@ -306,183 +383,6 @@ def bulk_run_cmd(
 
     if result.failed or result.errors:
         raise typer.Exit(1)
-
-
-def _enrich_from_artifacts(workdir: Path, stages: list[dict[str, Any]]) -> None:
-    """Enrich stage dicts with metrics read from artifact files on disk."""
-    # analysis.toon.yaml → analyze/code2llm stage
-    analysis = workdir / "project" / "analysis.toon.yaml"
-    if analysis.exists():
-        header = analysis.read_text(errors="replace").splitlines()[:2]
-        hdr = "\n".join(header)
-        # line 1: "# code2llm | 12f 4797L | python:11,shell:1"
-        m_f = re.search(r"(\d+)f\s+(\d+)L", hdr)
-        m_cc = re.search(r"CC\u0304?=([0-9.]+)", hdr)
-        m_cr = re.search(r"critical:(\d+)", hdr)
-        for sd in stages:
-            if sd["name"] in ("analyze", "code2llm") and sd.get("status") != "skipped":
-                if m_f:
-                    sd.setdefault("files", int(m_f.group(1)))
-                    sd.setdefault("lines", int(m_f.group(2)))
-                if m_cc:
-                    sd.setdefault("cc", float(m_cc.group(1)))
-                if m_cr:
-                    sd.setdefault("critical", int(m_cr.group(1)))
-
-    # validation.toon.yaml → validate/vallm stage
-    validation = workdir / "project" / "validation.toon.yaml"
-    if validation.exists():
-        header = validation.read_text(errors="replace").splitlines()[:5]
-        hdr = "\n".join(header)
-        # line 1: "# vallm batch | 86f | 36✓ 1⚠ 7✗"
-        m_v = re.search(r"(\d+)\u2713\s+(\d+)\u26a0\s+(\d+)\u2717", hdr)
-        # SUMMARY: scanned: 86  passed: 36 (41.9%)
-        m_s = re.search(r"passed:\s*\d+\s*\(([0-9.]+)%\)", hdr)
-        for sd in stages:
-            if sd["name"] in ("validate", "vallm") and sd.get("status") != "skipped":
-                if m_v:
-                    sd.setdefault("vallm_passed", int(m_v.group(1)))
-                    sd.setdefault("vallm_warnings", int(m_v.group(2)))
-                    sd.setdefault("vallm_errors", int(m_v.group(3)))
-                if m_s:
-                    sd.setdefault("vallm_pass_pct", float(m_s.group(1)))
-
-    # TODO.md → prefact stage
-    todo = workdir / "TODO.md"
-    if todo.exists():
-        head = todo.read_text(errors="replace")[:500]
-        m_t = re.search(r"\*?\*?Total issues:\*?\*?\s*(\d+)\s*active(?:,\s*(\d+)\s*completed)?", head)
-        if m_t:
-            for sd in stages:
-                if sd["name"] in ("prefact",) and sd.get("status") != "skipped":
-                    sd.setdefault("tickets", int(m_t.group(1)))
-                    if m_t.group(2):
-                        sd.setdefault("tickets_completed", int(m_t.group(2)))
-
-
-def _extract_stage_summary(name: str, stdout: str, stderr: str) -> dict[str, str]:
-    """Extract key metrics from stage output as YAML-ready key: value pairs."""
-    text = (stdout or "") + "\n" + (stderr or "")
-    metrics: dict[str, str] = {}
-    metrics.update(_extract_pytest_stage_summary(name, text))
-    metrics.update(_extract_lint_stage_summary(text))
-    metrics.update(_extract_prefact_stage_summary(name, text))
-    metrics.update(_extract_code2llm_stage_summary(name, text))
-    metrics.update(_extract_validation_stage_summary(name, text))
-    metrics.update(_extract_fix_stage_summary(name, text))
-    metrics.update(_extract_mypy_stage_summary(name, text))
-    metrics.update(_extract_bandit_stage_summary(text))
-    return metrics
-
-
-def _infer_fix_result(stage: dict[str, Any]) -> str:
-    files_changed = stage.get("files_changed")
-    if isinstance(files_changed, (int, float)):
-        return "changed" if float(files_changed) > 0 else "no_changes"
-
-    status = str(stage.get("fix_status", "")).strip().lower()
-    if not status:
-        return "unknown"
-    if "no changes" in status or "no change" in status:
-        return "no_changes"
-    if any(token in status for token in ("applied", "changed", "updated", "modified", "fixed")):
-        return "changed"
-    return "unknown"
-
-
-def _build_run_summary(report: dict[str, Any]) -> dict[str, Any]:
-    summary: dict[str, Any] = {}
-    stages = [
-        stage
-        for iteration in report.get("iterations", [])
-        if isinstance(iteration, dict)
-        for stage in iteration.get("stages", [])
-        if isinstance(stage, dict)
-    ]
-
-    prefact_stage = next((stage for stage in stages if stage.get("name") == "prefact"), None)
-    if prefact_stage:
-        tickets = prefact_stage.get("tickets")
-        tickets_completed = prefact_stage.get("tickets_completed")
-        if isinstance(tickets, (int, float)):
-            summary["todo_active"] = int(tickets)
-        if isinstance(tickets_completed, (int, float)):
-            summary["todo_completed"] = int(tickets_completed)
-        if isinstance(tickets, (int, float)) and isinstance(tickets_completed, (int, float)):
-            summary["todo_total"] = int(tickets) + int(tickets_completed)
-
-    fix_stage = next((stage for stage in stages if stage.get("name") == "fix"), None)
-    if fix_stage:
-        files_changed = fix_stage.get("files_changed")
-        if isinstance(files_changed, (int, float)):
-            summary["fix_files_changed"] = int(files_changed)
-        failed = fix_stage.get("failed")
-        if isinstance(failed, (int, float)):
-            summary["fix_failed"] = int(failed)
-        errors = fix_stage.get("errors")
-        if isinstance(errors, (int, float)):
-            summary["fix_errors"] = int(errors)
-        summary["fix_result"] = _infer_fix_result(fix_stage)
-
-    return summary
-
-
-def _format_run_summary(summary: dict[str, Any]) -> str:
-    if not summary:
-        return ""
-
-    parts: list[str] = []
-
-    todo_bits: list[str] = []
-    if "todo_active" in summary:
-        todo_bits.append(f"{summary['todo_active']} active")
-    if "todo_completed" in summary:
-        todo_bits.append(f"{summary['todo_completed']} completed")
-    if "todo_total" in summary:
-        todo_bits.append(f"{summary['todo_total']} total")
-    if todo_bits:
-        parts.append(f"TODO {', '.join(todo_bits)}")
-
-    fix_bits: list[str] = []
-    if "fix_result" in summary:
-        fix_bits.append(f"result={summary['fix_result']}")
-    if "fix_files_changed" in summary:
-        fix_bits.append(f"{summary['fix_files_changed']} files changed")
-    if "fix_failed" in summary:
-        fix_bits.append(f"{summary['fix_failed']} failed")
-    if "fix_errors" in summary:
-        fix_bits.append(f"{summary['fix_errors']} errors")
-    if fix_bits:
-        parts.append(f"fix {', '.join(fix_bits)}")
-
-    if "fix_result" in summary:
-        if summary["fix_result"] == "changed":
-            outcome = "changes applied"
-        elif summary["fix_result"] == "no_changes":
-            outcome = "no changes applied"
-        else:
-            outcome = "change status unknown"
-        parts.append(f"outcome: {outcome}")
-
-    return f"[bold]Run summary[/bold]: {'; '.join(parts)}"
-
-
-def _get_last_error_line(text: str) -> str:
-    """Return the last meaningful error line, filtering out informational noise."""
-    if not text:
-        return ""
-    noise_prefixes = (
-        "Using .gitignore", "Excluded ", "✓ ", "Results saved",
-        "Processing ", "Scanning ", "Checking ", "Loading ", "Collecting ",
-    )
-    error_kws = ("error", "fail", "assert", "exception", "traceback",
-                 "critical", "syntax", "invalid", "cannot", "no module")
-    clean = [l.strip() for l in text.splitlines()
-             if l.strip() and not any(l.strip().startswith(p) for p in noise_prefixes)]
-    err_lines = [l for l in clean if any(kw in l.lower() for kw in error_kws)]
-    if err_lines:
-        return err_lines[-1][:200]
-    return clean[-1][:200] if clean else ""
 
 
 @app.command()
@@ -1418,226 +1318,6 @@ def tools() -> None:
     console.print("      optional: true")
 
 
-def _extract_pytest_stage_summary(name: str, text: str) -> dict[str, Any]:
-    lower = name.lower()
-    if not any(kw in lower for kw in ("test", "pytest", "check")):
-        return {}
-    out: dict[str, Any] = {}
-    m = re.search(r"(\d+) passed", text)
-    if m:
-        out["passed"] = int(m.group(1))
-    m = re.search(r"(\d+) failed", text)
-    if m:
-        out["failed"] = int(m.group(1))
-    m = re.search(r"(\d+) error", text)
-    if m:
-        out["errors"] = int(m.group(1))
-    return out
-
-
-def _extract_lint_stage_summary(text: str) -> dict[str, Any]:
-    m = re.search(r"Found (\d+) error", text)
-    if m:
-        return {"lint_errors": int(m.group(1))}
-    if "All checks passed" in text:
-        return {"lint_errors": 0}
-    return {}
-
-
-def _extract_prefact_stage_summary(name: str, text: str) -> dict[str, Any]:
-    m = re.search(r"\*?\*?Total issues:\*?\*?\s*(\d+)\s*active", text)
-    if m:
-        return {"tickets": int(m.group(1))}
-    if "prefact" in name.lower():
-        open_tickets = text.count("- [ ]")
-        if open_tickets:
-            return {"tickets": open_tickets}
-    return {}
-
-
-def _extract_code2llm_stage_summary(name: str, text: str) -> dict[str, Any]:
-    m = re.search(r"(\d+)\s+file", text)
-    if m and ("analyze" in name.lower() or "code2llm" in name.lower()):
-        out: dict[str, Any] = {"files": int(m.group(1))}
-        m2 = re.search(r"([\d,]+)\s+line", text)
-        if m2:
-            out["lines"] = int(m2.group(1).replace(",", ""))
-        return out
-    return {}
-
-
-def _extract_validation_stage_summary(name: str, text: str) -> dict[str, Any]:
-    lower_name = name.lower()
-    if "valid" not in lower_name and "vallm" not in lower_name:
-        return {}
-    out: dict[str, Any] = {}
-    m_cc = re.search(r"CC\u0304?[:\s=]+([0-9.]+)", text)
-    if not m_cc:
-        m_cc = re.search(r"\bcc[:\s=]+([0-9.]+)", text, re.IGNORECASE)
-    if m_cc:
-        out["cc"] = float(m_cc.group(1))
-    m_crit = re.search(r"critical[:\s=]+([0-9]+)", text, re.IGNORECASE)
-    if m_crit:
-        out["critical"] = int(m_crit.group(1))
-    return out
-
-
-def _extract_fix_stage_summary(name: str, text: str) -> dict[str, Any]:
-    if "fix" not in name.lower():
-        return {}
-    out: dict[str, Any] = {}
-    m = re.search(r"Selected:\s*\S+\s*\u2192\s*(.+)", text)
-    if m:
-        out["model"] = m.group(1).strip().split()[0]
-    m_iss = re.search(r"Loaded (\d+) errors?", text)
-    if m_iss:
-        out["issues_loaded"] = int(m_iss.group(1))
-    m2 = re.search(r"(\d+)\s+file[s]?\s+changed", text, re.IGNORECASE)
-    if not m2:
-        m2 = re.search(r"Applied\s+(\d+)\s+changes?", text, re.IGNORECASE)
-    if not m2:
-        m2 = re.search(r"(\d+)\s+file[s]?\s+(?:updated|modified|rewritten)", text, re.IGNORECASE)
-    if m2:
-        out["files_changed"] = int(m2.group(1))
-    else:
-        changed_files = set(re.findall(r"^\+\+\+ b/(.+)$", text, re.MULTILINE))
-        if changed_files:
-            out["files_changed"] = len(changed_files)
-        else:
-            m3 = re.search(r"(Applied|No changes|Updated|Modified|Fixed)[^\n]*", text, re.IGNORECASE)
-            if m3:
-                raw = m3.group(0)[:80]
-                out["fix_status"] = re.sub(r"[^\x20-\x7e]", "", raw).strip()
-    return out
-
-
-def _extract_mypy_stage_summary(name: str, text: str) -> dict[str, Any]:  # noqa: ARG001
-    m = re.search(r"Found (\d+) error[s]? in (\d+) file", text)
-    if m:
-        return {"mypy_errors": int(m.group(1)), "mypy_files": int(m.group(2))}
-    return {}
-
-
-def _extract_bandit_stage_summary(text: str) -> dict[str, Any]:
-    m = re.search(r"High: (\d+)\s+Medium: (\d+)\s+Low: (\d+)", text)
-    if not m:
-        return {}
-    return {
-        "bandit_high": int(m.group(1)),
-        "bandit_medium": int(m.group(2)),
-        "bandit_low": int(m.group(3)),
-    }
-
-
-def _format_log_entry_row(entry: dict) -> tuple:
-    """Return (ts, event_name, name, status, details) for one log entry."""
-    ts = entry.get("_timestamp", "")[:19].replace("T", " ")[11:]
-    event_name = entry.get("event", entry.get("_function_name", ""))
-    ok = entry.get("ok")
-    status = "[green]PASS[/green]" if ok else ("[red]FAIL[/red]" if ok is False else "[dim]—[/dim]")
-    name = ""
-    details = ""
-
-    if event_name == "stage_done":
-        name = entry.get("stage", "")
-        tool_info = f"tool:{entry['tool']}" if entry.get("tool") else ""
-        rc_info = f"rc={entry.get('original_returncode', '?')}"
-        dur = f"{entry.get('duration_s', 0):.1f}s"
-        details = " ".join(filter(None, [tool_info, rc_info, dur]))
-        if entry.get("skipped"):
-            status = "[dim]SKIP[/dim]"
-        if entry.get("stderr_tail"):
-            details += f" err: {entry['stderr_tail'][:80]}"
-    elif event_name == "gate_check":
-        name = entry.get("metric", "")
-        val = entry.get("value")
-        thr = entry.get("threshold")
-        op = {"le": "≤", "ge": "≥", "lt": "<", "gt": ">", "eq": "="}.get(str(entry.get("operator", "")), "?")
-        val_s = f"{val:.1f}" if val is not None else "N/A"
-        details = f"{val_s} {op} {thr}"
-    elif event_name in ("pipeline_start", "pipeline_end"):
-        name = entry.get("pipeline", "")
-        parts: list[str] = []
-        if event_name == "pipeline_start":
-            parts.append(f"stages={entry.get('stages')}")
-            parts.append(f"gates={entry.get('gates')}")
-            parts.append(f"max_iter={entry.get('max_iterations')}")
-            if entry.get("dry_run"):
-                parts.append("DRY-RUN")
-        else:
-            parts.append("PASS" if entry.get("final_ok") else "FAIL")
-            parts.append(f"iter={entry.get('iterations')}")
-            dur_s = entry.get("total_duration_s", 0)
-            parts.append(f"{dur_s:.1f}s" if isinstance(dur_s, (int, float)) else str(dur_s))
-        details = " ".join(parts)
-    else:
-        details = str(entry)[:80]
-
-    return ts, event_name, name, status, details
-
-
-def _query_nfo_db(db_path: Path, event: str = "", failed: bool = False,
-                  tail: int = 0, sql: str = "", stage: str = "") -> list[dict]:
-    """Query the nfo SQLite pipeline log and return structured dicts."""
-    import sqlite3
-    from pyqual.pipeline import PIPELINE_TABLE
-
-    conn = sqlite3.connect(str(db_path))
-    conn.row_factory = sqlite3.Row
-
-    if sql:
-        rows = conn.execute(sql).fetchall()
-        conn.close()
-        return [dict(r) for r in rows]
-
-    # Build query from filters
-    where_clauses: list[str] = []
-    params: list[str] = []
-
-    if event:
-        where_clauses.append("function_name = ?")
-        params.append(event)
-
-    if stage:
-        where_clauses.append("kwargs LIKE ?")
-        params.append(f"%'stage': '{stage}%")
-
-    if failed:
-        where_clauses.append("level = 'WARNING'")
-
-    where = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
-    limit = f"LIMIT {tail}" if tail > 0 else ""
-    order = "ORDER BY rowid DESC" if tail > 0 else "ORDER BY rowid ASC"
-
-    query = f"SELECT * FROM {PIPELINE_TABLE} {where} {order} {limit}"
-    rows = conn.execute(query, params).fetchall()
-    conn.close()
-
-    entries = [dict(r) for r in rows]
-    if tail > 0:
-        entries.reverse()
-    return entries
-
-
-def _row_to_event_dict(row: dict) -> dict:
-    """Parse an nfo SQLite row into a structured event dict.
-
-    nfo stores kwargs as repr string in the 'kwargs' column.
-    We parse it back to extract structured fields.
-    """
-    import ast
-    kwargs_raw = row.get("kwargs", "{}")
-    try:
-        data = ast.literal_eval(kwargs_raw) if isinstance(kwargs_raw, str) else kwargs_raw
-    except (ValueError, SyntaxError):
-        data = {}
-    data["_timestamp"] = row.get("timestamp", "")
-    data["_level"] = row.get("level", "")
-    data["_function_name"] = row.get("function_name", "")
-    data["_duration_ms"] = row.get("duration_ms")
-    return data
-
-
 @app.command()
 def logs(
     workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
@@ -1665,7 +1345,7 @@ def logs(
         pyqual logs --level gate_check # only gate results
         pyqual logs --sql "SELECT * FROM pipeline_logs WHERE function_name='stage_done' AND level='WARNING'"
     """
-    from pyqual.pipeline import PIPELINE_DB
+    from pyqual.constants import PIPELINE_DB
 
     db_path = Path(workdir) / PIPELINE_DB
     if not db_path.exists():
@@ -1852,7 +1532,7 @@ def history(
         pyqual history --json           # raw JSONL for LLM consumption
         pyqual history --verbose        # include aider stdout
     """
-    from pyqual.pipeline import LLX_HISTORY_FILE
+    from pyqual.constants import LLX_HISTORY_FILE
 
     history_path = Path(workdir) / LLX_HISTORY_FILE
     if not history_path.exists():

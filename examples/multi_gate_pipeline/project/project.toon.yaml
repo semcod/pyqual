@@ -1,0 +1,9 @@
+# multi_gate_pipeline | 0 func | 1f | 61L | unknown | 2026-03-31
+
+HEALTH:
+  CC̄=0.0  critical=0 (limit:10)  dup=0  cycles=0
+
+MODULES[0] (top by size):
+
+EVOLUTION:
+  2026-03-31 CC̄=0.0 crit=0 61L // Automated analysis

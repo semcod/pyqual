@@ -10,14 +10,13 @@ from typing import Any
 import yaml
 from dotenv import load_dotenv
 
+from pyqual.constants import DEFAULT_STAGE_TIMEOUT
 from pyqual.tools import (
     get_preset,
     list_presets,
     load_entry_point_presets,
     register_custom_tools_from_yaml,
 )
-
-DEFAULT_STAGE_TIMEOUT = 300
 
 
 def _load_env_file() -> None:
@@ -138,9 +137,32 @@ class PyqualConfig:
         if custom_tools:
             register_custom_tools_from_yaml(custom_tools)
 
+        # --- Profile support ---
+        # If profile: is set, use it as the base and merge user overrides.
+        profile_name = pipeline.get("profile")
+        profile_stages: list[dict[str, Any]] = []
+        profile_metrics: dict[str, Any] = {}
+        profile_loop: dict[str, Any] = {}
+        profile_env: dict[str, Any] = {}
+        if profile_name:
+            from pyqual.profiles import get_profile, list_profiles
+            profile = get_profile(profile_name)
+            if profile is None:
+                raise ValueError(
+                    f"Unknown profile '{profile_name}'. "
+                    f"Available: {', '.join(list_profiles())}. "
+                    f"Use 'pyqual profiles' to see details."
+                )
+            profile_stages = list(profile.stages)
+            profile_metrics = dict(profile.metrics)
+            profile_loop = dict(profile.loop)
+            profile_env = dict(profile.env)
+
+        # Stages: explicit stages override profile, otherwise use profile stages
+        raw_stages = pipeline.get("stages", profile_stages)
         _stage_fields = {f.name for f in StageConfig.__dataclass_fields__.values()}
         stages = []
-        for s in pipeline.get("stages", []):
+        for s in raw_stages:
             filtered = {k: v for k, v in s.items() if k in _stage_fields}
             stage = StageConfig(**filtered)
             if not stage.run and not stage.tool:
@@ -159,22 +181,31 @@ class PyqualConfig:
                     f"Use 'run:' for custom commands."
                 )
             stages.append(stage)
+
+        # Metrics: profile defaults merged with user overrides
+        merged_metrics = {**profile_metrics, **(pipeline.get("metrics") or {})}
         gates = [
             GateConfig.from_dict(k, v)
-            for k, v in (pipeline.get("metrics") or {}).items()
+            for k, v in merged_metrics.items()
         ]
-        loop_raw = pipeline.get("loop", {})
-        if loop_raw:
+
+        # Loop: profile defaults merged with user overrides
+        merged_loop = {**profile_loop, **(pipeline.get("loop") or {})}
+        if merged_loop:
             _loop_fields = {f.name for f in LoopConfig.__dataclass_fields__.values()}
-            loop = LoopConfig(**{k: v for k, v in loop_raw.items() if k in _loop_fields})
+            loop = LoopConfig(**{k: v for k, v in merged_loop.items() if k in _loop_fields})
         else:
             loop = LoopConfig()
+
+        # Env: profile defaults merged with user overrides
+        merged_env = {**profile_env, **(pipeline.get("env") or {})}
+
         return cls(
-            name=pipeline.get("name", "default"),
+            name=pipeline.get("name", profile_name or "default"),
             stages=stages,
             gates=gates,
             loop=loop,
-            env=_normalize_env_values(pipeline.get("env", {})),
+            env=_normalize_env_values(merged_env),
         )
 
     @staticmethod

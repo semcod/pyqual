@@ -112,6 +112,7 @@ def _from_secrets(workdir: Path) -> dict[str, float]:
                     max_sev = max(max_sev, severities.get(sev, 0))
                 result["secrets_severity"] = float(max_sev)
                 result["secrets_count"] = float(len(data))
+                result["secrets_found"] = result["secrets_count"]
         except (json.JSONDecodeError, TypeError):
             pass
     return result
@@ -126,12 +127,20 @@ def _from_vulnerabilities(workdir: Path) -> dict[str, float]:
             data = json.loads(vuln_path.read_text())
             if isinstance(data, list):
                 critical = sum(1 for v in data if v.get("severity", "").lower() == "critical")
+                high = sum(1 for v in data if v.get("severity", "").lower() == "high")
+                medium = sum(1 for v in data if v.get("severity", "").lower() == "medium")
                 result["vuln_critical"] = float(critical)
+                result["vuln_high"] = float(high)
+                result["vuln_medium"] = float(medium)
                 result["vuln_count"] = float(len(data))
             elif isinstance(data, dict):
                 vulns = data.get("vulnerabilities", [])
                 critical = sum(1 for v in vulns if v.get("severity", "").lower() == "critical")
+                high = sum(1 for v in vulns if v.get("severity", "").lower() == "high")
+                medium = sum(1 for v in vulns if v.get("severity", "").lower() == "medium")
                 result["vuln_critical"] = float(critical)
+                result["vuln_high"] = float(high)
+                result["vuln_medium"] = float(medium)
                 result["vuln_count"] = float(len(vulns))
         except (json.JSONDecodeError, TypeError):
             pass
@@ -311,6 +320,34 @@ def _from_memory_profile(workdir: Path) -> dict[str, float]:
     return result
 
 
+def _from_radon(workdir: Path) -> dict[str, float]:
+    """Extract maintainability index from radon JSON output."""
+    result: dict[str, float] = {}
+    p = workdir / ".pyqual" / "radon.json"
+    if not p.exists():
+        return result
+    try:
+        data = json.loads(p.read_text())
+        if isinstance(data, dict):
+            scores = [
+                float(v["mi"]) for v in data.values()
+                if isinstance(v, dict) and "mi" in v
+            ]
+            if not scores:
+                scores = [
+                    float(entry["mi"])
+                    for entries in data.values()
+                    if isinstance(entries, list)
+                    for entry in entries
+                    if isinstance(entry, dict) and "mi" in entry
+                ]
+            if scores:
+                result["maintainability_index"] = round(sum(scores) / len(scores), 2)
+    except (json.JSONDecodeError, TypeError, KeyError, ValueError):
+        pass
+    return result
+
+
 def _from_mypy(workdir: Path) -> dict[str, float]:
     """Extract mypy type error count from JSON output."""
     result: dict[str, float] = {}
@@ -453,6 +490,7 @@ _COLLECTORS = [
     _from_git_health,
     _from_llm_quality,
     _from_ai_cost,
+    _from_radon,
     _from_mypy,
     _from_ruff,
     _from_pylint,

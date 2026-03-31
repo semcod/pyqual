@@ -1,0 +1,63 @@
+# System Architecture Analysis
+
+## Overview
+
+- **Project**: /home/tom/github/semcod/pyqual/examples/llx
+- **Primary Language**: shell
+- **Languages**: shell: 1
+- **Analysis Mode**: static
+- **Total Functions**: 1
+- **Total Classes**: 0
+- **Modules**: 1
+- **Entry Points**: 1
+
+## Architecture by Module
+
+### demo
+- **Functions**: 1
+- **File**: `demo.sh`
+
+## Key Entry Points
+
+Main execution flows into the system:
+
+### demo.check_tool
+
+## Process Flows
+
+Key execution flows identified:
+
+### Flow 1: check_tool
+```
+check_tool [demo]
+```
+
+## Data Transformation Functions
+
+Key functions that process and transform data:
+
+## Public API Surface
+
+Functions exposed as public API (no underscore prefix):
+
+- `demo.check_tool` - 0 calls
+
+## System Interactions
+
+How components interact:
+
+```mermaid
+graph TD
+```
+
+## Reverse Engineering Guidelines
+
+1. **Entry Points**: Start analysis from the entry points listed above
+2. **Core Logic**: Focus on classes with many methods
+3. **Data Flow**: Follow data transformation functions
+4. **Process Flows**: Use the flow diagrams for execution paths
+5. **API Surface**: Public API functions reveal the interface
+
+## Context for LLM
+
+Maintain the identified architectural patterns and public API surface when suggesting changes.

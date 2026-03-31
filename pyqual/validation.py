@@ -31,7 +31,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
-CONFIG_READ_MAX_CHARS = 2000
+from pyqual.constants import CONFIG_READ_MAX_CHARS
 
 
 # ---------------------------------------------------------------------------

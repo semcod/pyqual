@@ -18,6 +18,8 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
+from pyqual.constants import DEFAULT_CC_MAX, README_EXCERPT_MAX_CHARS, TOP_LEVEL_FILES_MAX
+
 import yaml
 
 logger = logging.getLogger("pyqual.bulk_init")
@@ -283,10 +285,10 @@ def _build_llm_prompt(fp: ProjectFingerprint) -> str:
     """Build the user prompt for LLM classification."""
     fp_dict = asdict(fp)
     # Trim large fields
-    if len(fp_dict.get("readme_excerpt", "")) > 300:
-        fp_dict["readme_excerpt"] = f"{fp_dict['readme_excerpt'][:300]}..."
-    if len(fp_dict.get("top_level_files", [])) > 30:
-        fp_dict["top_level_files"] = [*fp_dict["top_level_files"][:30], "..."]
+    if len(fp_dict.get("readme_excerpt", "")) > README_EXCERPT_MAX_CHARS:
+        fp_dict["readme_excerpt"] = f"{fp_dict['readme_excerpt'][:README_EXCERPT_MAX_CHARS]}..."
+    if len(fp_dict.get("top_level_files", [])) > TOP_LEVEL_FILES_MAX:
+        fp_dict["top_level_files"] = [*fp_dict["top_level_files"][:TOP_LEVEL_FILES_MAX], "..."]
 
     return (
         f"## Project fingerprint\n\n"
@@ -311,7 +313,7 @@ class ProjectConfig:
     lint_tool_preset: str | None = None
     build_command: str | None = None
     extra_excludes: list[str] = field(default_factory=list)
-    cc_max: int = 15
+    cc_max: int = DEFAULT_CC_MAX
     extra_stages: list[dict[str, Any]] = field(default_factory=list)
 
 

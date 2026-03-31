@@ -11,7 +11,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from pyqual.config import StageConfig
-from pyqual.pipeline import Pipeline, StageResult, LLX_HISTORY_FILE, LLX_MCP_REPORT
+from pyqual.constants import LLX_HISTORY_FILE, LLX_MCP_REPORT
+from pyqual.pipeline import Pipeline, StageResult
 
 
 def _stage(name: str, skipped: bool = False, passed: bool = True) -> StageResult:

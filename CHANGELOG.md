@@ -123,6 +123,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.61] - 2026-03-31
+
+### Docs
+- Update README.md
+- Update docs/ai-fix-tools.md
+- Update docs/configuration.md
+- Update docs/integrations.md
+- Update docs/logs-and-data.md
+- Update docs/quickstart.md
+- Update examples/README.md
+- Update examples/llm_fix/project/README.md
+- Update examples/llm_fix/project/context.md
+- Update examples/llx/project/README.md
+- ... and 14 more files
+
+### Test
+- Update tests/test_pipeline_stages.py
+- Update tests/test_profiles.py
+
+### Other
+- Update .gitignore
+- Update examples/custom_plugins/pyqual.yaml
+- Update examples/llm_fix/project/analysis.toon.yaml
+- Update examples/llm_fix/project/calls.mmd
+- Update examples/llm_fix/project/compact_flow.mmd
+- Update examples/llm_fix/project/evolution.toon.yaml
+- Update examples/llm_fix/project/flow.mmd
+- Update examples/llm_fix/project/index.html
+- Update examples/llm_fix/project/map.toon.yaml
+- Update examples/llm_fix/project/project.toon.yaml
+- ... and 72 more files
+
 ## [0.1.60] - 2026-03-31
 
 ### Docs
