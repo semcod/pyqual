@@ -140,6 +140,13 @@ pipeline:
       optional: true
       timeout: 300
 
+    # Generate comprehensive markdown report with Mermaid diagram and ASCII flow
+    - name: markdown_report
+      run: python3 -m pyqual.report_generator
+      when: always
+      optional: true
+      timeout: 30
+
   # Loop behavior
   loop:
     max_iterations: 3

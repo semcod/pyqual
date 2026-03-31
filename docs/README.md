@@ -1,7 +1,7 @@
 <!-- code2docs:start --># pyqual
 
-![version](https://img.shields.io/badge/version-0.1.0-blue) ![python](https://img.shields.io/badge/python-%3E%3D3.9-blue) ![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey) ![functions](https://img.shields.io/badge/functions-298-green)
-> **298** functions | **60** classes | **52** files | CC̄ = 6.0
+![version](https://img.shields.io/badge/version-0.1.0-blue) ![python](https://img.shields.io/badge/python-%3E%3D3.9-blue) ![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey) ![functions](https://img.shields.io/badge/functions-305-green)
+> **305** functions | **62** classes | **53** files | CC̄ = 6.1
 
 > Auto-generated project documentation from source code analysis.
 
@@ -151,7 +151,7 @@ Content outside the markers is preserved when regenerating. Enable this with `sy
 
 ```
 pyqual/
-├── project        ├── config        ├── config        ├── main        ├── config            ├── MetricsTrendChart            ├── StagesChart            ├── Settings        ├── App            ├── Overview        ├── types/            ├── MetricsChart            ├── RepositoryDetail        ├── api/├── run_analysis        ├── dynamic_thresholds        ├── composite_gates        ├── metric_history        ├── minimal        ├── check_gates        ├── run_pipeline        ├── demo        ├── run_pipeline        ├── main        ├── sync_tickets        ├── performance_collector    ├── llm        ├── code_health_collector    ├── plugins    ├── config    ├── tools    ├── gates├── pyqual/    ├── tickets    ├── parallel    ├── cli    ├── builtin_collectors    ├── run_parallel_fix    ├── cli_plugin_helpers    ├── _gate_collectors    ├── validation    ├── cli_run_helpers    ├── profiles    ├── cli_log_helpers    ├── bulk_init    ├── constants        ├── llx_mcp_service    ├── integrations/        ├── llx_mcp    ├── bulk_run    ├── report    ├── pipeline```
+├── project        ├── config        ├── config        ├── main        ├── config            ├── MetricsTrendChart            ├── StagesChart            ├── Settings        ├── App            ├── Overview        ├── types/            ├── MetricsChart            ├── RepositoryDetail        ├── api/├── run_analysis        ├── metric_history        ├── dynamic_thresholds        ├── composite_gates        ├── minimal        ├── check_gates        ├── run_pipeline        ├── demo        ├── main        ├── sync_tickets        ├── run_pipeline        ├── performance_collector        ├── code_health_collector    ├── llm    ├── config    ├── plugins    ├── report_generator    ├── tools    ├── gates├── pyqual/    ├── tickets    ├── parallel    ├── cli    ├── builtin_collectors    ├── run_parallel_fix    ├── cli_plugin_helpers    ├── _gate_collectors    ├── validation    ├── cli_run_helpers    ├── profiles    ├── cli_log_helpers    ├── bulk_init    ├── constants        ├── llx_mcp_service    ├── integrations/        ├── llx_mcp    ├── bulk_run    ├── report    ├── pipeline```
 
 ## API Overview
 
@@ -171,13 +171,15 @@ pyqual/
 - **`RepositoryDetailProps`** — —
 - **`PerformanceCollector`** — Collect latency and throughput metrics from load test results.
 - **`CodeHealthCollector`** — Weighted composite health score from multiple code quality signals.
-- **`PluginMetadata`** — Metadata for a pyqual plugin.
-- **`MetricCollector`** — Base class for metric collector plugins.
-- **`PluginRegistry`** — Registry for metric collector plugins.
 - **`StageConfig`** — Single pipeline stage.
 - **`GateConfig`** — Single quality gate threshold.
 - **`LoopConfig`** — Loop iteration settings.
 - **`PyqualConfig`** — Full pyqual.yaml configuration.
+- **`PluginMetadata`** — Metadata for a pyqual plugin.
+- **`MetricCollector`** — Base class for metric collector plugins.
+- **`PluginRegistry`** — Registry for metric collector plugins.
+- **`StageResult`** — —
+- **`PipelineRun`** — —
 - **`ToolPreset`** — Definition of a built-in tool invocation preset.
 - **`GateResult`** — Result of a single gate check.
 - **`Gate`** — Single quality gate with metric extraction.
@@ -273,17 +275,15 @@ pyqual/
 - `repos()` — —
 - `run_project(project_path)` — —
 - `main()` — —
-- `main()` — Run the dynamic-threshold gate example.
-- `compute_composite_score(metrics)` — Compute a weighted quality score (0–100) from available metrics.
-- `run_composite_check(workdir)` — Run individual gates + composite score on a workdir.
 - `load_history(workdir)` — Load metric history from JSON file.
 - `save_snapshot(workdir, metrics)` — Append current metrics as a timestamped snapshot and return full history.
 - `detect_regressions(history, tolerance)` — Compare latest snapshot to previous and detect regressions.
 - `print_trend_report(analysis)` — Print trend analysis and return True if no regressions found.
 - `main()` — Run the metric history self-test with synthetic history.
+- `main()` — Run the dynamic-threshold gate example.
+- `compute_composite_score(metrics)` — Compute a weighted quality score (0–100) from available metrics.
+- `run_composite_check(workdir)` — Run individual gates + composite score on a workdir.
 - `check_tool()` — —
-- `build_report(result, gate_results)` — Build a structured JSON report from pipeline + gate results.
-- `main()` — —
 - `get_db_path(project_id)` — Get the path to a project's pipeline database.
 - `read_summary_json(project_id)` — Read the summary.json file for a project.
 - `query_pipeline_db(db_path, query, params)` — Execute a query on the pipeline database.
@@ -299,8 +299,17 @@ pyqual/
 - `sync_from_cli(args)` — Parse CLI args and run the appropriate sync.
 - `tickets_from_gate_failures(workdir, dry_run)` — Check gates and create tickets for any failures.
 - `main()` — —
+- `build_report(result, gate_results)` — Build a structured JSON report from pipeline + gate results.
+- `main()` — —
 - `get_available_plugins()` — Get metadata for all available built-in plugins.
 - `install_plugin_config(name, workdir)` — Generate YAML configuration snippet for a named plugin.
+- `get_last_run(db_path)` — Get the last pipeline run from database.
+- `generate_mermaid_diagram(run)` — Generate Mermaid flowchart of pipeline execution.
+- `generate_ascii_diagram(run)` — Generate ASCII art diagram of pipeline execution.
+- `generate_metrics_table(run)` — Generate metrics table.
+- `generate_stage_details(run)` — Generate detailed stage results.
+- `generate_report(workdir)` — Generate full markdown report.
+- `main()` — Generate and print report.
 - `get_preset(name)` — Look up a tool preset by name (case-insensitive).
 - `list_presets()` — Return sorted list of available preset names.
 - `is_builtin(name)` — Return True if *name* is a built-in (not externally registered) preset.
@@ -445,6 +454,7 @@ pyqual/
 📄 `pyqual.plugins` (9 functions, 3 classes)
 📄 `pyqual.profiles` (2 functions, 1 classes)
 📄 `pyqual.report` (16 functions)
+📄 `pyqual.report_generator` (7 functions, 2 classes)
 📄 `pyqual.run_parallel_fix` (4 functions)
 📄 `pyqual.tickets` (6 functions)
 📄 `pyqual.tools` (15 functions, 1 classes)

@@ -1,10 +1,10 @@
-# pyqual | 41f 9642L | shell:1,javascript:2,typescript:11,python:27 | 2026-03-31
-# stats: 280 func | 0 cls | 41 mod | CC̄=6.0 | critical:23 | cycles:0
+# pyqual | 42f 9949L | shell:1,typescript:11,javascript:2,python:28 | 2026-03-31
+# stats: 287 func | 0 cls | 42 mod | CC̄=6.0 | critical:23 | cycles:0
 # alerts[5]: fan-out run=50; CC main=37; CC Pipeline._execute_stage=29; CC history=29; CC watch=29
 # hotspots[5]: run fan=50; main fan=28; history fan=27; PyqualConfig._parse fan=24; fix_config fan=23
 # evolution: CC̄ 6.0→6.0 (flat 0.0)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[41]:
+M[42]:
   dashboard/api/main.py,314
   dashboard/postcss.config.js,6
   dashboard/src/App.tsx,203
@@ -41,6 +41,7 @@ M[41]:
   pyqual/plugins.py,130
   pyqual/profiles.py,124
   pyqual/report.py,544
+  pyqual/report_generator.py,307
   pyqual/run_parallel_fix.py,342
   pyqual/tickets.py,73
   pyqual/tools.py,325
@@ -287,6 +288,17 @@ D:
     e: run_project,main
     run_project(project_path)
     main()
+  pyqual/report_generator.py:
+    e: StageResult,PipelineRun,get_last_run,generate_mermaid_diagram,generate_ascii_diagram,generate_metrics_table,generate_stage_details,generate_report,main
+    StageResult:
+    PipelineRun:
+    get_last_run(db_path)
+    generate_mermaid_diagram(run)
+    generate_ascii_diagram(run)
+    generate_metrics_table(run)
+    generate_stage_details(run)
+    generate_report(workdir)
+    main()
   pyqual/cli_plugin_helpers.py:
     e: plugin_list,plugin_search,plugin_info,plugin_add,plugin_remove,plugin_validate,plugin_unknown_action
     plugin_list(plugins;tag)
@@ -389,11 +401,11 @@ D:
     build_parser()
     main(argv)
   project.sh:
-  dashboard/tailwind.config.js:
   dashboard/vite.config.ts:
     i: @vitejs/plugin-react,vite
   dashboard/src/main.tsx:
     i: ./App,react,react-dom/client
+  dashboard/tailwind.config.js:
   dashboard/postcss.config.js:
   dashboard/src/types/index.ts:
     e: PyqualMetric,PyqualStage,PyqualSummary,Repository,DashboardConfig,MetricHistory,MetricTrend

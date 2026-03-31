@@ -4,12 +4,12 @@
 
 - **Project**: /home/tom/github/semcod/pyqual
 - **Primary Language**: python
-- **Languages**: python: 37, typescript: 11, shell: 2, javascript: 2
+- **Languages**: python: 38, typescript: 11, shell: 2, javascript: 2
 - **Analysis Mode**: static
-- **Total Functions**: 298
-- **Total Classes**: 60
-- **Modules**: 52
-- **Entry Points**: 191
+- **Total Functions**: 305
+- **Total Classes**: 62
+- **Modules**: 53
+- **Entry Points**: 192
 
 ## Architecture by Module
 
@@ -71,6 +71,11 @@
 - **Classes**: 1
 - **File**: `MetricsChart.tsx`
 
+### pyqual.report_generator
+- **Functions**: 7
+- **Classes**: 2
+- **File**: `report_generator.py`
+
 ### pyqual.config
 - **Functions**: 7
 - **Classes**: 4
@@ -99,10 +104,6 @@
 - **Functions**: 6
 - **Classes**: 3
 - **File**: `gates.py`
-
-### pyqual.tickets
-- **Functions**: 6
-- **File**: `tickets.py`
 
 ## Key Entry Points
 
@@ -243,12 +244,12 @@ Checks for:
 > List built-in tool presets for pipeline stages.
 - **Calls**: app.command, Table, table.add_column, table.add_column, table.add_column, table.add_column, table.add_column, sorted
 
+### pyqual.builtin_collectors.LLMBenchCollector.collect
+- **Calls**: humaneval_path.exists, codebleu_path.exists, json.loads, json.loads, humaneval_path.read_text, data.get, data.get, float
+
 ### pyqual.cli.mcp_fix
 > Run the llx-backed MCP fix workflow.
 - **Calls**: app.command, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option
-
-### pyqual.builtin_collectors.LLMBenchCollector.collect
-- **Calls**: humaneval_path.exists, codebleu_path.exists, json.loads, json.loads, humaneval_path.read_text, data.get, data.get, float
 
 ### pyqual.integrations.llx_mcp.main
 > CLI entry point used by pyqual pipeline stages.
@@ -358,16 +359,16 @@ _parse [pyqual.config.PyqualConfig]
 - **Methods**: 3
 - **Key Methods**: pyqual.bulk_run.ProjectRunState.progress_pct, pyqual.bulk_run.ProjectRunState.elapsed, pyqual.bulk_run.ProjectRunState.gates_label
 
-### examples.custom_plugins.code_health_collector.CodeHealthCollector
-> Weighted composite health score from multiple code quality signals.
-- **Methods**: 2
-- **Key Methods**: examples.custom_plugins.code_health_collector.CodeHealthCollector.collect, examples.custom_plugins.code_health_collector.CodeHealthCollector.get_config_example
-- **Inherits**: MetricCollector
-
 ### examples.custom_plugins.performance_collector.PerformanceCollector
 > Collect latency and throughput metrics from load test results.
 - **Methods**: 2
 - **Key Methods**: examples.custom_plugins.performance_collector.PerformanceCollector.collect, examples.custom_plugins.performance_collector.PerformanceCollector.get_config_example
+- **Inherits**: MetricCollector
+
+### examples.custom_plugins.code_health_collector.CodeHealthCollector
+> Weighted composite health score from multiple code quality signals.
+- **Methods**: 2
+- **Key Methods**: examples.custom_plugins.code_health_collector.CodeHealthCollector.collect, examples.custom_plugins.code_health_collector.CodeHealthCollector.get_config_example
 - **Inherits**: MetricCollector
 
 ### pyqual.plugins.MetricCollector
@@ -459,10 +460,6 @@ Does NOT run any stages — this is a stati
 > Return (ts, event_name, name, status, details) for one log entry.
 - **Output to**: entry.get, entry.get, None.replace, entry.get, entry.get
 
-### pyqual.bulk_run._parse_output_line
-> Parse a line of pyqual run output and update state.
-- **Output to**: line.strip, clean.startswith, clean.startswith, None.strip, None.strip
-
 ### pyqual.integrations.llx_mcp_service.build_parser
 > Build the CLI parser for the MCP service.
 - **Output to**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, os.getenv, int
@@ -474,6 +471,10 @@ Does NOT run any stages — this is a stati
 ### pyqual.report._parse_pyproject_fallback
 > Minimal regex parser for pyproject.toml when tomllib is unavailable.
 - **Output to**: path.read_text, re.search, re.search, m.group, m.group
+
+### pyqual.bulk_run._parse_output_line
+> Parse a line of pyqual run output and update state.
+- **Output to**: line.strip, clean.startswith, clean.startswith, None.strip, None.strip
 
 ## Behavioral Patterns
 
@@ -505,6 +506,7 @@ Functions exposed as public API (no underscore prefix):
 - `pyqual.bulk_init.classify_with_llm` - 26 calls
 - `pyqual.parallel.ParallelExecutor.run` - 25 calls
 - `pyqual.cli_plugin_helpers.plugin_search` - 25 calls
+- `pyqual.report_generator.get_last_run` - 23 calls
 - `pyqual.builtin_collectors.SecurityCollector.collect` - 23 calls
 - `pyqual.cli.init` - 22 calls
 - `pyqual.bulk_init.bulk_init` - 22 calls
@@ -513,19 +515,18 @@ Functions exposed as public API (no underscore prefix):
 - `pyqual.cli.status` - 21 calls
 - `pyqual.cli.gates` - 20 calls
 - `pyqual.cli_run_helpers.extract_fix_stage_summary` - 20 calls
-- `pyqual.cli.tools` - 19 calls
 - `pyqual.run_parallel_fix.mark_completed_todos` - 19 calls
+- `pyqual.cli.tools` - 19 calls
 - `pyqual.cli_plugin_helpers.plugin_list` - 19 calls
 - `pyqual.cli_plugin_helpers.plugin_add` - 19 calls
-- `pyqual.cli.mcp_fix` - 18 calls
 - `pyqual.builtin_collectors.LLMBenchCollector.collect` - 18 calls
-- `pyqual.bulk_run.build_dashboard_table` - 18 calls
+- `pyqual.cli.mcp_fix` - 18 calls
 - `pyqual.integrations.llx_mcp.main` - 18 calls
+- `pyqual.bulk_run.build_dashboard_table` - 18 calls
 - `dashboard.src.components.RepositoryDetail.RepositoryDetail` - 17 calls
 - `examples.custom_gates.composite_gates.run_composite_check` - 17 calls
 - `pyqual.cli.mcp_refactor` - 17 calls
 - `pyqual.cli.doctor` - 17 calls
-- `pyqual.cli_log_helpers.query_nfo_db` - 17 calls
 
 ## System Interactions
 

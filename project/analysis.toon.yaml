@@ -1,38 +1,38 @@
-# code2llm | 41f 9642L | python:27,typescript:11,javascript:2,shell:1 | 2026-03-31
-# CC̄=6.0 | critical:23/298 | dups:0 | cycles:0
+# code2llm | 42f 9913L | python:28,typescript:11,javascript:2,shell:1 | 2026-03-31
+# CC̄=6.0 | critical:23/305 | dups:0 | cycles:0
 
 HEALTH[20]:
   🔴 GOD   pyqual/pipeline.py = 616L, 10 classes, 24m, max CC=29
   🟡 CC    RepositoryDetail CC=20 (limit:15)
   🟡 CC    _parse CC=23 (limit:15)
   🟡 CC    run CC=15 (limit:15)
+  🟡 CC    main CC=37 (limit:15)
   🟡 CC    bulk_run_cmd CC=19 (limit:15)
   🟡 CC    run CC=25 (limit:15)
   🟡 CC    logs CC=22 (limit:15)
   🟡 CC    watch CC=29 (limit:15)
   🟡 CC    history CC=29 (limit:15)
-  🟡 CC    main CC=37 (limit:15)
-  🟡 CC    _from_vulnerabilities CC=17 (limit:15)
   🟡 CC    _classify_failure CC=21 (limit:15)
   🟡 CC    validate_config CC=26 (limit:15)
   🟡 CC    detect_project_facts CC=16 (limit:15)
+  🟡 CC    _from_vulnerabilities CC=17 (limit:15)
   🟡 CC    enrich_from_artifacts CC=20 (limit:15)
   🟡 CC    build_run_summary CC=20 (limit:15)
   🟡 CC    _classify_heuristic CC=26 (limit:15)
   🟡 CC    bulk_init CC=18 (limit:15)
+  🟡 CC    _read_costs_data CC=22 (limit:15)
   🟡 CC    _run_single_project CC=19 (limit:15)
-  🟡 CC    _build_project_row CC=19 (limit:15)
 
 REFACTOR[2]:
   1. split pyqual/pipeline.py  (god module)
   2. split 19 high-CC methods  (CC>15)
 
-PIPELINES[160]:
-  [1] Src [MetricsTrendChart]: MetricsTrendChart
+PIPELINES[161]:
+  [1] Src [StagesChart]: StagesChart
       PURITY: 100% pure
   [2] Src [data]: data
       PURITY: 100% pure
-  [3] Src [StagesChart]: StagesChart
+  [3] Src [MetricsTrendChart]: MetricsTrendChart
       PURITY: 100% pure
   [4] Src [data]: data
       PURITY: 100% pure
@@ -44,7 +44,7 @@ LAYERS:
   │ run_analysis                88L  0C    2m  CC=11     ←0
   │ project.sh                  36L  0C    0m  CC=0.0    ←0
   │
-  pyqual/                         CC̄=6.8    ←in:1  →out:0
+  pyqual/                         CC̄=6.7    ←in:1  →out:0
   │ !! cli                       1466L  0C   24m  CC=29     ←0
   │ !! bulk_init                  716L  3C   15m  CC=26     ←1
   │ !! pipeline                   616L  10C   24m  CC=29     ←0
@@ -57,6 +57,7 @@ LAYERS:
   │ !! parallel                   326L  4C    7m  CC=15     ←0
   │ tools                      325L  1C   15m  CC=8      ←3
   │ !! cli_run_helpers            315L  0C   14m  CC=20     ←0
+  │ report_generator           271L  2C    7m  CC=11     ←0
   │ !! config                     263L  4C    7m  CC=23     ←5
   │ cli_plugin_helpers         191L  0C    7m  CC=11     ←1
   │ plugins                    130L  3C    9m  CC=5      ←4
