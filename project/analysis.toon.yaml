@@ -13,30 +13,30 @@ HEALTH[20]:
   🟡 CC    watch CC=29 (limit:15)
   🟡 CC    history CC=29 (limit:15)
   🟡 CC    main CC=37 (limit:15)
-  🟡 CC    _classify_failure CC=21 (limit:15)
-  🟡 CC    validate_config CC=26 (limit:15)
-  🟡 CC    detect_project_facts CC=16 (limit:15)
   🟡 CC    _from_vulnerabilities CC=17 (limit:15)
   🟡 CC    _classify_heuristic CC=26 (limit:15)
   🟡 CC    bulk_init CC=18 (limit:15)
+  🟡 CC    _classify_failure CC=21 (limit:15)
+  🟡 CC    validate_config CC=26 (limit:15)
+  🟡 CC    detect_project_facts CC=16 (limit:15)
   🟡 CC    enrich_from_artifacts CC=20 (limit:15)
   🟡 CC    build_run_summary CC=20 (limit:15)
-  🟡 CC    _read_costs_data CC=22 (limit:15)
+  🟡 CC    _run_single_project CC=19 (limit:15)
 
 REFACTOR[2]:
   1. split pyqual/pipeline.py  (god module)
   2. split 19 high-CC methods  (CC>15)
 
 PIPELINES[161]:
-  [1] Src [StagesChart]: StagesChart
+  [1] Src [MetricsTrendChart]: MetricsTrendChart
       PURITY: 100% pure
   [2] Src [data]: data
       PURITY: 100% pure
-  [3] Src [MetricsTrendChart]: MetricsTrendChart
+  [3] Src [App]: App → loadRepositories
       PURITY: 100% pure
-  [4] Src [data]: data
+  [4] Src [handleRepositorySelect]: handleRepositorySelect
       PURITY: 100% pure
-  [5] Src [Settings]: Settings
+  [5] Src [runs]: runs
       PURITY: 100% pure
 
 LAYERS:

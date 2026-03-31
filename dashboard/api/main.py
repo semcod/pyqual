@@ -11,13 +11,29 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
 import logging
 
+from dashboard.constants import (
+    DEFAULT_RUNS_LIMIT,
+    DEFAULT_METRIC_HISTORY_DAYS,
+    DEFAULT_STAGE_PERFORMANCE_DAYS,
+    DEFAULT_GATE_STATUS_DAYS,
+    CORS_ALLOWED_ORIGINS,
+    DEFAULT_INGEST_TOKEN,
+    DEFAULT_HOST,
+    DEFAULT_PORT,
+    PROJECTS_BASE_DIR,
+    PYQUAL_SUBDIR,
+    PIPELINE_DB_NAME,
+    SUMMARY_JSON_NAME,
+    STATIC_DIR,
+)
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Security
 security = HTTPBearer()
-INGEST_TOKEN = os.getenv("PYQUAL_DASHBOARD_TOKEN", "default-token-change-me")
+INGEST_TOKEN = os.getenv("PYQUAL_DASHBOARD_TOKEN", DEFAULT_INGEST_TOKEN)
 
 app = FastAPI(
     title="Pyqual Dashboard API",
@@ -28,24 +44,24 @@ app = FastAPI(
 # Enable CORS for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173"],
+    allow_origins=CORS_ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # Serve static files (for production)
-if Path("../dist").exists():
-    app.mount("/", StaticFiles(directory="../dist", html=True), name="static")
+if Path(STATIC_DIR).exists():
+    app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")
 
 # Database helper functions
 def get_db_path(project_id: str) -> Path:
     """Get the path to a project's pipeline database."""
-    return Path(f"projects/{project_id}/.pyqual/pipeline.db")
+    return Path(f"{PROJECTS_BASE_DIR}/{project_id}/{PYQUAL_SUBDIR}/{PIPELINE_DB_NAME}")
 
 def read_summary_json(project_id: str) -> Optional[Dict[str, Any]]:
     """Read the summary.json file for a project."""
-    summary_path = Path(f"projects/{project_id}/.pyqual/summary.json")
+    summary_path = Path(f"{PROJECTS_BASE_DIR}/{project_id}/{PYQUAL_SUBDIR}/{SUMMARY_JSON_NAME}")
     if summary_path.exists():
         try:
             with open(summary_path) as f:
@@ -103,7 +119,7 @@ async def get_latest_run(project_id: str):
     return summary
 
 @app.get("/api/projects/{project_id}/runs")
-async def get_project_runs(project_id: str, limit: int = 50):
+async def get_project_runs(project_id: str, limit: int = DEFAULT_RUNS_LIMIT):
     """Get recent runs for a project."""
     db_path = get_db_path(project_id)
     
@@ -130,7 +146,7 @@ async def get_project_runs(project_id: str, limit: int = 50):
     return runs
 
 @app.get("/api/projects/{project_id}/metrics/{metric}")
-async def get_metric_history(project_id: str, metric: str, days: int = 30):
+async def get_metric_history(project_id: str, metric: str, days: int = DEFAULT_METRIC_HISTORY_DAYS):
     """Get historical values for a specific metric."""
     db_path = get_db_path(project_id)
     
@@ -160,7 +176,7 @@ async def get_metric_history(project_id: str, metric: str, days: int = 30):
     return history
 
 @app.get("/api/projects/{project_id}/stages")
-async def get_stage_performance(project_id: str, days: int = 30):
+async def get_stage_performance(project_id: str, days: int = DEFAULT_STAGE_PERFORMANCE_DAYS):
     """Get stage performance over time."""
     db_path = get_db_path(project_id)
     
@@ -192,7 +208,7 @@ async def get_stage_performance(project_id: str, days: int = 30):
     return stages
 
 @app.get("/api/projects/{project_id}/gates")
-async def get_gate_status(project_id: str, days: int = 7):
+async def get_gate_status(project_id: str, days: int = DEFAULT_GATE_STATUS_DAYS):
     """Get recent gate check results."""
     db_path = get_db_path(project_id)
     
@@ -282,15 +298,15 @@ async def ingest_results(
             raise HTTPException(status_code=400, detail=f"Missing required field: {field}")
     
     # Create project directory if needed
-    project_dir = Path(f"projects/{project_id}")
+    project_dir = Path(f"{PROJECTS_BASE_DIR}/{project_id}")
     project_dir.mkdir(parents=True, exist_ok=True)
     
     # Create .pyqual directory
-    pyqual_dir = project_dir / ".pyqual"
+    pyqual_dir = project_dir / PYQUAL_SUBDIR
     pyqual_dir.mkdir(exist_ok=True)
     
     # Save summary
-    summary_path = pyqual_dir / "summary.json"
+    summary_path = pyqual_dir / SUMMARY_JSON_NAME
     with open(summary_path, "w") as f:
         json.dump(data, f, indent=2)
     
@@ -311,4 +327,4 @@ async def health_check():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host=DEFAULT_HOST, port=DEFAULT_PORT)

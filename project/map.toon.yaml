@@ -1,4 +1,4 @@
-# pyqual | 42f 9963L | shell:1,typescript:11,javascript:2,python:28 | 2026-03-31
+# pyqual | 42f 9963L | shell:1,javascript:2,typescript:11,python:28 | 2026-03-31
 # stats: 288 func | 0 cls | 42 mod | CC̄=6.0 | critical:24 | cycles:0
 # alerts[5]: fan-out run=50; CC main=37; CC Pipeline._execute_stage=29; CC history=29; CC watch=29
 # hotspots[5]: run fan=50; main fan=28; history fan=27; PyqualConfig._parse fan=24; fix_config fan=23
@@ -92,19 +92,6 @@ D:
     IterationResult:  # Result of one full pipeline iteration...
     PipelineResult:  # Result of the complete pipeline run (all iterations)...
     Pipeline: __init__(9),run(1),check_gates(0),_run_iteration(2),_iteration_stagnated(0),_should_run_stage(4),_resolve_tool_stage(1),_execute_stage(2),_execute_captured(5),_execute_streaming(5),_init_nfo(0),_nfo_emit(4),_is_fix_stage(1),_log_stage(2),_archive_llx_report(2),_log_gates(2),_log_event(1),_ensure_pyqual_dir(0)  # Execute pipeline stages in a loop until quality gates pass...
-  pyqual/validation.py:
-    e: ErrorDomain,EC,StageFailure,Severity,ValidationIssue,ValidationResult,error_domain,_classify_failure,_resolve_gate_metric,validate_config,detect_project_facts
-    ErrorDomain(str,Enum):
-    EC:  # Namespace for standardised error-code string constants...
-    StageFailure:  # Runtime failure description from a completed stage...
-    Severity(str,Enum):
-    ValidationIssue:  # Single validation finding...
-    ValidationResult: add(5)  # Aggregated result of validating one pyqual.yaml...
-    error_domain(code)
-    _classify_failure(f)
-    _resolve_gate_metric(gate_key)
-    validate_config(config_path)
-    detect_project_facts(workdir)
   pyqual/bulk_init.py:
     e: ProjectFingerprint,ProjectConfig,BulkInitResult,_collect_top_level_entries,_collect_manifests,_collect_file_extensions,_load_json_object,_collect_json_scripts,_collect_makefile_targets,_collect_pyproject_metadata,_collect_readme_excerpt,collect_fingerprint,_build_llm_prompt,classify_with_llm,_classify_heuristic,_safe_name,generate_pyqual_yaml,bulk_init
     ProjectFingerprint:  # Lightweight summary of a project directory sent to LLM for c...
@@ -125,6 +112,19 @@ D:
     _safe_name(name)
     generate_pyqual_yaml(project_name;cfg)
     bulk_init(root)
+  pyqual/validation.py:
+    e: ErrorDomain,EC,StageFailure,Severity,ValidationIssue,ValidationResult,error_domain,_classify_failure,_resolve_gate_metric,validate_config,detect_project_facts
+    ErrorDomain(str,Enum):
+    EC:  # Namespace for standardised error-code string constants...
+    StageFailure:  # Runtime failure description from a completed stage...
+    Severity(str,Enum):
+    ValidationIssue:  # Single validation finding...
+    ValidationResult: add(5)  # Aggregated result of validating one pyqual.yaml...
+    error_domain(code)
+    _classify_failure(f)
+    _resolve_gate_metric(gate_key)
+    validate_config(config_path)
+    detect_project_facts(workdir)
   pyqual/config.py:
     e: StageConfig,GateConfig,LoopConfig,PyqualConfig,_load_env_file,_normalize_env_values
     StageConfig: __post_init__(0)  # Single pipeline stage...
@@ -402,12 +402,12 @@ D:
     build_parser()
     main(argv)
   project.sh:
-  dashboard/vite.config.ts:
-    i: @vitejs/plugin-react,vite
   dashboard/tailwind.config.js:
-  dashboard/postcss.config.js:
   dashboard/src/main.tsx:
     i: ./App,react,react-dom/client
+  dashboard/vite.config.ts:
+    i: @vitejs/plugin-react,vite
+  dashboard/postcss.config.js:
   dashboard/src/types/index.ts:
     e: PyqualMetric,PyqualStage,PyqualSummary,Repository,DashboardConfig,MetricHistory,MetricTrend
     PyqualMetric:

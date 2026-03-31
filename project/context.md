@@ -447,15 +447,15 @@ Checks for:
 - Unknown or mis
 - **Output to**: app.command, typer.Option, typer.Option, typer.Option, pyqual.validation.validate_config
 
+### pyqual.cli_plugin_helpers.plugin_validate
+> Validate that configured plugins in pyqual.yaml are available.
+- **Output to**: config_path.read_text, console.print, console.print, set, set
+
 ### pyqual.validation.validate_config
 > Validate a pyqual.yaml file and return structured issues.
 
 Does NOT run any stages — this is a stati
 - **Output to**: ValidationResult, raw.get, pipeline.get, pipeline.get, metrics_raw.items
-
-### pyqual.cli_plugin_helpers.plugin_validate
-> Validate that configured plugins in pyqual.yaml are available.
-- **Output to**: config_path.read_text, console.print, console.print, set, set
 
 ### pyqual.cli_run_helpers.format_run_summary
 - **Output to**: todo_bits.append, todo_bits.append, todo_bits.append, parts.append, fix_bits.append
@@ -472,13 +472,13 @@ Does NOT run any stages — this is a stati
 > Build the CLI parser for the llx MCP helper.
 - **Output to**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument
 
-### pyqual.report._parse_pyproject_fallback
-> Minimal regex parser for pyproject.toml when tomllib is unavailable.
-- **Output to**: path.read_text, re.search, re.search, m.group, m.group
-
 ### pyqual.bulk_run._parse_output_line
 > Parse a line of pyqual run output and update state.
 - **Output to**: line.strip, clean.startswith, clean.startswith, None.strip, None.strip
+
+### pyqual.report._parse_pyproject_fallback
+> Minimal regex parser for pyproject.toml when tomllib is unavailable.
+- **Output to**: path.read_text, re.search, re.search, m.group, m.group
 
 ## Behavioral Patterns
 

@@ -1,6 +1,5 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
-import { BrowserRouter } from 'react-router-dom'
 import App from '../App'
 
 // Mock the API functions
@@ -28,24 +27,24 @@ vi.mock('../api', () => ({
 }))
 
 const renderWithRouter = (component: React.ReactElement) => {
-  return render(
-    <BrowserRouter>
-      {component}
-    </BrowserRouter>
-  )
+  return render(component)
 }
 
 describe('App', () => {
   it('renders without crashing', async () => {
     renderWithRouter(<App />)
-    expect(screen.getByText('Pyqual Dashboard')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('Pyqual Dashboard')).toBeInTheDocument()
+    }, { timeout: 3000 })
   })
 
-  it('shows navigation links', () => {
+  it('shows navigation links', async () => {
     renderWithRouter(<App />)
-    expect(screen.getByText('Overview')).toBeInTheDocument()
-    expect(screen.getByText('Repositories')).toBeInTheDocument()
-    expect(screen.getByText('Settings')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('Overview')).toBeInTheDocument()
+      expect(screen.getByText('Repositories')).toBeInTheDocument()
+      expect(screen.getByText('Settings')).toBeInTheDocument()
+    }, { timeout: 3000 })
   })
 
   it('shows loading state initially', () => {

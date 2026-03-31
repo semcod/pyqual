@@ -1,4 +1,4 @@
-# pyqual | 288 func | 32f | 14014L | python | 2026-03-31
+# pyqual | 288 func | 32f | 14070L | python | 2026-03-31
 
 HEALTH:
   CC̄=6.0  critical=58 (limit:10)  dup=1  cycles=0
@@ -11,8 +11,8 @@ ALERTS[20]:
   !!! cc_exceeded      Pipeline._execute_stage = 29 (limit:15)
   !!! high_fan_out     main = 28 (limit:10)
   !!! high_fan_out     history = 27 (limit:10)
-  !!! cc_exceeded      validate_config = 26 (limit:15)
   !!! cc_exceeded      _classify_heuristic = 26 (limit:15)
+  !!! cc_exceeded      validate_config = 26 (limit:15)
   !!! cc_exceeded      run = 25 (limit:15)
 
 MODULES[42] (top by size):
@@ -51,7 +51,7 @@ REFACTOR[15]:
   [2] H/L Split watch (CC=29 → target CC<10)
   [3] H/L Split history (CC=29 → target CC<10)
   [4] H/L Split main (CC=37 → target CC<10)
-  [5] H/L Split validate_config (CC=26 → target CC<10)
+  [5] H/L Split _classify_heuristic (CC=26 → target CC<10)
 
 EVOLUTION:
-  2026-03-31 CC̄=6.0 crit=58 14014L // Automated analysis
+  2026-03-31 CC̄=6.0 crit=58 14070L // Automated analysis
