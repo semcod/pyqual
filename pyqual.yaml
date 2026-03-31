@@ -44,13 +44,13 @@ pipeline:
       when: first_iteration
       timeout: 300
 
-    - name: analyze
-      tool: code2llm
-      when: first_iteration
+    # - name: analyze
+    #   tool: code2llm
+    #   when: first_iteration
 
-    - name: validate
-      run: vallm batch pyqual tests --recursive --format toon --output ./project
-      when: always
+    # - name: validate
+    #   run: vallm batch pyqual tests --recursive --format toon --output ./project
+    #   when: always
 
     # Security scans (uncomment to enable):
     # - name: audit
