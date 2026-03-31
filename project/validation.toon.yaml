@@ -1,9 +1,9 @@
-# vallm batch | 33f | 32✓ 11⚠ 1✗ | 2026-03-31
+# vallm batch | 33f | 33✓ 12⚠ 0✗ | 2026-03-31
 
 SUMMARY:
-  scanned: 33  passed: 32 (97.0%)  warnings: 11  errors: 1  unsupported: 0
+  scanned: 33  passed: 33 (100.0%)  warnings: 12  errors: 0  unsupported: 0
 
-WARNINGS[11]{path,score}:
+WARNINGS[12]{path,score}:
   pyqual/cli.py,0.80
     issues[12]{rule,severity,message,line}:
       complexity.cyclomatic,warning,bulk_run_cmd has cyclomatic complexity 19 (max: 15),253
@@ -63,6 +63,10 @@ WARNINGS[11]{path,score}:
     issues[2]{rule,severity,message,line}:
       complexity.cyclomatic,warning,_parse has cyclomatic complexity 23 (max: 15),133
       complexity.lizard_cc,warning,_parse: CC=23 exceeds limit 15,133
+  pyqual/report.py,0.97
+    issues[2]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,_read_costs_data has cyclomatic complexity 22 (max: 15),115
+      complexity.lizard_cc,warning,_read_costs_data: CC=22 exceeds limit 15,115
   pyqual/builtin_collectors.py,0.98
     issues[1]{rule,severity,message,line}:
       complexity.maintainability,warning,Low maintainability index: 12.4 (threshold: 20),
@@ -72,9 +76,4 @@ WARNINGS[11]{path,score}:
   tests/test_pipeline_stages.py,0.98
     issues[1]{rule,severity,message,line}:
       complexity.maintainability,warning,Low maintainability index: 3.9 (threshold: 20),
-
-ERRORS[1]{path,score}:
-  pyqual/report.py,0.98
-    issues[1]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'tomli' not found,68
 

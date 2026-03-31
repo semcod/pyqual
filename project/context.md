@@ -68,14 +68,14 @@
 - **Classes**: 3
 - **File**: `bulk_run.py`
 
+### pyqual.tickets
+- **Functions**: 6
+- **File**: `tickets.py`
+
 ### pyqual.gates
 - **Functions**: 6
 - **Classes**: 3
 - **File**: `gates.py`
-
-### pyqual.tickets
-- **Functions**: 6
-- **File**: `tickets.py`
 
 ### pyqual.validation
 - **Functions**: 6
@@ -229,12 +229,12 @@ Checks for:
 > List built-in tool presets for pipeline stages.
 - **Calls**: app.command, Table, table.add_column, table.add_column, table.add_column, table.add_column, table.add_column, sorted
 
+### pyqual.builtin_collectors.LLMBenchCollector.collect
+- **Calls**: humaneval_path.exists, codebleu_path.exists, json.loads, json.loads, humaneval_path.read_text, data.get, data.get, float
+
 ### pyqual.cli.mcp_fix
 > Run the llx-backed MCP fix workflow.
 - **Calls**: app.command, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option
-
-### pyqual.builtin_collectors.LLMBenchCollector.collect
-- **Calls**: humaneval_path.exists, codebleu_path.exists, json.loads, json.loads, humaneval_path.read_text, data.get, data.get, float
 
 ### pyqual.integrations.llx_mcp.main
 > CLI entry point used by pyqual pipeline stages.
@@ -458,13 +458,13 @@ Does NOT run any stages — this is a stati
 > Build the CLI parser for the llx MCP helper.
 - **Output to**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument
 
-### pyqual.report._parse_pyproject_fallback
-> Minimal regex parser for pyproject.toml when tomllib is unavailable.
-- **Output to**: path.read_text, re.search, re.search, m.group, m.group
-
 ### pyqual.bulk_run._parse_output_line
 > Parse a line of pyqual run output and update state.
 - **Output to**: line.strip, clean.startswith, clean.startswith, None.strip, None.strip
+
+### pyqual.report._parse_pyproject_fallback
+> Minimal regex parser for pyproject.toml when tomllib is unavailable.
+- **Output to**: path.read_text, re.search, re.search, m.group, m.group
 
 ## Behavioral Patterns
 
@@ -505,8 +505,8 @@ Functions exposed as public API (no underscore prefix):
 - `pyqual.cli.tools` - 19 calls
 - `pyqual.cli_plugin_helpers.plugin_list` - 19 calls
 - `pyqual.cli_plugin_helpers.plugin_add` - 19 calls
-- `pyqual.cli.mcp_fix` - 18 calls
 - `pyqual.builtin_collectors.LLMBenchCollector.collect` - 18 calls
+- `pyqual.cli.mcp_fix` - 18 calls
 - `pyqual.integrations.llx_mcp.main` - 18 calls
 - `pyqual.bulk_run.build_dashboard_table` - 18 calls
 - `examples.custom_gates.composite_gates.run_composite_check` - 17 calls
