@@ -23,22 +23,22 @@ flowchart TD
     end
 
     subgraph Core
-        run_analysis__main["main"]
-        pyqual__config__StageConfig____post_init__["__post_init__"]
-        pyqual__config__GateConfig__from_dict["from_dict"]
-        pyqual__config__PyqualConfig__load["load"]
-        pyqual__config__PyqualConfig___parse["_parse"]
-        pyqual__config__PyqualConfig__default_yaml["default_yaml"]
-        pyqual__plugins__PluginMetadata____post_init__["__post_init__"]
-        pyqual__plugins__MetricCollector__collect["collect"]
-        pyqual__plugins__MetricCollector__get_config_example["get_config_example"]
-        pyqual__plugins__PluginRegistry__register["register"]
-        pyqual__plugins__PluginRegistry__get["get"]
-        pyqual__plugins__PluginRegistry__list_plugins["list_plugins"]
-        pyqual__plugins__PluginRegistry__create_instance["create_instance"]
-        pyqual__tools__ToolPreset__is_available["is_available"]
-        pyqual__tools__ToolPreset__shell_command["shell_command"]
-        ...["+85 more"]
+        dashboard__src__components__MetricsTrendChart__MetricsTrendChart["MetricsTrendChart"]
+        dashboard__src__components__MetricsTrendChart__data["data"]
+        dashboard__src__components__StagesChart__StagesChart["StagesChart"]
+        dashboard__src__components__StagesChart__data["data"]
+        dashboard__src__components__Settings__Settings["Settings"]
+        dashboard__src__App__App["App"]
+        dashboard__src__App__repos["repos"]
+        dashboard__src__App__handleRepositorySelect["handleRepositorySelect"]
+        dashboard__src__App__runs["runs"]
+        dashboard__src__App__RepositoryCard["RepositoryCard"]
+        dashboard__src__App__lastRun["lastRun"]
+        dashboard__src__App__statusColor["statusColor"]
+        dashboard__src__App__statusIcon["statusIcon"]
+        dashboard__src__components__Overview__Overview["Overview"]
+        dashboard__src__components__Overview__totalRepos["totalRepos"]
+        ...["+144 more"]
     end
 
-    class run_analysis__main,pyqual__config__StageConfig____post_init__,pyqual__config__GateConfig__from_dict,pyqual__config__PyqualConfig__load,pyqual__config__PyqualConfig___parse,pyqual__config__PyqualConfig__default_yaml,pyqual__plugins__PluginMetadata____post_init__,pyqual__plugins__MetricCollector__collect,pyqual__plugins__MetricCollector__get_config_example,pyqual__plugins__PluginRegistry__register entry
+    class dashboard__src__components__MetricsTrendChart__MetricsTrendChart,dashboard__src__components__MetricsTrendChart__data,dashboard__src__components__StagesChart__StagesChart,dashboard__src__components__StagesChart__data,dashboard__src__components__Settings__Settings,dashboard__src__App__App,dashboard__src__App__repos,dashboard__src__App__handleRepositorySelect,dashboard__src__App__runs,dashboard__src__App__RepositoryCard entry

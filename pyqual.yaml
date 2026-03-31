@@ -113,43 +113,9 @@ pipeline:
       optional: true
 
     # Continuous improvement: process TODO.md items when all gates pass
-    # Groups similar tasks and applies fixes using Claude Code (fallback: llx)
+    # Uses parallel execution with multiple tools (Claude Code + llx)
     - name: todo_fix
-      run: |
-        set -e
-        PATH="$HOME/.local/bin:$PATH"
-        if [ ! -f TODO.md ]; then
-          echo "No TODO.md found — skipping"
-          exit 0
-        fi
-        # Count unchecked items
-        TODO_COUNT=$(grep -c '^\- \[ \]' TODO.md 2>/dev/null || echo 0)
-        if [ "$TODO_COUNT" -eq 0 ]; then
-          echo "No pending TODO items — skipping"
-          exit 0
-        fi
-        echo "Found $TODO_COUNT pending TODO items"
-        # Extract first 10 items (batch size) for this iteration
-        ITEMS=$(grep '^\- \[ \]' TODO.md | head -10)
-        echo "Processing batch:"
-        echo "$ITEMS"
-        # Try Claude Code first, fallback to llx
-        if command -v claude >/dev/null 2>&1; then
-          claude -p "You are improving code quality. Process these TODO items from TODO.md.
-        Group similar items and fix them together. Apply minimal, safe changes.
-        Mark completed items with [x] in TODO.md when done.
-
-        Items to process:
-        $ITEMS" \
-            --model sonnet \
-            --allowedTools "Edit,Read,Write,Bash(git diff),Bash(python),Bash(pytest -x)" \
-            --output-format text \
-          && echo "Claude Code completed TODO batch." \
-          || { echo "Claude failed, trying llx..."; llx fix . --apply --errors TODO.md --verbose; }
-        else
-          echo "Claude not available, using llx..."
-          llx fix . --apply --errors TODO.md --verbose
-        fi
+      run: python3 -m pyqual.run_parallel_fix
       when: metrics_pass
       optional: true
       timeout: 1800

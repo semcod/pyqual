@@ -1,0 +1,20 @@
+{
+  "repositories": [
+    {
+      "id": "pyqual",
+      "name": "Pyqual",
+      "url": "https://github.com/semcod/pyqual",
+      "branch": "main",
+      "ciUrl": "https://github.com/semcod/pyqual/actions"
+    },
+    {
+      "id": "my-project",
+      "name": "My Project",
+      "url": "https://github.com/myorg/my-project",
+      "branch": "main",
+      "ciUrl": "https://github.com/myorg/my-project/actions"
+    }
+  ],
+  "refreshInterval": 60,
+  "theme": "light"
+}

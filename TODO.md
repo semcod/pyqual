@@ -8,14 +8,14 @@
 
 ## 📋 Current Issues
 
-- [ ] pyproject.toml:22 - Outdated dependency: typer 0.23.1 → 0.24.1 (wheel)
-- [ ] pyproject.toml:23 - Outdated dependency: rich 13.7.1 → 14.3.3 (wheel)
-- [ ] pyproject.toml:24 - Outdated dependency: litellm 1.80.16 → 1.83.0 (wheel)
-- [ ] pyproject.toml:27 - Outdated dependency: nfo 0.2.13 → 0.2.20 (wheel)
-- [ ] pyproject.toml:29 - Outdated dependency: planfile 0.1.51 → 0.1.52 (wheel)
-- [ ] pyqual/__init__.py:27 - Duplicate import: 'DEFAULT_MAX_TOKENS' (first at line 25)
-- [ ] pyqual/__init__.py:27 - Duplicate import: 'LLM' (first at line 25)
-- [ ] pyqual/__init__.py:27 - Duplicate import: 'LLMResponse' (first at line 25)
+- [x] pyproject.toml:22 - Outdated dependency: typer 0.23.1 → 0.24.1 (wheel)
+- [x] pyproject.toml:23 - Outdated dependency: rich 13.7.1 → 14.3.3 (wheel)
+- [x] pyproject.toml:24 - Outdated dependency: litellm 1.80.16 → 1.83.0 (wheel)
+- [x] pyproject.toml:27 - Outdated dependency: nfo 0.2.13 → 0.2.20 (wheel)
+- [x] pyproject.toml:29 - Outdated dependency: planfile 0.1.51 → 0.1.52 (wheel)
+- [x] pyqual/__init__.py:27 - Duplicate import: 'DEFAULT_MAX_TOKENS' (first at line 25)
+- [x] pyqual/__init__.py:27 - Duplicate import: 'LLM' (first at line 25)
+- [x] pyqual/__init__.py:27 - Duplicate import: 'LLMResponse' (first at line 25)
 - [ ] pyqual/_gate_collectors.py:7 - Unused import: 'annotations'
 - [ ] pyqual/builtin_collectors.py:3 - Unused import: 'annotations'
 - [ ] pyqual/bulk_init.py:12 - Unused import: 'annotations'

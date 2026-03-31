@@ -1,10 +1,24 @@
-# pyqual | 25f 7465L | shell:1,python:24 | 2026-03-31
-# stats: 206 func | 0 cls | 25 mod | CC̄=6.6 | critical:20 | cycles:0
-# alerts[5]: fan-out run=50; CC Pipeline._execute_stage=29; CC history=29; CC watch=29; fan-out history=27
-# hotspots[5]: run fan=50; history fan=27; PyqualConfig._parse fan=24; fix_config fan=23; logs fan=23
-# evolution: CC̄ 6.6→6.6 (flat 0.0)
+# pyqual | 41f 9640L | shell:1,javascript:2,typescript:11,python:27 | 2026-03-31
+# stats: 280 func | 0 cls | 41 mod | CC̄=6.0 | critical:23 | cycles:0
+# alerts[5]: fan-out run=50; CC main=37; CC Pipeline._execute_stage=29; CC history=29; CC watch=29
+# hotspots[5]: run fan=50; main fan=28; history fan=27; PyqualConfig._parse fan=24; fix_config fan=23
+# evolution: CC̄ 6.0→6.0 (flat 0.0)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[25]:
+M[41]:
+  dashboard/api/main.py,314
+  dashboard/postcss.config.js,6
+  dashboard/src/App.tsx,202
+  dashboard/src/api/index.ts,205
+  dashboard/src/components/MetricsChart.tsx,82
+  dashboard/src/components/MetricsTrendChart.tsx,60
+  dashboard/src/components/Overview.tsx,175
+  dashboard/src/components/RepositoryDetail.tsx,178
+  dashboard/src/components/Settings.tsx,129
+  dashboard/src/components/StagesChart.tsx,54
+  dashboard/src/main.tsx,10
+  dashboard/src/types/index.ts,62
+  dashboard/tailwind.config.js,11
+  dashboard/vite.config.ts,20
   project.sh,36
   pyqual/__init__.py,85
   pyqual/_gate_collectors.py,499
@@ -22,15 +36,23 @@ M[25]:
   pyqual/integrations/llx_mcp.py,102
   pyqual/integrations/llx_mcp_service.py,70
   pyqual/llm.py,126
+  pyqual/parallel.py,326
   pyqual/pipeline.py,616
   pyqual/plugins.py,130
   pyqual/profiles.py,124
   pyqual/report.py,544
+  pyqual/run_parallel_fix.py,341
   pyqual/tickets.py,73
   pyqual/tools.py,325
   pyqual/validation.py,463
   run_analysis.py,88
 D:
+  pyqual/run_parallel_fix.py:
+    e: count_todo_items,mark_completed_todos,run_tool,main
+    count_todo_items(todo_path)
+    mark_completed_todos(todo_path;changed_files)
+    run_tool(name;command;workdir;timeout)
+    main()
   pyqual/cli.py:
     e: _setup_logging,init,profiles,bulk_init_cmd,bulk_run_cmd,run,gates,validate,fix_config,status,report,_run_mcp_workflow,mcp_fix,mcp_refactor,mcp_service,tickets_todo,tickets_github,tickets_all,plugin,doctor,tools,logs,watch,history
     _setup_logging(verbose;workdir)
@@ -128,6 +150,16 @@ D:
     update_readme_badges(readme_path;metrics;gates_passed;project_meta;gates_passed_count;gates_total)
     run(workdir;config_path;readme_path)
     main()
+  dashboard/src/components/RepositoryDetail.tsx:
+    i: ../types,./MetricsTrendChart,./StagesChart,@heroicons/react/24/outline,react,react-router-dom
+    e: RepositoryDetailProps,RepositoryDetail,navigate,repo,latestRun,gate,passed
+    RepositoryDetailProps:
+    RepositoryDetail()
+    navigate()
+    repo()
+    latestRun()
+    gate()
+    passed()
   pyqual/cli_run_helpers.py:
     e: extract_pytest_stage_summary,extract_lint_stage_summary,extract_prefact_stage_summary,extract_code2llm_stage_summary,extract_validation_stage_summary,extract_fix_stage_summary,extract_mypy_stage_summary,extract_bandit_stage_summary,extract_stage_summary,enrich_from_artifacts,infer_fix_result,build_run_summary,format_run_summary,get_last_error_line
     extract_pytest_stage_summary(name;text)
@@ -180,6 +212,15 @@ D:
     _from_pylint(workdir)
     _from_flake8(workdir)
     _from_interrogate(workdir)
+  pyqual/parallel.py:
+    e: FixTool,TaskResult,ParallelRunResult,ParallelExecutor,parse_todo_items,group_similar_issues,run_parallel_fix
+    FixTool:  # Configuration for a single fix tool...
+    TaskResult:  # Result of processing a single task...
+    ParallelRunResult:  # Result of parallel execution...
+    ParallelExecutor: __init__(4),_run_tool_task(3),_tool_worker(1),run(2)  # Executes tasks across multiple fix tools in parallel...
+    parse_todo_items(todo_path)
+    group_similar_issues(issues;max_group_size)
+    run_parallel_fix(workdir;tools;todo_path;issues;env;group_similar;on_task_done)
   pyqual/builtin_collectors.py:
     e: LLMBenchCollector,HallucinationCollector,SBOMCollector,I18nCollector,A11yCollector,RepoMetricsCollector,SecurityCollector,LlxMcpFixCollector
     LLMBenchCollector(MetricCollector): collect(1)  # LLM code generation quality metrics from human-eval and Code...
@@ -195,6 +236,53 @@ D:
     query_nfo_db(db_path;event;failed;tail;sql;stage)
     row_to_event_dict(row)
     format_log_entry_row(entry)
+  dashboard/src/components/Overview.tsx:
+    i: ../types,./MetricsChart,react
+    e: OverviewProps,Overview,totalRepos,passingRepos,failingRepos,avgCoverage
+    OverviewProps:
+    Overview()
+    totalRepos()
+    passingRepos()
+    failingRepos()
+    avgCoverage()
+  dashboard/src/App.tsx:
+    i: ./api,./components/Overview,./components/RepositoryDetail,./components/Settings,./types,react,react-router-dom
+    e: App,loadRepositories,repos,handleRepositorySelect,runs,RepositoryCard,lastRun,statusColor,statusIcon
+    App()
+    loadRepositories()
+    repos()
+    handleRepositorySelect()
+    runs()
+    RepositoryCard()
+    lastRun()
+    statusColor()
+    statusIcon()
+  dashboard/src/api/index.ts:
+    i: ../types
+    e: API_BASE_URL,GITHUB_TOKEN,loadConfig,response,fetchRepositories,config,repositories,lastRun,fetchLatestRun,response,releases,latestRelease,summaryAsset,summaryResponse,response,fetchRepositoryRuns,response,fetchMetricsHistory,response,getRepoPath,match,fetchRepositoriesWithFallback,repos
+    API_BASE_URL()
+    GITHUB_TOKEN()
+    loadConfig()
+    response()
+    fetchRepositories()
+    config()
+    repositories()
+    lastRun()
+    fetchLatestRun()
+    response()
+    releases()
+    latestRelease()
+    summaryAsset()
+    summaryResponse()
+    response()
+    fetchRepositoryRuns()
+    response()
+    fetchMetricsHistory()
+    response()
+    getRepoPath()
+    match()
+    fetchRepositoriesWithFallback()
+    repos()
   run_analysis.py:
     e: run_project,main
     run_project(project_path)
@@ -224,6 +312,37 @@ D:
     register_custom_tools_from_yaml(custom_tools)
     load_entry_point_presets()
     resolve_stage_command(tool_name;workdir)
+  dashboard/src/components/MetricsTrendChart.tsx:
+    i: ../types,react,recharts
+    e: MetricsTrendChartProps,MetricsTrendChart,data
+    MetricsTrendChartProps:
+    MetricsTrendChart()
+    data()
+  dashboard/src/components/MetricsChart.tsx:
+    i: ../types,react,recharts
+    e: MetricsChartProps,MetricsChart,data,days,today,date,baseCoverage,variation
+    MetricsChartProps:
+    MetricsChart()
+    data()
+    days()
+    today()
+    date()
+    baseCoverage()
+    variation()
+  dashboard/api/main.py:
+    e: get_db_path,read_summary_json,query_pipeline_db,get_projects,get_latest_run,get_project_runs,get_metric_history,get_stage_performance,get_gate_status,get_project_summary,ingest_results,health_check
+    get_db_path(project_id)
+    read_summary_json(project_id)
+    query_pipeline_db(db_path;query;params)
+    get_projects()
+    get_latest_run(project_id)
+    get_project_runs(project_id;limit)
+    get_metric_history(project_id;metric;days)
+    get_stage_performance(project_id;days)
+    get_gate_status(project_id;days)
+    get_project_summary(project_id)
+    ingest_results(project_id;data;credentials)
+    health_check()
   pyqual/integrations/llx_mcp.py:
     e: build_parser,main
     build_parser()
@@ -240,6 +359,12 @@ D:
     GateResult: __str__(0)  # Result of a single gate check...
     Gate: check(1)  # Single quality gate with metric extraction...
     GateSet: __init__(1),check_all(1),all_passed(1),_collect_metrics(1)  # Collection of quality gates with metric collection...
+  dashboard/src/components/StagesChart.tsx:
+    i: ../types,react,recharts
+    e: StagesChartProps,StagesChart,data
+    StagesChartProps:
+    StagesChart()
+    data()
   pyqual/tickets.py:
     e: _load_sync_integration,_normalize_sources,sync_planfile_tickets,sync_todo_tickets,sync_github_tickets,sync_all_tickets
     _load_sync_integration()
@@ -248,6 +373,10 @@ D:
     sync_todo_tickets(workdir;dry_run;direction)
     sync_github_tickets(workdir;dry_run;direction)
     sync_all_tickets(workdir;dry_run;direction)
+  dashboard/src/components/Settings.tsx:
+    i: @heroicons/react/24/outline,react
+    e: Settings
+    Settings()
   pyqual/profiles.py:
     e: PipelineProfile,get_profile,list_profiles
     PipelineProfile:  # A reusable pipeline template with default stages and metrics...
@@ -260,6 +389,21 @@ D:
     build_parser()
     main(argv)
   project.sh:
+  dashboard/tailwind.config.js:
+  dashboard/vite.config.ts:
+    i: @vitejs/plugin-react,vite
+  dashboard/src/main.tsx:
+    i: ./App,react,react-dom/client
+  dashboard/postcss.config.js:
+  dashboard/src/types/index.ts:
+    e: PyqualMetric,PyqualStage,PyqualSummary,Repository,DashboardConfig,MetricHistory,MetricTrend
+    PyqualMetric:
+    PyqualStage:
+    PyqualSummary:
+    Repository:
+    DashboardConfig:
+    MetricHistory:
+    MetricTrend:
   pyqual/llm.py:
   pyqual/__init__.py:
   pyqual/constants.py:

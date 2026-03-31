@@ -1,42 +1,42 @@
-# code2llm | 25f 7465L | python:24,shell:1 | 2026-03-31
-# CC̄=6.6 | critical:20/224 | dups:0 | cycles:0
+# code2llm | 41f 9640L | python:27,typescript:11,javascript:2,shell:1 | 2026-03-31
+# CC̄=6.0 | critical:23/298 | dups:0 | cycles:0
 
 HEALTH[20]:
   🔴 GOD   pyqual/pipeline.py = 616L, 10 classes, 24m, max CC=29
+  🟡 CC    RepositoryDetail CC=20 (limit:15)
   🟡 CC    _parse CC=23 (limit:15)
+  🟡 CC    run CC=15 (limit:15)
   🟡 CC    bulk_run_cmd CC=19 (limit:15)
   🟡 CC    run CC=25 (limit:15)
   🟡 CC    logs CC=22 (limit:15)
   🟡 CC    watch CC=29 (limit:15)
   🟡 CC    history CC=29 (limit:15)
+  🟡 CC    main CC=37 (limit:15)
   🟡 CC    _from_vulnerabilities CC=17 (limit:15)
   🟡 CC    _classify_failure CC=21 (limit:15)
   🟡 CC    validate_config CC=26 (limit:15)
   🟡 CC    detect_project_facts CC=16 (limit:15)
-  🟡 CC    _classify_heuristic CC=26 (limit:15)
-  🟡 CC    bulk_init CC=18 (limit:15)
   🟡 CC    enrich_from_artifacts CC=20 (limit:15)
   🟡 CC    build_run_summary CC=20 (limit:15)
+  🟡 CC    _classify_heuristic CC=26 (limit:15)
+  🟡 CC    bulk_init CC=18 (limit:15)
   🟡 CC    _run_single_project CC=19 (limit:15)
   🟡 CC    _build_project_row CC=19 (limit:15)
-  🟡 CC    bulk_run CC=17 (limit:15)
-  🟡 CC    _read_costs_data CC=22 (limit:15)
-  🟡 CC    _should_run_stage CC=17 (limit:15)
 
 REFACTOR[2]:
   1. split pyqual/pipeline.py  (god module)
   2. split 19 high-CC methods  (CC>15)
 
-PIPELINES[116]:
-  [1] Src [main]: main → run_project
+PIPELINES[160]:
+  [1] Src [MetricsTrendChart]: MetricsTrendChart
       PURITY: 100% pure
-  [2] Src [main]: main → save_snapshot → load_history
+  [2] Src [data]: data
       PURITY: 100% pure
-  [3] Src [main]: main
+  [3] Src [StagesChart]: StagesChart
       PURITY: 100% pure
-  [4] Src [run_composite_check]: run_composite_check → compute_composite_score
+  [4] Src [data]: data
       PURITY: 100% pure
-  [5] Src [main]: main → sync_from_cli → sync_github_tickets → sync_planfile_tickets → ...(1 more)
+  [5] Src [Settings]: Settings
       PURITY: 100% pure
 
 LAYERS:
@@ -44,7 +44,7 @@ LAYERS:
   │ run_analysis                88L  0C    2m  CC=11     ←0
   │ project.sh                  36L  0C    0m  CC=0.0    ←0
   │
-  pyqual/                         CC̄=6.6    ←in:1  →out:0
+  pyqual/                         CC̄=6.8    ←in:1  →out:0
   │ !! cli                       1466L  0C   24m  CC=29     ←0
   │ !! bulk_init                  716L  3C   15m  CC=26     ←1
   │ !! pipeline                   616L  10C   24m  CC=29     ←0
@@ -53,6 +53,8 @@ LAYERS:
   │ !! _gate_collectors           499L  0C   22m  CC=17     ←0
   │ !! validation                 463L  6C    6m  CC=26     ←2
   │ builtin_collectors         432L  8C   15m  CC=14     ←0
+  │ !! run_parallel_fix           341L  0C    4m  CC=37     ←0
+  │ !! parallel                   326L  4C    7m  CC=15     ←0
   │ tools                      325L  1C   15m  CC=8      ←3
   │ !! cli_run_helpers            315L  0C   14m  CC=20     ←0
   │ !! config                     263L  4C    7m  CC=23     ←5
@@ -68,6 +70,22 @@ LAYERS:
   │ llx_mcp_service             70L  0C    4m  CC=1      ←0
   │ constants                   41L  0C    0m  CC=0.0    ←0
   │ __init__                     1L  0C    0m  CC=0.0    ←0
+  │
+  dashboard/                      CC̄=3.5    ←in:0  →out:0
+  │ main                       314L  0C   12m  CC=6      ←0
+  │ index.ts                   205L  0C   19m  CC=11     ←0
+  │ App.tsx                    202L  0C    9m  CC=11     ←0
+  │ !! RepositoryDetail.tsx       178L  1C    6m  CC=20     ←0
+  │ Overview.tsx               175L  1C    5m  CC=12     ←0
+  │ Settings.tsx               129L  0C    1m  CC=2      ←0
+  │ MetricsChart.tsx            82L  1C    7m  CC=6      ←0
+  │ index.ts                    62L  7C    0m  CC=0.0    ←0
+  │ MetricsTrendChart.tsx       60L  1C    2m  CC=6      ←0
+  │ StagesChart.tsx             54L  1C    2m  CC=4      ←0
+  │ vite.config.ts              20L  0C    0m  CC=0.0    ←0
+  │ tailwind.config.js          11L  0C    0m  CC=0.0    ←0
+  │ main.tsx                    10L  0C    0m  CC=0.0    ←0
+  │ postcss.config.js            6L  0C    0m  CC=0.0    ←0
   │
 
 COUPLING:

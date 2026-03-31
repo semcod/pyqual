@@ -1,21 +1,21 @@
-# pyqual | 206 func | 20f | 10952L | python | 2026-03-31
+# pyqual | 280 func | 31f | 13691L | python | 2026-03-31
 
 HEALTH:
-  CC̄=6.6  critical=49 (limit:10)  dup=0  cycles=0
+  CC̄=6.0  critical=56 (limit:10)  dup=0  cycles=0
 
 ALERTS[20]:
   !!! high_fan_out     run = 50 (limit:10)
+  !!! cc_exceeded      main = 37 (limit:15)
   !!! cc_exceeded      watch = 29 (limit:15)
   !!! cc_exceeded      history = 29 (limit:15)
   !!! cc_exceeded      Pipeline._execute_stage = 29 (limit:15)
+  !!! high_fan_out     main = 28 (limit:10)
   !!! high_fan_out     history = 27 (limit:10)
   !!! cc_exceeded      validate_config = 26 (limit:15)
   !!! cc_exceeded      _classify_heuristic = 26 (limit:15)
   !!! cc_exceeded      run = 25 (limit:15)
-  !!! high_fan_out     PyqualConfig._parse = 24 (limit:10)
-  !!! high_fan_out     fix_config = 23 (limit:10)
 
-MODULES[25] (top by size):
+MODULES[41] (top by size):
   M[pyqual/cli.py] 1466L C:0 F:24 CC↑29 D:0 (python)
   M[pyqual/bulk_init.py] 716L C:3 F:15 CC↑26 D:1 (python)
   M[pyqual/pipeline.py] 616L C:10 F:24 CC↑29 D:0 (python)
@@ -24,19 +24,20 @@ MODULES[25] (top by size):
   M[pyqual/_gate_collectors.py] 499L C:0 F:22 CC↑17 D:0 (python)
   M[pyqual/validation.py] 463L C:6 F:6 CC↑26 D:2 (python)
   M[pyqual/builtin_collectors.py] 432L C:8 F:15 CC↑14 D:0 (python)
+  M[pyqual/run_parallel_fix.py] 341L C:0 F:4 CC↑37 D:0 (python)
+  M[pyqual/parallel.py] 326L C:4 F:7 CC↑15 D:0 (python)
   M[pyqual/tools.py] 325L C:1 F:15 CC↑8 D:3 (python)
   M[pyqual/cli_run_helpers.py] 315L C:0 F:14 CC↑20 D:0 (python)
+  M[dashboard/api/main.py] 314L C:0 F:12 CC↑6 D:0 (python)
   M[pyqual/config.py] 263L C:4 F:7 CC↑23 D:0 (python)
-  M[pyqual/cli_plugin_helpers.py] 191L C:0 F:7 CC↑11 D:1 (python)
-  M[pyqual/plugins.py] 130L C:3 F:9 CC↑5 D:2 (python)
-  M[pyqual/llm.py] 126L C:0 F:0 CC↑0 D:0 (python)
-  M[pyqual/profiles.py] 124L C:1 F:2 CC↑1 D:2 (python)
-  LANGS: python:24/shell:1
+  M[dashboard/src/api/index.ts] 205L C:0 F:19 CC↑11 D:0 (typescript)
+  LANGS: python:27/typescript:11/javascript:2/shell:1
 
 HOTSPOTS[10]:
   ★ run fan=50  // Execute pipeline loop until quality gates pass.
 
 Output is streamed as YAML to s
+  ★ main fan=28  // Run parallel fix on TODO.md items using multiple tools.
   ★ history fan=27  // View history of LLX/LLM fix runs from .pyqual/llx_history.jsonl.
 
 Each time a fi
@@ -44,16 +45,13 @@ Each time a fi
   ★ fix_config fan=23  // Use LLM to auto-repair pyqual.yaml based on project structure.
 
 Scans the projec
-  ★ logs fan=23  // View structured pipeline logs from .pyqual/pipeline.db (nfo SQLite).
-
-Logs are w
 
 REFACTOR[15]:
   [1] H/L Split run (CC=25 → target CC<10)
   [2] H/L Split watch (CC=29 → target CC<10)
   [3] H/L Split history (CC=29 → target CC<10)
-  [4] H/L Split validate_config (CC=26 → target CC<10)
-  [5] H/L Split _classify_heuristic (CC=26 → target CC<10)
+  [4] H/L Split main (CC=37 → target CC<10)
+  [5] H/L Split validate_config (CC=26 → target CC<10)
 
 EVOLUTION:
-  2026-03-31 CC̄=6.6 crit=49 10952L // Automated analysis
+  2026-03-31 CC̄=6.0 crit=56 13691L // Automated analysis

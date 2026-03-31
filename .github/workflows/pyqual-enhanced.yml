@@ -1,0 +1,279 @@
+name: Pyqual Quality Gates
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master]
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: 'Pyqual profile to run'
+        required: false
+        default: 'python'
+        type: choice
+        options:
+          - python
+          - python-full
+          - lint-only
+          - ci
+          - security
+
+env:
+  PYQUAL_VERSION: 'latest'
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  quality-gates:
+    name: Quality Gates
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+      fail-fast: false
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for better analysis
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+    
+    - name: Set up Node.js (for some tools)
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+    
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git jq sqlite3
+    
+    - name: Install pyqual
+      run: |
+        pip install pyqual[all]
+    
+    - name: Install optional tools
+      run: |
+        # Install Claude Code if API key is provided
+        if [[ -n "${{ secrets.ANTHROPIC_API_KEY }}" ]]; then
+          npm install -g @anthropic-ai/claude-code
+        fi
+        
+        # Install additional linters and tools
+        pip install bandit safety trufflehog gitleaks
+    
+    - name: Run pyqual init (if no config)
+      run: |
+        if [[ ! -f pyqual.yaml ]]; then
+          profile="${{ github.event.inputs.profile || 'python' }}"
+          pyqual init --profile "$profile"
+        fi
+    
+    - name: Run quality gates
+      run: |
+        pyqual run --config pyqual.yaml --verbose
+      env:
+        # LLM providers
+        LLM_MODEL: ${{ secrets.LLM_MODEL || 'openrouter/qwen/qwen3-coder-next' }}
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        
+        # Coverage settings
+        COVERAGE_THRESHOLD: ${{ secrets.COVERAGE_THRESHOLD || '80' }}
+        
+        # Enable/disable features
+        PYQUAL_ENABLE_FIX: ${{ secrets.PYQUAL_ENABLE_FIX || 'false' }}
+        PYQUAL_MAX_ITERATIONS: ${{ secrets.PYQUAL_MAX_ITERATIONS || '3' }}
+    
+    - name: Generate summary report
+      if: always()
+      run: |
+        # Create a summary JSON for the dashboard
+        python << 'EOF'
+        import json
+        import sqlite3
+        from pathlib import Path
+        from datetime import datetime
+        
+        # Read pipeline results
+        db_path = Path(".pyqual/pipeline.db")
+        summary = {
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "commit": "${{ github.sha }}",
+            "branch": "${{ github.ref_name }}",
+            "workflow_run_id": "${{ github.run_id }}",
+            "python_version": "${{ matrix.python-version }}",
+            "status": "passed",
+            "metrics": {},
+            "stages": [],
+            "gates": []
+        }
+        
+        if db_path.exists():
+            conn = sqlite3.connect(db_path)
+            conn.row_factory = sqlite3.Row
+            
+            # Get pipeline end status
+            end_row = conn.execute(
+                "SELECT kwargs FROM pipeline_logs WHERE function_name='pipeline_end' ORDER BY id DESC LIMIT 1"
+            ).fetchone()
+            
+            if end_row:
+                import ast
+                kwargs = ast.literal_eval(end_row["kwargs"])
+                summary["status"] = "passed" if kwargs.get("final_ok") else "failed"
+                summary["iterations"] = kwargs.get("iterations", 0)
+                summary["duration_s"] = kwargs.get("total_duration_s", 0)
+            
+            # Get gate checks
+            for row in conn.execute(
+                "SELECT kwargs FROM pipeline_logs WHERE function_name='gate_check' ORDER BY id"
+            ).fetchall():
+                import ast
+                gate = ast.literal_eval(row["kwargs"])
+                summary["gates"].append({
+                    "metric": gate.get("metric"),
+                    "value": gate.get("value"),
+                    "threshold": gate.get("threshold"),
+                    "passed": gate.get("ok")
+                })
+                if gate.get("metric"):
+                    summary["metrics"][gate.get("metric")] = gate.get("value")
+            
+            # Get stage results
+            for row in conn.execute(
+                "SELECT kwargs FROM pipeline_logs WHERE function_name='stage_done' ORDER BY id"
+            ).fetchall():
+                import ast
+                stage = ast.literal_eval(row["kwargs"])
+                summary["stages"].append({
+                    "name": stage.get("stage"),
+                    "duration_s": stage.get("duration_s", 0),
+                    "passed": stage.get("ok"),
+                    "skipped": stage.get("skipped", False)
+                })
+            
+            conn.close()
+        
+        # Write summary
+        Path(".pyqual/summary.json").write_text(json.dumps(summary, indent=2))
+        print(json.dumps(summary, indent=2))
+        EOF
+    
+    - name: Upload artifacts
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: pyqual-results-python${{ matrix.python-version }}
+        path: |
+          .pyqual/
+          htmlcov/
+          reports/
+        retention-days: 30
+    
+    - name: Upload coverage to Codecov
+      if: matrix.python-version == env.PYTHON_VERSION && always()
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./.pyqual/coverage.json
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+    
+    - name: Comment PR with results
+      if: github.event_name == 'pull_request' && matrix.python-version == env.PYTHON_VERSION
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          
+          try {
+            const summary = JSON.parse(fs.readFileSync('.pyqual/summary.json', 'utf8'));
+            
+            const comment = `
+            ## 🤖 Pyqual Quality Gate Results
+            
+            **Status:** ${summary.status === 'passed' ? '✅ Passed' : '❌ Failed'}
+            **Duration:** ${summary.duration_s?.toFixed(2)}s
+            **Iterations:** ${summary.iterations || 0}
+            
+            ### Metrics
+            ${summary.gates.map(gate => 
+              `- **${gate.metric}:** ${gate.value}${gate.threshold ? ` (threshold: ${gate.threshold})` : ''} ${gate.passed ? '✅' : '❌'}`
+            ).join('\n')}
+            
+            ### Stages
+            ${summary.stages.map(stage => 
+              `- **${stage.name}:** ${stage.passed ? '✅' : stage.skipped ? '⏭️' : '❌'} (${stage.duration_s.toFixed(2)}s)`
+            ).join('\n')}
+            
+            [View detailed logs](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID})
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+          } catch (error) {
+            console.log('Could not read pyqual results:', error);
+          }
+    
+    - name: Check gate status
+      if: always()
+      run: |
+        if [[ -f .pyqual/summary.json ]]; then
+          status=$(jq -r '.status' .pyqual/summary.json)
+          if [[ "$status" != "passed" ]]; then
+            echo "Quality gates failed!"
+            exit 1
+          fi
+        fi
+
+  # Dashboard update job (runs after quality gates)
+  update-dashboard:
+    name: Update Dashboard
+    needs: quality-gates
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+    - name: Checkout dashboard repo
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ secrets.DASHBOARD_REPO || 'your-org/pyqual-dashboard' }}
+        token: ${{ secrets.DASHBOARD_TOKEN || github.token }}
+        path: dashboard
+    
+    - name: Download results
+      uses: actions/download-artifact@v4
+      with:
+        pattern: pyqual-results-python*
+        path: dashboard/data/
+        merge-multiple: true
+    
+    - name: Update dashboard data
+      run: |
+        cd dashboard
+        # Process and merge results
+        python scripts/process_results.py
+        
+        # Commit and push
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add data/
+        git diff --staged --quiet || git commit -m "Update metrics from ${{ github.repository }} ${{ github.sha }}"
+        git push

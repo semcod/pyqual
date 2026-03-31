@@ -1,0 +1,354 @@
+# GitLab CI/CD pipeline for Pyqual quality gates
+stages:
+  - prepare
+  - quality
+  - report
+  - deploy
+
+variables:
+  PYQUAL_VERSION: 'latest'
+  PYTHON_VERSION: '3.11'
+  # Cache pip downloads
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  paths:
+    - .cache/pip
+    - .venv/
+    - node_modules/
+
+# Base template for all jobs
+.pyqual_base:
+  image: python:$PYTHON_VERSION
+  before_script:
+    - python -m venv .venv
+    - source .venv/bin/activate
+    - pip install --upgrade pip
+    - pip install pyqual[all]
+    # Install Node.js for some tools
+    - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+    - apt-get update && apt-get install -y git jq sqlite3 nodejs
+    # Install optional security tools
+    - pip install bandit safety trufflehog
+    - npm install -g @anthropic-ai/claude-code || true
+
+# Prepare job - install dependencies and initialize config
+prepare:
+  extends: .pyqual_base
+  stage: prepare
+  script:
+    - |
+      if [[ ! -f pyqual.yaml ]]; then
+        profile="${PYQUAL_PROFILE:-python}"
+        pyqual init --profile "$profile"
+      fi
+  artifacts:
+    paths:
+      - pyqual.yaml
+    expire_in: 1 hour
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_PIPELINE_SOURCE == "push"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+# Matrix strategy for multiple Python versions
+.quality_matrix:
+  extends: .pyqual_base
+  stage: quality
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ['3.9', '3.10', '3.11', '3.12']
+  script:
+    - source .venv/bin/activate
+    - |
+      cat << 'EOF' > run_pyqual.sh
+      #!/bin/bash
+      set -e
+      
+      # Run quality gates
+      pyqual run --config pyqual.yaml --verbose
+      
+      # Generate summary report
+      python << 'PYTHON_EOF'
+      import json
+      import sqlite3
+      from pathlib import Path
+      from datetime import datetime
+      
+      # Read pipeline results
+      db_path = Path(".pyqual/pipeline.db")
+      summary = {
+          "timestamp": datetime.utcnow().isoformat() + "Z",
+          "commit": "$CI_COMMIT_SHA",
+          "branch": "$CI_COMMIT_REF_NAME",
+          "pipeline_id": "$CI_PIPELINE_ID",
+          "job_id": "$CI_JOB_ID",
+          "project_id": "$CI_PROJECT_ID",
+          "python_version": "$PYTHON_VERSION",
+          "status": "passed",
+          "metrics": {},
+          "stages": [],
+          "gates": []
+      }
+      
+      if db_path.exists():
+          conn = sqlite3.connect(db_path)
+          conn.row_factory = sqlite3.Row
+          
+          # Get pipeline end status
+          end_row = conn.execute(
+              "SELECT kwargs FROM pipeline_logs WHERE function_name='pipeline_end' ORDER BY id DESC LIMIT 1"
+          ).fetchone()
+          
+          if end_row:
+              import ast
+              kwargs = ast.literal_eval(end_row["kwargs"])
+              summary["status"] = "passed" if kwargs.get("final_ok") else "failed"
+              summary["iterations"] = kwargs.get("iterations", 0)
+              summary["duration_s"] = kwargs.get("total_duration_s", 0)
+          
+          # Get gate checks
+          for row in conn.execute(
+              "SELECT kwargs FROM pipeline_logs WHERE function_name='gate_check' ORDER BY id"
+          ).fetchall():
+              import ast
+              gate = ast.literal_eval(row["kwargs"])
+              summary["gates"].append({
+                  "metric": gate.get("metric"),
+                  "value": gate.get("value"),
+                  "threshold": gate.get("threshold"),
+                  "passed": gate.get("ok")
+              })
+              if gate.get("metric"):
+                  summary["metrics"][gate.get("metric")] = gate.get("value")
+          
+          # Get stage results
+          for row in conn.execute(
+              "SELECT kwargs FROM pipeline_logs WHERE function_name='stage_done' ORDER BY id"
+          ).fetchall():
+              import ast
+              stage = ast.literal_eval(row["kwargs"])
+              summary["stages"].append({
+                  "name": stage.get("stage"),
+                  "duration_s": stage.get("duration_s", 0),
+                  "passed": stage.get("ok"),
+                  "skipped": stage.get("skipped", False)
+              })
+          
+          conn.close()
+      
+      # Write summary
+      Path(".pyqual/summary.json").write_text(json.dumps(summary, indent=2))
+      print(json.dumps(summary, indent=2))
+      PYTHON_EOF
+      
+      # Check status and exit appropriately
+      if [[ -f .pyqual/summary.json ]]; then
+          status=$(jq -r '.status' .pyqual/summary.json)
+          echo "Quality gates status: $status"
+          if [[ "$status" != "passed" ]]; then
+            exit 1
+          fi
+      fi
+      EOF
+      
+      chmod +x run_pyqual.sh
+      ./run_pyqual.sh
+  environment:
+    name: review/$CI_COMMIT_REF_SLUG
+    on_stop: cleanup
+  artifacts:
+    name: pyqual-results-$PYTHON_VERSION
+    paths:
+      - .pyqual/
+      - htmlcov/
+      - reports/
+    reports:
+      junit: .pyqual/junit.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: .pyqual/coverage.xml
+    expire_in: 1 week
+  rules:
+    - if: $PYQUAL_SKIP_QUALITY
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_PIPELINE_SOURCE == "push"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+# Run quality gates
+quality:
+  extends: .quality_matrix
+  environment:
+    name: quality/$CI_COMMIT_REF_SLUG
+  variables:
+    # LLM providers
+    LLM_MODEL: $LLM_MODEL
+    ANTHROPIC_API_KEY: $ANTHROPIC_API_KEY
+    OPENROUTER_API_KEY: $OPENROUTER_API_KEY
+    OPENAI_API_KEY: $OPENAI_API_KEY
+    
+    # Coverage settings
+    COVERAGE_THRESHOLD: $COVERAGE_THRESHOLD
+    
+    # Enable/disable features
+    PYQUAL_ENABLE_FIX: $PYQUAL_ENABLE_FIX
+    PYQUAL_MAX_ITERATIONS: $PYQUAL_MAX_ITERATIONS
+
+# Generate and upload reports
+report:
+  stage: report
+  image: python:3.11-alpine
+  before_script:
+    - apk add --no-cache jq sqlite3 curl
+  script:
+    - |
+      # Merge all Python version results
+      echo "Merging results from all Python versions..."
+      
+      # Create combined summary
+      python << 'EOF'
+      import json
+      import glob
+      from pathlib import Path
+      
+      combined = {
+          "timestamp": datetime.utcnow().isoformat() + "Z",
+          "commit": "$CI_COMMIT_SHA",
+          "branch": "$CI_COMMIT_REF_NAME",
+          "pipeline_id": "$CI_PIPELINE_ID",
+          "project_id": "$CI_PROJECT_ID",
+          "project_name": "$CI_PROJECT_NAME",
+          "project_url": "$CI_PROJECT_URL",
+          "pipeline_url": "$CI_PIPELINE_URL",
+          "results": {},
+          "summary": {
+              "total_runs": 0,
+              "passed": 0,
+              "failed": 0,
+              "python_versions": []
+          }
+      }
+      
+      # Find all summary files
+      for summary_file in glob.glob(".pyqual-*/.pyqual/summary.json"):
+          version = summary_file.split('/')[0].replace('.pyqual-', '')
+          with open(summary_file) as f:
+              data = json.load(f)
+              combined["results"][version] = data
+              combined["summary"]["total_runs"] += 1
+              if data.get("status") == "passed":
+                  combined["summary"]["passed"] += 1
+              else:
+                  combined["summary"]["failed"] += 1
+              combined["summary"]["python_versions"].append(version)
+      
+      # Write combined report
+      Path(".pyqual/combined-summary.json").write_text(json.dumps(combined, indent=2))
+      
+      # Generate HTML report
+      html = f"""
+      <!DOCTYPE html>
+      <html>
+      <head>
+          <title>Pyqual Report - $CI_PROJECT_NAME</title>
+          <style>
+              body {{ font-family: Arial, sans-serif; margin: 20px; }}
+              .header {{ background: #f5f5f5; padding: 20px; border-radius: 5px; }}
+              .status-passed {{ color: green; }}
+              .status-failed {{ color: red; }}
+              .metrics {{ display: flex; gap: 20px; margin: 20px 0; }}
+              .metric {{ background: #f9f9f9; padding: 15px; border-radius: 5px; text-align: center; }}
+              table {{ border-collapse: collapse; width: 100%; }}
+              th, td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}
+              th {{ background-color: #f2f2f2; }}
+          </style>
+      </head>
+      <body>
+          <div class="header">
+              <h1>🤖 Pyqual Quality Report</h1>
+              <p><strong>Project:</strong> $CI_PROJECT_NAME</p>
+              <p><strong>Branch:</strong> $CI_COMMIT_REF_NAME</p>
+              <p><strong>Commit:</strong> $CI_COMMIT_SHA</p>
+              <p><strong>Pipeline:</strong> <a href="$CI_PIPELINE_URL">#$CI_PIPELINE_ID</a></p>
+              <p><strong>Status:</strong> <span class="status-{combined['summary']['passed'] == combined['summary']['total_runs'] and 'passed' or 'failed'}">
+                  {combined['summary']['passed']}/{combined['summary']['total_runs']} checks passed
+              </span></p>
+          </div>
+          
+          <h2>Results by Python Version</h2>
+          <table>
+              <tr><th>Version</th><th>Status</th><th>Duration</th><th>Iterations</th></tr>
+      """
+      
+      for version, data in combined["results"].items():
+          status = data.get("status", "unknown")
+          html += f"""
+              <tr>
+                  <td>{version}</td>
+                  <td class="status-{status}">{status}</td>
+                  <td>{data.get('duration_s', 0):.2f}s</td>
+                  <td>{data.get('iterations', 0)}</td>
+              </tr>
+          """
+      
+      html += """
+          </table>
+      </body>
+      </html>
+      """
+      
+      Path(".pyqual/report.html").write_text(html)
+      EOF
+      
+      # Upload to dashboard if configured
+      if [[ -n "$DASHBOARD_URL" && -n "$DASHBOARD_TOKEN" ]]; then
+          echo "Uploading to dashboard..."
+          curl -X POST \
+            -H "Authorization: Bearer $DASHBOARD_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d @.pyqual/combined-summary.json \
+            "$DASHBOARD_URL/api/projects/$CI_PROJECT_ID/results"
+      fi
+  artifacts:
+    name: pyqual-combined-report
+    paths:
+      - .pyqual/combined-summary.json
+      - .pyqual/report.html
+    expire_in: 1 month
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_PIPELINE_SOURCE == "push"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+# Deploy to production (only on main branch)
+deploy:
+  stage: deploy
+  image: alpine:latest
+  script:
+    - echo "Deploying to production..."
+    # Add your deployment commands here
+  environment:
+    name: production
+    url: https://your-dashboard-url.com
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "push"
+
+# Cleanup review environments
+cleanup:
+  extends: .pyqual_base
+  stage: .post
+  script:
+    - echo "Cleaning up review environment..."
+  environment:
+    name: review/$CI_COMMIT_REF_SLUG
+    action: stop
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: manual
+
+# Scheduled nightly run
+nightly-quality:
+  extends: .quality_matrix
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"

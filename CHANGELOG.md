@@ -123,6 +123,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.71] - 2026-03-31
+
+### Docs
+- Update .aider.chat.history.md
+- Update README.md
+- Update dashboard/README.md
+- Update dashboard/node_modules/@alloc/quick-lru/readme.md
+- Update dashboard/node_modules/@babel/code-frame/README.md
+- Update dashboard/node_modules/@babel/compat-data/README.md
+- Update dashboard/node_modules/@babel/core/README.md
+- Update dashboard/node_modules/@babel/generator/README.md
+- Update dashboard/node_modules/@babel/helper-compilation-targets/README.md
+- Update dashboard/node_modules/@babel/helper-globals/README.md
+- ... and 263 more files
+
+### Other
+- Update .aider.input.history
+- Update .gitignore
+- Update .pyqual/llx_history.jsonl
+- Update .pyqual/pipeline.db
+- Update dashboard/api/main.py
+- Update dashboard/api/requirements.txt
+- Update dashboard/config/repos.example.json
+- Update dashboard/index.html
+- Update dashboard/node_modules/.bin/autoprefixer
+- Update dashboard/node_modules/.bin/baseline-browser-mapping
+- ... and 15674 more files
+
 ## [0.1.70] - 2026-03-31
 
 ### Docs
