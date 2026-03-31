@@ -224,7 +224,7 @@ strategies:
   python:
     test: pytest tests/ -v
     build: python -m build
-    publish: twine upload dist/pyqual-{version}*
+    publish: python -m twine upload dist/pyqual-{version}*
     publish_enabled: true
     dependencies:
       file: requirements.txt

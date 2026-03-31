@@ -1,4 +1,4 @@
-# pyqual | 25f 7460L | shell:1,python:24 | 2026-03-31
+# pyqual | 25f 7575L | shell:1,python:24 | 2026-03-31
 # stats: 206 func | 0 cls | 25 mod | CC̄=6.6 | critical:20 | cycles:0
 # alerts[5]: fan-out run=50; CC history=29; CC watch=29; fan-out history=27; CC Pipeline._execute_stage=26
 # hotspots[5]: run fan=50; history fan=27; PyqualConfig._parse fan=24; fix_config fan=23; logs fan=23
@@ -24,7 +24,7 @@ M[25]:
   pyqual/llm.py,126
   pyqual/pipeline.py,611
   pyqual/plugins.py,130
-  pyqual/profiles.py,124
+  pyqual/profiles.py,239
   pyqual/report.py,544
   pyqual/tickets.py,73
   pyqual/tools.py,325

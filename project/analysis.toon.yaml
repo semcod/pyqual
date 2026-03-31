@@ -1,40 +1,41 @@
-# code2llm | 25f 7460L | python:24,shell:1 | 2026-03-31
-# CC̄=6.6 | critical:20/224 | dups:0 | cycles:0
+# code2llm | 25f 7575L | python:24,shell:1 | 2026-03-31
+# CC̄=6.6 | critical:20/227 | dups:0 | cycles:1
 
 HEALTH[20]:
   🔴 GOD   pyqual/pipeline.py = 611L, 10 classes, 24m, max CC=26
   🟡 CC    _parse CC=23 (limit:15)
+  🟡 CC    _from_vulnerabilities CC=17 (limit:15)
   🟡 CC    bulk_run_cmd CC=19 (limit:15)
   🟡 CC    run CC=25 (limit:15)
   🟡 CC    logs CC=22 (limit:15)
   🟡 CC    watch CC=29 (limit:15)
   🟡 CC    history CC=29 (limit:15)
-  🟡 CC    _from_vulnerabilities CC=17 (limit:15)
   🟡 CC    _classify_failure CC=21 (limit:15)
   🟡 CC    validate_config CC=26 (limit:15)
   🟡 CC    detect_project_facts CC=16 (limit:15)
   🟡 CC    enrich_from_artifacts CC=20 (limit:15)
   🟡 CC    build_run_summary CC=20 (limit:15)
-  🟡 CC    _classify_heuristic CC=26 (limit:15)
-  🟡 CC    bulk_init CC=18 (limit:15)
   🟡 CC    _run_single_project CC=19 (limit:15)
   🟡 CC    _build_project_row CC=19 (limit:15)
   🟡 CC    bulk_run CC=17 (limit:15)
+  🟡 CC    _classify_heuristic CC=26 (limit:15)
+  🟡 CC    bulk_init CC=18 (limit:15)
   🟡 CC    _read_costs_data CC=22 (limit:15)
   🟡 CC    _should_run_stage CC=17 (limit:15)
 
-REFACTOR[2]:
+REFACTOR[3]:
   1. split pyqual/pipeline.py  (god module)
   2. split 19 high-CC methods  (CC>15)
+  3. break 1 circular dependencies
 
 PIPELINES[116]:
-  [1] Src [main]: main
+  [1] Src [main]: main → run_project
       PURITY: 100% pure
-  [2] Src [main]: main → run_project
+  [2] Src [main]: main → save_snapshot → load_history
       PURITY: 100% pure
-  [3] Src [run_composite_check]: run_composite_check → compute_composite_score
+  [3] Src [main]: main
       PURITY: 100% pure
-  [4] Src [main]: main → save_snapshot → load_history
+  [4] Src [run_composite_check]: run_composite_check → compute_composite_score
       PURITY: 100% pure
   [5] Src [main]: main → sync_from_cli → sync_github_tickets → sync_planfile_tickets → ...(1 more)
       PURITY: 100% pure
@@ -56,10 +57,10 @@ LAYERS:
   │ tools                      325L  1C   15m  CC=8      ←3
   │ !! cli_run_helpers            315L  0C   14m  CC=20     ←0
   │ !! config                     263L  4C    7m  CC=23     ←5
+  │ profiles                   239L  1C    2m  CC=1      ←2
   │ cli_plugin_helpers         191L  0C    7m  CC=11     ←1
   │ plugins                    130L  3C    9m  CC=5      ←4
   │ llm                        126L  0C    0m  CC=0.0    ←0
-  │ profiles                   124L  1C    2m  CC=1      ←2
   │ cli_log_helpers            120L  0C    3m  CC=14     ←0
   │ llx_mcp                    102L  0C    2m  CC=6      ←0
   │ gates                       89L  3C    6m  CC=5      ←0
@@ -74,7 +75,7 @@ COUPLING:
                       pyqual  run_analysis
         pyqual            ──            ←1
   run_analysis             1            ──
-  CYCLES: none
+  CYCLES: 1
 
 EXTERNAL:
   validation: run `vallm batch .` → validation.toon
