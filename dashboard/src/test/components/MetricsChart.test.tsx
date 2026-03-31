@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
-import MetricsChart from '../components/MetricsChart'
-import { Repository } from '../types'
+import MetricsChart from '../../components/MetricsChart.tsx'
+import { Repository } from '../../types'
 
 const mockRepositories: Repository[] = [
   {
