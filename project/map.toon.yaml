@@ -1,4 +1,4 @@
-# pyqual | 41f 9640L | shell:1,javascript:2,typescript:11,python:27 | 2026-03-31
+# pyqual | 41f 9641L | shell:1,javascript:2,typescript:11,python:27 | 2026-03-31
 # stats: 280 func | 0 cls | 41 mod | CC̄=6.0 | critical:23 | cycles:0
 # alerts[5]: fan-out run=50; CC main=37; CC Pipeline._execute_stage=29; CC history=29; CC watch=29
 # hotspots[5]: run fan=50; main fan=28; history fan=27; PyqualConfig._parse fan=24; fix_config fan=23
@@ -7,7 +7,7 @@
 M[41]:
   dashboard/api/main.py,314
   dashboard/postcss.config.js,6
-  dashboard/src/App.tsx,202
+  dashboard/src/App.tsx,203
   dashboard/src/api/index.ts,205
   dashboard/src/components/MetricsChart.tsx,82
   dashboard/src/components/MetricsTrendChart.tsx,60
@@ -389,12 +389,12 @@ D:
     build_parser()
     main(argv)
   project.sh:
-  dashboard/tailwind.config.js:
+  dashboard/postcss.config.js:
   dashboard/vite.config.ts:
     i: @vitejs/plugin-react,vite
   dashboard/src/main.tsx:
     i: ./App,react,react-dom/client
-  dashboard/postcss.config.js:
+  dashboard/tailwind.config.js:
   dashboard/src/types/index.ts:
     e: PyqualMetric,PyqualStage,PyqualSummary,Repository,DashboardConfig,MetricHistory,MetricTrend
     PyqualMetric:

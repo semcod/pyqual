@@ -1,4 +1,4 @@
-# code2llm | 41f 9640L | python:27,typescript:11,javascript:2,shell:1 | 2026-03-31
+# code2llm | 41f 9641L | python:27,typescript:11,javascript:2,shell:1 | 2026-03-31
 # CC̄=6.0 | critical:23/298 | dups:0 | cycles:0
 
 HEALTH[20]:
@@ -12,16 +12,16 @@ HEALTH[20]:
   🟡 CC    watch CC=29 (limit:15)
   🟡 CC    history CC=29 (limit:15)
   🟡 CC    main CC=37 (limit:15)
-  🟡 CC    _from_vulnerabilities CC=17 (limit:15)
   🟡 CC    _classify_failure CC=21 (limit:15)
   🟡 CC    validate_config CC=26 (limit:15)
   🟡 CC    detect_project_facts CC=16 (limit:15)
+  🟡 CC    _from_vulnerabilities CC=17 (limit:15)
   🟡 CC    enrich_from_artifacts CC=20 (limit:15)
   🟡 CC    build_run_summary CC=20 (limit:15)
-  🟡 CC    _classify_heuristic CC=26 (limit:15)
-  🟡 CC    bulk_init CC=18 (limit:15)
   🟡 CC    _run_single_project CC=19 (limit:15)
   🟡 CC    _build_project_row CC=19 (limit:15)
+  🟡 CC    bulk_run CC=17 (limit:15)
+  🟡 CC    _classify_heuristic CC=26 (limit:15)
 
 REFACTOR[2]:
   1. split pyqual/pipeline.py  (god module)
@@ -36,7 +36,7 @@ PIPELINES[160]:
       PURITY: 100% pure
   [4] Src [data]: data
       PURITY: 100% pure
-  [5] Src [Settings]: Settings
+  [5] Src [App]: App → loadRepositories
       PURITY: 100% pure
 
 LAYERS:
@@ -74,7 +74,7 @@ LAYERS:
   dashboard/                      CC̄=3.5    ←in:0  →out:0
   │ main                       314L  0C   12m  CC=6      ←0
   │ index.ts                   205L  0C   19m  CC=11     ←0
-  │ App.tsx                    202L  0C    9m  CC=11     ←0
+  │ App.tsx                    203L  0C    9m  CC=11     ←0
   │ !! RepositoryDetail.tsx       178L  1C    6m  CC=20     ←0
   │ Overview.tsx               175L  1C    5m  CC=12     ←0
   │ Settings.tsx               129L  0C    1m  CC=2      ←0

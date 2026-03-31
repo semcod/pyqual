@@ -10,7 +10,7 @@ import { Repository, PyqualSummary } from './types';
 import Overview from './components/Overview';
 import RepositoryDetail from './components/RepositoryDetail';
 import Settings from './components/Settings';
-import { fetchRepositories, fetchRepositoryRuns } from './api';
+import { fetchRepositoriesWithFallback, fetchRepositoryRuns } from './api';
 import './App.css';
 
 function App() {
@@ -26,7 +26,8 @@ function App() {
   const loadRepositories = async () => {
     try {
       setLoading(true);
-      const repos = await fetchRepositories();
+      const repos = await fetchRepositoriesWithFallback();
+      console.log('Loaded repositories:', repos);
       setRepositories(repos);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load repositories');

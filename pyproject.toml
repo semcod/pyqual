@@ -47,12 +47,12 @@ packages = ["pyqual", "pyqual.integrations"]
 pyqual = ["default_tools.json"]
 
 [tool.costs]
-model = "openrouter/qwen/qwen3-coder-next"
+model = "openrouter/x-ai/grok-code-fast-1"
 all_commits = true
 
 [tool.pfix]
 # Self-healing Python configuration
-model = "openrouter/qwen/qwen3-coder-next"
+model = "openrouter/x-ai/grok-code-fast-1"
 auto_apply = true
 auto_install_deps = true
 auto_restart = false

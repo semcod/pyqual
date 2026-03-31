@@ -143,6 +143,6 @@ pipeline:
 
   # Environment (optional)
   env:
-    LLM_MODEL: openrouter/qwen/qwen3-coder-next
+    LLM_MODEL: openrouter/x-ai/grok-code-fast-1
     LLX_DEFAULT_TIER: balanced
     LLX_VERBOSE: true

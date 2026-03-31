@@ -1,9 +1,9 @@
-# vallm batch | 205f | 107✓ 20⚠ 2✗ | 2026-03-31
+# vallm batch | 35f | 34✓ 12⚠ 1✗ | 2026-03-31
 
 SUMMARY:
-  scanned: 205  passed: 107 (52.2%)  warnings: 20  errors: 2  unsupported: 96
+  scanned: 35  passed: 34 (97.1%)  warnings: 12  errors: 1  unsupported: 0
 
-WARNINGS[20]{path,score}:
+WARNINGS[12]{path,score}:
   pyqual/cli.py,0.80
     issues[12]{rule,severity,message,line}:
       complexity.cyclomatic,warning,bulk_run_cmd has cyclomatic complexity 19 (max: 15),253
@@ -18,9 +18,6 @@ WARNINGS[20]{path,score}:
       complexity.lizard_cc,warning,logs: CC=22 exceeds limit 15,1165
       complexity.lizard_cc,warning,watch: CC=29 exceeds limit 15,1253
       complexity.lizard_cc,warning,history: CC=28 exceeds limit 15,1359
-  dashboard/vite.config.ts,0.83
-    issues[1]{rule,severity,message,line}:
-      js.import.resolvable,warning,Module 'vite' not found,1
   pyqual/validation.py,0.87
     issues[7]{rule,severity,message,line}:
       complexity.cyclomatic,warning,_classify_failure has cyclomatic complexity 21 (max: 15),158
@@ -30,9 +27,6 @@ WARNINGS[20]{path,score}:
       complexity.lizard_cc,warning,validate_config: CC=26 exceeds limit 15,285
       complexity.lizard_length,warning,validate_config: 110 lines exceeds limit 100,285
       complexity.lizard_cc,warning,detect_project_facts: CC=16 exceeds limit 15,424
-  dashboard/vitest.config.ts,0.89
-    issues[1]{rule,severity,message,line}:
-      js.import.resolvable,warning,Module 'vitest/config' not found,1
   pyqual/bulk_run.py,0.90
     issues[6]{rule,severity,message,line}:
       complexity.cyclomatic,warning,_run_single_project has cyclomatic complexity 19 (max: 15),222
@@ -41,14 +35,6 @@ WARNINGS[20]{path,score}:
       complexity.lizard_cc,warning,_run_single_project: CC=19 exceeds limit 15,222
       complexity.lizard_cc,warning,_build_project_row: CC=19 exceeds limit 15,331
       complexity.lizard_cc,warning,bulk_run: CC=17 exceeds limit 15,460
-  dashboard/src/components/Overview.tsx,0.93
-    issues[2]{rule,severity,message,line}:
-      complexity.lizard_cc,warning,Overview: CC=23 exceeds limit 15,16
-      complexity.lizard_length,warning,Overview: 132 lines exceeds limit 100,16
-  dashboard/src/components/RepositoryDetail.tsx,0.93
-    issues[2]{rule,severity,message,line}:
-      complexity.lizard_cc,warning,RepositoryDetail: CC=39 exceeds limit 15,12
-      complexity.lizard_length,warning,RepositoryDetail: 153 lines exceeds limit 100,12
   pyqual/bulk_init.py,0.93
     issues[4]{rule,severity,message,line}:
       complexity.cyclomatic,warning,_classify_heuristic has cyclomatic complexity 26 (max: 15),377
@@ -78,24 +64,10 @@ WARNINGS[20]{path,score}:
       complexity.cyclomatic,warning,_from_vulnerabilities has cyclomatic complexity 17 (max: 15),121
       complexity.maintainability,warning,Low maintainability index: 2.0 (threshold: 20),
       complexity.lizard_cc,warning,_from_vulnerabilities: CC=17 exceeds limit 15,121
-  test_pyqual.py,0.96
-    issues[2]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,test_pipeline_writes_nfo_sqlite_log has cyclomatic complexity 17 (max: 15),382
-      complexity.maintainability,warning,Low maintainability index: 14.3 (threshold: 20),
-  dashboard/src/App.tsx,0.97
-    issues[1]{rule,severity,message,line}:
-      complexity.lizard_length,warning,App: 115 lines exceeds limit 100,16
-  dashboard/src/components/Settings.tsx,0.97
-    issues[1]{rule,severity,message,line}:
-      complexity.lizard_length,warning,Settings: 110 lines exceeds limit 100,4
   pyqual/config.py,0.97
     issues[2]{rule,severity,message,line}:
       complexity.cyclomatic,warning,_parse has cyclomatic complexity 23 (max: 15),133
       complexity.lizard_cc,warning,_parse: CC=23 exceeds limit 15,133
-  pyqual/report.py,0.97
-    issues[2]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,_read_costs_data has cyclomatic complexity 22 (max: 15),115
-      complexity.lizard_cc,warning,_read_costs_data: CC=22 exceeds limit 15,115
   pyqual/builtin_collectors.py,0.98
     issues[1]{rule,severity,message,line}:
       complexity.maintainability,warning,Low maintainability index: 12.4 (threshold: 20),
@@ -106,20 +78,8 @@ WARNINGS[20]{path,score}:
     issues[1]{rule,severity,message,line}:
       complexity.maintainability,warning,Low maintainability index: 3.9 (threshold: 20),
 
-ERRORS[2]{path,score}:
-  dashboard/src/test/setup.ts,0.00
+ERRORS[1]{path,score}:
+  pyqual/report.py,0.98
     issues[1]{rule,severity,message,line}:
-      syntax.tree_sitter,error,tree-sitter found 34 parse error(s) in typescript,
-  dashboard/api/main.py,0.88
-    issues[4]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'fastapi' not found,1
-      python.import.resolvable,error,Module 'fastapi.middleware.cors' not found,2
-      python.import.resolvable,error,Module 'fastapi.staticfiles' not found,3
-      python.import.resolvable,error,Module 'fastapi.security' not found,4
+      python.import.resolvable,error,Module 'tomli' not found,68
 
-UNSUPPORTED[5]{bucket,count}:
-  *.md,48
-  Dockerfile*,1
-  *.txt,8
-  *.yml,2
-  other,37
