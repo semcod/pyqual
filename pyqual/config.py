@@ -40,6 +40,29 @@ def _normalize_env_values(env: dict[str, Any] | None) -> dict[str, str]:
     return normalized
 
 
+_STAGE_WHEN_DEFAULTS: dict[str, str] = {
+    "analyze": "first_iteration",
+    "baseline": "first_iteration",
+    "code2llm": "first_iteration",
+    "prefact": "metrics_fail",
+    "fix": "metrics_fail",
+    "fix_regression": "metrics_fail",
+    "auto_fix": "metrics_fail",
+    "repair": "metrics_fail",
+    "verify": "after_fix",
+    "verify_fix": "after_fix",
+    "regression_report": "after_verify_fix",
+    "push": "metrics_pass",
+    "publish": "metrics_pass",
+    "deploy": "metrics_pass",
+}
+"""Smart defaults for ``when:`` based on stage name.
+
+Users can still override with explicit ``when:`` in their YAML.
+If the stage name is not in this dict, the default is ``"always"``.
+"""
+
+
 @dataclass
 class StageConfig:
     """Single pipeline stage."""
@@ -47,9 +70,13 @@ class StageConfig:
     run: str = ""
     tool: str = ""            # built-in tool preset (e.g. "ruff", "pytest")
     optional: bool = False    # skip silently when tool binary is missing
-    when: str = "always"      # always | first_iteration | metrics_fail | metrics_pass | any_stage_fail | after_fix
+    when: str = ""            # auto-inferred from name if empty; see _STAGE_WHEN_DEFAULTS
     timeout: int = DEFAULT_STAGE_TIMEOUT
     capture_output: bool = True
+
+    def __post_init__(self) -> None:
+        if not self.when:
+            self.when = _STAGE_WHEN_DEFAULTS.get(self.name, "always")
 
 
 @dataclass
@@ -99,7 +126,7 @@ class PyqualConfig:
     @property
     def llm_model(self) -> str:
         """Get LLM model from env or config."""
-        return self.env.get("LLM_MODEL") or os.getenv("LLM_MODEL") or os.getenv("PFIX_MODEL", "openrouter/qwen/qwen3-coder-next")
+        return self.env.get("LLM_MODEL") or os.getenv("LLM_MODEL", "openrouter/qwen/qwen3-coder-next")
 
     @classmethod
     def _parse(cls, raw: dict[str, Any]) -> "PyqualConfig":
@@ -111,9 +138,11 @@ class PyqualConfig:
         if custom_tools:
             register_custom_tools_from_yaml(custom_tools)
 
+        _stage_fields = {f.name for f in StageConfig.__dataclass_fields__.values()}
         stages = []
         for s in pipeline.get("stages", []):
-            stage = StageConfig(**s)
+            filtered = {k: v for k, v in s.items() if k in _stage_fields}
+            stage = StageConfig(**filtered)
             if not stage.run and not stage.tool:
                 raise ValueError(
                     f"Stage '{stage.name}': must have either 'run' or 'tool' (got neither)."
@@ -135,7 +164,11 @@ class PyqualConfig:
             for k, v in (pipeline.get("metrics") or {}).items()
         ]
         loop_raw = pipeline.get("loop", {})
-        loop = LoopConfig(**loop_raw) if loop_raw else LoopConfig()
+        if loop_raw:
+            _loop_fields = {f.name for f in LoopConfig.__dataclass_fields__.values()}
+            loop = LoopConfig(**{k: v for k, v in loop_raw.items() if k in _loop_fields})
+        else:
+            loop = LoopConfig()
         return cls(
             name=pipeline.get("name", "default"),
             stages=stages,

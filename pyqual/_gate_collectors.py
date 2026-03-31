@@ -182,7 +182,9 @@ def _from_pyroma(workdir: Path) -> dict[str, float]:
     if pyr_path.exists():
         try:
             data = json.loads(pyr_path.read_text())
-            score = data.get("score") or data.get("rating")
+            score = data.get("score")
+            if score is None:
+                score = data.get("rating")
             if isinstance(score, (int, float)):
                 result["pyroma_score"] = float(score)
             elif isinstance(score, str) and score.upper() in "ABCDEF":
@@ -200,10 +202,10 @@ def _from_git_health(workdir: Path) -> dict[str, float]:
         try:
             data = json.loads(git_path.read_text())
             age = data.get("main_branch_age_days")
-            if age:
+            if age is not None:
                 result["git_branch_age"] = float(age)
             todos = data.get("todo_count")
-            if todos:
+            if todos is not None:
                 result["todo_count"] = float(todos)
         except (json.JSONDecodeError, TypeError):
             pass
@@ -219,21 +221,25 @@ def _from_llm_quality(workdir: Path) -> dict[str, float]:
             try:
                 data = json.loads(path.read_text())
                 if fname == "humaneval.json":
-                    pass_at_1 = data.get("pass_at_1") or data.get("pass@1")
-                    if pass_at_1:
+                    pass_at_1 = data.get("pass_at_1")
+                    if pass_at_1 is None:
+                        pass_at_1 = data.get("pass@1")
+                    if pass_at_1 is not None:
                         result["llm_pass_rate"] = float(pass_at_1)
                 else:
                     cc = data.get("avg_cyclomatic_complexity")
-                    if cc:
+                    if cc is not None:
                         result["llm_cc"] = float(cc)
                     hal = data.get("hallucination_rate")
-                    if hal:
+                    if hal is not None:
                         result["hallucination_rate"] = float(hal)
                     bias = data.get("prompt_bias_score")
-                    if bias:
+                    if bias is not None:
                         result["prompt_bias_score"] = float(bias)
-                    eff = data.get("agent_iterations") or data.get("agent_efficiency")
-                    if eff:
+                    eff = data.get("agent_iterations")
+                    if eff is None:
+                        eff = data.get("agent_efficiency")
+                    if eff is not None:
                         result["agent_efficiency"] = float(eff)
             except (json.JSONDecodeError, TypeError):
                 pass
@@ -247,8 +253,10 @@ def _from_ai_cost(workdir: Path) -> dict[str, float]:
     if cost_path.exists():
         try:
             data = json.loads(cost_path.read_text())
-            cost = data.get("total_cost") or data.get("cost_usd")
-            if cost:
+            cost = data.get("total_cost")
+            if cost is None:
+                cost = data.get("cost_usd")
+            if cost is not None:
                 result["ai_cost"] = float(cost)
         except (json.JSONDecodeError, TypeError):
             pass
@@ -270,9 +278,9 @@ def _from_benchmark(workdir: Path) -> dict[str, float]:
                         reg = ((curr[key] - prev[key]) / prev[key]) * 100
                         result["bench_regression"] = reg
                         break
-            if "version" in str(data):
+            elif isinstance(data, dict):
                 results = data.get("results", {})
-                if results:
+                if isinstance(results, dict) and results:
                     bench_times = [v for v in results.values() if isinstance(v, (int, float))]
                     if bench_times:
                         result["bench_time"] = sum(bench_times) / len(bench_times)
@@ -288,11 +296,15 @@ def _from_memory_profile(workdir: Path) -> dict[str, float]:
     if mem_path.exists():
         try:
             data = json.loads(mem_path.read_text())
-            peak = data.get("peak_memory_mb") or data.get("peak")
-            if peak:
+            peak = data.get("peak_memory_mb")
+            if peak is None:
+                peak = data.get("peak")
+            if peak is not None:
                 result["mem_usage"] = float(peak)
-            cpu = data.get("cpu_time_s") or data.get("cpu_time")
-            if cpu:
+            cpu = data.get("cpu_time_s")
+            if cpu is None:
+                cpu = data.get("cpu_time")
+            if cpu is not None:
                 result["cpu_time"] = float(cpu)
         except (json.JSONDecodeError, TypeError):
             pass
@@ -364,8 +376,10 @@ def _from_pylint(workdir: Path) -> dict[str, float]:
         result["pylint_error"] = _count_pylint_by_type(data, "error", "E")
         result["pylint_warnings"] = _count_pylint_by_type(data, "warning", "W")
     elif isinstance(data, dict):
-        score = data.get("score") or data.get("rating")
-        if score:
+        score = data.get("score")
+        if score is None:
+            score = data.get("rating")
+        if score is not None:
             result["pylint_score"] = float(score)
         messages = data.get("messages", [])
         result["pylint_errors"] = float(len(messages))
@@ -403,11 +417,17 @@ def _from_interrogate(workdir: Path) -> dict[str, float]:
     if p.exists():
         try:
             data = json.loads(p.read_text())
-            coverage = data.get("coverage") or data.get("percent_covered")
-            if coverage:
+            coverage = data.get("coverage")
+            if coverage is None:
+                coverage = data.get("percent_covered")
+            if coverage is not None:
                 result["docstring_coverage"] = float(coverage)
-            total = data.get("total") or data.get("total_objects")
-            documented = data.get("documented") or data.get("documented_objects")
+            total = data.get("total")
+            if total is None:
+                total = data.get("total_objects")
+            documented = data.get("documented")
+            if documented is None:
+                documented = data.get("documented_objects")
             if total and documented is not None:
                 result["docstring_total"] = float(total)
                 result["docstring_missing"] = float(total - documented)

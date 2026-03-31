@@ -127,7 +127,7 @@ TOOL_PRESETS: dict[str, ToolPreset] = {
     # -- Testing --
     "pytest": ToolPreset(
         binary="pytest",
-        command="pytest --cov --cov-report=json:.pyqual/coverage.json -q",
+        command="pytest --cov-report=json:.pyqual/coverage.json -q",
         output="",
         allow_failure=False,
     ),
