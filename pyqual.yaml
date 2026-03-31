@@ -18,7 +18,8 @@ pipeline:
       when: first_iteration
 
     - name: validate
-      tool: vallm
+      run: vallm batch pyqual tests --recursive --format toon --output ./project
+      when: always
 
     # Security scans (uncomment to enable):
     # - name: audit
@@ -30,21 +31,22 @@ pipeline:
 
     - name: test
       tool: pytest
+      optional: true
 
     - name: prefact
       tool: prefact
       optional: true
-      when: any_stage_fail
+      when: metrics_fail
       timeout: 900
 
     # LLX-powered code fix (no built-in preset — uses run:)
     - name: fix
-      run: llx fix . --errors .pyqual/errors.json --verbose
-      when: any_stage_fail
+      run: llx fix . --apply --errors .pyqual/errors.json --verbose
+      when: metrics_fail
       timeout: 1800
 
     - name: verify
-      tool: vallm
+      run: vallm batch pyqual tests --recursive --format toon --output ./project
       optional: true
       when: after_fix
       timeout: 300

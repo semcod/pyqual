@@ -1,3 +1,5 @@
+![img.png](img.png)
+
 # pyqual
 
 ## AI Cost Tracking
