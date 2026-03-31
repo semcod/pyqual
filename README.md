@@ -4,11 +4,11 @@
 
 ## AI Cost Tracking
 
-![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.66-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
-![AI Cost](https://img.shields.io/badge/AI%20Cost-$7.50-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-29.4h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
+![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.67-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![AI Cost](https://img.shields.io/badge/AI%20Cost-$7.50-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-30.5h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
 
-- 🤖 **LLM usage:** $7.5000 (66 commits)
-- 👤 **Human dev:** ~$2939 (29.4h @ $100/h, 30min dedup)
+- 🤖 **LLM usage:** $7.5000 (67 commits)
+- 👤 **Human dev:** ~$3054 (30.5h @ $100/h, 30min dedup)
 
 Generated on 2026-03-31 using [openrouter/qwen/qwen3-coder-next](https://openrouter.ai/qwen/qwen3-coder-next)
 
@@ -260,10 +260,10 @@ pyqual bulk-run  running:3  pass:12  fail:1  err:0  queue:43  total:59
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━┳━━━━━━┓
 ┃Project       ┃  Status    ┃ Iter  ┃ Stage    ┃  Progress  ┃ Gates ┃ Time ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━╇━━━━━━┩
-│aidesk        │ ✅ passed   │  2/3  │          │   100%     │  2/2  │12.3s │
-│allama        │ 🔄 running │  1/3  │ validate │ ████░░░░░░ │  0/2  │ 8.5s │
-│blog-pactown  │ ❌ failed   │  3/3  │          │    60%     │  1/2  │45.2s │
-│…             │ ⏳ queued   │       │          │            │       │      │
+│aidesk        │ ✅ passed  │  2/3  │          │   100%     │  2/2  │12.3s │
+│allama        │ 🔄 running  │  1/3  │ validate │ ████░░░░░░ │  0/2  │ 8.5s │
+│blog-pactown  │ ❌ failed  │  3/3  │          │    60%     │  1/2  │45.2s │
+│…             │ ⏳ queued  │       │          │            │       │      │
 └──────────────┴────────────┴───────┴──────────┴────────────┴───────┴──────┘
 ```
 
