@@ -1,4 +1,4 @@
-# pyqual | 41f 9641L | shell:1,javascript:2,typescript:11,python:27 | 2026-03-31
+# pyqual | 41f 9642L | shell:1,javascript:2,typescript:11,python:27 | 2026-03-31
 # stats: 280 func | 0 cls | 41 mod | CC̄=6.0 | critical:23 | cycles:0
 # alerts[5]: fan-out run=50; CC main=37; CC Pipeline._execute_stage=29; CC history=29; CC watch=29
 # hotspots[5]: run fan=50; main fan=28; history fan=27; PyqualConfig._parse fan=24; fix_config fan=23
@@ -41,7 +41,7 @@ M[41]:
   pyqual/plugins.py,130
   pyqual/profiles.py,124
   pyqual/report.py,544
-  pyqual/run_parallel_fix.py,341
+  pyqual/run_parallel_fix.py,342
   pyqual/tickets.py,73
   pyqual/tools.py,325
   pyqual/validation.py,463

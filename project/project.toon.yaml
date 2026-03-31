@@ -1,4 +1,4 @@
-# pyqual | 280 func | 31f | 13692L | python | 2026-03-31
+# pyqual | 280 func | 31f | 13693L | python | 2026-03-31
 
 HEALTH:
   CC̄=6.0  critical=56 (limit:10)  dup=0  cycles=0
@@ -24,7 +24,7 @@ MODULES[41] (top by size):
   M[pyqual/_gate_collectors.py] 499L C:0 F:22 CC↑17 D:0 (python)
   M[pyqual/validation.py] 463L C:6 F:6 CC↑26 D:2 (python)
   M[pyqual/builtin_collectors.py] 432L C:8 F:15 CC↑14 D:0 (python)
-  M[pyqual/run_parallel_fix.py] 341L C:0 F:4 CC↑37 D:0 (python)
+  M[pyqual/run_parallel_fix.py] 342L C:0 F:4 CC↑37 D:0 (python)
   M[pyqual/parallel.py] 326L C:4 F:7 CC↑15 D:0 (python)
   M[pyqual/tools.py] 325L C:1 F:15 CC↑8 D:3 (python)
   M[pyqual/cli_run_helpers.py] 315L C:0 F:14 CC↑20 D:0 (python)
@@ -54,4 +54,4 @@ REFACTOR[15]:
   [5] H/L Split validate_config (CC=26 → target CC<10)
 
 EVOLUTION:
-  2026-03-31 CC̄=6.0 crit=56 13692L // Automated analysis
+  2026-03-31 CC̄=6.0 crit=56 13693L // Automated analysis

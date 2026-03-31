@@ -358,16 +358,16 @@ _parse [pyqual.config.PyqualConfig]
 - **Methods**: 3
 - **Key Methods**: pyqual.bulk_run.ProjectRunState.progress_pct, pyqual.bulk_run.ProjectRunState.elapsed, pyqual.bulk_run.ProjectRunState.gates_label
 
-### examples.custom_plugins.performance_collector.PerformanceCollector
-> Collect latency and throughput metrics from load test results.
-- **Methods**: 2
-- **Key Methods**: examples.custom_plugins.performance_collector.PerformanceCollector.collect, examples.custom_plugins.performance_collector.PerformanceCollector.get_config_example
-- **Inherits**: MetricCollector
-
 ### examples.custom_plugins.code_health_collector.CodeHealthCollector
 > Weighted composite health score from multiple code quality signals.
 - **Methods**: 2
 - **Key Methods**: examples.custom_plugins.code_health_collector.CodeHealthCollector.collect, examples.custom_plugins.code_health_collector.CodeHealthCollector.get_config_example
+- **Inherits**: MetricCollector
+
+### examples.custom_plugins.performance_collector.PerformanceCollector
+> Collect latency and throughput metrics from load test results.
+- **Methods**: 2
+- **Key Methods**: examples.custom_plugins.performance_collector.PerformanceCollector.collect, examples.custom_plugins.performance_collector.PerformanceCollector.get_config_example
 - **Inherits**: MetricCollector
 
 ### pyqual.plugins.MetricCollector
@@ -459,13 +459,13 @@ Does NOT run any stages — this is a stati
 > Return (ts, event_name, name, status, details) for one log entry.
 - **Output to**: entry.get, entry.get, None.replace, entry.get, entry.get
 
-### pyqual.integrations.llx_mcp_service.build_parser
-> Build the CLI parser for the MCP service.
-- **Output to**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, os.getenv, int
-
 ### pyqual.bulk_run._parse_output_line
 > Parse a line of pyqual run output and update state.
 - **Output to**: line.strip, clean.startswith, clean.startswith, None.strip, None.strip
+
+### pyqual.integrations.llx_mcp_service.build_parser
+> Build the CLI parser for the MCP service.
+- **Output to**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, os.getenv, int
 
 ### pyqual.integrations.llx_mcp.build_parser
 > Build the CLI parser for the llx MCP helper.
@@ -487,7 +487,7 @@ Does NOT run any stages — this is a stati
 Functions exposed as public API (no underscore prefix):
 
 - `pyqual.cli.run` - 115 calls
-- `pyqual.run_parallel_fix.main` - 83 calls
+- `pyqual.run_parallel_fix.main` - 84 calls
 - `pyqual.bulk_init.generate_pyqual_yaml` - 77 calls
 - `pyqual.cli.history` - 72 calls
 - `pyqual.cli.watch` - 59 calls

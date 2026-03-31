@@ -1,4 +1,4 @@
-# code2llm | 41f 9641L | python:27,typescript:11,javascript:2,shell:1 | 2026-03-31
+# code2llm | 41f 9642L | python:27,typescript:11,javascript:2,shell:1 | 2026-03-31
 # CC̄=6.0 | critical:23/298 | dups:0 | cycles:0
 
 HEALTH[20]:
@@ -53,7 +53,7 @@ LAYERS:
   │ !! _gate_collectors           499L  0C   22m  CC=17     ←0
   │ !! validation                 463L  6C    6m  CC=26     ←2
   │ builtin_collectors         432L  8C   15m  CC=14     ←0
-  │ !! run_parallel_fix           341L  0C    4m  CC=37     ←0
+  │ !! run_parallel_fix           342L  0C    4m  CC=37     ←0
   │ !! parallel                   326L  4C    7m  CC=15     ←0
   │ tools                      325L  1C   15m  CC=8      ←3
   │ !! cli_run_helpers            315L  0C   14m  CC=20     ←0
