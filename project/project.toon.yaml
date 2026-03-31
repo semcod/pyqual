@@ -1,7 +1,7 @@
-# pyqual | 287 func | 32f | 14000L | python | 2026-03-31
+# pyqual | 288 func | 32f | 14014L | python | 2026-03-31
 
 HEALTH:
-  CC̄=6.0  critical=57 (limit:10)  dup=1  cycles=0
+  CC̄=6.0  critical=58 (limit:10)  dup=1  cycles=0
 
 ALERTS[20]:
   !!! high_fan_out     run = 50 (limit:10)
@@ -27,9 +27,9 @@ MODULES[42] (top by size):
   M[pyqual/run_parallel_fix.py] 342L C:0 F:4 CC↑37 D:0 (python)
   M[pyqual/parallel.py] 326L C:4 F:7 CC↑15 D:0 (python)
   M[pyqual/tools.py] 325L C:1 F:15 CC↑8 D:3 (python)
+  M[pyqual/report_generator.py] 321L C:2 F:8 CC↑15 D:0 (python)
   M[pyqual/cli_run_helpers.py] 315L C:0 F:14 CC↑20 D:0 (python)
   M[dashboard/api/main.py] 314L C:0 F:12 CC↑6 D:0 (python)
-  M[pyqual/report_generator.py] 307L C:2 F:7 CC↑11 D:0 (python)
   M[pyqual/config.py] 263L C:4 F:7 CC↑23 D:0 (python)
   LANGS: python:28/typescript:11/javascript:2/shell:1
 
@@ -47,11 +47,11 @@ Each time a fi
 Scans the projec
 
 REFACTOR[15]:
-  [1] H/L Split main (CC=37 → target CC<10)
-  [2] H/L Split run (CC=25 → target CC<10)
-  [3] H/L Split watch (CC=29 → target CC<10)
-  [4] H/L Split history (CC=29 → target CC<10)
+  [1] H/L Split run (CC=25 → target CC<10)
+  [2] H/L Split watch (CC=29 → target CC<10)
+  [3] H/L Split history (CC=29 → target CC<10)
+  [4] H/L Split main (CC=37 → target CC<10)
   [5] H/L Split validate_config (CC=26 → target CC<10)
 
 EVOLUTION:
-  2026-03-31 CC̄=6.0 crit=57 14000L // Automated analysis
+  2026-03-31 CC̄=6.0 crit=58 14014L // Automated analysis

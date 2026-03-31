@@ -6,7 +6,7 @@
 - **Primary Language**: python
 - **Languages**: python: 38, typescript: 11, shell: 2, javascript: 2
 - **Analysis Mode**: static
-- **Total Functions**: 305
+- **Total Functions**: 306
 - **Total Classes**: 62
 - **Modules**: 53
 - **Entry Points**: 192
@@ -66,15 +66,15 @@
 - **Classes**: 3
 - **File**: `plugins.py`
 
+### pyqual.report_generator
+- **Functions**: 8
+- **Classes**: 2
+- **File**: `report_generator.py`
+
 ### dashboard.src.components.MetricsChart
 - **Functions**: 7
 - **Classes**: 1
 - **File**: `MetricsChart.tsx`
-
-### pyqual.report_generator
-- **Functions**: 7
-- **Classes**: 2
-- **File**: `report_generator.py`
 
 ### pyqual.config
 - **Functions**: 7
@@ -329,15 +329,15 @@ _parse [pyqual.config.PyqualConfig]
 - **Key Methods**: pyqual.builtin_collectors.LlxMcpFixCollector._tier_rank, pyqual.builtin_collectors.LlxMcpFixCollector._load_report, pyqual.builtin_collectors.LlxMcpFixCollector._assign_float, pyqual.builtin_collectors.LlxMcpFixCollector._count_lines, pyqual.builtin_collectors.LlxMcpFixCollector._collect_analysis_metrics, pyqual.builtin_collectors.LlxMcpFixCollector._collect_aider_metrics, pyqual.builtin_collectors.LlxMcpFixCollector.get_config_example, pyqual.builtin_collectors.LlxMcpFixCollector.collect
 - **Inherits**: MetricCollector
 
-### pyqual.plugins.PluginRegistry
-> Registry for metric collector plugins.
-- **Methods**: 4
-- **Key Methods**: pyqual.plugins.PluginRegistry.register, pyqual.plugins.PluginRegistry.get, pyqual.plugins.PluginRegistry.list_plugins, pyqual.plugins.PluginRegistry.create_instance
-
 ### pyqual.config.PyqualConfig
 > Full pyqual.yaml configuration.
 - **Methods**: 4
 - **Key Methods**: pyqual.config.PyqualConfig.load, pyqual.config.PyqualConfig.llm_model, pyqual.config.PyqualConfig._parse, pyqual.config.PyqualConfig.default_yaml
+
+### pyqual.plugins.PluginRegistry
+> Registry for metric collector plugins.
+- **Methods**: 4
+- **Key Methods**: pyqual.plugins.PluginRegistry.register, pyqual.plugins.PluginRegistry.get, pyqual.plugins.PluginRegistry.list_plugins, pyqual.plugins.PluginRegistry.create_instance
 
 ### pyqual.gates.GateSet
 > Collection of quality gates with metric collection.
@@ -387,11 +387,6 @@ _parse [pyqual.config.PyqualConfig]
 - **Methods**: 2
 - **Key Methods**: pyqual.validation.StageFailure.error_code, pyqual.validation.StageFailure.domain
 
-### pyqual.plugins.PluginMetadata
-> Metadata for a pyqual plugin.
-- **Methods**: 1
-- **Key Methods**: pyqual.plugins.PluginMetadata.__post_init__
-
 ### pyqual.config.StageConfig
 > Single pipeline stage.
 - **Methods**: 1
@@ -401,6 +396,11 @@ _parse [pyqual.config.PyqualConfig]
 > Single quality gate threshold.
 - **Methods**: 1
 - **Key Methods**: pyqual.config.GateConfig.from_dict
+
+### pyqual.plugins.PluginMetadata
+> Metadata for a pyqual plugin.
+- **Methods**: 1
+- **Key Methods**: pyqual.plugins.PluginMetadata.__post_init__
 
 ### pyqual.gates.GateResult
 > Result of a single gate check.
@@ -431,6 +431,10 @@ Key functions that process and transform data:
 ### pyqual.config.PyqualConfig._parse
 - **Output to**: raw.get, pyqual.tools.load_entry_point_presets, pyqual.tools.load_user_tools, pipeline.get, pipeline.get
 
+### pyqual.report_generator.parse_kwargs
+> Parse kwargs string that might have single quotes.
+- **Output to**: json.loads, ast.literal_eval
+
 ### pyqual.parallel.parse_todo_items
 > Parse unchecked items from TODO.md.
 - **Output to**: todo_path.read_text, content.splitlines, todo_path.exists, line.strip, line.startswith
@@ -443,15 +447,15 @@ Checks for:
 - Unknown or mis
 - **Output to**: app.command, typer.Option, typer.Option, typer.Option, pyqual.validation.validate_config
 
-### pyqual.cli_plugin_helpers.plugin_validate
-> Validate that configured plugins in pyqual.yaml are available.
-- **Output to**: config_path.read_text, console.print, console.print, set, set
-
 ### pyqual.validation.validate_config
 > Validate a pyqual.yaml file and return structured issues.
 
 Does NOT run any stages — this is a stati
 - **Output to**: ValidationResult, raw.get, pipeline.get, pipeline.get, metrics_raw.items
+
+### pyqual.cli_plugin_helpers.plugin_validate
+> Validate that configured plugins in pyqual.yaml are available.
+- **Output to**: config_path.read_text, console.print, console.print, set, set
 
 ### pyqual.cli_run_helpers.format_run_summary
 - **Output to**: todo_bits.append, todo_bits.append, todo_bits.append, parts.append, fix_bits.append
@@ -506,8 +510,8 @@ Functions exposed as public API (no underscore prefix):
 - `pyqual.bulk_init.classify_with_llm` - 26 calls
 - `pyqual.parallel.ParallelExecutor.run` - 25 calls
 - `pyqual.cli_plugin_helpers.plugin_search` - 25 calls
-- `pyqual.report_generator.get_last_run` - 23 calls
 - `pyqual.builtin_collectors.SecurityCollector.collect` - 23 calls
+- `pyqual.report_generator.get_last_run` - 22 calls
 - `pyqual.cli.init` - 22 calls
 - `pyqual.bulk_init.bulk_init` - 22 calls
 - `pyqual.bulk_run.bulk_run` - 22 calls
@@ -515,8 +519,8 @@ Functions exposed as public API (no underscore prefix):
 - `pyqual.cli.status` - 21 calls
 - `pyqual.cli.gates` - 20 calls
 - `pyqual.cli_run_helpers.extract_fix_stage_summary` - 20 calls
-- `pyqual.run_parallel_fix.mark_completed_todos` - 19 calls
 - `pyqual.cli.tools` - 19 calls
+- `pyqual.run_parallel_fix.mark_completed_todos` - 19 calls
 - `pyqual.cli_plugin_helpers.plugin_list` - 19 calls
 - `pyqual.cli_plugin_helpers.plugin_add` - 19 calls
 - `pyqual.builtin_collectors.LLMBenchCollector.collect` - 18 calls

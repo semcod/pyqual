@@ -1174,3 +1174,42 @@ sprints:
     model_hints:
       planning: balanced
       implementation: balanced
+  - id: ticket-4d56a5a9
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/report_generator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/report_generator.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-01bc57a1
+    name: Fix magic-numbers issues
+    description: Resolve 7 magic-numbers issues in pyqual/report_generator.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - pyqual/report_generator.py
+    rule_id: magic-numbers
+    count: 7
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ab52deca
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in pyqual/report_generator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/report_generator.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced

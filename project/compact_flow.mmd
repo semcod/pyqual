@@ -22,8 +22,8 @@ flowchart TD
     examples__ticket_workflow ==>|4| pyqual__tickets
     pyqual__cli ==>|4| pyqual__config
     pyqual__cli ==>|4| pyqual__tickets
-    pyqual__cli_plugin_helpers ==>|4| pyqual__plugins
     pyqual__validation ==>|4| pyqual__tools
+    pyqual__cli_plugin_helpers ==>|4| pyqual__plugins
     pyqual__config -->|2| pyqual__profiles
     pyqual__cli -->|2| pyqual__profiles
     pyqual__pipeline -->|2| pyqual__tools
