@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
-import StagesChart from '../components/StagesChart'
-import { PyqualStage } from '../types'
+import StagesChart from '../../components/StagesChart.tsx'
+import { PyqualStage } from '../../types'
 
 const mockStages: PyqualStage[] = [
   {

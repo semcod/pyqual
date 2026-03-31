@@ -98,9 +98,10 @@ describe('Overview', () => {
       />
     )
     
+    // Use getAllByText because numbers appear in multiple cards (Total, Passing, Failing)
+    const allOnes = screen.getAllByText('1')
+    expect(allOnes.length).toBeGreaterThanOrEqual(2) // At least 2 "1" elements (passing + failing)
     expect(screen.getByText('2')).toBeInTheDocument() // Total repos
-    expect(screen.getByText('1')).toBeInTheDocument() // Passing repos
-    expect(screen.getByText('1')).toBeInTheDocument() // Failing repos
   })
 
   it('displays average coverage', () => {
@@ -140,7 +141,7 @@ describe('Overview', () => {
     
     expect(screen.getByText('Test Repository')).toBeInTheDocument()
     expect(screen.getByText('Test Repository 2')).toBeInTheDocument()
-    expect(screen.getByText('main')).toBeInTheDocument()
+    expect(screen.getAllByText('main').length).toBeGreaterThanOrEqual(2) // Both repos on main branch
   })
 
   it('displays status badges correctly', () => {
@@ -190,7 +191,7 @@ describe('Overview', () => {
     )
     
     expect(screen.getByText('Total Repositories')).toBeInTheDocument()
-    expect(screen.getByText('0')).toBeInTheDocument()
+    expect(screen.getAllByText('0').length).toBeGreaterThanOrEqual(1)
   })
 
   it('displays N/A for repositories without runs', () => {
@@ -212,6 +213,8 @@ describe('Overview', () => {
     )
     
     expect(screen.getByText('No runs')).toBeInTheDocument()
-    expect(screen.getByText('N/A')).toBeInTheDocument()
+    // Multiple N/A cells in the table - coverage, duration, etc
+    const naElements = screen.getAllByText('N/A')
+    expect(naElements.length).toBeGreaterThan(0)
   })
 })
