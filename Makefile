@@ -1,4 +1,4 @@
-.PHONY: help install install-dev test lint format clean build publish upload
+.PHONY: help install install-dev test lint format clean build bump-patch bump-minor publish upload
 
 # Default target
 help:
@@ -10,7 +10,9 @@ help:
 	@echo "  format       Format code"
 	@echo "  clean        Clean build artifacts"
 	@echo "  build        Build the package"
-	@echo "  publish      Build and publish to PyPI"
+	@echo "  bump-patch   Bump patch version (0.1.2 -> 0.1.3)"
+	@echo "  bump-minor   Bump minor version (0.1.2 -> 0.2.0)"
+	@echo "  publish      Bump version, build and publish to PyPI"
 	@echo "  upload       Upload to PyPI (alias for publish)"
 
 # Install the package
@@ -46,8 +48,33 @@ clean:
 build: clean
 	venv/bin/python -m build
 
-# Build and publish to PyPI
-publish: build
+# Bump patch version (0.1.2 -> 0.1.3)
+bump-patch:
+	@echo "Bumping patch version..."
+	@CURRENT=$$(cat VERSION); \
+	MAJOR=$$(echo $$CURRENT | cut -d. -f1); \
+	MINOR=$$(echo $$CURRENT | cut -d. -f2); \
+	PATCH=$$(echo $$CURRENT | cut -d. -f3); \
+	NEW_PATCH=$$((PATCH + 1)); \
+	NEW_VERSION="$$MAJOR.$$MINOR.$$NEW_PATCH"; \
+	echo "$$NEW_VERSION" > VERSION; \
+	sed -i "s/version = \"$$CURRENT\"/version = \"$$NEW_VERSION\"/" pyproject.toml; \
+	echo "Version bumped: $$CURRENT -> $$NEW_VERSION"
+
+# Bump minor version (0.1.2 -> 0.2.0)
+bump-minor:
+	@echo "Bumping minor version..."
+	@CURRENT=$$(cat VERSION); \
+	MAJOR=$$(echo $$CURRENT | cut -d. -f1); \
+	MINOR=$$(echo $$CURRENT | cut -d. -f2); \
+	NEW_MINOR=$$((MINOR + 1)); \
+	NEW_VERSION="$$MAJOR.$$NEW_MINOR.0"; \
+	echo "$$NEW_VERSION" > VERSION; \
+	sed -i "s/version = \"$$CURRENT\"/version = \"$$NEW_VERSION\"/" pyproject.toml; \
+	echo "Version bumped: $$CURRENT -> $$NEW_VERSION"
+
+# Build and publish to PyPI (auto-bumps patch version)
+publish: bump-patch build
 	venv/bin/python -m twine upload dist/*
 
 # Upload to PyPI (alias)
