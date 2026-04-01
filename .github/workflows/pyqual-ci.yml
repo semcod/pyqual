@@ -297,7 +297,7 @@ jobs:
         GITHUB_ISSUE_NUMBER: ${{ github.event.issue.number }}
 
     - name: Update GitHub issue on success
-      if: steps.pyqual-run.outputs.exit_code == '0' && github.event_name == 'issues'
+      if: (steps.pyqual-run.outputs.exit_code == '0' && github.event_name == 'issues') || (steps.pyqual-run.outputs.exit_code == '0' && github.event_name == 'workflow_dispatch' && github.event.inputs.issue_number != '')
       run: |
         python3 << 'EOF'
         import os
@@ -312,14 +312,18 @@ jobs:
         from pyqual.config import load_config
         
         reporter = GitHubActionsReporter()
-        issue_number = os.environ.get("GITHUB_ISSUE_NUMBER")
         
-        print(f"DEBUG: GITHUB_ISSUE_NUMBER = {issue_number}")
+        # Get issue number from issues event or workflow_dispatch input
+        issue_number = os.environ.get("GITHUB_ISSUE_NUMBER") or os.environ.get("INPUT_ISSUE_NUMBER")
+        
+        print(f"DEBUG: GITHUB_ISSUE_NUMBER = {os.environ.get('GITHUB_ISSUE_NUMBER')}")
+        print(f"DEBUG: INPUT_ISSUE_NUMBER = {os.environ.get('INPUT_ISSUE_NUMBER')}")
+        print(f"DEBUG: Final issue_number = {issue_number}")
         print(f"DEBUG: Reporter token available = {bool(reporter.token)}")
         print(f"DEBUG: Reporter repo = {reporter.repo}")
         
         if not issue_number:
-            print("No issue number found - skipping comment")
+            print("No issue number found - skipping comment and close")
             sys.exit(0)
         
         print(f"Processing issue #{issue_number}")
@@ -456,6 +460,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_ISSUE_NUMBER: ${{ github.event.issue.number }}
+        INPUT_ISSUE_NUMBER: ${{ github.event.inputs.issue_number }}
 
     - name: Push changes if successful
       if: steps.pyqual-run.outputs.exit_code == '0'
