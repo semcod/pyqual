@@ -3,7 +3,7 @@
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional, Union
 
 import yaml
 from dotenv import load_dotenv
@@ -25,7 +25,7 @@ def _load_env_file() -> None:
         load_dotenv(env_path)
 
 
-def _normalize_env_values(env: dict[str, Any] | None) -> dict[str, str]:
+def _normalize_env_values(env: Optional[dict[str, Any]]) -> dict[str, str]:
     """Convert YAML env values to strings suitable for subprocess environments."""
     normalized: dict[str, str] = {}
     for key, value in (env or {}).items():
@@ -113,7 +113,7 @@ class PyqualConfig:
     env: dict[str, str] = field(default_factory=dict)
 
     @classmethod
-    def load(cls, path: str | Path = "pyqual.yaml") -> "PyqualConfig":
+    def load(cls, path: Union[str, Path] = "pyqual.yaml") -> "PyqualConfig":
         """Load configuration from YAML file."""
         _load_env_file()
         p = Path(path)
