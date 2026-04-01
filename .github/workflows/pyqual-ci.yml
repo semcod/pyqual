@@ -34,8 +34,8 @@ jobs:
 
     - name: Install tools
       run: |
-        pip install pyqual[all]
-        npm install -g @anthropic-ai/claude-code
+        pip install -e .
+        npm install -g @anthropic-ai/claude-code || true
         # Install GitHub CLI
         curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
         sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg

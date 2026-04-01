@@ -5,6 +5,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pathlib import Path
 import sqlite3
 import json
+import ast
 import os
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
@@ -88,6 +89,19 @@ def query_pipeline_db(db_path: Path, query: str, params: tuple = ()) -> List[Dic
         logger.error(f"Database query failed: {e}")
         return []
 
+def safe_parse(data: str) -> dict:
+    """Parse kwargs from SQLite, handling both JSON and Python repr formats."""
+    if not data:
+        return {}
+    try:
+        return json.loads(data)
+    except json.JSONDecodeError:
+        pass
+    try:
+        return ast.literal_eval(data)
+    except (SyntaxError, ValueError):
+        return {}
+
 # API Endpoints
 @app.get("/api/projects")
 async def get_projects():
@@ -136,7 +150,7 @@ async def get_project_runs(project_id: str, limit: int = DEFAULT_RUNS_LIMIT):
     
     runs = []
     for row in query_pipeline_db(db_path, query, (limit,)):
-        kwargs = json.loads(row["kwargs"])
+        kwargs = safe_parse(row["kwargs"])
         run = {
             "timestamp": row["timestamp"],
             "status": "passed" if kwargs.get("final_ok") else "failed",
@@ -168,7 +182,7 @@ async def get_metric_history(project_id: str, metric: str, days: int = DEFAULT_M
     pattern = f"%'metric': '{metric}'%"
     
     for row in query_pipeline_db(db_path, query, (pattern, threshold)):
-        kwargs = json.loads(row["kwargs"])
+        kwargs = safe_parse(row["kwargs"])
         if kwargs.get("metric") == metric:
             history.append({
                 "timestamp": row["timestamp"],
@@ -194,7 +208,7 @@ async def get_stage_performance(project_id: str, days: int = DEFAULT_STAGE_PERFO
     
     stages = {}
     for row in query_pipeline_db(db_path, query, (threshold,)):
-        kwargs = json.loads(row["kwargs"])
+        kwargs = safe_parse(row["kwargs"])
         stage_name = kwargs.get("stage", "unknown")
         
         if stage_name not in stages:
@@ -226,7 +240,7 @@ async def get_gate_status(project_id: str, days: int = DEFAULT_GATE_STATUS_DAYS)
     
     gates = []
     for row in query_pipeline_db(db_path, query, (threshold,)):
-        kwargs = json.loads(row["kwargs"])
+        kwargs = safe_parse(row["kwargs"])
         gates.append({
             "timestamp": row["timestamp"],
             "metric": kwargs.get("metric"),
@@ -251,7 +265,7 @@ async def get_project_summary(project_id: str):
     if not end_rows:
         raise HTTPException(status_code=HTTP_NOT_FOUND, detail="No pipeline runs found")
     
-    latest = json.loads(end_rows[0]["kwargs"])
+    latest = safe_parse(end_rows[0]["kwargs"])
     
     # Get all gate checks from latest run
     # This is a simplified approach - in production, you'd track run IDs
@@ -264,7 +278,7 @@ async def get_project_summary(project_id: str):
     
     gates = []
     for row in query_pipeline_db(db_path, gate_query, (end_rows[0]["timestamp"],)):
-        kwargs = json.loads(row["kwargs"])
+        kwargs = safe_parse(row["kwargs"])
         gates.append(kwargs)
     
     # Calculate metrics

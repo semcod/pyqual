@@ -61,7 +61,8 @@ jobs:
     
     - name: Install pyqual
       run: |
-        pip install pyqual[all]
+        # Install from local source (mcp/vallm not on PyPI yet)
+        pip install -e .
     
     - name: Install optional tools
       run: |
@@ -71,7 +72,7 @@ jobs:
         fi
         
         # Install additional linters and tools
-        pip install bandit safety trufflehog gitleaks
+        pip install bandit safety trufflehog
     
     - name: Run pyqual init (if no config)
       run: |
@@ -104,8 +105,24 @@ jobs:
         python << 'EOF'
         import json
         import sqlite3
+        import ast
         from pathlib import Path
         from datetime import datetime
+        
+        def safe_parse(data):
+            """Parse kwargs from SQLite, handling both JSON and Python repr formats."""
+            if not data:
+                return {}
+            try:
+                # Try JSON first (double quotes)
+                return json.loads(data)
+            except json.JSONDecodeError:
+                pass
+            try:
+                # Fall back to Python literal eval (single quotes, used by nfo)
+                return ast.literal_eval(data)
+            except (SyntaxError, ValueError):
+                return {}
         
         # Read pipeline results
         db_path = Path(".pyqual/pipeline.db")
@@ -131,7 +148,7 @@ jobs:
             ).fetchone()
             
             if end_row:
-                kwargs = json.loads(end_row["kwargs"])
+                kwargs = safe_parse(end_row["kwargs"])
                 summary["status"] = "passed" if kwargs.get("final_ok") else "failed"
                 summary["iterations"] = kwargs.get("iterations", 0)
                 summary["duration_s"] = kwargs.get("total_duration_s", 0)
@@ -140,27 +157,29 @@ jobs:
             for row in conn.execute(
                 "SELECT kwargs FROM pipeline_logs WHERE function_name='gate_check' ORDER BY id"
             ).fetchall():
-                gate = json.loads(row["kwargs"])
-                summary["gates"].append({
-                    "metric": gate.get("metric"),
-                    "value": gate.get("value"),
-                    "threshold": gate.get("threshold"),
-                    "passed": gate.get("ok")
-                })
-                if gate.get("metric"):
-                    summary["metrics"][gate.get("metric")] = gate.get("value")
+                gate = safe_parse(row["kwargs"])
+                if gate:
+                    summary["gates"].append({
+                        "metric": gate.get("metric"),
+                        "value": gate.get("value"),
+                        "threshold": gate.get("threshold"),
+                        "passed": gate.get("ok")
+                    })
+                    if gate.get("metric"):
+                        summary["metrics"][gate.get("metric")] = gate.get("value")
             
             # Get stage results
             for row in conn.execute(
                 "SELECT kwargs FROM pipeline_logs WHERE function_name='stage_done' ORDER BY id"
             ).fetchall():
-                stage = json.loads(row["kwargs"])
-                summary["stages"].append({
-                    "name": stage.get("stage"),
-                    "duration_s": stage.get("duration_s", 0),
-                    "passed": stage.get("ok"),
-                    "skipped": stage.get("skipped", False)
-                })
+                stage = safe_parse(row["kwargs"])
+                if stage:
+                    summary["stages"].append({
+                        "name": stage.get("stage"),
+                        "duration_s": stage.get("duration_s", 0),
+                        "passed": stage.get("ok"),
+                        "skipped": stage.get("skipped", False)
+                    })
             
             conn.close()
         

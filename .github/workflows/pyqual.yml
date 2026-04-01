@@ -16,8 +16,8 @@ jobs:
 
     - name: Install pyqual + tools
       run: |
-        pip install pyqual[all]
-        npm install -g @anthropic-ai/claude-code
+        pip install -e .
+        npm install -g @anthropic-ai/claude-code || true
 
     - name: Run quality gate loop
       run: pyqual run --config pyqual.yaml

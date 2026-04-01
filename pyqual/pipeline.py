@@ -577,10 +577,10 @@ class Pipeline:
 
         try:
             with open(history_path, "a") as f:
-                f.write(_json.dumps(entry, ensure_ascii=False, default=str) + "\n")
+                f.write(f"{_json.dumps(entry, ensure_ascii=False, default=str)}\n")
             log.info("llx_history: archived fix run to %s", history_path)
         except Exception as exc:
-            log.warning("llx_history: failed to archive: %s", exc)
+            log.warning(f"llx_history: failed to archive: {exc}")
 
     def _log_gates(self, iteration: int, gates: list[GateResult]) -> None:
         """Write structured nfo log entries for gate check results."""

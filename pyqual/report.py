@@ -25,6 +25,16 @@ from urllib.parse import quote
 import yaml
 
 from pyqual.config import PyqualConfig
+from pyqual.constants import (
+    BADGE_THRESHOLD_CC_LOW,
+    BADGE_THRESHOLD_CC_MED,
+    BADGE_THRESHOLD_CC_HIGH,
+    BADGE_THRESHOLD_EXCELLENT,
+    BADGE_THRESHOLD_GOOD,
+    BADGE_THRESHOLD_PASS,
+    BADGE_THRESHOLD_POOR,
+    BADGE_THRESHOLD_WARN,
+)
 from pyqual.gates import GateSet
 
 # ---------------------------------------------------------------------------
@@ -37,16 +47,16 @@ BADGE_END = "<!-- pyqual:badges:end -->"
 
 # Quality metric badges: (metric_key, label, color_fn, format_fn)
 _QUALITY_BADGE_DEFS: list[tuple[str, str, Any, Any]] = [
-    ("cc", "CC̄", lambda v: "brightgreen" if v <= 10 else "green" if v <= 15 else "orange" if v <= 25 else "red", lambda v: f"{v:.1f}"),
-    ("coverage", "coverage", lambda v: "brightgreen" if v >= 80 else "green" if v >= 60 else "orange" if v >= 40 else "red", lambda v: f"{v:.0f}%25"),
-    ("vallm_pass", "vallm", lambda v: "brightgreen" if v >= 90 else "green" if v >= 70 else "orange" if v >= 50 else "red", lambda v: f"{v:.0f}%25"),
+    ("cc", "CC̄", lambda v: "brightgreen" if v <= BADGE_THRESHOLD_CC_LOW else "green" if v <= BADGE_THRESHOLD_CC_MED else "orange" if v <= BADGE_THRESHOLD_CC_HIGH else "red", lambda v: f"{v:.1f}"),
+    ("coverage", "coverage", lambda v: "brightgreen" if v >= BADGE_THRESHOLD_EXCELLENT else "green" if v >= BADGE_THRESHOLD_GOOD else "orange" if v >= BADGE_THRESHOLD_POOR else "red", lambda v: f"{v:.0f}%25"),
+    ("vallm_pass", "vallm", lambda v: "brightgreen" if v >= BADGE_THRESHOLD_PASS else "green" if v >= 70 else "orange" if v >= BADGE_THRESHOLD_WARN else "red", lambda v: f"{v:.0f}%25"),
     ("critical", "critical", lambda v: "brightgreen" if v == 0 else "red", lambda v: f"{v:.0f}"),
     ("error_count", "errors", lambda v: "brightgreen" if v == 0 else "orange" if v <= 5 else "red", lambda v: f"{v:.0f}"),
-    ("maintainability_index", "MI", lambda v: "brightgreen" if v >= 80 else "green" if v >= 60 else "orange" if v >= 40 else "red", lambda v: f"{v:.0f}"),
+    ("maintainability_index", "MI", lambda v: "brightgreen" if v >= BADGE_THRESHOLD_EXCELLENT else "green" if v >= BADGE_THRESHOLD_GOOD else "orange" if v >= BADGE_THRESHOLD_POOR else "red", lambda v: f"{v:.0f}"),
     ("ruff_errors", "ruff", lambda v: "brightgreen" if v == 0 else "orange" if v <= 10 else "red", lambda v: f"{v:.0f}"),
     ("mypy_errors", "mypy", lambda v: "brightgreen" if v == 0 else "orange" if v <= 5 else "red", lambda v: f"{v:.0f}"),
     ("bandit_high", "bandit", lambda v: "brightgreen" if v == 0 else "red", lambda v: f"{v:.0f}%20high"),
-    ("docstring_coverage", "docstrings", lambda v: "brightgreen" if v >= 80 else "green" if v >= 60 else "orange" if v >= 40 else "red", lambda v: f"{v:.0f}%25"),
+    ("docstring_coverage", "docstrings", lambda v: "brightgreen" if v >= BADGE_THRESHOLD_EXCELLENT else "green" if v >= BADGE_THRESHOLD_GOOD else "orange" if v >= BADGE_THRESHOLD_POOR else "red", lambda v: f"{v:.0f}%25"),
 ]
 
 
