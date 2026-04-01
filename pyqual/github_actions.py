@@ -47,10 +47,92 @@ class GitHubActionsReporter:
         self.sha = os.environ.get("GITHUB_SHA")
         self.ref = os.environ.get("GITHUB_REF")
         
+    def create_issue(
+        self,
+        title: str,
+        body: str,
+        labels: list[str] | None = None,
+    ) -> int | None:
+        """Create a new GitHub issue. Returns issue number or None."""
+        if not self.token or not self.repo:
+            print("GITHUB_TOKEN or GITHUB_REPOSITORY not set")
+            return None
+        
+        labels = labels or []
+        
+        cmd = [
+            "gh", "api",
+            "-X", "POST",
+            f"repos/{self.repo}/issues",
+            "-f", f"title={title}",
+            "-f", f"body={body}",
+        ]
+        
+        for label in labels:
+            cmd.extend(["-f", f"labels[]={label}"])
+        
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            env={**os.environ, "GH_TOKEN": self.token}
+        )
+        
+        if result.returncode == 0:
+            try:
+                data = json.loads(result.stdout)
+                issue_num = data.get("number")
+                print(f"Created issue #{issue_num}: {title}")
+                return issue_num
+            except json.JSONDecodeError:
+                print(f"Failed to parse issue creation response: {result.stdout[:200]}")
+                return None
+        else:
+            print(f"Failed to create issue: {result.stderr[:200]}")
+            return None
+
+    def ensure_issue_exists(
+        self,
+        title: str,
+        body: str,
+        labels: list[str] | None = None,
+    ) -> int | None:
+        """Create issue if no open issue with same title exists."""
+        labels = labels or []
+        
+        # Search for existing open issue with same title
+        if self.token and self.repo:
+            cmd = [
+                "gh", "search", "issues",
+                title,
+                "--repo", self.repo,
+                "--state", "open",
+                "--json", "number,title",
+                "--limit", "5"
+            ]
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                env={**os.environ, "GH_TOKEN": self.token}
+            )
+            if result.returncode == 0:
+                try:
+                    existing = json.loads(result.stdout)
+                    for issue in existing:
+                        if title.lower() in issue.get("title", "").lower():
+                            print(f"Issue already exists: #{issue['number']}")
+                            return issue["number"]
+                except json.JSONDecodeError:
+                    pass
+        
+        # Create new issue
+        return self.create_issue(title, body, labels)
+
     def is_running_in_github_actions(self) -> bool:
         """Check if running in GitHub Actions environment."""
         return os.environ.get("GITHUB_ACTIONS") == "true"
-    
+
     def get_pr_number(self) -> int | None:
         """Extract PR number from GitHub event."""
         if not self.event_path:
