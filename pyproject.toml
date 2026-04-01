@@ -24,8 +24,6 @@ dependencies = [
     "litellm>=1.0",
     "python-dotenv>=1.0",
     "nfo>=0.2.13",
-    "prefact",
-    "planfile",
 ]
 
 [project.optional-dependencies]
