@@ -80,12 +80,13 @@ jobs:
         # Save issue metadata for later
         meta_path = Path(".pyqual/triggering_issue.json")
         meta_path.parent.mkdir(parents=True, exist_ok=True)
-        json.dump({
-            "number": int(issue_number),
-            "title": issue_title,
-            "body": issue_body[:1000],
-            "action": os.environ.get("ISSUE_ACTION", "opened")
-        }, meta_path, indent=2)
+        with open(meta_path, "w") as f:
+            json.dump({
+                "number": int(issue_number),
+                "title": issue_title,
+                "body": issue_body[:1000],
+                "action": os.environ.get("ISSUE_ACTION", "opened")
+            }, f, indent=2)
         print(f"Saved issue metadata to {meta_path}")
         EOF
         echo "::endgroup::"
