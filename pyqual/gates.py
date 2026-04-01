@@ -68,6 +68,18 @@ class GateSet:
         """Return True if all gates pass."""
         return all(r.passed for r in self.check_all(workdir))
 
+    def completion_percentage(self, workdir: Path = Path(".")) -> float:
+        """Calculate ticket completion percentage based on passed gates.
+        
+        Returns percentage (0-100) indicating how complete the ticket is.
+        Each gate contributes equally to the total score.
+        """
+        results = self.check_all(workdir)
+        if not results:
+            return 0.0
+        passed_count = sum(1 for r in results if r.passed)
+        return (passed_count / len(results)) * 100
+
     def _collect_metrics(self, workdir: Path) -> dict[str, float]:
         """Collect metrics from .pyqual/ artifacts and .toon files."""
         from pyqual._gate_collectors import _COLLECTORS
