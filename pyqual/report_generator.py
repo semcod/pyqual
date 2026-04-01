@@ -8,8 +8,6 @@ Creates a comprehensive report with:
 - Current metrics and gates status
 """
 
-from __future__ import annotations
-
 import json
 import sqlite3
 from dataclasses import dataclass

@@ -39,8 +39,6 @@ To override a built-in preset, create ``pyqual.tools.json`` next to your
     }
 """
 
-from __future__ import annotations
-
 import json
 import logging
 import shutil

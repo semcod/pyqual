@@ -61,7 +61,10 @@ LOG_DETAIL_MAX_LEN = 80    # max chars for fallback log detail display
 MODEL_COLUMN_WIDTH = 28  # width for model column in tables
 
 # ---------------------------------------------------------------------------
-# Default metric thresholds
+# Default timeouts for profile stages
+# ---------------------------------------------------------------------------
+PREFACT_TIMEOUT = 900   # 15 minutes
+FIX_TIMEOUT = 1800      # 30 minutes
 # ---------------------------------------------------------------------------
 DEFAULT_VALLM_PASS_MIN = 90   # default vallm pass percentage minimum
 DEFAULT_COVERAGE_MIN = 80     # default test coverage minimum percentage
@@ -73,3 +76,14 @@ TODO_HEAD_CHARS = 500          # chars to read from TODO.md header for parsing
 STAGE_OUTPUT_MAX_CHARS = 200   # max chars for last meaningful output line
 ERROR_MSG_MAX_CHARS = 200      # max chars for error messages in bulk run
 ERROR_MSG_PREVIEW_CHARS = 30   # max chars for error message preview
+
+# ---------------------------------------------------------------------------
+# Additional magic numbers from TODO cleanup
+# ---------------------------------------------------------------------------
+BULK_INIT_MAX_CHARS = 500      # from bulk_init.py:249
+BULK_RUN_ERROR_LINES = 200     # from bulk_run.py:324
+BULK_RUN_STATUS_INTERVAL = 30  # from bulk_run.py:383
+BULK_RUN_TABLE_WIDTH = 50      # from bulk_run.py:431
+REPORT_GATE_COVERAGE = 80      # from report.py:43
+REPORT_GATE_VALLM = 90         # from report.py:44
+REPORT_GATE_SECURITY = 80      # from report.py:47

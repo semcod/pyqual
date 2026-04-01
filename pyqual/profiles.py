@@ -16,7 +16,13 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from pyqual.constants import DEFAULT_CC_MAX, DEFAULT_COVERAGE_MIN, DEFAULT_VALLM_PASS_MIN
+from pyqual.constants import (
+    DEFAULT_CC_MAX,
+    DEFAULT_COVERAGE_MIN,
+    DEFAULT_VALLM_PASS_MIN,
+    PREFACT_TIMEOUT,
+    FIX_TIMEOUT,
+)
 
 
 @dataclass(frozen=True)
@@ -40,8 +46,8 @@ PROFILES: dict[str, PipelineProfile] = {
             {"name": "analyze", "tool": "code2llm"},
             {"name": "validate", "tool": "vallm"},
             {"name": "test", "tool": "pytest", "optional": True},
-            {"name": "prefact", "tool": "prefact", "optional": True, "timeout": 900},
-            {"name": "fix", "tool": "llx-fix", "optional": True, "timeout": 1800},
+            {"name": "prefact", "tool": "prefact", "optional": True, "timeout": PREFACT_TIMEOUT},
+            {"name": "fix", "tool": "llx-fix", "optional": True, "timeout": FIX_TIMEOUT},
             {"name": "verify", "tool": "vallm", "optional": True},
         ],
         metrics={
@@ -57,8 +63,8 @@ PROFILES: dict[str, PipelineProfile] = {
             {"name": "analyze", "tool": "code2llm"},
             {"name": "validate", "tool": "vallm"},
             {"name": "test", "tool": "pytest", "optional": True},
-            {"name": "prefact", "tool": "prefact", "optional": True, "timeout": 900},
-            {"name": "fix", "tool": "llx-fix", "optional": True, "timeout": 1800},
+            {"name": "prefact", "tool": "prefact", "optional": True, "timeout": PREFACT_TIMEOUT},
+            {"name": "fix", "tool": "llx-fix", "optional": True, "timeout": FIX_TIMEOUT},
             {"name": "verify", "tool": "vallm", "optional": True},
             {"name": "push", "run": "goal push --bump patch --no-publish --todo --model ${LLM_MODEL}", "optional": True, "timeout": 120},
             {"name": "publish", "run": "goal publish", "optional": True, "timeout": 300},

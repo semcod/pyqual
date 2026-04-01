@@ -1056,6 +1056,73 @@ def tickets_all(
         raise typer.Exit(1)
 
 
+@tickets_app.command("fetch")
+def tickets_fetch(
+    label: str | None = typer.Option(None, "--label", "-l", help="Filter by label (e.g. 'pyqual-fix')"),
+    state: str = typer.Option("open", "--state", "-s", help="Issue state: open, closed, all"),
+    output: Path = typer.Option(None, "--output", "-o", help="Output JSON file"),
+    todo_output: Path = typer.Option(None, "--todo-output", "-t", help="Append to TODO.md"),
+    append: bool = typer.Option(False, "--append", "-a", help="Append to TODO.md instead of overwrite"),
+) -> None:
+    """Fetch GitHub issues/PRs as tasks.
+    
+    Examples:
+        pyqual tickets fetch --label pyqual-fix
+        pyqual tickets fetch --label bug --output tasks.json
+        pyqual tickets fetch --todo-output TODO.md --append
+    """
+    from pyqual.github_tasks import fetch_github_tasks, save_tasks_to_json, save_tasks_to_todo
+    
+    tasks = fetch_github_tasks(
+        label=label,
+        state=state,
+        include_prs=True,
+        include_issues=True,
+    )
+    
+    if not tasks:
+        console.print("[yellow]No tasks found matching criteria[/yellow]")
+        raise typer.Exit(0)
+    
+    console.print(f"[bold]Found {len(tasks)} tasks[/bold]")
+    for t in tasks:
+        console.print(f"  - #{t.number}: {t.title[:50]}{'...' if len(t.title) > 50 else ''}")
+    
+    if output:
+        save_tasks_to_json(tasks, output)
+    
+    if todo_output:
+        save_tasks_to_todo(tasks, todo_output, append=append)
+
+
+@tickets_app.command("comment")
+def tickets_comment(
+    issue_number: int = typer.Argument(..., help="Issue or PR number"),
+    message: str = typer.Argument(..., help="Comment text"),
+    is_pr: bool = typer.Option(False, "--pr", help="Comment on PR instead of issue"),
+) -> None:
+    """Post a comment on a GitHub issue or PR.
+    
+    Examples:
+        pyqual tickets comment 123 "Fix applied successfully"
+        pyqual tickets comment 456 "Failed due to timeout" --pr
+    """
+    from pyqual.github_actions import GitHubActionsReporter
+    
+    reporter = GitHubActionsReporter()
+    
+    if is_pr:
+        success = reporter.post_pr_comment(message, issue_number)
+    else:
+        success = reporter.post_issue_comment(message, issue_number)
+    
+    if success:
+        console.print(f"[green]✅ Comment posted to #{issue_number}[/green]")
+    else:
+        console.print(f"[red]❌ Failed to post comment[/red]")
+        raise typer.Exit(1)
+
+
 @app.command()
 def plugin(
     action: str = typer.Argument(..., help="Action: list, add, remove, info, search, validate"),

@@ -255,7 +255,7 @@ def main() -> int:
         print("\n[DRY RUN] Would execute:")
         for cfg in tool_configs:
             print(f"  - {cfg['name']}: timeout={cfg['timeout']}s")
-        print(f"\n[DRY RUN] Skipping actual execution")
+        print("\n[DRY RUN] Skipping actual execution")
         return 0
     
     # Run tools in parallel

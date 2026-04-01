@@ -13,7 +13,6 @@ import os
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
 
 
 @dataclass
@@ -99,7 +98,7 @@ class GitHubActionsReporter:
                     body=i.get("body", ""),
                     state=i["state"],
                     html_url=i["url"],
-                    labels=[l["name"] for l in i.get("labels", [])],
+                    labels=[label["name"] for label in i.get("labels", [])],
                     assignees=[a["login"] for a in i.get("assignees", [])],
                     source="issue"
                 )
@@ -136,7 +135,7 @@ class GitHubActionsReporter:
                     body=p.get("body", ""),
                     state=p["state"],
                     html_url=p["url"],
-                    labels=[l["name"] for l in p.get("labels", [])],
+                    labels=[label["name"] for label in p.get("labels", [])],
                     assignees=[a["login"] for a in p.get("assignees", [])],
                     source="pull_request"
                 )

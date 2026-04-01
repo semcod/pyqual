@@ -22,8 +22,6 @@ whether to auto-fix the config (CONFIG/ENV) or let the fix-stage handle it
 (PROJECT) or surface it to the user (PIPELINE/LLM).
 """
 
-from __future__ import annotations
-
 import re
 import shutil
 from dataclasses import dataclass, field
