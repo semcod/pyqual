@@ -10,6 +10,8 @@ import re
 from pathlib import Path
 from typing import Any
 
+from pyqual.constants import STAGE_OUTPUT_MAX_CHARS, TODO_HEAD_CHARS
+
 
 # ---------------------------------------------------------------------------
 # Stage output → metric extraction
@@ -191,7 +193,7 @@ def enrich_from_artifacts(workdir: Path, stages: list[dict[str, Any]]) -> None:
     # TODO.md → prefact stage
     todo = workdir / "TODO.md"
     if todo.exists():
-        head = todo.read_text(errors="replace")[:500]
+        head = todo.read_text(errors="replace")[:TODO_HEAD_CHARS]
         m_t = re.search(r"\*?\*?Total issues:\*?\*?\s*(\d+)\s*active(?:,\s*(\d+)\s*completed)?", head)
         if m_t:
             for sd in stages:
@@ -311,5 +313,5 @@ def get_last_error_line(text: str) -> str:
              if ln.strip() and not any(ln.strip().startswith(p) for p in noise_prefixes)]
     err_lines = [ln for ln in clean if any(kw in ln.lower() for kw in error_kws)]
     if err_lines:
-        return err_lines[-1][:200]
-    return clean[-1][:200] if clean else ""
+        return err_lines[-1][:STAGE_OUTPUT_MAX_CHARS]
+    return clean[-1][:STAGE_OUTPUT_MAX_CHARS] if clean else ""

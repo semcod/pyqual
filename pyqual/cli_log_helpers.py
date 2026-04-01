@@ -11,7 +11,7 @@ import ast
 import sqlite3
 from pathlib import Path
 
-from pyqual.constants import PIPELINE_TABLE
+from pyqual.constants import LOG_DETAIL_MAX_LEN, PIPELINE_TABLE, TIMESTAMP_COL_WIDTH, TIMESTAMP_TIME_START
 
 
 def query_nfo_db(db_path: Path, event: str = "", failed: bool = False,
@@ -74,7 +74,7 @@ def row_to_event_dict(row: dict) -> dict:
 
 def format_log_entry_row(entry: dict) -> tuple:
     """Return (ts, event_name, name, status, details) for one log entry."""
-    ts = entry.get("_timestamp", "")[:19].replace("T", " ")[11:]
+    ts = entry.get("_timestamp", "")[:TIMESTAMP_COL_WIDTH].replace("T", " ")[TIMESTAMP_TIME_START:]
     event_name = entry.get("event", entry.get("_function_name", ""))
     ok = entry.get("ok")
     status = "[green]PASS[/green]" if ok else ("[red]FAIL[/red]" if ok is False else "[dim]—[/dim]")
@@ -114,6 +114,6 @@ def format_log_entry_row(entry: dict) -> tuple:
             parts.append(f"{dur_s:.1f}s" if isinstance(dur_s, (int, float)) else str(dur_s))
         details = " ".join(parts)
     else:
-        details = str(entry)[:80]
+        details = str(entry)[:LOG_DETAIL_MAX_LEN]
 
     return ts, event_name, name, status, details

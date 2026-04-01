@@ -116,7 +116,7 @@ pipeline:
     # Uses parallel execution with multiple tools (Claude Code + llx)
     - name: todo_fix
       run: python3 -m pyqual.run_parallel_fix
-      when: metrics_pass
+      when: never
       optional: true
       timeout: 1800
 

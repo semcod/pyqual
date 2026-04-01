@@ -16,6 +16,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
+from pyqual.constants import DEFAULT_CC_MAX, DEFAULT_COVERAGE_MIN, DEFAULT_VALLM_PASS_MIN
+
 
 @dataclass(frozen=True)
 class PipelineProfile:
@@ -43,9 +45,9 @@ PROFILES: dict[str, PipelineProfile] = {
             {"name": "verify", "tool": "vallm", "optional": True},
         ],
         metrics={
-            "cc_max": 15,
-            "vallm_pass_min": 90,
-            "coverage_min": 80,
+            "cc_max": DEFAULT_CC_MAX,
+            "vallm_pass_min": DEFAULT_VALLM_PASS_MIN,
+            "coverage_min": DEFAULT_COVERAGE_MIN,
         },
     ),
 
@@ -62,9 +64,9 @@ PROFILES: dict[str, PipelineProfile] = {
             {"name": "publish", "run": "goal publish", "optional": True, "timeout": 300},
         ],
         metrics={
-            "cc_max": 15,
-            "vallm_pass_min": 90,
-            "coverage_min": 80,
+            "cc_max": DEFAULT_CC_MAX,
+            "vallm_pass_min": DEFAULT_VALLM_PASS_MIN,
+            "coverage_min": DEFAULT_COVERAGE_MIN,
         },
     ),
 
@@ -76,8 +78,8 @@ PROFILES: dict[str, PipelineProfile] = {
             {"name": "test", "tool": "pytest", "optional": True},
         ],
         metrics={
-            "cc_max": 15,
-            "coverage_min": 80,
+            "cc_max": DEFAULT_CC_MAX,
+            "coverage_min": DEFAULT_COVERAGE_MIN,
         },
         loop={"max_iterations": 1},
     ),
@@ -90,9 +92,9 @@ PROFILES: dict[str, PipelineProfile] = {
             {"name": "test", "tool": "pytest", "optional": True},
         ],
         metrics={
-            "cc_max": 15,
-            "vallm_pass_min": 90,
-            "coverage_min": 80,
+            "cc_max": DEFAULT_CC_MAX,
+            "vallm_pass_min": DEFAULT_VALLM_PASS_MIN,
+            "coverage_min": DEFAULT_COVERAGE_MIN,
         },
         loop={"max_iterations": 1, "on_fail": "report"},
     ),
@@ -106,8 +108,8 @@ PROFILES: dict[str, PipelineProfile] = {
             {"name": "test", "tool": "pytest", "optional": True},
         ],
         metrics={
-            "cc_max": 15,
-            "coverage_min": 80,
+            "cc_max": DEFAULT_CC_MAX,
+            "coverage_min": DEFAULT_COVERAGE_MIN,
         },
         loop={"max_iterations": 1},
     ),

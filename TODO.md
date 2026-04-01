@@ -36,20 +36,20 @@
 - [ ] pyqual/cli.py:534 - Duplicate import: 'LLM' (first at line 748)
 - [ ] pyqual/cli.py:1412 - Magic number: 28 - use named constant
 - [ ] pyqual/cli.py:1465 - module execution block
-- [ ] pyqual/cli_log_helpers.py:8 - Unused import: 'annotations'
-- [ ] pyqual/cli_log_helpers.py:13 - Unused import: 'Any'
-- [ ] pyqual/cli_log_helpers.py:78 - Magic number: 11 - use named constant
-- [ ] pyqual/cli_log_helpers.py:78 - Magic number: 19 - use named constant
-- [ ] pyqual/cli_log_helpers.py:118 - Magic number: 80 - use named constant
-- [ ] pyqual/cli_run_helpers.py:7 - Unused import: 'annotations'
-- [ ] pyqual/cli_run_helpers.py:194 - Magic number: 500 - use named constant
-- [ ] pyqual/cli_run_helpers.py:314 - Magic number: 200 - use named constant
-- [ ] pyqual/cli_run_helpers.py:315 - Magic number: 200 - use named constant
+- [x] pyqual/cli_log_helpers.py:8 - Unused import: 'annotations'
+- [x] pyqual/cli_log_helpers.py:13 - Unused import: 'Any'
+- [x] pyqual/cli_log_helpers.py:78 - Magic number: 11 - use named constant
+- [x] pyqual/cli_log_helpers.py:78 - Magic number: 19 - use named constant
+- [x] pyqual/cli_log_helpers.py:118 - Magic number: 80 - use named constant
+- [x] pyqual/cli_run_helpers.py:7 - Unused import: 'annotations'
+- [x] pyqual/cli_run_helpers.py:194 - Magic number: 500 - use named constant
+- [x] pyqual/cli_run_helpers.py:314 - Magic number: 200 - use named constant
+- [x] pyqual/cli_run_helpers.py:315 - Magic number: 200 - use named constant
 - [ ] pyqual/config.py:3 - Unused import: 'annotations'
-- [ ] pyqual/constants.py:1 - High comment-to-code ratio: 15/21
-- [ ] pyqual/constants.py:6 - Magic number: 124 - use named constant
-- [ ] pyqual/constants.py:7 - Magic number: 500 - use named constant
-- [ ] pyqual/constants.py:8 - Magic number: 2000 - use named constant
+- [x] pyqual/constants.py:1 - High comment-to-code ratio: 15/21
+- [x] pyqual/constants.py:6 - Magic number: 124 - use named constant
+- [x] pyqual/constants.py:7 - Magic number: 500 - use named constant
+- [x] pyqual/constants.py:8 - Magic number: 2000 - use named constant
 - [ ] pyqual/integrations/llx_mcp.py:9 - Unused import: 'annotations'
 - [ ] pyqual/integrations/llx_mcp.py:101 - module execution block
 - [ ] pyqual/integrations/llx_mcp_service.py:9 - Unused import: 'annotations'
@@ -64,10 +64,10 @@
 - [ ] pyqual/parallel.py:308 - Magic number: 300 - use named constant
 - [ ] pyqual/pipeline.py:3 - Unused import: 'annotations'
 - [ ] pyqual/pipeline.py:582 - String concatenation can be converted to f-string
-- [ ] pyqual/profiles.py:14 - Unused import: 'annotations'
-- [ ] pyqual/profiles.py:46 - Magic number: 15 - use named constant
-- [ ] pyqual/profiles.py:47 - Magic number: 90 - use named constant
-- [ ] pyqual/profiles.py:48 - Magic number: 80 - use named constant
+- [x] pyqual/profiles.py:14 - Unused import: 'annotations'
+- [x] pyqual/profiles.py:46 - Magic number: 15 - use named constant
+- [x] pyqual/profiles.py:47 - Magic number: 90 - use named constant
+- [x] pyqual/profiles.py:48 - Magic number: 80 - use named constant
 - [ ] pyqual/report.py:15 - Unused import: 'annotations'
 - [ ] pyqual/report.py:43 - Magic number in comparison: 80
 - [ ] pyqual/report.py:44 - Magic number in comparison: 90

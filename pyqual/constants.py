@@ -46,5 +46,19 @@ BULK_STAGE_COLUMN_MAX_WIDTH = 20
 # ---------------------------------------------------------------------------
 # CLI formatting
 # ---------------------------------------------------------------------------
-TIMESTAMP_COL_WIDTH = 19  # "YYYY-MM-DD HH:MM:SS"
-BULK_PASS_PREVIEW = 20    # max passed-gate names to show inline
+TIMESTAMP_COL_WIDTH = 19   # "YYYY-MM-DD HH:MM:SS"
+TIMESTAMP_TIME_START = 11  # offset to skip "YYYY-MM-DD " prefix
+BULK_PASS_PREVIEW = 20     # max passed-gate names to show inline
+LOG_DETAIL_MAX_LEN = 80    # max chars for fallback log detail display
+
+# ---------------------------------------------------------------------------
+# Default metric thresholds
+# ---------------------------------------------------------------------------
+DEFAULT_VALLM_PASS_MIN = 90   # default vallm pass percentage minimum
+DEFAULT_COVERAGE_MIN = 80     # default test coverage minimum percentage
+
+# ---------------------------------------------------------------------------
+# Text truncation limits
+# ---------------------------------------------------------------------------
+TODO_HEAD_CHARS = 500          # chars to read from TODO.md header for parsing
+STAGE_OUTPUT_MAX_CHARS = 200   # max chars for last meaningful output line
