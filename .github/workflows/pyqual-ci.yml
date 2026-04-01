@@ -67,15 +67,28 @@ jobs:
         
         print(f"Processing issue #{issue_number}: {issue_title[:60]}...")
         
-        # Create TODO.md with only this issue
+        # Read existing TODO.md if present (preserves prefact-generated content)
         todo_path = Path("TODO.md")
-        todo_content = "# GitHub Issue #" + issue_number + "\n\n"
-        todo_content += "- [ ] #" + issue_number + ": " + issue_title + "\n\n"
-        todo_content += "### Issue Body\n"
+        existing_content = ""
+        if todo_path.exists():
+            existing_content = todo_path.read_text()
+            print("Preserved existing TODO.md content from prefact")
+        
+        # Create GitHub issue section
+        github_section = f"# GitHub Issue #{issue_number}\n\n"
+        github_section += f"- [ ] #{issue_number}: {issue_title}\n\n"
+        github_section += "### Issue Body\n"
         todo_body = issue_body[:500] + "..." if len(issue_body) > 500 else issue_body
-        todo_content += todo_body + "\n\n---\n*Auto-generated from GitHub issue event*\n"
+        github_section += todo_body + "\n\n---\n*Auto-generated from GitHub issue event*\n"
+        
+        # Combine: GitHub issue first, then existing prefact content
+        if existing_content:
+            todo_content = github_section + "\n" + existing_content
+        else:
+            todo_content = github_section
+        
         todo_path.write_text(todo_content)
-        print(f"Created TODO.md with issue #{issue_number}")
+        print(f"Created TODO.md with issue #{issue_number} + {len(existing_content)} bytes existing content")
         
         # Save issue metadata for later
         meta_path = Path(".pyqual/triggering_issue.json")
