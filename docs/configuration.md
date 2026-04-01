@@ -459,6 +459,58 @@ pyqual works with **any AI coding agent** that has a CLI: Claude Code, Codex CLI
 
 **→ See [AI Fix Tools](ai-fix-tools.md) for complete `pyqual.yaml` examples for each tool.**
 
+## Constants Reference
+
+pyqual uses centralized constants to avoid magic numbers throughout the codebase. These are available in `pyqual.constants`:
+
+### Default Thresholds
+
+```python
+from pyqual.constants import (
+    DEFAULT_CC_MAX,           # 15 - cyclomatic complexity limit
+    DEFAULT_VALLM_PASS_MIN,   # 90 - vallm pass rate (%)
+    DEFAULT_COVERAGE_MIN,     # 80 - test coverage (%)
+)
+```
+
+### Profile Timeouts
+
+```python
+from pyqual.constants import (
+    PREFACT_TIMEOUT,    # 900s (15 min) - prefact analysis timeout
+    FIX_TIMEOUT,        # 1800s (30 min) - LLM fix timeout
+    DEFAULT_STAGE_TIMEOUT,  # 300s (5 min) - default stage timeout
+)
+```
+
+### Badge Thresholds (for README badges)
+
+```python
+from pyqual.constants import (
+    BADGE_THRESHOLD_CC_LOW,      # 10 - excellent CC
+    BADGE_THRESHOLD_CC_MED,      # 15 - good CC
+    BADGE_THRESHOLD_CC_HIGH,     # 25 - acceptable CC
+    BADGE_THRESHOLD_EXCELLENT,   # 80 - excellent metric
+    BADGE_THRESHOLD_GOOD,        # 75 - good metric
+    BADGE_THRESHOLD_PASS,        # 60 - pass threshold
+    BADGE_THRESHOLD_POOR,        # 40 - poor threshold
+)
+```
+
+### Usage in Your Code
+
+```python
+from pyqual.config import PyqualConfig
+from pyqual.constants import DEFAULT_CC_MAX, DEFAULT_COVERAGE_MIN
+
+config = PyqualConfig.load("pyqual.yaml")
+# Override with constants
+config.metrics["cc_max"] = DEFAULT_CC_MAX
+config.metrics["coverage_min"] = DEFAULT_COVERAGE_MIN
+```
+
+---
+
 ## Examples
 
 See the [examples/](../examples/) directory for complete configurations:

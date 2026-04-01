@@ -252,12 +252,48 @@ print(fixed.content)
 
 ## Named Constants
 
-| Constant | Module | Default | Description |
-|----------|--------|---------|-------------|
-| `DEFAULT_STAGE_TIMEOUT` | `pyqual.config` | 300 | Stage timeout in seconds |
-| `DEFAULT_MCP_PORT` | `pyqual.cli` | 8000 | MCP service port |
-| `DEFAULT_MAX_TOKENS` | `llx.llm` (re-exported by `pyqual.llm`) | 2000 | LLM max response tokens |
-| `TIMEOUT_EXIT_CODE` | `pyqual.pipeline` | 124 | Exit code for timed-out stages |
+All constants are centralized in `pyqual.constants` for consistency:
+
+### Importing Constants
+
+```python
+from pyqual.constants import (
+    # Default thresholds
+    DEFAULT_CC_MAX,           # 15
+    DEFAULT_VALLM_PASS_MIN,   # 90
+    DEFAULT_COVERAGE_MIN,     # 80
+    
+    # Timeouts
+    PREFACT_TIMEOUT,          # 900 (15 min)
+    FIX_TIMEOUT,              # 1800 (30 min)
+    DEFAULT_STAGE_TIMEOUT,    # 300 (5 min)
+    
+    # Badge thresholds
+    BADGE_THRESHOLD_CC_LOW,   # 10
+    BADGE_THRESHOLD_CC_MED,   # 15
+    BADGE_THRESHOLD_CC_HIGH,  # 25
+    BADGE_THRESHOLD_EXCELLENT, # 80
+    
+    # CLI formatting
+    TIMESTAMP_COL_WIDTH,      # 19
+    BULK_PASS_PREVIEW,        # 20
+)
+```
+
+### Constants Reference Table
+
+| Constant | Value | Description |
+|----------|-------|-------------|
+| `DEFAULT_CC_MAX` | 15 | Cyclomatic complexity limit |
+| `DEFAULT_VALLM_PASS_MIN` | 90 | vallm pass rate (%) |
+| `DEFAULT_COVERAGE_MIN` | 80 | Test coverage (%) |
+| `PREFACT_TIMEOUT` | 900 | Prefact stage timeout (15 min) |
+| `FIX_TIMEOUT` | 1800 | LLM fix stage timeout (30 min) |
+| `DEFAULT_STAGE_TIMEOUT` | 300 | Default stage timeout (5 min) |
+| `BADGE_THRESHOLD_CC_LOW` | 10 | Excellent CC for badges |
+| `BADGE_THRESHOLD_CC_MED` | 15 | Good CC for badges |
+| `BADGE_THRESHOLD_CC_HIGH` | 25 | Acceptable CC for badges |
+| `DEFAULT_MAX_TOKENS` | 2000 | LLM max response tokens |
 
 ## Examples
 

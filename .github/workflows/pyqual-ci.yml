@@ -329,6 +329,8 @@ jobs:
       if: steps.pyqual-run.outputs.exit_code == '0'
       run: |
         if [ -n "$(git status --porcelain)" ]; then
+          git config user.email "pyqual-bot@semcod.github.io"
+          git config user.name "Pyqual Bot"
           git add -A
           git commit -m "fix: pyqual auto-fix [ci skip]" || true
           git push origin HEAD || true
