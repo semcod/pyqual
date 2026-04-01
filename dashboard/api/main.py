@@ -25,6 +25,8 @@ from dashboard.constants import (
     PIPELINE_DB_NAME,
     SUMMARY_JSON_NAME,
     STATIC_DIR,
+    HTTP_NOT_FOUND,
+    HTTP_UNAUTHORIZED,
 )
 
 # Configure logging

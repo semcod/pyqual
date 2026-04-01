@@ -1213,3 +1213,29 @@ sprints:
     model_hints:
       planning: balanced
       implementation: balanced
+  - id: ticket-eb54a8a1
+    name: Fix magic-numbers issues
+    description: Resolve 8 magic-numbers issues in dashboard/constants.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - dashboard/constants.py
+    rule_id: magic-numbers
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2055ce81
+    name: Fix llm-generated-code issues
+    description: Resolve 1 llm-generated-code issues in pyqual/run_parallel_fix.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/run_parallel_fix.py
+    rule_id: llm-generated-code
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced

@@ -13,6 +13,14 @@ from typing import Any
 from pyqual.constants import STAGE_OUTPUT_MAX_CHARS, TODO_HEAD_CHARS
 
 
+def count_todo_items(todo_path: Path) -> int:
+    """Count pending TODO items in TODO.md."""
+    if not todo_path.exists():
+        return 0
+    content = todo_path.read_text()
+    return content.count("- [ ]")
+
+
 # ---------------------------------------------------------------------------
 # Stage output → metric extraction
 # ---------------------------------------------------------------------------

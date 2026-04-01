@@ -79,7 +79,7 @@ pipeline:
         [ -f .pyqual/errors.json ] && ERRORS=$(cat .pyqual/errors.json)
         [ -f TODO.md ] && ERRORS="$ERRORS
         $(cat TODO.md)"
-        if claude -p "Fix all quality gate failures in this Python project. Apply changes directly.
+        if timeout 900 claude -p "Fix all quality gate failures in this Python project. Apply changes directly.
 
         $ERRORS" \
           --model sonnet \
@@ -88,11 +88,11 @@ pipeline:
           echo "Claude Code fix completed."
         else
           rc=$?
-          echo "Claude Code exited with $rc; falling back to llx fix."
+          echo "Claude Code exited with $rc (timeout=900s); falling back to llx fix."
           llx fix . --apply --errors .pyqual/errors.json --verbose
         fi
       when: metrics_fail
-      timeout: 1800
+      timeout: 1200
 
     # LLX fallback (uncomment if Claude Code unavailable)
     # - name: fix
@@ -116,7 +116,7 @@ pipeline:
     # Uses parallel execution with multiple tools (Claude Code + llx)
     - name: todo_fix
       run: python3 -m pyqual.run_parallel_fix
-      when: never
+      when: metrics_pass
       optional: true
       timeout: 1800
 
