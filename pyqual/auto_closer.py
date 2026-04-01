@@ -1,20 +1,23 @@
 #!/usr/bin/env python3
-"""Automated ticket closer based on pyqual quality gates.
+"""Automated ticket closer and evaluator based on pyqual quality gates.
 
 Marks planfile tickets as 'done' if:
-1. All quality gates in pyqual.yaml pass.
-2. The ticket is currently 'open' or 'in_progress'.
-3. (Optional) The ticket is related to recently modified files.
+1. Quality gates recorded in .pyqual/metrics_report.yaml pass.
+2. The ticket is currently 'in_progress'.
+3. The ticket is related to recently modified files.
+
+New features:
+- LLM-based evaluation of the implementation.
+- Automated GitHub commenting with evaluation scores.
 """
 
 import os
 import subprocess
 import sys
+import yaml
 from pathlib import Path
 
-from pyqual.config import PyqualConfig
-from pyqual.gates import GateSet
-from planfile import Planfile, TicketStatus
+REPORT_FILE = ".pyqual/metrics_report.yaml"
 
 
 def get_changed_files() -> set[str]:
@@ -40,71 +43,145 @@ def get_changed_files() -> set[str]:
         return set()
 
 
+def get_diff_content() -> str:
+    """Get the unified diff of recent changes."""
+    try:
+        res = subprocess.run(
+            ["git", "diff", "HEAD~1", "HEAD"],
+            capture_output=True, text=True, timeout=10
+        )
+        diff = res.stdout
+        
+        # Also append current uncommitted changes
+        res = subprocess.run(
+            ["git", "diff"],
+            capture_output=True, text=True, timeout=10
+        )
+        diff += "\n" + res.stdout
+        return diff
+    except Exception:
+        return ""
+
+
+def evaluate_with_llm(title: str, description: str, diff: str) -> str:
+    """Use LLM to evaluate the implementation quality."""
+    try:
+        from pyqual.llm import get_llm
+        llm = get_llm()
+        
+        prompt = f"""Evaluate the following code changes for task: "{title}"
+Description: {description}
+
+Code Diff:
+```diff
+{diff[:5000]}
+```
+
+Provide a score (0-100%) and a concise summary (2-3 sentences) of the implementation quality. 
+Specifically, comment on:
+1. How well the task requirements were met.
+2. Code style and potential issues.
+3. Completeness of the fix.
+
+Format your response as a GitHub-style markdown block."""
+        
+        response = llm.complete(prompt, system="You are a senior code reviewer.")
+        return response.content
+    except Exception as e:
+        return f"⚠️ LLM Evaluation failed: {e}"
+
+
 def main():
     workdir = Path.cwd()
-    config_path = workdir / "pyqual.yaml"
+    report_path = workdir / REPORT_FILE
     
-    if not config_path.exists():
-        print(f"✗ pyqual.yaml not found in {workdir}")
+    if not report_path.exists():
+        print(f"ℹ️ {REPORT_FILE} not found. Skipping auto-closure.")
+        return
+
+    try:
+        data = yaml.safe_load(report_path.read_text())
+        report = data.get("pyqual_report", data)
+        status = report.get("status")
+        gates_info = report.get("gates", {})
+    except Exception as e:
+        print(f"✗ Failed to parse {REPORT_FILE}: {e}")
+        return
+    
+    # Calculate simple pass rate metric
+    passed = gates_info.get("passed", 0)
+    total = gates_info.get("total", 1)
+    completion_rate = (passed / total) * 100 if total > 0 else 0
+    
+    if status != "pass":
+        print(f"❌ Quality gates status: {status} ({completion_rate:.1f}% passed). Skipping task closure.")
+        return
+
+    print(f"✅ Quality gates passed ({completion_rate:.1f}%)! Processing tickets...")
+    
+    try:
+        from planfile.core.store import PlanfileStore
+        from planfile.core.models import TicketStatus
+        from pyqual.github_actions import GitHubActionsReporter
+    except ImportError as e:
+        print(f"✗ Library missing: {e}")
         sys.exit(1)
 
-    print("🔍 Evaluating Quality Gates...")
-    config = PyqualConfig.load(config_path)
-    gate_set = GateSet(config.gates)
-    results = gate_set.check_all(workdir)
-    
-    all_passed = True
-    for res in results:
-        print(f"  {res}")
-        if not res.passed:
-            all_passed = False
-
-    if not all_passed:
-        print("\n❌ Quality gates failed. Skipping automated task closure.")
-        sys.exit(0)  # Exit 0 as this is a normal conditional skip
-
-    print("\n✅ All quality gates passed! Identifying tickets to close...")
-    
-    from planfile.core.store import PlanfileStore
     store = PlanfileStore(str(workdir))
     tickets = store.list_tickets("all")
-    print(f"DEBUG: Found {len(tickets)} tickets in store {store.root}")
+    print(f"DEBUG: Found {len(tickets)} tickets: {[t.id for t in tickets[:5]]}...")
     changed_files = get_changed_files()
+    diff_content = get_diff_content()
+    reporter = GitHubActionsReporter()
     
     closed_count = 0
     for ticket in tickets:
-        if ticket.status in [TicketStatus.done]:
+        current_status = str(ticket.status).lower()
+        if ticket.id == "PLF-002":
+            print(f"DEBUG: Checking PLF-002: status='{current_status}'")
+            
+        if "done" in current_status:
             continue
             
-        # Match ticket to work:
-        # 1. If ticket explicitly lists files, check if any matched
-        # 2. If it is a strategy-linked ticket, check if its rule/context matches
-        
         should_close = False
-        
-        # Files match
         ticket_files = ticket.sync.get("files", [])
         if any(f in changed_files for f in ticket_files):
             should_close = True
             
-        # Simple heuristic: if it's in_progress, it's likely what we just fixed
-        print(f"    Checking {ticket.id} status: {ticket.status} (type: {type(ticket.status)})")
-        if str(ticket.status) == "in_progress" or ticket.status == TicketStatus.in_progress:
+        if "in_progress" in current_status:
             should_close = True
-            
-        # Fallback if no specific file mapping: 
-        # If the project is perfect, we might want to close all logic-related tasks 
-        # But let's be conservative for now.
 
         if should_close:
-            print(f"  ✓ Closing {ticket.id}: {ticket.title}")
+            print(f"  ✓ Evaluating {ticket.id}: {ticket.title}")
+            
+            # 1. Generate local LLM evaluation
+            evaluation = evaluate_with_llm(ticket.title, ticket.description, diff_content)
+            
+            # 2. Try to find GitHub Issue number
+            # planfile stores external IDs in sync metadata
+            external_id = ticket.sync.get("id")
+            if external_id and external_id.isdigit():
+                issue_num = int(external_id)
+                print(f"    📢 Posting evaluation comment to issue #{issue_num}...")
+                
+                comment_body = f"""### 📊 Pyqual Task Evaluation for {ticket.id}
+**Status:** ✅ Quality Gates Passed ({completion_rate:.1f}%)
+
+{evaluation}
+
+---
+*Automatically evaluated and closed by pyqual.*"""
+                
+                reporter.post_issue_comment(comment_body, issue_num)
+            
+            # 3. Mark as done locally
             store.update_ticket(ticket.id, status=TicketStatus.done)
             closed_count += 1
 
     if closed_count > 0:
-        print(f"\n🎉 Successfully marked {closed_count} tickets as DONE.")
+        print(f"\n🎉 Successfully evaluated and marked {closed_count} tickets as DONE.")
     else:
-        print("\nℹ️ No matching active tickets found to close.")
+        print("\nℹ️ No active tickets matched for closure.")
 
 
 if __name__ == "__main__":

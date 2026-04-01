@@ -6,6 +6,7 @@ pipeline:
     cc_max: 15           # cyclomatic complexity per function
     vallm_pass_min: 90   # vallm validation pass rate (%)
     coverage_min: 55     # test coverage (%) — realistic for current codebase
+    completion_rate_min: 100 # percentage of passed gates required for closure
     # Security gates (uncomment to enable):
     # vuln_high_max: 0     # pip-audit high severity CVEs
     # bandit_high_max: 0   # bandit high severity issues
@@ -148,7 +149,10 @@ pipeline:
       timeout: 300
 
     - name: close_tasks
-      run: planfile sync all
+      run: |
+        export PYTHONPATH=$PYTHONPATH:.
+        python3 pyqual/auto_closer.py
+        planfile sync all
       when: metrics_pass
       optional: true
 
