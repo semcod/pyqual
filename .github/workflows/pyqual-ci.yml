@@ -120,6 +120,65 @@ jobs:
         ISSUE_BODY: ${{ github.event.issue.body }}
         ISSUE_ACTION: ${{ github.event.action }}
 
+    - name: Process issue with Claude Code
+      if: github.event_name == 'issues' || (github.event_name == 'workflow_dispatch' && github.event.inputs.issue_number != '')
+      id: process-claude
+      run: |
+        echo "::group::Processing issue with Claude Code"
+        export PATH="$HOME/.local/bin:$PATH"
+        
+        # Get issue details
+        ISSUE_NUM="${{ github.event.issue.number || github.event.inputs.issue_number }}"
+        ISSUE_TITLE="${{ github.event.issue.title }}"
+        ISSUE_BODY="${{ github.event.issue.body }}"
+        
+        echo "Processing issue #$ISSUE_NUM: $ISSUE_TITLE"
+        
+        # Create prompt for Claude Code
+        PROMPT=$(cat << 'PROMPT_EOF'
+        You are given a GitHub issue to implement. Read the issue details below and make the necessary changes to the codebase.
+        
+        Issue Title: $ISSUE_TITLE
+        
+        Issue Description:
+        $ISSUE_BODY
+        
+        Instructions:
+        1. Analyze the issue requirements carefully
+        2. Make the necessary code/documentation changes
+        3. Ensure all quality gates still pass after changes
+        4. Do not commit - just apply changes
+        
+        Apply changes directly to the repository files.
+        PROMPT_EOF
+        )
+        
+        # Run Claude Code with the prompt
+        if timeout 600 claude -p "$PROMPT" \
+          --model sonnet \
+          --allowedTools "Edit,Read,Write,Bash(git diff),Bash(python),Bash(pytest -x)" \
+          --output-format text; then
+          echo "✅ Claude Code successfully processed the issue"
+          echo "changes_made=true" >> $GITHUB_OUTPUT
+        else
+          rc=$?
+          echo "⚠️ Claude Code exited with code $rc"
+          echo "changes_made=false" >> $GITHUB_OUTPUT
+        fi
+        
+        # Check if changes were made
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "Changes detected:"
+          git status --short
+        else
+          echo "No changes made"
+        fi
+        
+        echo "::endgroup::"
+      env:
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Run quality gate loop
       id: pyqual-run
       continue-on-error: true
