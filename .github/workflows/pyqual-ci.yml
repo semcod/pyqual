@@ -314,9 +314,15 @@ jobs:
         reporter = GitHubActionsReporter()
         issue_number = os.environ.get("GITHUB_ISSUE_NUMBER")
         
+        print(f"DEBUG: GITHUB_ISSUE_NUMBER = {issue_number}")
+        print(f"DEBUG: Reporter token available = {bool(reporter.token)}")
+        print(f"DEBUG: Reporter repo = {reporter.repo}")
+        
         if not issue_number:
-            print("No issue number found")
+            print("No issue number found - skipping comment")
             sys.exit(0)
+        
+        print(f"Processing issue #{issue_number}")
         
         # Calculate completion percentage using pyqual gates
         try:
