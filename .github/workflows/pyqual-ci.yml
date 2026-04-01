@@ -74,6 +74,8 @@ jobs:
         python3 << 'EOF'
         import os
         import sys
+        from pathlib import Path
+        from datetime import datetime
         sys.path.insert(0, '.')
         
         from pyqual.github_actions import GitHubActionsReporter
@@ -127,10 +129,29 @@ jobs:
         
         success = reporter.post_pr_comment(report)
         print(f"Posted comment: {success}")
+        
+        # Add ticket to TODO.md
+        todo_path = Path("TODO.md")
+        pr_number = os.environ.get("PR_NUMBER", "unknown")
+        timestamp = datetime.now().strftime("%Y-%m-%d")
+        
+        todo_entry = f"\n- [ ] [CI Fail] Stage '{stage}' failed in PR #{pr_number} - {error_msg} ({timestamp})\n"
+        
+        if todo_path.exists():
+            content = todo_path.read_text()
+            if "## CI Failures" not in content:
+                content += "\n\n## CI Failures\n\n"
+            content += todo_entry
+        else:
+            content = f"# TODO\n\n## CI Failures\n{todo_entry}"
+        
+        todo_path.write_text(content)
+        print(f"Added ticket to TODO.md: {todo_entry.strip()}")
         EOF
         echo "::endgroup::"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
 
     - name: Update GitHub issue on failure
       if: steps.pyqual-run.outputs.exit_code != '0' && github.event_name == 'issues'

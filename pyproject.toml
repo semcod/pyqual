@@ -23,7 +23,6 @@ dependencies = [
     "rich>=13.0",
     "litellm>=1.0",
     "python-dotenv>=1.0",
-    "mcp>=1.0",
     "nfo>=0.2.13",
     "prefact",
     "planfile",
@@ -35,7 +34,7 @@ costs = ["costs"]
 dev = ["pytest>=8.0", "pytest-cov>=5.0","goal>=2.1.0", "costs>=0.1.20", "pfix>=0.1.60"]
 llx = ["llx>=0.1.47"]
 mcp = ["llx>=0.1.47", "mcp>=1.0", "uvicorn>=0.29"]
-all = ["llx>=0.1.47", "code2llm", "vallm", "redup", "costs", "mcp>=1.0", "uvicorn>=0.29"]
+all = ["llx>=0.1.47", "code2llm", "vallm", "redup", "costs"]
 
 [project.scripts]
 pyqual = "pyqual.cli:app"
