@@ -1,3 +1,30 @@
+# GitHub Issue #11
+
+- [x] #11: Add GitHub Actions integration documentation to README
+
+### Issue Body
+## Problem
+
+README.md nie zawiera dokumentacji nowej funkcji GitHub Actions integracji. Użytkownicy nie wiedzą jak używać automatycznego przetwarzania issue przez pyqual.
+
+## Zadanie
+
+Dodaj do README.md sekcję opisującą:
+1. Jak działa automatyczne przetwarzanie issue
+2. Wymagane labelki (np. `pyqual-fix`)
+3. Konfiguracja workflow
+4. Przykład użycia
+
+## Oczekiwany wynik
+
+Zaktualizowany README.md z nową sekcją "GitHub Actions Integration".
+
+---
+*Auto-fix przez pyqual*
+
+---
+*Auto-generated from GitHub issue event*
+
 # GitHub Issue #10
 
 - [x] #10: Refactor: Extract magic numbers in pyqual/constants.py
