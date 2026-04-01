@@ -9,8 +9,6 @@ Usage (CLI):
     pyqual bulk-init /path/to/workspace --no-llm   # heuristic-only fallback
 """
 
-from __future__ import annotations
-
 import json
 import logging
 import re

@@ -90,7 +90,7 @@ def format_log_entry_row(entry: dict) -> tuple:
         if entry.get("skipped"):
             status = "[dim]SKIP[/dim]"
         if entry.get("stderr_tail"):
-            details += f" err: {entry['stderr_tail'][:80]}"
+            details += f" err: {entry['stderr_tail'][:LOG_DETAIL_MAX_LEN]}"
     elif event_name == "gate_check":
         name = entry.get("metric", "")
         val = entry.get("value")

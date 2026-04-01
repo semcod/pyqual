@@ -4,8 +4,6 @@ Each function takes a workdir Path and returns a dict[str, float].
 ``_COLLECTORS`` is the ordered list used by GateSet._collect_metrics.
 """
 
-from __future__ import annotations
-
 import json
 import re
 from pathlib import Path

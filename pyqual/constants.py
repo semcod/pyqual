@@ -44,12 +44,21 @@ BULK_STAGE_COLUMN_MIN_WIDTH = 12
 BULK_STAGE_COLUMN_MAX_WIDTH = 20
 
 # ---------------------------------------------------------------------------
+# LLM / AI
+# ---------------------------------------------------------------------------
+DEFAULT_MAX_TOKENS = 2000
+CONFIG_READ_MAX_CHARS = 2000
+LLM_FIX_MAX_TOKENS = 1200       # for auto-fix config
+LLM_HISTORY_MAX_TOKENS = 1500   # for history command
+
+# ---------------------------------------------------------------------------
 # CLI formatting
 # ---------------------------------------------------------------------------
 TIMESTAMP_COL_WIDTH = 19   # "YYYY-MM-DD HH:MM:SS"
 TIMESTAMP_TIME_START = 11  # offset to skip "YYYY-MM-DD " prefix
 BULK_PASS_PREVIEW = 20     # max passed-gate names to show inline
 LOG_DETAIL_MAX_LEN = 80    # max chars for fallback log detail display
+MODEL_COLUMN_WIDTH = 28  # width for model column in tables
 
 # ---------------------------------------------------------------------------
 # Default metric thresholds

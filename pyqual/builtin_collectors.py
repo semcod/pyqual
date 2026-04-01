@@ -1,7 +1,5 @@
 """Built-in metric collector plugins for pyqual."""
 
-from __future__ import annotations
-
 import json
 from pathlib import Path
 from typing import Any

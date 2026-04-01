@@ -32,6 +32,10 @@ from pyqual.constants import (
     DEFAULT_MCP_PORT,
     STATUS_COLUMN_WIDTH,
     TIMESTAMP_COL_WIDTH,
+    LLM_FIX_MAX_TOKENS,
+    LLM_HISTORY_MAX_TOKENS,
+    MODEL_COLUMN_WIDTH,
+    LOG_DETAIL_MAX_LEN,
 )
 from pyqual.gates import GateSet
 try:
@@ -547,7 +551,7 @@ def run(
         )
         try:
             llm = LLM()
-            resp = llm.complete(prompt, temperature=0.1, max_tokens=1200)
+            resp = llm.complete(prompt, temperature=0.1, max_tokens=LLM_FIX_MAX_TOKENS)
             new_yaml = resp.content.strip()
             if new_yaml.startswith("```"):
                 new_yaml = "\n".join(line for line in new_yaml.splitlines()
