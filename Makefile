@@ -46,7 +46,7 @@ clean:
 
 # Build the package
 build: clean
-	venv/bin/python -m build
+	python3 -m build
 
 # Bump patch version (0.1.2 -> 0.1.3)
 bump-patch:
@@ -75,7 +75,7 @@ bump-minor:
 
 # Build and publish to PyPI (auto-bumps patch version)
 publish: bump-patch build
-	venv/bin/python -m twine upload dist/*
+	python3 -m twine upload dist/*
 
 # Upload to PyPI (alias)
 upload: publish
