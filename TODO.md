@@ -1,3 +1,26 @@
+# GitHub Issue #12
+
+- [x] #12: [TEST] GitHub Actions Integration Test
+
+### Issue Body
+## Test Issue
+    
+This issue was created automatically by test script.
+
+### Purpose
+Verify GitHub Actions integration works correctly.
+
+### Checklist
+- [ ] Issue created
+- [ ] Can be fetched by pyqual
+- [ ] Comments can be posted
+
+---
+*Auto-generated test*
+
+---
+*Auto-generated from GitHub issue event*
+
 # GitHub Issue #11
 
 - [x] #11: Add GitHub Actions integration documentation to README
