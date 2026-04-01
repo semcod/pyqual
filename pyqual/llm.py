@@ -5,8 +5,6 @@ When ``llx`` is installed (Python ≥ 3.10), all symbols are re-exported from
 provided so that pyqual keeps working on Python 3.9 or without ``llx``.
 """
 
-from __future__ import annotations
-
 try:
     # Prefer the upstream canonical implementation.
     from llx.llm import (  # noqa: F401

@@ -1,7 +1,5 @@
 """Parallel task executor for distributing TODO items across multiple fix tools."""
 
-from __future__ import annotations
-
 import logging
 import os
 import subprocess
@@ -13,6 +11,8 @@ from pathlib import Path
 from queue import Queue
 from typing import Callable
 
+from pyqual.constants import DEFAULT_STAGE_TIMEOUT, LOG_DETAIL_MAX_LEN
+
 log = logging.getLogger("pyqual.parallel")
 
 
@@ -22,7 +22,7 @@ class FixTool:
     name: str
     command: str  # Command template with {issue} placeholder
     max_concurrent: int = 1  # How many parallel tasks this tool can handle
-    timeout: int = 300  # Timeout per task in seconds
+    timeout: int = DEFAULT_STAGE_TIMEOUT  # Timeout per task in seconds
     priority: int = 0  # Higher = gets tasks first
 
 
@@ -124,7 +124,7 @@ class ParallelExecutor:
         command = tool.command.replace("{issue}", issue)
         command = command.replace("{issues}", issue)  # Support both placeholders
         
-        log.info("parallel task=%d tool=%s issue=%r", task_id, tool.name, issue[:80])
+        log.info("parallel task=%d tool=%s issue=%r", task_id, tool.name, issue[:LOG_DETAIL_MAX_LEN])
         
         try:
             # Merge current environment with custom env to preserve PATH
@@ -305,7 +305,7 @@ def run_parallel_fix(
             name=t.get("name", f"tool_{i}"),
             command=t.get("command", ""),
             max_concurrent=t.get("max_concurrent", 1),
-            timeout=t.get("timeout", 300),
+            timeout=t.get("timeout", DEFAULT_STAGE_TIMEOUT),
             priority=t.get("priority", 0),
         )
         for i, t in enumerate(tools)

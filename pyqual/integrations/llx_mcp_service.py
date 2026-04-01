@@ -6,8 +6,6 @@ run_service.  The thin wrappers here preserve backward-compatible
 imports for existing pyqual code and honour PYQUAL_LLX_MCP_* env vars.
 """
 
-from __future__ import annotations
-
 import argparse
 import os
 from typing import Any

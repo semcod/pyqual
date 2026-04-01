@@ -101,8 +101,7 @@ prepare:
           ).fetchone()
           
           if end_row:
-              import ast
-              kwargs = ast.literal_eval(end_row["kwargs"])
+              kwargs = json.loads(end_row["kwargs"])
               summary["status"] = "passed" if kwargs.get("final_ok") else "failed"
               summary["iterations"] = kwargs.get("iterations", 0)
               summary["duration_s"] = kwargs.get("total_duration_s", 0)
@@ -111,8 +110,7 @@ prepare:
           for row in conn.execute(
               "SELECT kwargs FROM pipeline_logs WHERE function_name='gate_check' ORDER BY id"
           ).fetchall():
-              import ast
-              gate = ast.literal_eval(row["kwargs"])
+              gate = json.loads(row["kwargs"])
               summary["gates"].append({
                   "metric": gate.get("metric"),
                   "value": gate.get("value"),
@@ -126,8 +124,7 @@ prepare:
           for row in conn.execute(
               "SELECT kwargs FROM pipeline_logs WHERE function_name='stage_done' ORDER BY id"
           ).fetchall():
-              import ast
-              stage = ast.literal_eval(row["kwargs"])
+              stage = json.loads(row["kwargs"])
               summary["stages"].append({
                   "name": stage.get("stage"),
                   "duration_s": stage.get("duration_s", 0),

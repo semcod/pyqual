@@ -33,9 +33,6 @@ from pyqual.constants import (
     STATUS_COLUMN_WIDTH,
     TIMESTAMP_COL_WIDTH,
     LLM_FIX_MAX_TOKENS,
-    LLM_HISTORY_MAX_TOKENS,
-    MODEL_COLUMN_WIDTH,
-    LOG_DETAIL_MAX_LEN,
 )
 from pyqual.gates import GateSet
 try:

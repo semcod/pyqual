@@ -10,8 +10,6 @@ Usage (CLI):
     pyqual bulk-run /path/to/workspace --dry-run
 """
 
-from __future__ import annotations
-
 import subprocess
 import threading
 import time

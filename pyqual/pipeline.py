@@ -1,7 +1,5 @@
 """Pipeline runner — executes stages in loop until quality gates pass."""
 
-from __future__ import annotations
-
 import json as _json
 import logging
 import os

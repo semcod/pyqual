@@ -6,8 +6,6 @@ run_llx_refactor_workflow.  The thin re-exports here preserve
 backward-compatible imports for existing pyqual code.
 """
 
-from __future__ import annotations
-
 import argparse
 import asyncio
 import json

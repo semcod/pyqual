@@ -1,0 +1,206 @@
+name: pyqual CI with GitHub Integration
+on: 
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  issues:
+    types: [opened, edited, labeled]
+
+jobs:
+  quality-loop:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with: 
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with: 
+        python-version: "3.11"
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with: 
+        node-version: "20"
+
+    - name: Install tools
+      run: |
+        pip install pyqual[all]
+        npm install -g @anthropic-ai/claude-code
+        # Install GitHub CLI
+        curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+        sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+        sudo apt update && sudo apt install gh -y
+
+    - name: Fetch GitHub issues as tasks
+      id: fetch-tasks
+      run: |
+        echo "::group::Fetching GitHub issues"
+        python3 -m pyqual.github_tasks --fetch-issues --label "pyqual-fix" --output .pyqual/github_tasks.json || true
+        echo "::endgroup::"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Run quality gate loop
+      id: pyqual-run
+      continue-on-error: true
+      run: |
+        echo "::group::Running pyqual"
+        pyqual run --config pyqual.yaml 2>&1 | tee .pyqual/pyqual_output.log
+        exit_code=${PIPESTATUS[0]}
+        echo "exit_code=$exit_code" >> $GITHUB_OUTPUT
+        exit $exit_code
+      env:
+        LLM_MODEL: ${{ secrets.LLM_MODEL || 'openrouter/qwen/qwen3-coder-next' }}
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PYQUAL_MAX_TODOS: "3"
+
+    - name: Analyze failure and post comment
+      if: steps.pyqual-run.outputs.exit_code != '0' && github.event_name == 'pull_request'
+      run: |
+        echo "::group::Analyzing failure"
+        python3 << 'EOF'
+        import os
+        import sys
+        sys.path.insert(0, '.')
+        
+        from pyqual.github_actions import GitHubActionsReporter
+        from pyqual.pipeline import PipelineError
+        
+        reporter = GitHubActionsReporter()
+        if not reporter.is_running_in_github_actions():
+            print("Not in GitHub Actions, skipping comment")
+            sys.exit(0)
+        
+        # Read pyqual output
+        log_file = Path(".pyqual/pyqual_output.log")
+        logs = log_file.read_text() if log_file.exists() else "No logs available"
+        
+        # Determine failure stage from logs
+        stage = "unknown"
+        error_msg = "Pipeline failed"
+        suggestions = []
+        
+        if "claude_fix" in logs and ("timeout" in logs.lower() or "rate limit" in logs.lower()):
+            stage = "claude_fix"
+            error_msg = "Claude Code fix stage timed out or hit rate limit"
+            suggestions = [
+                "Try running with fewer TODO items: `PYQUAL_MAX_TODOS=3 pyqual run`",
+                "Check ANTHROPIC_API_KEY is valid and has quota",
+                "Consider using llx fallback instead of Claude Code"
+            ]
+        elif "test" in logs and "failed" in logs.lower():
+            stage = "test"
+            error_msg = "Tests are failing"
+            suggestions = [
+                "Run tests locally: `pytest -xvs` to see detailed output",
+                "Check if test failures are related to your changes",
+                "Update tests if the behavior change is intentional"
+            ]
+        elif "prefact" in logs:
+            stage = "prefact"
+            error_msg = "Prefact analysis found issues"
+            suggestions = [
+                "Review prefact output in .pyqual/prefact.json",
+                "Fix code quality issues manually or use `pyqual run` to auto-fix",
+                "Some issues may be false positives - review carefully"
+            ]
+        
+        report = reporter.generate_failure_report(
+            stage_name=stage,
+            error=error_msg,
+            logs=logs,
+            suggestions=suggestions
+        )
+        
+        success = reporter.post_pr_comment(report)
+        print(f"Posted comment: {success}")
+        EOF
+        echo "::endgroup::"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Update GitHub issue on failure
+      if: steps.pyqual-run.outputs.exit_code != '0' && github.event_name == 'issues'
+      run: |
+        python3 << 'EOF'
+        import os
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, '.')
+        
+        from pyqual.github_actions import GitHubActionsReporter
+        
+        reporter = GitHubActionsReporter()
+        issue_number = os.environ.get("GITHUB_ISSUE_NUMBER")
+        
+        if not issue_number:
+            print("No issue number found")
+            sys.exit(0)
+        
+        log_file = Path(".pyqual/pyqual_output.log")
+        logs = log_file.read_text() if log_file.exists() else "No logs available"
+        
+        body = f"""## ⚠️ Pyqual failed to process this issue
+
+The automated fix attempt failed. Please check the issue details and try again.
+
+### Error Output
+<details>
+<summary>Logs</summary>
+
+```
+{logs[:2000]}
+```
+</details>
+
+### Next Steps
+1. Review the issue description for clarity
+2. Ensure the issue has the `pyqual-fix` label
+3. Run pyqual locally: `pyqual run --max 5`
+4. Check pipeline logs in GitHub Actions
+
+---
+*Failed at: {os.environ.get('GITHUB_SHA', 'unknown')[:8]}*
+"""
+        
+        reporter.post_issue_comment(body, int(issue_number))
+        EOF
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_ISSUE_NUMBER: ${{ github.event.issue.number }}
+
+    - name: Push changes if successful
+      if: steps.pyqual-run.outputs.exit_code == '0'
+      run: |
+        if [ -n "$(git status --porcelain)" ]; then
+          git add -A
+          git commit -m "fix: pyqual auto-fix [ci skip]" || true
+          git push origin HEAD || true
+        fi
+
+    - name: Upload artifacts
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: pyqual-metrics
+        path: .pyqual/
+        if-no-files-found: ignore
+
+    - name: Fail job if pyqual failed
+      if: steps.pyqual-run.outputs.exit_code != '0'
+      run: |
+        echo "::error::Pyqual pipeline failed - see logs and PR comments for details"
+        exit 1
