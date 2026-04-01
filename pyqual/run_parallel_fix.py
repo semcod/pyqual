@@ -15,6 +15,9 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
+LLX_TOOL_TIMEOUT = 600   # seconds — llx fix run
+AIDER_TOOL_TIMEOUT = 900  # seconds — aider Docker run
+
 
 def count_todo_items(todo_path: Path) -> int:
     """Count unchecked items in TODO.md."""
@@ -172,7 +175,7 @@ def main() -> int:
         tool_configs.append({
             "name": "llx",
             "command": f"LLM_MODEL={llm_model} llx fix . --apply --errors TODO.md --verbose",
-            "timeout": 600,
+            "timeout": LLX_TOOL_TIMEOUT,
         })
         print(f"✓ llx available (model={llm_model})")
     except ImportError:
@@ -205,7 +208,7 @@ def main() -> int:
                     '--read TODO.md '  # Read TODO.md as context, don't edit it
                     '--message "Fix the code issues listed in TODO.md. Focus on: unused imports, magic numbers, duplicate imports. Do NOT modify TODO.md itself."'
                 ),
-                "timeout": 900,
+                "timeout": AIDER_TOOL_TIMEOUT,
             })
             print(f"✓ aider available (Docker, model={llm_model})")
         else:
@@ -313,27 +316,27 @@ def main() -> int:
             print(f"    error: \"{error_msg}\"")
     
     # Summary
-    print(f"summary:")
+    print("summary:")
     print(f"  succeeded: {succeeded}")
     print(f"  failed: {failed}")
     print(f"  files_changed: {len(changed_files)}")
     print(f"  todos_completed: {completed_count}")
     
     if changed_files:
-        print(f"  changed:")
+        print("  changed:")
         for f in changed_files[:10]:
             print(f"    - {f}")
         if len(changed_files) > 10:
             print(f"    # ... and {len(changed_files) - 10} more")
     
     # Help section - how to get more details
-    print(f"help:")
-    print(f"  logs_db: \".pyqual/pipeline.db\"")
-    print(f"  logs_jsonl: \".pyqual/llx_history.jsonl\"")
-    print(f"  view_logs: \"pyqual logs --last 10\"")
-    print(f"  view_errors: \"pyqual logs --failed\"")
-    print(f"  live_tail: \"pyqual watch\"")
-    print(f"  raw_sql: \"sqlite3 .pyqual/pipeline.db 'SELECT * FROM pipeline_logs ORDER BY id DESC LIMIT 20'\"")
+    print("help:")
+    print("  logs_db: \".pyqual/pipeline.db\"")
+    print("  logs_jsonl: \".pyqual/llx_history.jsonl\"")
+    print("  view_logs: \"pyqual logs --last 10\"")
+    print("  view_errors: \"pyqual logs --failed\"")
+    print("  live_tail: \"pyqual watch\"")
+    print("  raw_sql: \"sqlite3 .pyqual/pipeline.db 'SELECT * FROM pipeline_logs ORDER BY id DESC LIMIT 20'\"")
     
     return 0 if failed == 0 else 1
 

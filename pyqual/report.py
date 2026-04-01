@@ -142,8 +142,7 @@ def _read_costs_data(workdir: Path) -> dict[str, Any]:
     # 2. Try costs package (if installed and no data yet)
     if "ai_cost" not in result:
         try:
-            from costs.git_parser import parse_commits, get_repo_stats  # type: ignore[import-untyped]
-            from costs.calculator import ai_cost as calc_ai_cost  # type: ignore[import-untyped]
+            from costs.git_parser import parse_commits  # type: ignore[import-untyped]
 
             all_commits = parse_commits(str(workdir), max_count=500, ai_only=False, full_history=True)
             ai_indicators = ["🤖", "ai:", "[ai]", "(ai)", "automat", "cascade", "claude", "gpt", "llm"]
@@ -345,11 +344,11 @@ def _build_project_badges(meta: dict[str, Any]) -> str:
 
     # AI Cost
     ai_cost = meta.get("ai_cost")
+    ai_commits = meta.get("ai_commits")
     if ai_cost is not None:
         cost_color = "brightgreen" if ai_cost < 1 else "green" if ai_cost < 5 else "orange" if ai_cost < 10 else "red"
-        commits_part = f" ({meta['ai_commits']} commits)" if "ai_commits" in meta else ""
         label = "AI Cost"
-        value = f"${ai_cost:.2f}"
+        value = f"${ai_cost:.2f}" + (f" ({ai_commits} commits)" if ai_commits else "")
         url = _badge_url(label, value, cost_color)
         badges.append(f"![{label}]({url})")
 

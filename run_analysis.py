@@ -4,7 +4,6 @@
 import sys
 import time
 import sqlite3
-import ast
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))

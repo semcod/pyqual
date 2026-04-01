@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
-import { describe, it, expect, vi } from 'vitest'
-import MetricsChart from '../../components/MetricsChart.tsx'
+import { describe, it, expect } from 'vitest'
+import MetricsChart from '../../components/MetricsChart'
 import { Repository } from '../../types'
 
 const mockRepositories: Repository[] = [
@@ -96,7 +96,7 @@ describe('MetricsChart', () => {
   })
 
   it('generates correct number of data points', () => {
-    const { container } = render(<MetricsChart repositories={mockRepositories} />)
+    render(<MetricsChart repositories={mockRepositories} />)
     // The chart should generate 30 days of data
     const lines = screen.getAllByTestId('line')
     expect(lines).toHaveLength(mockRepositories.length)

@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
-import StagesChart from '../../components/StagesChart.tsx'
+import StagesChart from '../../components/StagesChart'
 import { PyqualStage } from '../../types'
 
 const mockStages: PyqualStage[] = [
@@ -60,7 +60,7 @@ describe('StagesChart', () => {
   })
 
   it('processes stage data correctly', () => {
-    const { container } = render(<StagesChart stages={mockStages} />)
+    render(<StagesChart stages={mockStages} />)
     // The component should render without errors
     expect(screen.getByTestId('bar-chart')).toBeInTheDocument()
   })

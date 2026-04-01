@@ -10,7 +10,6 @@ from __future__ import annotations
 import ast
 import sqlite3
 from pathlib import Path
-from typing import Any
 
 from pyqual.constants import PIPELINE_TABLE
 

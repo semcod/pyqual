@@ -39,3 +39,12 @@ DEFAULT_CC_MAX = 15
 BULK_LINE_TRUNCATE = 120
 BULK_TABLE_PROJECT_MIN_WIDTH = 20
 BULK_TABLE_PROJECT_MAX_WIDTH = 28
+BULK_ANALYSIS_MAX_CHARS = 80
+BULK_STAGE_COLUMN_MIN_WIDTH = 12
+BULK_STAGE_COLUMN_MAX_WIDTH = 20
+
+# ---------------------------------------------------------------------------
+# CLI formatting
+# ---------------------------------------------------------------------------
+TIMESTAMP_COL_WIDTH = 19  # "YYYY-MM-DD HH:MM:SS"
+BULK_PASS_PREVIEW = 20    # max passed-gate names to show inline

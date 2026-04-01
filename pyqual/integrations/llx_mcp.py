@@ -25,8 +25,6 @@ from llx.mcp.workflows import (  # canonical upstream
 from llx.utils.issues import (  # canonical upstream
     build_fix_prompt,
     load_issue_source as _load_issue_source,
-    load_todo_markdown as _load_todo_markdown,
-    task_prompt_label as _task_prompt_label,
 )
 
 DEFAULT_ENDPOINT = "http://localhost:8000/sse"

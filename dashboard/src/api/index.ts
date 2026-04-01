@@ -1,18 +1,18 @@
 import { Repository, PyqualSummary, DashboardConfig } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-const GITHUB_TOKEN = import.meta.env.VITE_GITHUB_TOKEN;
+const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:8000';
+const GITHUB_TOKEN = (import.meta as any).env?.VITE_GITHUB_TOKEN;
 
 // Load configuration
 export const loadConfig = async (): Promise<DashboardConfig> => {
   try {
     const response = await fetch('/config/repos.json');
-    if (!response.ok) {
-      throw new Error(`Failed to load config: ${response.statusText}`);
+    if (!response || !response.ok) {
+      throw new Error(`Failed to load config: ${response?.statusText || 'No response'}`);
     }
     return await response.json();
   } catch (error) {
-    console.error('Error loading config:', error);
+    console.warn('Config load failed (using defaults):', error);
     // Return default config for development
     return {
       repositories: [],
@@ -42,7 +42,7 @@ export const fetchRepositories = async (): Promise<Repository[]> => {
 };
 
 // Fetch latest run from GitHub releases
-export const fetchLatestRun = async (repository: Repository): Promise<PyqualSummary | null> => {
+export const fetchLatestRun = async (repository: Repository): Promise<PyqualSummary | undefined> => {
   // Try to fetch from GitHub releases first
   try {
     const releasesUrl = `https://api.github.com/repos/${getRepoPath(repository.url)}/releases`;
@@ -80,7 +80,7 @@ export const fetchLatestRun = async (repository: Repository): Promise<PyqualSumm
     console.error('Failed to fetch from local API:', error);
   }
 
-  return null;
+  return undefined;
 };
 
 // Fetch all runs for a repository

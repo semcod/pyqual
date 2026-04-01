@@ -307,9 +307,9 @@ def get_last_error_line(text: str) -> str:
     )
     error_kws = ("error", "fail", "assert", "exception", "traceback",
                  "critical", "syntax", "invalid", "cannot", "no module")
-    clean = [l.strip() for l in text.splitlines()
-             if l.strip() and not any(l.strip().startswith(p) for p in noise_prefixes)]
-    err_lines = [l for l in clean if any(kw in l.lower() for kw in error_kws)]
+    clean = [ln.strip() for ln in text.splitlines()
+             if ln.strip() and not any(ln.strip().startswith(p) for p in noise_prefixes)]
+    err_lines = [ln for ln in clean if any(kw in ln.lower() for kw in error_kws)]
     if err_lines:
         return err_lines[-1][:200]
     return clean[-1][:200] if clean else ""

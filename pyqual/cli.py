@@ -24,13 +24,14 @@ from pyqual.cli_run_helpers import (
     extract_stage_summary as _extract_stage_summary,
     format_run_summary as _format_run_summary,
     get_last_error_line as _get_last_error_line,
-    infer_fix_result as _infer_fix_result,
 )
 from pyqual.config import PyqualConfig
 from pyqual.constants import (
     BULK_LINE_TRUNCATE,
+    BULK_PASS_PREVIEW,
     DEFAULT_MCP_PORT,
     STATUS_COLUMN_WIDTH,
+    TIMESTAMP_COL_WIDTH,
 )
 from pyqual.gates import GateSet
 try:
@@ -52,8 +53,8 @@ from pyqual.tickets import sync_todo_tickets
 from pyqual.validation import EC, ErrorDomain, Severity, detect_project_facts, validate_config
 
 LOG_FORMAT = "%(asctime)s %(levelname)s %(name)s — %(message)s"
-_TIMESTAMP_COL_WIDTH = 19  # "YYYY-MM-DD HH:MM:SS"
-_BULK_PASS_PREVIEW = 20    # max passed-gate names to show inline
+_TIMESTAMP_COL_WIDTH = TIMESTAMP_COL_WIDTH  # "YYYY-MM-DD HH:MM:SS"
+_BULK_PASS_PREVIEW = BULK_PASS_PREVIEW    # max passed-gate names to show inline
 
 app = typer.Typer(help="Declarative quality gate loops for AI-assisted development.")
 console = Console()
@@ -183,7 +184,6 @@ def bulk_init_cmd(
     """
     from pyqual.bulk_init import (
         PROJECT_CONFIG_SCHEMA,
-        BulkInitResult,
         bulk_init,
     )
 
@@ -232,7 +232,7 @@ def bulk_init_cmd(
 
     # Skipped (non-project)
     if result.skipped_nonproject:
-        console.print(f"\n[dim]Skipped (non-project):[/dim]")
+        console.print("\n[dim]Skipped (non-project):[/dim]")
         for name, reason in result.skipped_nonproject:
             console.print(f"  [dim]{name}: {reason}[/dim]")
 
@@ -282,7 +282,6 @@ def bulk_run_cmd(
 
     from pyqual.bulk_run import (
         BulkRunResult,
-        RunStatus,
         build_dashboard_table,
         bulk_run,
         discover_projects,
@@ -551,8 +550,8 @@ def run(
             resp = llm.complete(prompt, temperature=0.1, max_tokens=1200)
             new_yaml = resp.content.strip()
             if new_yaml.startswith("```"):
-                new_yaml = "\n".join(l for l in new_yaml.splitlines()
-                                     if not l.startswith("```")).strip()
+                new_yaml = "\n".join(line for line in new_yaml.splitlines()
+                                     if not line.startswith("```")).strip()
             backup = cfg_path.with_suffix(".yaml.bak")
             cfg_path.rename(backup)
             cfg_path.write_text(new_yaml)
@@ -801,8 +800,8 @@ Rules:
     if new_yaml.startswith("```"):
         lines = new_yaml.splitlines()
         new_yaml = "\n".join(
-            l for l in lines
-            if not l.startswith("```")
+            line for line in lines
+            if not line.startswith("```")
         ).strip()
 
     console.print(new_yaml)
@@ -1276,7 +1275,7 @@ def watch(
 
     _wc.print(f"[bold]pyqual watch[/bold]  workdir={_wd}")
     _wc.print(f"[dim]Watching: {db_path}[/dim]")
-    _wc.print(f"[dim]Press Ctrl+C to stop.[/dim]\n")
+    _wc.print("[dim]Press Ctrl+C to stop.[/dim]\n")
 
     last_db_count = 0
     last_history_lines = 0
@@ -1305,9 +1304,6 @@ def watch(
                         last_db_count = len(entries)
                         for entry in new_entries:
                             ts, event_name, name, status_col, details = _format_log_entry_row(entry)
-                            icon = "✅" if "PASS" in status_col or status_col.strip() == "" else "❌"
-                            if "SKIP" in status_col:
-                                icon = "⏭"
                             _wc.print(f"  {ts}  [bold]{event_name:<14}[/bold] {name:<20} {status_col:<8} {details}")
 
                             if show_output and entry.get("_function_name") == "stage_done":
@@ -1415,7 +1411,7 @@ def history(
     table.add_column("Duration", justify="right", width=8)
 
     for entry in entries:
-        ts = entry.get("timestamp", "")[:19].replace("T", " ")
+        ts = entry.get("timestamp", "")[:TIMESTAMP_COL_WIDTH].replace("T", " ")
         stage = entry.get("stage", "")
         model = entry.get("model", "")
         issues = str(entry.get("issues_count", "?"))

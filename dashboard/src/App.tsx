@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import {
   ChartBarIcon,
@@ -6,7 +6,7 @@ import {
   DocumentTextIcon,
   Cog6ToothIcon
 } from '@heroicons/react/24/outline';
-import { Repository, PyqualSummary } from './types';
+import { Repository } from './types';
 import Overview from './components/Overview';
 import RepositoryDetail from './components/RepositoryDetail';
 import Settings from './components/Settings';
@@ -15,7 +15,6 @@ import './App.css';
 
 function App() {
   const [repositories, setRepositories] = useState<Repository[]>([]);
-  const [selectedRepo, setSelectedRepo] = useState<Repository | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,7 +36,6 @@ function App() {
   };
 
   const handleRepositorySelect = async (repo: Repository) => {
-    setSelectedRepo(repo);
     if (!repo.runs) {
       try {
         const runs = await fetchRepositoryRuns(repo.id);

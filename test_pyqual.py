@@ -4,6 +4,8 @@ import json
 import tempfile
 from pathlib import Path
 
+import yaml
+
 from pyqual.config import PyqualConfig, GateConfig
 from pyqual.gates import Gate, GateSet
 from pyqual.pipeline import Pipeline
@@ -11,7 +13,6 @@ from pyqual.pipeline import Pipeline
 
 def test_default_yaml_parses() -> None:
     """Default pyqual.yaml should parse without errors."""
-    import yaml
     raw = yaml.safe_load(PyqualConfig.default_yaml())
     config = PyqualConfig._parse(raw)
     assert config.name == "quality-loop"
@@ -240,7 +241,6 @@ pipeline:
 
 def test_tool_preset_stage_config() -> None:
     """StageConfig with tool: field parses correctly."""
-    import yaml
     raw = yaml.safe_load("""\
 pipeline:
   name: tool-test
@@ -322,7 +322,6 @@ def test_tool_preset_resolution() -> None:
 
 def test_stage_requires_run_or_tool() -> None:
     """StageConfig must have either 'run' or 'tool'."""
-    import yaml
     raw = yaml.safe_load("""\
 pipeline:
   name: bad-config
@@ -340,7 +339,6 @@ pipeline:
 
 def test_stage_rejects_both_run_and_tool() -> None:
     """StageConfig rejects having both 'run' and 'tool' set."""
-    import yaml
     raw = yaml.safe_load("""\
 pipeline:
   name: ambiguous

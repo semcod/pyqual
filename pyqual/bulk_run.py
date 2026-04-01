@@ -19,7 +19,14 @@ from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 
-from pyqual.constants import BULK_LINE_TRUNCATE, BULK_TABLE_PROJECT_MAX_WIDTH, BULK_TABLE_PROJECT_MIN_WIDTH
+from pyqual.constants import (
+    BULK_LINE_TRUNCATE,
+    BULK_TABLE_PROJECT_MAX_WIDTH,
+    BULK_TABLE_PROJECT_MIN_WIDTH,
+    BULK_ANALYSIS_MAX_CHARS,
+    BULK_STAGE_COLUMN_MIN_WIDTH,
+    BULK_STAGE_COLUMN_MAX_WIDTH,
+)
 from typing import Any
 
 import yaml
@@ -210,7 +217,7 @@ def _analyze_project(state: ProjectRunState, log_dir: Path | None = None) -> Non
             max_tokens=100,
         )
         analysis = response.content.strip().replace("\n", " ")
-        state.analysis = analysis[:80]
+        state.analysis = analysis[:BULK_ANALYSIS_MAX_CHARS]
     except Exception as exc:
         state.analysis = f"[llm error: {str(exc)[:40]}]"
 
@@ -241,7 +248,7 @@ def _run_single_project(
 
     # --- Pre-flight validation (fast, local, no subprocess) ---
     try:
-        from pyqual.validation import Severity, validate_config
+        from pyqual.validation import validate_config
         preflight = validate_config(config_path)
         if not preflight.ok:
             state.status = RunStatus.ERROR
@@ -416,7 +423,7 @@ def build_dashboard_table(
     table.add_column("Project", style="bold", min_width=BULK_TABLE_PROJECT_MIN_WIDTH, max_width=BULK_TABLE_PROJECT_MAX_WIDTH)
     table.add_column("Status", width=10, justify="center")
     table.add_column("Iter", width=7, justify="center")
-    table.add_column("Stage", min_width=12, max_width=20)
+    table.add_column("Stage", min_width=BULK_STAGE_COLUMN_MIN_WIDTH, max_width=BULK_STAGE_COLUMN_MAX_WIDTH)
     table.add_column("Progress", width=10, justify="center")
     table.add_column("Gates", width=8, justify="center")
     table.add_column("Time", width=8, justify="right")

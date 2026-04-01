@@ -265,37 +265,37 @@ def generate_report(workdir: Path | None = None) -> str:
         return "# No pipeline run found\n\nRun `pyqual run` first to generate a report."
     
     lines = [
-        f"# Pyqual Pipeline Report",
-        f"",
+        "# Pyqual Pipeline Report",
+        "",
         f"**Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
         f"**Pipeline run:** {run.timestamp}",
-        f"",
-        f"---",
-        f"",
-        f"## 🔄 Pipeline Flow Diagram",
-        f"",
+        "",
+        "---",
+        "",
+        "## 🔄 Pipeline Flow Diagram",
+        "",
         generate_mermaid_diagram(run),
-        f"",
-        f"## 📈 ASCII Visualization",
-        f"",
+        "",
+        "## 📈 ASCII Visualization",
+        "",
         "```",
         generate_ascii_diagram(run),
         "```",
-        f"",
+        "",
         generate_metrics_table(run),
-        f"",
+        "",
         generate_stage_details(run),
-        f"",
-        f"---",
-        f"",
-        f"## 📝 Summary",
-        f"",
+        "",
+        "---",
+        "",
+        "## 📝 Summary",
+        "",
     ]
     
     if run.all_gates_passed:
         lines.append(f"✅ **All quality gates passed!** Pipeline completed successfully in {run.total_time:.1f}s.")
     else:
-        lines.append(f"❌ **Some quality gates failed.** Review the stage details above.")
+        lines.append("❌ **Some quality gates failed.** Review the stage details above.")
     
     lines.append("")
     

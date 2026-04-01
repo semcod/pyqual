@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import { BrowserRouter } from 'react-router-dom'
-import Overview from '../../components/Overview.tsx'
+import Overview from '../../components/Overview'
 import { Repository } from '../../types'
 
 const mockRepositories: Repository[] = [
