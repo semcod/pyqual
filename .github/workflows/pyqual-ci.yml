@@ -6,6 +6,12 @@ on:
     branches: [main, master]
   issues:
     types: [opened, edited, labeled]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: 'Issue number to process (optional)'
+        required: false
+        type: string
 
 jobs:
   quality-loop:
