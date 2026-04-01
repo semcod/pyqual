@@ -26,6 +26,8 @@ from pyqual.constants import (
     BULK_ANALYSIS_MAX_CHARS,
     BULK_STAGE_COLUMN_MIN_WIDTH,
     BULK_STAGE_COLUMN_MAX_WIDTH,
+    ERROR_MSG_MAX_CHARS,
+    ERROR_MSG_PREVIEW_CHARS,
 )
 from typing import Any
 
@@ -321,7 +323,7 @@ def _run_single_project(
     except Exception as exc:
         state.duration = time.monotonic() - state.start_time
         state.status = RunStatus.ERROR
-        state.error_msg = str(exc)[:200]
+        state.error_msg = str(exc)[:ERROR_MSG_MAX_CHARS]
     finally:
         if log_fh is not None:
             log_fh.close()
@@ -380,7 +382,7 @@ def _build_project_row(s: ProjectRunState, show_last_line: bool,
         time_text = ""
 
     if s.error_msg and s.status in (RunStatus.ERROR, RunStatus.TIMEOUT):
-        stage_text = f"[red]{s.error_msg[:30]}[/]"
+        stage_text = f"[red]{s.error_msg[:ERROR_MSG_PREVIEW_CHARS]}[/]"
 
     row: list = [s.name, status_text, iter_text, stage_text, progress, gates_text, time_text]
     if show_last_line:

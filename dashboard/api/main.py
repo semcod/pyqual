@@ -27,6 +27,7 @@ from dashboard.constants import (
     STATIC_DIR,
     HTTP_NOT_FOUND,
     HTTP_UNAUTHORIZED,
+    HTTP_BAD_REQUEST,
 )
 
 # Configure logging
@@ -117,7 +118,7 @@ async def get_latest_run(project_id: str):
     """Get the latest run for a project."""
     summary = read_summary_json(project_id)
     if not summary:
-        raise HTTPException(status_code=404, detail="Project not found or no runs available")
+        raise HTTPException(status_code=HTTP_NOT_FOUND, detail="Project not found or no runs available")
     return summary
 
 @app.get("/api/projects/{project_id}/runs")
@@ -249,7 +250,7 @@ async def get_project_summary(project_id: str):
     )
     
     if not end_rows:
-        raise HTTPException(status_code=404, detail="No pipeline runs found")
+        raise HTTPException(status_code=HTTP_NOT_FOUND, detail="No pipeline runs found")
     
     latest = ast.literal_eval(end_rows[0]["kwargs"])
     
@@ -291,13 +292,13 @@ async def ingest_results(
     """Ingest results from CI/CD pipeline."""
     # Verify token
     if credentials.credentials != INGEST_TOKEN:
-        raise HTTPException(status_code=401, detail="Invalid authentication token")
+        raise HTTPException(status_code=HTTP_UNAUTHORIZED, detail="Invalid authentication token")
     
     # Validate data structure
     required_fields = ["timestamp", "status", "metrics"]
     for field in required_fields:
         if field not in data:
-            raise HTTPException(status_code=400, detail=f"Missing required field: {field}")
+            raise HTTPException(status_code=HTTP_BAD_REQUEST, detail=f"Missing required field: {field}")
     
     # Create project directory if needed
     project_dir = Path(f"{PROJECTS_BASE_DIR}/{project_id}")

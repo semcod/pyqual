@@ -84,7 +84,7 @@
   },
   "prefact": {
     "binary": "prefact",
-    "command": "prefact -a",
+    "command": "prefact -a -e examples",
     "output": ""
   },
   "llx-fix": {

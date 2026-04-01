@@ -62,3 +62,5 @@ DEFAULT_COVERAGE_MIN = 80     # default test coverage minimum percentage
 # ---------------------------------------------------------------------------
 TODO_HEAD_CHARS = 500          # chars to read from TODO.md header for parsing
 STAGE_OUTPUT_MAX_CHARS = 200   # max chars for last meaningful output line
+ERROR_MSG_MAX_CHARS = 200      # max chars for error messages in bulk run
+ERROR_MSG_PREVIEW_CHARS = 30   # max chars for error message preview

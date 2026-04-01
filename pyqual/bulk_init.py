@@ -246,7 +246,7 @@ def _collect_readme_excerpt(project_dir: Path) -> str:
         readme = project_dir / readme_name
         if readme.exists():
             try:
-                return readme.read_text(errors="ignore")[:500]
+                return readme.read_text(errors="ignore")[:README_EXCERPT_MAX_CHARS]
             except OSError:
                 return ""
     return ""
