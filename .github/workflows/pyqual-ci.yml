@@ -58,18 +58,23 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Process triggering issue
-      if: github.event_name == 'issues'
+      if: github.event_name == 'issues' || (github.event_name == 'workflow_dispatch' && github.event.inputs.issue_number != '')
       id: process-issue
       run: |
-        echo "::group::Processing triggering issue #${{ github.event.issue.number }}"
+        echo "::group::Processing triggering issue"
         python3 << 'EOF'
         import json
         import os
         from pathlib import Path
         
-        issue_number = os.environ.get("ISSUE_NUMBER")
+        # Get issue number from event or workflow_dispatch input
+        issue_number = os.environ.get("ISSUE_NUMBER") or os.environ.get("INPUT_ISSUE_NUMBER")
         issue_title = os.environ.get("ISSUE_TITLE", "Unknown")
         issue_body = os.environ.get("ISSUE_BODY", "")
+        
+        if not issue_number:
+            print("No issue number provided, skipping issue processing")
+            sys.exit(0)
         
         print(f"Processing issue #{issue_number}: {issue_title[:60]}...")
         
