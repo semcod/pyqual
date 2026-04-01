@@ -44,7 +44,7 @@ import logging
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 log = logging.getLogger("pyqual.tools")
 
@@ -136,7 +136,7 @@ _BUILTIN_NAMES: frozenset[str] = frozenset(TOOL_PRESETS.keys())
 # Public API
 # ---------------------------------------------------------------------------
 
-def get_preset(name: str) -> ToolPreset | None:
+def get_preset(name: str) -> Optional[ToolPreset]:
     """Look up a tool preset by name (case-insensitive)."""
     return TOOL_PRESETS.get(name.lower())
 
@@ -182,13 +182,13 @@ def register_preset(name: str, preset: ToolPreset, *, override: bool = False) ->
     log.info("registered tool preset: %s (binary=%s)", key, preset.binary)
 
 
-def load_user_tools(workdir: Path | str = ".") -> int:
+def load_user_tools(workdir: Optional[Path] = None) -> int:
     """Load user tool overrides from ``pyqual.tools.json`` in *workdir*.
 
     Merges into ``TOOL_PRESETS``, overriding built-in presets with the same name.
     Returns the number of presets loaded/overridden.
     """
-    user_file = Path(workdir) / USER_TOOLS_FILE
+    user_file = (workdir or Path(".")) / USER_TOOLS_FILE
     if not user_file.exists():
         return 0
     user_presets = _load_json_presets(user_file)
@@ -216,7 +216,7 @@ def preset_to_dict(preset: ToolPreset) -> dict[str, Any]:
     return d
 
 
-def dump_presets_json(names: list[str] | None = None) -> str:
+def dump_presets_json(names: Optional[list[str]] = None) -> str:
     """Serialize current presets (or a subset) to JSON string.
 
     Useful for ``pyqual tools --json`` or generating a starter
