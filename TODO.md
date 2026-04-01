@@ -1,3 +1,36 @@
+# GitHub Issue #13
+
+- [x] #13: Test: Verify GitHub Actions auto-processing
+
+### Issue Body
+## Test
+
+Ten issue testuje czy GitHub Actions automatycznie:
+1. Przetwarza issue po utworzeniu
+2. Uruchamia pyqual run
+3. Dodaje komentarz z wynikami
+4. Zamyka issue jeśli wszystkie gate przechodzą
+
+## Oczekiwany flow
+
+```
+Issue created with label pyqual-fix
+  ↓
+Workflow triggers (issues: opened)
+  ↓
+pyqual run --config pyqual.yaml
+  ↓
+Post comment with completion %
+  ↓
+Close issue if all gates pass
+```
+
+---
+*Test auto-close functionality*
+
+---
+*Auto-generated from GitHub issue event*
+
 # GitHub Issue #12
 
 - [x] #12: [TEST] GitHub Actions Integration Test
