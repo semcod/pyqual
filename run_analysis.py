@@ -9,7 +9,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from pyqual.config import PyqualConfig
-from pyqual.constants import TOP_LEVEL_FILES_MAX
 from pyqual.pipeline import Pipeline
 
 PIPELINE_CONFIG = Path(__file__).parent / "examples" / "project_analysis" / "pyqual.yaml"
@@ -59,11 +58,11 @@ def run_project(project_path: str) -> None:
     if project_dir.exists():
         files = sorted(project_dir.glob("*"))
         print(f"  Output files in project/: {len(files)}")
-        for f in files[:TOP_LEVEL_FILES_MAX]:
+        for f in files[:15]:
             size = f.stat().st_size if f.is_file() else 0
             print(f"    {f.name:40s} {size:>10,d} bytes")
-        if len(files) > TOP_LEVEL_FILES_MAX:
-            print(f"    ... and {len(files) - TOP_LEVEL_FILES_MAX} more")
+        if len(files) > 15:
+            print(f"    ... and {len(files) - 15} more")
 
     print()
 

@@ -15,12 +15,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from pyqual.constants import (
-    DEFAULT_CC_MAX,
-    DEFAULT_VALLM_PASS_MIN,
-    STAGE_OUTPUT_MAX_CHARS,
-)
-
 import ast
 
 
@@ -87,7 +81,7 @@ def get_last_run(db_path: Path) -> PipelineRun | None:
     gates = []
     metrics = {}
     
-    for row in rows[:STAGE_OUTPUT_MAX_CHARS//10]:  # Last 20 stages max
+    for row in rows[:20]:  # Last 20 stages max
         kwargs = parse_kwargs(row['kwargs'])
         stage_name = kwargs.get('stage', 'unknown')
         
@@ -127,9 +121,9 @@ def get_last_run(db_path: Path) -> PipelineRun | None:
     
     # Build gates from metrics
     if 'cc' in metrics:
-        gates.append({'metric': 'cc', 'value': metrics['cc'], 'threshold': float(DEFAULT_CC_MAX), 'passed': metrics['cc'] <= DEFAULT_CC_MAX})
+        gates.append({'metric': 'cc', 'value': metrics['cc'], 'threshold': 15.0, 'passed': metrics['cc'] <= 15.0})
     if 'vallm_pass_pct' in metrics:
-        gates.append({'metric': 'vallm_pass', 'value': metrics['vallm_pass_pct'], 'threshold': float(DEFAULT_VALLM_PASS_MIN), 'passed': metrics['vallm_pass_pct'] >= DEFAULT_VALLM_PASS_MIN})
+        gates.append({'metric': 'vallm_pass', 'value': metrics['vallm_pass_pct'], 'threshold': 90.0, 'passed': metrics['vallm_pass_pct'] >= 90.0})
     
     conn.close()
     

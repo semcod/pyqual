@@ -87,15 +87,3 @@ BULK_RUN_TABLE_WIDTH = 50      # from bulk_run.py:431
 REPORT_GATE_COVERAGE = 80      # from report.py:43
 REPORT_GATE_VALLM = 90         # from report.py:44
 REPORT_GATE_SECURITY = 80      # from report.py:47
-
-# ---------------------------------------------------------------------------
-# Badge thresholds for README badges (used by report.py)
-# ---------------------------------------------------------------------------
-BADGE_THRESHOLD_CC_LOW = 5.0       # CC threshold for low complexity (green)
-BADGE_THRESHOLD_CC_MED = 10.0      # CC threshold for medium complexity (yellow)
-BADGE_THRESHOLD_CC_HIGH = 15.0     # CC threshold for high complexity (orange)
-BADGE_THRESHOLD_EXCELLENT = 90     # Excellent threshold percentage
-BADGE_THRESHOLD_GOOD = 75          # Good threshold percentage
-BADGE_THRESHOLD_PASS = 60          # Pass threshold percentage
-BADGE_THRESHOLD_POOR = 40          # Poor threshold percentage
-BADGE_THRESHOLD_WARN = 50          # Warning threshold percentage

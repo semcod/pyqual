@@ -201,6 +201,11 @@ Environment:
         action="store_true",
         help="Show what would be done without running tools"
     )
+    parser.add_argument(
+        "--skip-claude", "-C",
+        action="store_true",
+        help="Skip Claude Code tool (useful when rate-limited)"
+    )
     return parser.parse_args()
 
 
@@ -237,7 +242,7 @@ def main() -> int:
     
     # Get available tools
     llm_model = os.environ.get("LLM_MODEL")
-    tools = get_available_tools(str(batch_file), len(batch_items), llm_model)
+    tools = get_available_tools(str(batch_file), len(batch_items), llm_model, skip_claude=args.skip_claude)
     
     if not tools:
         print("\nNo fix tools available — skipping")
