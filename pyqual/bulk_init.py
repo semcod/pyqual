@@ -86,7 +86,7 @@ PROJECT_CONFIG_SCHEMA: dict[str, Any] = {
         },
         "cc_max": {
             "type": "integer",
-            "default": 15,
+            "default": DEFAULT_CC_MAX,
             "description": "Max cyclomatic complexity threshold.",
         },
         "extra_stages": {
@@ -212,7 +212,7 @@ def _collect_makefile_targets(project_dir: Path) -> list[str]:
             m = re.match(r"^([A-Za-z0-9_-]+):", line)
             if m and not m.group(1).startswith("."):
                 targets.append(m.group(1))
-        return targets[:30]
+        return targets[:TOP_LEVEL_FILES_MAX]
     except OSError:
         return []
 
@@ -365,7 +365,7 @@ def classify_with_llm(fp: ProjectFingerprint, model: str | None = None) -> Proje
         lint_tool_preset=data.get("lint_tool_preset"),
         build_command=data.get("build_command"),
         extra_excludes=data.get("extra_excludes", []),
-        cc_max=data.get("cc_max", 15),
+        cc_max=data.get("cc_max", DEFAULT_CC_MAX),
         extra_stages=data.get("extra_stages", []),
     )
 
