@@ -1,0 +1,10 @@
+# planfile Integrations configuration
+integrations:
+  github:
+    token: ${GITHUB_TOKEN}
+    repo: semcod/pyqual
+
+  markdown:
+    changelog_file: CHANGELOG.md
+    todo_file: TODO.md
+    is_default: true

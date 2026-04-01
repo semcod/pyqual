@@ -24,8 +24,11 @@ from llx.utils.issues import (  # canonical upstream
     build_fix_prompt,
     load_issue_source as _load_issue_source,
 )
+from pyqual.constants import (
+    DEFAULT_MCP_PORT,
+)
 
-DEFAULT_ENDPOINT = "http://localhost:8000/sse"
+DEFAULT_ENDPOINT = f"http://localhost:{DEFAULT_MCP_PORT}/sse"
 
 # Re-export so existing ``from pyqual.integrations.llx_mcp import …``
 # keeps working without changes.

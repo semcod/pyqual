@@ -1,0 +1,27 @@
+{
+  "issues": "<list_length_150129>",
+  "metrics": "<list_length_734>",
+  "tasks": [],
+  "analyzed_files": "<list_length_26290>",
+  "summary": {
+    "total_issues": 150129,
+    "priority_breakdown": {
+      "critical": 8158,
+      "high": 301,
+      "medium": 25628,
+      "low": 116042
+    },
+    "category_breakdown": {
+      "bug": 29292,
+      "performance": 1012,
+      "refactor": 663,
+      "test": 93848,
+      "documentation": 22201,
+      "feature": 2822,
+      "technical_debt": 291
+    },
+    "total_metrics": 734,
+    "critical_metrics": 9,
+    "total_tasks": 0
+  }
+}

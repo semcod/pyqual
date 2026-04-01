@@ -14,6 +14,12 @@ import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
+from pyqual.constants import (
+    GITHUB_API_TIMEOUT,
+    GITHUB_DEFAULT_LABEL,
+    GITHUB_SEARCH_LIMIT,
+)
+
 
 @dataclass
 class GitHubTask:
@@ -108,7 +114,7 @@ class GitHubActionsReporter:
                 "--repo", self.repo,
                 "--state", "open",
                 "--json", "number,title",
-                "--limit", "5"
+                "--limit", str(GITHUB_SEARCH_LIMIT)
             ]
             result = subprocess.run(
                 cmd,
@@ -166,7 +172,8 @@ class GitHubActionsReporter:
         
         try:
             result = subprocess.run(
-                cmd, capture_output=True, text=True, timeout=30,
+                ["gh", "pr", "list", "--repo", self.repo, "--state", state, "--json", "number,title,body,state,url,labels,assignees"],
+                capture_output=True, text=True, timeout=GITHUB_API_TIMEOUT,
                 env={**os.environ, "GITHUB_TOKEN": self.token}
             )
             if result.returncode != 0:
@@ -203,7 +210,8 @@ class GitHubActionsReporter:
         
         try:
             result = subprocess.run(
-                cmd, capture_output=True, text=True, timeout=30,
+                ["gh", "pr", "list", "--repo", self.repo, "--state", state, "--json", "number,title,body,state,url,labels,assignees"],
+                capture_output=True, text=True, timeout=GITHUB_API_TIMEOUT,
                 env={**os.environ, "GITHUB_TOKEN": self.token}
             )
             if result.returncode != 0:
@@ -235,7 +243,7 @@ class GitHubActionsReporter:
         try:
             result = subprocess.run(
                 ["gh", "pr", "comment", str(pr), "--repo", self.repo, "--body", body],
-                capture_output=True, text=True, timeout=30,
+                capture_output=True, text=True, timeout=GITHUB_API_TIMEOUT,
                 env={**os.environ, "GITHUB_TOKEN": self.token}
             )
             return result.returncode == 0
@@ -250,7 +258,43 @@ class GitHubActionsReporter:
         try:
             result = subprocess.run(
                 ["gh", "issue", "comment", str(issue_number), "--repo", self.repo, "--body", body],
-                capture_output=True, text=True, timeout=30,
+                capture_output=True, text=True, timeout=GITHUB_API_TIMEOUT,
+                env={**os.environ, "GITHUB_TOKEN": self.token}
+            )
+            return result.returncode == 0
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            return False
+
+    def close_issue(self, issue_number: int, comment: str | None = None) -> bool:
+        """Close a GitHub issue."""
+        if not self.token or not self.repo:
+            return False
+
+        if comment:
+            self.post_issue_comment(comment, issue_number)
+
+        try:
+            result = subprocess.run(
+                ["gh", "issue", "close", str(issue_number), "--repo", self.repo],
+                capture_output=True, text=True, timeout=GITHUB_API_TIMEOUT,
+                env={**os.environ, "GITHUB_TOKEN": self.token}
+            )
+            return result.returncode == 0
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            return False
+
+    def close_pull_request(self, pr_number: int, comment: str | None = None) -> bool:
+        """Close a GitHub pull request."""
+        if not self.token or not self.repo:
+            return False
+
+        if comment:
+            self.post_pr_comment(comment, pr_number)
+
+        try:
+            result = subprocess.run(
+                ["gh", "pr", "close", str(pr_number), "--repo", self.repo],
+                capture_output=True, text=True, timeout=GITHUB_API_TIMEOUT,
                 env={**os.environ, "GITHUB_TOKEN": self.token}
             )
             return result.returncode == 0

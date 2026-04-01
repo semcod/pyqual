@@ -87,3 +87,22 @@ BULK_RUN_TABLE_WIDTH = 50      # from bulk_run.py:431
 REPORT_GATE_COVERAGE = 80      # from report.py:43
 REPORT_GATE_VALLM = 90         # from report.py:44
 REPORT_GATE_SECURITY = 80      # from report.py:47
+
+# ---------------------------------------------------------------------------
+# GitHub Integration
+# ---------------------------------------------------------------------------
+GITHUB_API_TIMEOUT = 30
+GITHUB_SEARCH_LIMIT = 5
+GITHUB_DEFAULT_LABEL = "pyqual-fix"
+
+# ---------------------------------------------------------------------------
+# Badge thresholds
+# ---------------------------------------------------------------------------
+BADGE_THRESHOLD_CC_LOW = 10
+BADGE_THRESHOLD_CC_MED = 15
+BADGE_THRESHOLD_CC_HIGH = 25
+BADGE_THRESHOLD_EXCELLENT = 90
+BADGE_THRESHOLD_GOOD = 80
+BADGE_THRESHOLD_PASS = 90
+BADGE_THRESHOLD_POOR = 60
+BADGE_THRESHOLD_WARN = 40

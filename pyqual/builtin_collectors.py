@@ -4,6 +4,13 @@ import json
 from pathlib import Path
 from typing import Any
 
+from pyqual.constants import (
+    CONFIG_READ_MAX_CHARS,
+    DEFAULT_CC_MAX,
+    DEFAULT_MCP_PORT,
+    LLX_MCP_REPORT,
+    PYQUAL_DIR,
+)
 from pyqual.plugins import MetricCollector, PluginMetadata, PluginRegistry
 
 
@@ -328,7 +335,7 @@ class LlxMcpFixCollector(MetricCollector):
         description="MCP-backed auto-fix/refactor workflow powered by llx and Aider in Docker",
         version="1.0.0",
         tags=["mcp", "docker", "llx", "llm", "fix", "refactor"],
-        config_example="""
+        config_example=f"""
 metrics:
   llx_fix_success_min: 1
   llx_fix_returncode_eq: 0
@@ -341,7 +348,7 @@ stages:
     timeout: 900
 
 env:
-  PYQUAL_LLX_MCP_URL: http://localhost:8000/sse
+  PYQUAL_LLX_MCP_URL: http://localhost:{DEFAULT_MCP_PORT}/sse
   PYQUAL_LLX_PROJECT_PATH: /workspace/project
   PYQUAL_LLX_USE_DOCKER: "false"
 """.strip(),

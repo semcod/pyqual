@@ -44,6 +44,13 @@ pipeline:
       when: first_iteration
       timeout: 300
 
+    - name: setup_tasks
+      run: |
+        planfile sync github
+        planfile sync markdown
+      when: first_iteration
+      optional: true
+
     # - name: analyze
     #   tool: code2llm
     #   when: first_iteration
@@ -139,6 +146,11 @@ pipeline:
       when: metrics_pass
       optional: true
       timeout: 300
+
+    - name: close_tasks
+      run: planfile sync all
+      when: metrics_pass
+      optional: true
 
     # Generate comprehensive markdown report with Mermaid diagram and ASCII flow
     - name: markdown_report

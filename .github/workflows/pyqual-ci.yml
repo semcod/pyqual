@@ -292,6 +292,7 @@ jobs:
         import os
         import sys
         import json
+        import re
         from pathlib import Path
         sys.path.insert(0, '.')
         
@@ -304,26 +305,105 @@ jobs:
             print("No issue number found")
             sys.exit(0)
         
+        # Parse pyqual output for metrics and gates
+        log_file = Path(".pyqual/pyqual_output.log")
+        pyqual_output = log_file.read_text() if log_file.exists() else ""
+        
+        # Check if all gates passed
+        all_gates_passed = "all_gates_passed: true" in pyqual_output or "result: all_gates_passed" in pyqual_output
+        
+        # Extract metrics from output
+        coverage_match = re.search(r'coverage:\s*(\d+)', pyqual_output)
+        cc_match = re.search(r'cc:\s*(\d+\.?\d*)', pyqual_output)
+        vallm_match = re.search(r'vallm_pass:\s*(\d+\.?\d*)', pyqual_output)
+        
+        coverage = float(coverage_match.group(1)) if coverage_match else None
+        cc = float(cc_match.group(1)) if cc_match else None
+        vallm = float(vallm_match.group(1)) if vallm_match else None
+        
+        # Check test results from log
+        tests_passed = "failed: 0" in pyqual_output or "passed:" in pyqual_output and "failed:" not in pyqual_output
+        
+        # Check pyqual.yaml thresholds
+        coverage_ok = coverage >= 55 if coverage else False
+        cc_ok = cc <= 15 if cc else False
+        vallm_ok = vallm >= 90 if vallm else False
+        
+        # Determine if we can close the issue
+        can_close = all_gates_passed and coverage_ok and cc_ok and vallm_ok and tests_passed
+        
+        print(f"Quality Gates Check:")
+        print(f"  all_gates_passed: {all_gates_passed}")
+        print(f"  coverage: {coverage}% (threshold: 55%) - {'✓' if coverage_ok else '✗'}")
+        print(f"  cc: {cc} (threshold: 15) - {'✓' if cc_ok else '✗'}")
+        print(f"  vallm_pass: {vallm}% (threshold: 90%) - {'✓' if vallm_ok else '✗'}")
+        print(f"  tests_passed: {tests_passed}")
+        print(f"  can_close_issue: {can_close}")
+        
         # Check if changes were made
         import subprocess
         result = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True)
         changes = result.stdout.strip()
         
-        if changes:
-            sha = os.environ.get('GITHUB_SHA', 'unknown')[:8]
-            body = "## ✅ Pyqual successfully processed this issue\n\n"
-            body += "Changes have been made and pushed to the repository.\n\n"
-            body += "### Files Modified\n<details>\n<summary>Click to see changes</summary>\n\n```\n"
-            body += changes[:2000]
-            body += f"\n```\n</details>\n\n---\n_Processed at: {sha}_"
+        if can_close:
+            if changes:
+                sha = os.environ.get('GITHUB_SHA', 'unknown')[:8]
+                body = "## ✅ Task completed successfully\n\n"
+                body += "All quality gates passed:\n"
+                body += f"- **Test coverage:** {coverage}% (≥55%)\n"
+                body += f"- **Cyclomatic complexity:** {cc} (≤15)\n"
+                body += f"- **VALLM pass rate:** {vallm}% (≥90%)\n"
+                body += f"- **All tests:** passed\n\n"
+                body += "Changes have been made and pushed to the repository.\n\n"
+                body += "### Files Modified\n<details>\n<summary>Click to see changes</summary>\n\n```\n"
+                body += changes[:2000]
+                body += f"\n```\n</details>\n\n"
+                body += "---\n"
+                body += "_Closing this issue as all requirements are met ✓_"
+            else:
+                body = "## ℹ️ No changes required\n\n"
+                body += "The pipeline ran successfully. All quality gates passed:\n"
+                body += f"- **Test coverage:** {coverage}% (≥55%)\n"
+                body += f"- **Cyclomatic complexity:** {cc} (≤15)\n"
+                body += f"- **VALLM pass rate:** {vallm}% (≥90%)\n\n"
+                body += "---\n"
+                body += "_Closing this issue as requirements are already met ✓_"
+            
+            # Post success comment
+            reporter.post_issue_comment(body, int(issue_number))
+            
+            # Close the issue
+            if reporter.token and reporter.repo:
+                import subprocess
+                close_cmd = [
+                    "gh", "issue", "close", str(issue_number),
+                    "--repo", reporter.repo,
+                    "--comment", "Auto-closed: All quality gates passed (coverage ≥55%, CC ≤15, VALLM ≥90%)"
+                ]
+                result = subprocess.run(
+                    close_cmd,
+                    capture_output=True, text=True,
+                    env={**os.environ, "GH_TOKEN": reporter.token}
+                )
+                if result.returncode == 0:
+                    print(f"✓ Closed issue #{issue_number}")
+                else:
+                    print(f"✗ Failed to close issue: {result.stderr[:200]}")
         else:
+            # Don't close - post status update only
             sha = os.environ.get('GITHUB_SHA', 'unknown')[:8]
-            body = "## ℹ️ Pyqual completed - no changes needed\n\n"
-            body += "The pipeline ran successfully but no automatic fixes were applied. "
-            body += "The issue may require manual intervention.\n\n"
+            body = "## 📊 Quality Gates Status\n\n"
+            body += "Pipeline completed but not all requirements met:\n\n"
+            body += f"- **all_gates_passed:** {'✓' if all_gates_passed else '✗'}\n"
+            body += f"- **coverage:** {coverage}% {'✓' if coverage_ok else '✗ (need ≥55%)'}\n"
+            body += f"- **cc:** {cc} {'✓' if cc_ok else '✗ (need ≤15)'}\n" 
+            body += f"- **vallm_pass:** {vallm}% {'✓' if vallm_ok else '✗ (need ≥90%)'}\n"
+            body += f"- **tests:** {'✓ passed' if tests_passed else '✗ failed'}\n\n"
+            body += "Issue remains open - manual review required.\n\n"
             body += f"---\n_Processed at: {sha}_"
-        
-        reporter.post_issue_comment(body, int(issue_number))
+            
+            reporter.post_issue_comment(body, int(issue_number))
+            print(f"✗ Issue #{issue_number} remains open - quality gates not fully met")
         
         # Update TODO.md to mark as done
         todo_path = Path("TODO.md")

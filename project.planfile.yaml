@@ -8,7 +8,10 @@ goals:
 - Improve code maintainability
 - Ensure consistent code style
 quality_gates:
-- metric: Prefact Issues
+- name: Zero Prefact Issues
+  description: Ensure no issues remain from prefact analysis
+  metric: Prefact Issues
+  criteria: 'count == 0'
   threshold: '0'
 sprints:
 - id: sprint-1

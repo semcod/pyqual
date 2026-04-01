@@ -77,13 +77,16 @@ def get_last_run(db_path: Path) -> PipelineRun | None:
     # Parse stages from recent entries (within last 10 minutes of latest)
     stages = []
     total_duration = 0.0
-    all_gates_passed = True
     gates = []
     metrics = {}
     
     for row in rows[:20]:  # Last 20 stages max
         kwargs = parse_kwargs(row['kwargs'])
-        stage_name = kwargs.get('stage', 'unknown')
+        stage_name = kwargs.get('stage', '')
+        
+        # Skip entries without proper stage name (filter out 'unknown')
+        if not stage_name or stage_name == 'unknown':
+            continue
         
         # Skip duplicate stages (keep most recent)
         if any(s.name == stage_name for s in stages):
@@ -98,7 +101,6 @@ def get_last_run(db_path: Path) -> PipelineRun | None:
             status = 'passed'
         else:
             status = 'failed'
-            all_gates_passed = False
         
         stages.append(StageResult(
             name=stage_name,
@@ -118,17 +120,46 @@ def get_last_run(db_path: Path) -> PipelineRun | None:
             metrics['files'] = kwargs['files']
         if 'passed' in kwargs and isinstance(kwargs['passed'], int):
             metrics['tests_passed'] = kwargs['passed']
+        # Extract coverage from coverage.json if available
+        if 'coverage' in kwargs:
+            metrics['coverage'] = kwargs['coverage']
+        elif 'coverage_percent' in kwargs:
+            metrics['coverage'] = kwargs['coverage_percent']
     
-    # Build gates from metrics
+    # Build gates from metrics with proper thresholds from config
     if 'cc' in metrics:
-        gates.append({'metric': 'cc', 'value': metrics['cc'], 'threshold': 15.0, 'passed': metrics['cc'] <= 15.0})
+        gates.append({'metric': 'cc', 'value': metrics['cc'], 'threshold': 15.0, 'operator': '<=', 'passed': metrics['cc'] <= 15.0})
     if 'vallm_pass_pct' in metrics:
-        gates.append({'metric': 'vallm_pass', 'value': metrics['vallm_pass_pct'], 'threshold': 90.0, 'passed': metrics['vallm_pass_pct'] >= 90.0})
+        gates.append({'metric': 'vallm_pass', 'value': metrics['vallm_pass_pct'], 'threshold': 90.0, 'operator': '>=', 'passed': metrics['vallm_pass_pct'] >= 90.0})
+    if 'coverage' in metrics:
+        gates.append({'metric': 'coverage', 'value': metrics['coverage'], 'threshold': 55.0, 'operator': '>=', 'passed': metrics['coverage'] >= 55.0})
+    
+    # Calculate all_gates_passed based on actual gates, not stages
+    all_gates_passed = all(gate.get('passed', False) for gate in gates) if gates else True
     
     conn.close()
     
     # Reverse stages to show in execution order
     stages.reverse()
+    
+    # Read coverage from file if available and not already extracted
+    if 'coverage' not in metrics:
+        coverage_file = db_path.parent / "coverage.json"
+        if coverage_file.exists():
+            try:
+                cov_data = json.loads(coverage_file.read_text())
+                if 'totals' in cov_data and 'percent_covered' in cov_data['totals']:
+                    metrics['coverage'] = cov_data['totals']['percent_covered']
+                elif 'percent_covered' in cov_data:
+                    metrics['coverage'] = cov_data['percent_covered']
+            except (json.JSONDecodeError, KeyError):
+                pass
+    
+    # Rebuild gates with coverage if now available
+    if 'coverage' in metrics and not any(g.get('metric') == 'coverage' for g in gates):
+        gates.append({'metric': 'coverage', 'value': metrics['coverage'], 'threshold': 55.0, 'operator': '>=', 'passed': metrics['coverage'] >= 55.0})
+        # Recalculate all_gates_passed
+        all_gates_passed = all(gate.get('passed', False) for gate in gates) if gates else True
     
     return PipelineRun(
         timestamp=latest_timestamp,
@@ -210,13 +241,27 @@ def generate_metrics_table(run: PipelineRun) -> str:
     lines.append("| Metric | Value | Threshold | Status |")
     lines.append("|--------|-------|-----------|--------|")
     
+    # Format values with proper units
     for gate in run.gates:
         metric = gate.get('metric', 'unknown')
         value = gate.get('value', 0)
         threshold = gate.get('threshold', 0)
+        operator = gate.get('operator', '>=')
         passed = gate.get('passed', False)
         status = "✅ PASS" if passed else "❌ FAIL"
-        lines.append(f"| {metric} | {value} | {threshold} | {status} |")
+        
+        # Format value based on metric type
+        if metric == 'cc':
+            value_str = f"{value:.1f}"
+            threshold_str = f"{operator} {threshold:.1f}"
+        elif metric in ('vallm_pass', 'coverage'):
+            value_str = f"{value:.1f}%"
+            threshold_str = f"{operator} {threshold:.1f}%"
+        else:
+            value_str = str(value)
+            threshold_str = f"{operator} {threshold}"
+        
+        lines.append(f"| {metric} | {value_str} | {threshold_str} | {status} |")
     
     return '\n'.join(lines)
 
