@@ -1,5 +1,7 @@
 """CLI for pyqual — declarative quality gate loops."""
 
+from __future__ import annotations
+
 import asyncio
 import json
 import logging

@@ -12,6 +12,8 @@ Or directly:
     python -m pyqual.report [--workdir .] [--config pyqual.yaml] [--readme README.md]
 """
 
+from __future__ import annotations
+
 import json
 import os
 import re
