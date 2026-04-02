@@ -275,7 +275,7 @@ jobs:
         path: dashboard
     
     - name: Download results
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
         pattern: pyqual-results-python*
         path: dashboard/data/
