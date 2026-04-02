@@ -1,0 +1,19 @@
+I can't edit anything yet because you haven't added the repository files to the chat.
+
+Please add the relevant files (or the whole repo) so I can fix the 5 issues you requested.
+At minimum, please upload:
+- TODO.md (so I can see the listed issues) -- I will not modify this file.
+- All Python files that TODO.md references, or at least the specific Python files that contain the reported issues.
+
+What I'll do once you upload the files:
+1) Inspect TODO.md and the referenced source files.
+2) Remove unused imports and duplicate imports (consolidate imports where appropriate).
+3) Replace magic numbers with named constants (module-level constants or configuration).
+4) Make minimal, well-documented edits and run a quick static-style cleanup.
+5) Produce SEARCH/REPLACE blocks to apply each change (one block per edit) and suggest any short shell commands (e.g., tests or linters) you can run.
+
+Please upload the files now (paste file contents or add files). After you do, I'll:
+- List the exact edits I'm going to make.
+- Provide the SEARCH/REPLACE blocks to apply them.
+
+End.
