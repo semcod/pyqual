@@ -201,7 +201,7 @@ jobs:
     
     - name: Upload coverage to Codecov
       if: matrix.python-version == env.PYTHON_VERSION && always()
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v6
       with:
         file: ./.pyqual/coverage.json
         flags: unittests
