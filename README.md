@@ -3,7 +3,7 @@
 # pyqual
 
 <!-- pyqual:badges:start -->
-![Version](https://img.shields.io/badge/version-0.1.93-blue) ![Python](https://img.shields.io/badge/python-%3E%3D3.9-blue) ![License](https://img.shields.io/badge/license-Apache-2.0-green) ![AI Cost](https://img.shields.io/badge/AI%20Cost-%2418.90%20%28126%20commits%29-red) ![Human Time](https://img.shields.io/badge/Human%20Time-39.5h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fopenai%2Fgpt-5-mini-lightgrey)
+![Version](https://img.shields.io/badge/version-0.1.94-blue) ![Python](https://img.shields.io/badge/python-%3E%3D3.9-blue) ![License](https://img.shields.io/badge/license-Apache-2.0-green) ![AI Cost](https://img.shields.io/badge/AI%20Cost-%2419.05%20%28127%20commits%29-red) ![Human Time](https://img.shields.io/badge/Human%20Time-40.0h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fopenai%2Fgpt-5-mini-lightgrey)
 ![pyqual](https://img.shields.io/badge/pyqual-fail-red) ![gates](https://img.shields.io/badge/gates-2%2F4-orange) ![CC̄](https://img.shields.io/badge/CC%CC%84-5.5-brightgreen) ![coverage](https://img.shields.io/badge/coverage-59%25-red) ![vallm](https://img.shields.io/badge/vallm-88%25-green) ![critical](https://img.shields.io/badge/critical-21-red) ![errors](https://img.shields.io/badge/errors-5-orange)
 <!-- pyqual:badges:end -->
 
