@@ -370,7 +370,7 @@ jobs:
         
         from pyqual.github_actions import GitHubActionsReporter
         from pyqual.gates import GateSet
-        from pyqual.config import load_config
+        from pyqual.config import PyqualConfig
         
         reporter = GitHubActionsReporter()
         
@@ -391,15 +391,8 @@ jobs:
         
         # Calculate completion percentage using pyqual gates
         try:
-            config = load_config()
-            gates_config = config.get("pipeline", {}).get("metrics", {})
-            from pyqual.config import GateConfig
-            gate_configs = [
-                GateConfig(metric="coverage", threshold=gates_config.get("coverage_min", 55), operator="ge"),
-                GateConfig(metric="cc_max", threshold=gates_config.get("cc_max", 15), operator="le"),
-                GateConfig(metric="vallm_pass", threshold=gates_config.get("vallm_pass_min", 90), operator="ge"),
-            ]
-            gate_set = GateSet(gate_configs)
+            config = PyqualConfig.load()
+            gate_set = GateSet(config.gates)
             completion_pct = gate_set.completion_percentage(Path("."))
             print(f"📊 Ticket completion: {completion_pct:.1f}%")
         except Exception as e:
