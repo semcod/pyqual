@@ -46,8 +46,6 @@ BULK_STAGE_COLUMN_MAX_WIDTH = 20
 # ---------------------------------------------------------------------------
 # LLM / AI
 # ---------------------------------------------------------------------------
-DEFAULT_MAX_TOKENS = 2000
-CONFIG_READ_MAX_CHARS = 2000
 LLM_FIX_MAX_TOKENS = 1200       # for auto-fix config
 LLM_HISTORY_MAX_TOKENS = 1500   # for history command
 

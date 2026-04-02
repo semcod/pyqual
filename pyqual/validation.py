@@ -155,6 +155,34 @@ _LINT_PATTERNS: list[re.Pattern] = [
 ]
 
 
+def _match_env_subtype(combined: str) -> str:
+    """Distinguish API-key vs network vs generic env failures."""
+    upper = combined.upper()
+    if "API" in upper or "KEY" in upper:
+        return EC.ENV_API_KEY_MISSING
+    return EC.ENV_TOOL_MISSING
+
+
+def _match_fix_env_subtype(combined: str) -> str:
+    """Distinguish fix-stage env failure subtypes."""
+    upper = combined.upper()
+    lower = combined.lower()
+    if "API" in upper or "KEY" in upper:
+        return EC.LLM_API_KEY_MISSING
+    if "network" in lower or "connect" in lower:
+        return EC.LLM_NETWORK_ERROR
+    return EC.LLM_FIX_FAILED
+
+
+# Ordered (pattern_list, error_code) pairs for general failure classification.
+_GENERAL_CLASSIFIERS: list[tuple[list[re.Pattern], str]] = [
+    (_ENV_PATTERNS, "ENV"),
+    (_LLM_PATTERNS, EC.LLM_GENERIC),
+    (_TEST_PATTERNS, EC.PROJECT_TEST_FAILURE),
+    (_LINT_PATTERNS, EC.PROJECT_LINT_FAILURE),
+]
+
+
 def _classify_failure(f: StageFailure) -> str:
     if f.timed_out:
         return EC.PIPELINE_TIMEOUT
@@ -165,33 +193,17 @@ def _classify_failure(f: StageFailure) -> str:
     if f.is_fix_stage:
         for pat in _ENV_PATTERNS:
             if pat.search(combined):
-                if "API" in combined.upper() or "KEY" in combined.upper():
-                    return EC.LLM_API_KEY_MISSING
-                if "network" in combined.lower() or "connect" in combined.lower():
-                    return EC.LLM_NETWORK_ERROR
+                return _match_fix_env_subtype(combined)
         return EC.LLM_FIX_FAILED
 
     # No output at all — binary likely missing
     if not combined and f.returncode != 0:
         return EC.ENV_TOOL_MISSING
 
-    for pat in _ENV_PATTERNS:
-        if pat.search(combined):
-            if "API" in combined.upper() or "KEY" in combined.upper():
-                return EC.ENV_API_KEY_MISSING
-            return EC.ENV_TOOL_MISSING
-
-    for pat in _LLM_PATTERNS:
-        if pat.search(combined):
-            return EC.LLM_GENERIC
-
-    for pat in _TEST_PATTERNS:
-        if pat.search(combined):
-            return EC.PROJECT_TEST_FAILURE
-
-    for pat in _LINT_PATTERNS:
-        if pat.search(combined):
-            return EC.PROJECT_LINT_FAILURE
+    for patterns, code in _GENERAL_CLASSIFIERS:
+        for pat in patterns:
+            if pat.search(combined):
+                return _match_env_subtype(combined) if code == "ENV" else code
 
     return EC.PROJECT_GENERIC
 
@@ -422,6 +434,23 @@ def validate_config(config_path: Path) -> ValidationResult:
 # Project-type heuristics (for fix-config / LLM context)
 # ---------------------------------------------------------------------------
 
+_LANG_MARKERS: dict[str, tuple[str, ...]] = {
+    "python": ("pyproject.toml", "setup.py", "setup.cfg"),
+    "nodejs": ("package.json",),
+    "rust": ("Cargo.toml",),
+    "go": ("go.mod",),
+    "java": ("pom.xml", "build.gradle"),
+}
+
+
+def _detect_language(file_names: set[str]) -> str:
+    """Detect project language from marker files."""
+    for lang, markers in _LANG_MARKERS.items():
+        if any(m in file_names for m in markers):
+            return lang
+    return "unknown"
+
+
 def detect_project_facts(workdir: Path) -> dict[str, Any]:
     """Scan project directory and return facts for LLM-based config repair."""
     facts: dict[str, Any] = {"workdir": str(workdir)}
@@ -429,19 +458,7 @@ def detect_project_facts(workdir: Path) -> dict[str, Any]:
     files = list(workdir.iterdir()) if workdir.exists() else []
     file_names = {f.name for f in files}
 
-    # Language / framework
-    if "pyproject.toml" in file_names or "setup.py" in file_names or "setup.cfg" in file_names:
-        facts["lang"] = "python"
-    elif "package.json" in file_names:
-        facts["lang"] = "nodejs"
-    elif "Cargo.toml" in file_names:
-        facts["lang"] = "rust"
-    elif "go.mod" in file_names:
-        facts["lang"] = "go"
-    elif "pom.xml" in file_names or "build.gradle" in file_names:
-        facts["lang"] = "java"
-    else:
-        facts["lang"] = "unknown"
+    facts["lang"] = _detect_language(file_names)
 
     # Available tools on PATH
     available_tools = []

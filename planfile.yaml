@@ -1148,3 +1148,224 @@ sprints:
     model_hints:
       planning: balanced
       implementation: balanced
+  - id: ticket-137d757c
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/_plugin_base.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/_plugin_base.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-30f596db
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/_gate_collectors.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/_gate_collectors.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7b55429d
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/bulk_init.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/bulk_init.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-5d12f8dd
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/bulk_run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/bulk_run.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c6ebf639
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/cli_plugin_helpers.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/cli_plugin_helpers.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e76f259f
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/config.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/config.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-5e6752d1
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/documentation.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/documentation.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-87d41349
+    name: Fix duplicate-imports issues
+    description: Resolve 1 duplicate-imports issues in pyqual/documentation.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/documentation.py
+    rule_id: duplicate-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4515ac7b
+    name: Fix magic-numbers issues
+    description: Resolve 5 magic-numbers issues in pyqual/documentation.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - pyqual/documentation.py
+    rule_id: magic-numbers
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-42aa8c6b
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in pyqual/documentation.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/documentation.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-429fb650
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/gates.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/gates.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-306f5515
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/llm.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/llm.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ceb1d4da
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/parallel.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/parallel.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f6b368af
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/pipeline.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/pipeline.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-03f2f31f
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/report.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/report.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4d56a5a9
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/report_generator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/report_generator.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-958781ee
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/validation.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/validation.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced

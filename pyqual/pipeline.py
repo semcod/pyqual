@@ -222,29 +222,23 @@ class Pipeline:
         iteration: int = 1,
     ) -> bool:
         """Determine if a stage should run based on its 'when' condition."""
-        if stage.when == "always":
-            return True
-        if stage.when == "first_iteration":
-            return iteration == 1
-        if stage.when == "metrics_fail":
-            return not gates_pass
-        if stage.when == "metrics_pass":
-            return gates_pass
-        if stage.when == "any_stage_fail":
-            if not stages_so_far:
-                return False
-            return any(
-                not s.passed and not s.skipped for s in stages_so_far
+        def _has_matching_stage(keyword: str) -> bool:
+            return bool(stages_so_far) and any(
+                keyword in s.name.lower() and not s.skipped for s in stages_so_far
             )
-        if stage.when == "after_fix":
-            if not stages_so_far:
-                return False
-            return any("fix" in s.name.lower() and not s.skipped for s in stages_so_far)
-        if stage.when == "after_verify_fix":
-            if not stages_so_far:
-                return False
-            return any("verify" in s.name.lower() and not s.skipped for s in stages_so_far)
-        return True
+
+        handlers = {
+            "always": lambda: True,
+            "first_iteration": lambda: iteration == 1,
+            "metrics_fail": lambda: not gates_pass,
+            "metrics_pass": lambda: gates_pass,
+            "any_stage_fail": lambda: bool(stages_so_far) and any(
+                not s.passed and not s.skipped for s in stages_so_far
+            ),
+            "after_fix": lambda: _has_matching_stage("fix"),
+            "after_verify_fix": lambda: _has_matching_stage("verify"),
+        }
+        return handlers.get(stage.when, lambda: True)()
 
     def _resolve_tool_stage(self, stage: StageConfig) -> tuple[str, bool]:
         """Resolve a tool-based stage to (command, allow_failure).
@@ -273,6 +267,42 @@ class Pipeline:
 
         return preset.shell_command("."), preset.allow_failure
 
+    def _resolve_env(self) -> dict[str, str]:
+        """Resolve ${VAR} references in config env values against os.environ.
+
+        Drops entries whose value is an unresolvable ${VAR} so they don't
+        overwrite real env vars (e.g. OAuth session tokens).
+        """
+        resolved: dict[str, str] = {}
+        for k, v in self.config.env.items():
+            if isinstance(v, str) and v.startswith("${") and v.endswith("}"):
+                real = os.environ.get(v[2:-1])
+                if real:
+                    resolved[k] = real
+            else:
+                resolved[k] = str(v)
+        return resolved
+
+    @staticmethod
+    def _check_optional_binary(command: str) -> str | None:
+        """Return the missing binary name if an optional command's binary isn't on PATH.
+
+        Returns None when the binary is available (or can't be checked).
+        """
+        cmd_stripped = command.strip()
+        if "\n" in cmd_stripped:
+            return None
+        if "|" in cmd_stripped:
+            cmd_stripped = cmd_stripped.rsplit("|", 1)[-1].strip()
+        binary = cmd_stripped.split()[0] if cmd_stripped else ""
+        shell_builtins = {
+            "set", "export", "cd", "source", ".", "exec", "eval",
+            "true", "false", "test", "[", "[[",
+        }
+        if binary and binary not in shell_builtins and "=" not in binary and not shutil.which(binary):
+            return binary
+        return None
+
     def _execute_stage(self, stage: StageConfig, dry_run: bool) -> StageResult:
         """Execute a single stage command."""
         command = stage.run
@@ -291,25 +321,15 @@ class Pipeline:
                 self._log_stage(stage, result)
                 return result
         elif stage.optional and command:
-            # Extract the main binary, handling pipes (e.g. "yes | goal push ...")
-            # and env-var prefixes. Check the last pipe segment's first word.
-            # Skip check for multi-line scripts (shell scripts don't need binary check).
-            cmd_stripped = command.strip()
-            is_multiline = "\n" in cmd_stripped
-            if not is_multiline:
-                if "|" in cmd_stripped:
-                    cmd_stripped = cmd_stripped.rsplit("|", 1)[-1].strip()
-                binary = cmd_stripped.split()[0] if cmd_stripped else ""
-                # Skip shell builtins and assignment-like tokens
-                shell_builtins = {"set", "export", "cd", "source", ".", "exec", "eval", "true", "false", "test", "[", "[["}
-                if binary and binary not in shell_builtins and "=" not in binary and not shutil.which(binary):
-                    result = StageResult(
-                        name=stage.name, returncode=0,
-                        stdout=f"[skipped] '{binary}' not found on PATH (optional)",
-                        stderr="", duration=0.0, skipped=True,
-                    )
-                    self._log_stage(stage, result)
-                    return result
+            missing = self._check_optional_binary(command)
+            if missing:
+                result = StageResult(
+                    name=stage.name, returncode=0,
+                    stdout=f"[skipped] '{missing}' not found on PATH (optional)",
+                    stderr="", duration=0.0, skipped=True,
+                )
+                self._log_stage(stage, result)
+                return result
 
         if dry_run:
             label = f"tool:{stage.tool}" if stage.tool else stage.run
@@ -331,20 +351,7 @@ class Pipeline:
             or (stage.tool and stage.tool in ("llx-fix", "aider"))
         )
 
-        # Resolve ${VAR} references in config env values against os.environ.
-        # Drop entries whose value is an unresolvable ${VAR} so they don't
-        # overwrite real env vars (e.g. OAuth session tokens).
-        resolved_env: dict[str, str] = {}
-        for k, v in self.config.env.items():
-            if isinstance(v, str) and v.startswith("${") and v.endswith("}"):
-                ref = v[2:-1]
-                real = os.environ.get(ref)
-                if real:
-                    resolved_env[k] = real
-                # else: drop — don't overwrite os.environ with literal "${…}"
-            else:
-                resolved_env[k] = str(v)
-        env = {**os.environ, **resolved_env}
+        env = {**os.environ, **self._resolve_env()}
         start = time.monotonic()
 
         if self.stream:

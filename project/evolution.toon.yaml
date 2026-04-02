@@ -1,4 +1,4 @@
-# code2llm/evolution | 328 func | 42f | 2026-04-02
+# code2llm/evolution | 351 func | 46f | 2026-04-02
 
 NEXT[10] (ranked by impact):
   [1] !! SPLIT           pyqual/cli.py
@@ -6,12 +6,12 @@ NEXT[10] (ranked by impact):
       EFFORT: ~4h  IMPACT: 25250
 
   [2] !! SPLIT           pyqual/bulk_init.py
-      WHY: 714L, 3 classes, max CC=26
-      EFFORT: ~4h  IMPACT: 18564
+      WHY: 716L, 3 classes, max CC=26
+      EFFORT: ~4h  IMPACT: 18616
 
   [3] !! SPLIT           pyqual/pipeline.py
-      WHY: 614L, 10 classes, max CC=29
-      EFFORT: ~4h  IMPACT: 17806
+      WHY: 623L, 10 classes, max CC=18
+      EFFORT: ~4h  IMPACT: 11214
 
   [4] !! SPLIT-FUNC      main  CC=36  fan=36
       WHY: CC=36 exceeds 15
@@ -25,30 +25,30 @@ NEXT[10] (ranked by impact):
       WHY: CC=33 exceeds 15
       EFFORT: ~1h  IMPACT: 693
 
-  [7] !! SPLIT-FUNC      Pipeline._execute_stage  CC=29  fan=23
-      WHY: CC=29 exceeds 15
-      EFFORT: ~1h  IMPACT: 667
-
-  [8] !  SPLIT-FUNC      PyqualConfig._parse  CC=23  fan=24
+  [7] !  SPLIT-FUNC      PyqualConfig._parse  CC=23  fan=24
       WHY: CC=23 exceeds 15
       EFFORT: ~1h  IMPACT: 552
 
-  [9] !  SPLIT-FUNC      main  CC=20  fan=26
+  [8] !  SPLIT-FUNC      main  CC=20  fan=26
       WHY: CC=20 exceeds 15
       EFFORT: ~1h  IMPACT: 520
 
-  [10] !! SPLIT-FUNC      validate_config  CC=26  fan=20
+  [9] !! SPLIT-FUNC      validate_config  CC=26  fan=20
       WHY: CC=26 exceeds 15
       EFFORT: ~1h  IMPACT: 520
+
+  [10] !  SPLIT-FUNC      _read_costs_data  CC=22  fan=20
+      WHY: CC=22 exceeds 15
+      EFFORT: ~1h  IMPACT: 440
 
 
 RISKS[3]:
   ⚠ Splitting pyqual/cli.py may break 21 import paths
   ⚠ Splitting pyqual/bulk_init.py may break 15 import paths
-  ⚠ Splitting pyqual/pipeline.py may break 24 import paths
+  ⚠ Splitting pyqual/pipeline.py may break 26 import paths
 
 METRICS-TARGET:
-  CC̄:          5.5 → ≤3.8
+  CC̄:          5.4 → ≤3.8
   max-CC:      36 → ≤18
   god-modules: 6 → 0
   high-CC(≥15): 21 → ≤10
@@ -79,4 +79,4 @@ PATTERNS (language parser shared logic):
     - Standardized FunctionInfo/ClassInfo models
 
 HISTORY:
-  prev CC̄=6.0 → now CC̄=5.5
+  prev CC̄=5.5 → now CC̄=5.4

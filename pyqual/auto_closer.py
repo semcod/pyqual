@@ -57,7 +57,7 @@ def get_diff_content() -> str:
             ["git", "diff"],
             capture_output=True, text=True, timeout=10
         )
-        diff += "\n" + res.stdout
+        diff += f"\n{res.stdout}"
         return diff
     except Exception:
         return ""

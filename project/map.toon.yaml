@@ -1,11 +1,11 @@
-# pyqual | 53f 11120L | shell:1,typescript:11,javascript:2,python:39 | 2026-04-02
-# stats: 328 func | 0 cls | 53 mod | CC̄=5.5 | critical:21 | cycles:0
+# pyqual | 58f 12031L | shell:3,typescript:11,javascript:2,python:42 | 2026-04-02
+# stats: 351 func | 0 cls | 58 mod | CC̄=5.4 | critical:21 | cycles:0
 # alerts[5]: fan-out run=50; fan-out register_observe_commands=41; CC main=36; fan-out main=36; CC get_last_run=33
 # hotspots[5]: run fan=50; register_observe_commands fan=41; main fan=36; main fan=26; PyqualConfig._parse fan=24
-# evolution: CC̄ 6.0→5.5 (improved -0.5)
+# evolution: CC̄ 5.5→5.4 (improved -0.1)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[53]:
-  dashboard/api/main.py,346
+M[58]:
+  dashboard/api/main.py,340
   dashboard/constants.py,57
   dashboard/postcss.config.js,6
   dashboard/src/App.tsx,201
@@ -20,43 +20,48 @@ M[53]:
   dashboard/src/types/index.ts,62
   dashboard/tailwind.config.js,11
   dashboard/vite.config.ts,20
+  integration/run_docker_matrix.sh,5
+  integration/run_matrix.sh,211
   project.sh,36
   pyqual/__init__.py,85
-  pyqual/_gate_collectors.py,497
-  pyqual/_plugin_base.py,85
+  pyqual/_gate_collectors.py,499
+  pyqual/_plugin_base.py,87
   pyqual/auto_closer.py,208
-  pyqual/builtin_collectors.py,437
-  pyqual/bulk_init.py,714
-  pyqual/bulk_run.py,557
+  pyqual/builtin_collectors.py,436
+  pyqual/bulk_init.py,716
+  pyqual/bulk_run.py,559
   pyqual/cli.py,1010
   pyqual/cli_bulk_cmds.py,243
-  pyqual/cli_log_helpers.py,119
-  pyqual/cli_observe.py,324
-  pyqual/cli_plugin_helpers.py,191
-  pyqual/cli_run_helpers.py,325
-  pyqual/config.py,261
-  pyqual/constants.py,108
+  pyqual/cli_log_helpers.py,117
+  pyqual/cli_observe.py,322
+  pyqual/cli_plugin_helpers.py,193
+  pyqual/cli_run_helpers.py,323
+  pyqual/config.py,263
+  pyqual/constants.py,106
+  pyqual/custom_fix.py,218
+  pyqual/documentation.py,388
   pyqual/fix_tools/__init__.py,47
   pyqual/fix_tools/aider.py,49
   pyqual/fix_tools/base.py,53
   pyqual/fix_tools/claude.py,33
   pyqual/fix_tools/llx.py,36
-  pyqual/gates.py,101
-  pyqual/github_actions.py,358
+  pyqual/gates.py,109
+  pyqual/github_actions.py,357
+  pyqual/github_tasks.py,64
   pyqual/integrations/__init__.py,1
   pyqual/integrations/llx_mcp.py,101
   pyqual/integrations/llx_mcp_service.py,68
-  pyqual/llm.py,124
-  pyqual/parallel.py,326
-  pyqual/pipeline.py,614
+  pyqual/llm.py,126
+  pyqual/parallel.py,328
+  pyqual/pipeline.py,623
   pyqual/plugins.py,52
-  pyqual/profiles.py,132
-  pyqual/report.py,551
-  pyqual/report_generator.py,364
+  pyqual/profiles.py,133
+  pyqual/report.py,553
+  pyqual/report_generator.py,366
   pyqual/run_parallel_fix.py,370
   pyqual/tickets.py,73
   pyqual/tools.py,323
-  pyqual/validation.py,461
+  pyqual/validation.py,464
   run_analysis.py,87
 D:
   pyqual/run_parallel_fix.py:
@@ -79,31 +84,6 @@ D:
     generate_stage_details(run)
     generate_report(workdir)
     main()
-  pyqual/pipeline.py:
-    e: OnStageStart,OnIterationStart,OnStageError,OnStageDone,OnStageOutput,OnIterationDone,StageResult,IterationResult,PipelineResult,Pipeline
-    OnStageStart(Protocol): __call__(1)
-    OnIterationStart(Protocol): __call__(1)
-    OnStageError(Protocol): __call__(1)
-    OnStageDone(Protocol): __call__(1)  # Called after each stage completes. Receives the full StageRe...
-    OnStageOutput(Protocol): __call__(3)  # Called with each line of streaming output from a stage...
-    OnIterationDone(Protocol): __call__(1)  # Called after each iteration completes. Receives the full Ite...
-    StageResult:  # Result of running a single stage...
-    IterationResult:  # Result of one full pipeline iteration...
-    PipelineResult:  # Result of the complete pipeline run (all iterations)...
-    Pipeline: __init__(9),run(1),check_gates(0),_run_iteration(2),_iteration_stagnated(0),_should_run_stage(4),_resolve_tool_stage(1),_execute_stage(2),_execute_captured(5),_execute_streaming(5),_init_nfo(0),_nfo_emit(4),_is_fix_stage(1),_log_stage(2),_archive_llx_report(2),_log_gates(2),_log_event(1),_ensure_pyqual_dir(0)  # Execute pipeline stages in a loop until quality gates pass...
-  pyqual/validation.py:
-    e: ErrorDomain,EC,StageFailure,Severity,ValidationIssue,ValidationResult,error_domain,_classify_failure,_resolve_gate_metric,validate_config,detect_project_facts
-    ErrorDomain(str,Enum):
-    EC:  # Namespace for standardised error-code string constants...
-    StageFailure:  # Runtime failure description from a completed stage...
-    Severity(str,Enum):
-    ValidationIssue:  # Single validation finding...
-    ValidationResult: add(5)  # Aggregated result of validating one pyqual.yaml...
-    error_domain(code)
-    _classify_failure(f)
-    _resolve_gate_metric(gate_key)
-    validate_config(config_path)
-    detect_project_facts(workdir)
   pyqual/bulk_init.py:
     e: ProjectFingerprint,ProjectConfig,BulkInitResult,_collect_top_level_entries,_collect_manifests,_collect_file_extensions,_load_json_object,_collect_json_scripts,_collect_makefile_targets,_collect_pyproject_metadata,_collect_readme_excerpt,collect_fingerprint,_build_llm_prompt,classify_with_llm,_classify_heuristic,_safe_name,generate_pyqual_yaml,bulk_init
     ProjectFingerprint:  # Lightweight summary of a project directory sent to LLM for c...
@@ -124,6 +104,19 @@ D:
     _safe_name(name)
     generate_pyqual_yaml(project_name;cfg)
     bulk_init(root)
+  pyqual/validation.py:
+    e: ErrorDomain,EC,StageFailure,Severity,ValidationIssue,ValidationResult,error_domain,_classify_failure,_resolve_gate_metric,validate_config,detect_project_facts
+    ErrorDomain(str,Enum):
+    EC:  # Namespace for standardised error-code string constants...
+    StageFailure:  # Runtime failure description from a completed stage...
+    Severity(str,Enum):
+    ValidationIssue:  # Single validation finding...
+    ValidationResult: add(5)  # Aggregated result of validating one pyqual.yaml...
+    error_domain(code)
+    _classify_failure(f)
+    _resolve_gate_metric(gate_key)
+    validate_config(config_path)
+    detect_project_facts(workdir)
   pyqual/cli.py:
     e: _setup_logging,init,profiles,run,gates,validate,fix_config,status,report,_run_mcp_workflow,mcp_fix,mcp_refactor,mcp_service,tickets_todo,tickets_github,tickets_all,tickets_fetch,tickets_comment,plugin,doctor,tools
     _setup_logging(verbose;workdir)
@@ -218,6 +211,18 @@ D:
     build_dashboard_table(states)
     discover_projects(root)
     bulk_run(root)
+  pyqual/pipeline.py:
+    e: OnStageStart,OnIterationStart,OnStageError,OnStageDone,OnStageOutput,OnIterationDone,StageResult,IterationResult,PipelineResult,Pipeline
+    OnStageStart(Protocol): __call__(1)
+    OnIterationStart(Protocol): __call__(1)
+    OnStageError(Protocol): __call__(1)
+    OnStageDone(Protocol): __call__(1)  # Called after each stage completes. Receives the full StageRe...
+    OnStageOutput(Protocol): __call__(3)  # Called with each line of streaming output from a stage...
+    OnIterationDone(Protocol): __call__(1)  # Called after each iteration completes. Receives the full Ite...
+    StageResult:  # Result of running a single stage...
+    IterationResult:  # Result of one full pipeline iteration...
+    PipelineResult:  # Result of the complete pipeline run (all iterations)...
+    Pipeline: __init__(9),run(1),check_gates(0),_run_iteration(2),_iteration_stagnated(0),_should_run_stage(4),_resolve_tool_stage(1),_resolve_env(0),_check_optional_binary(0),_execute_stage(2),_execute_captured(5),_execute_streaming(5),_init_nfo(0),_nfo_emit(4),_is_fix_stage(1),_log_stage(2),_archive_llx_report(2),_log_gates(2),_log_event(1),_ensure_pyqual_dir(0)  # Execute pipeline stages in a loop until quality gates pass...
   pyqual/_gate_collectors.py:
     e: _read_artifact_text,_from_toon,_from_vallm,_from_coverage,_from_bandit,_from_secrets,_from_vulnerabilities,_from_sbom,_from_vulture,_from_pyroma,_from_git_health,_from_llm_quality,_from_ai_cost,_from_benchmark,_from_memory_profile,_from_radon,_from_mypy,_from_ruff,_count_pylint_by_type,_from_pylint,_from_flake8,_from_interrogate
     _read_artifact_text(workdir;filenames)
@@ -251,6 +256,12 @@ D:
     parse_todo_items(todo_path)
     group_similar_issues(issues;max_group_size)
     run_parallel_fix(workdir;tools;todo_path;issues;env;group_similar;on_task_done)
+  pyqual/documentation.py:
+    e: DocumentationCollector
+    DocumentationCollector(MetricCollector): _find_file(2),_check_file_exists(2),_read_pyproject(1),_parse_pyproject_fallback(1),_check_pyproject_metadata(1),_analyze_readme(1),_check_docs_folder(1),_check_required_files(1),_get_docstring_coverage(1),_check_license_type(1),collect(1)  # Documentation completeness and quality metrics.
+
+Measures:
+-...
   pyqual/builtin_collectors.py:
     e: LLMBenchCollector,HallucinationCollector,SBOMCollector,I18nCollector,A11yCollector,RepoMetricsCollector,SecurityCollector,LlxMcpFixCollector
     LLMBenchCollector(MetricCollector): collect(1)  # LLM code generation quality metrics from human-eval and Code...
@@ -266,6 +277,11 @@ D:
     query_nfo_db(db_path;event;failed;tail;sql;stage)
     row_to_event_dict(row)
     format_log_entry_row(entry)
+  pyqual/custom_fix.py:
+    e: apply_patch,add_docstring,parse_and_apply_suggestions
+    apply_patch(file_path;old_text;new_text)
+    add_docstring(file_path;docstring)
+    parse_and_apply_suggestions(suggestions)
   dashboard/src/components/Overview.tsx:
     i: ../types,./MetricsChart,react
     e: OverviewProps,Overview,totalRepos,passingRepos,failingRepos,avgCoverage
@@ -378,15 +394,20 @@ D:
     get_project_summary(project_id)
     ingest_results(project_id;data;credentials)
     health_check()
-  pyqual/integrations/llx_mcp.py:
-    e: build_parser,main
-    build_parser()
-    main(argv)
+  pyqual/github_tasks.py:
+    e: fetch_github_tasks,save_tasks_to_todo,save_tasks_to_json
+    fetch_github_tasks(label;state;include_issues;include_prs)
+    save_tasks_to_todo(tasks;todo_path;append)
+    save_tasks_to_json(tasks;json_path)
   pyqual/gates.py:
     e: GateResult,Gate,GateSet
     GateResult: __str__(0)  # Result of a single gate check...
     Gate: check(1)  # Single quality gate with metric extraction...
-    GateSet: __init__(1),check_all(1),all_passed(1),completion_percentage(1),_collect_metrics(1)  # Collection of quality gates with metric collection...
+    GateSet: __init__(1),_completion_rate(1),check_all(1),all_passed(1),completion_percentage(1),_collect_metrics(1)  # Collection of quality gates with metric collection...
+  pyqual/integrations/llx_mcp.py:
+    e: build_parser,main
+    build_parser()
+    main(argv)
   pyqual/_plugin_base.py:
     e: PluginMetadata,MetricCollector,PluginRegistry
     PluginMetadata: __post_init__(0)  # Metadata for a pyqual plugin...
@@ -450,10 +471,10 @@ D:
   project.sh:
   dashboard/vite.config.ts:
     i: @vitejs/plugin-react,vite
-  dashboard/tailwind.config.js:
   dashboard/postcss.config.js:
   dashboard/src/main.tsx:
     i: ./App,react,react-dom/client
+  dashboard/tailwind.config.js:
   dashboard/src/types/index.ts:
     e: PyqualMetric,PyqualStage,PyqualSummary,Repository,DashboardConfig,MetricHistory,MetricTrend
     PyqualMetric:
@@ -468,3 +489,14 @@ D:
   pyqual/__init__.py:
   pyqual/constants.py:
   pyqual/integrations/__init__.py:
+  integration/run_docker_matrix.sh:
+  integration/run_matrix.sh:
+    e: run_case,hello,hello,add,hello,hello,hello,hello
+    run_case()
+    hello()
+    hello()
+    add()
+    hello()
+    hello()
+    hello()
+    hello()

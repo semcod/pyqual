@@ -163,27 +163,7 @@ class PyqualConfig:
 
         # Stages: explicit stages override profile, otherwise use profile stages
         raw_stages = pipeline.get("stages", profile_stages)
-        _stage_fields = {f.name for f in StageConfig.__dataclass_fields__.values()}
-        stages = []
-        for s in raw_stages:
-            filtered = {k: v for k, v in s.items() if k in _stage_fields}
-            stage = StageConfig(**filtered)
-            if not stage.run and not stage.tool:
-                raise ValueError(
-                    f"Stage '{stage.name}': must have either 'run' or 'tool' (got neither)."
-                )
-            if stage.run and stage.tool:
-                raise ValueError(
-                    f"Stage '{stage.name}': set 'run' or 'tool', not both. "
-                    f"Use 'run' for custom commands, 'tool' for built-in presets."
-                )
-            if stage.tool and get_preset(stage.tool) is None:
-                raise ValueError(
-                    f"Stage '{stage.name}': unknown tool preset '{stage.tool}'. "
-                    f"Available: {', '.join(list_presets())}. "
-                    f"Use 'run:' for custom commands."
-                )
-            stages.append(stage)
+        stages = cls._validate_stages(raw_stages)
 
         # Metrics: profile defaults merged with user overrides
         merged_metrics = {**profile_metrics, **(pipeline.get("metrics") or {})}
@@ -210,6 +190,32 @@ class PyqualConfig:
             loop=loop,
             env=_normalize_env_values(merged_env),
         )
+
+    @staticmethod
+    def _validate_stages(raw_stages: list[dict[str, Any]]) -> list["StageConfig"]:
+        """Validate and construct StageConfig list from raw dicts."""
+        _stage_fields = {f.name for f in StageConfig.__dataclass_fields__.values()}
+        stages = []
+        for s in raw_stages:
+            filtered = {k: v for k, v in s.items() if k in _stage_fields}
+            stage = StageConfig(**filtered)
+            if not stage.run and not stage.tool:
+                raise ValueError(
+                    f"Stage '{stage.name}': must have either 'run' or 'tool' (got neither)."
+                )
+            if stage.run and stage.tool:
+                raise ValueError(
+                    f"Stage '{stage.name}': set 'run' or 'tool', not both. "
+                    f"Use 'run' for custom commands, 'tool' for built-in presets."
+                )
+            if stage.tool and get_preset(stage.tool) is None:
+                raise ValueError(
+                    f"Stage '{stage.name}': unknown tool preset '{stage.tool}'. "
+                    f"Available: {', '.join(list_presets())}. "
+                    f"Use 'run:' for custom commands."
+                )
+            stages.append(stage)
+        return stages
 
     @staticmethod
     def default_yaml() -> str:

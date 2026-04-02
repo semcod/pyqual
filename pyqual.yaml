@@ -4,6 +4,7 @@ pipeline:
   # Quality gates — pipeline iterates until ALL pass
   metrics:
     cc_max: 15           # cyclomatic complexity per function
+    critical_max: 20     # functions above complexity threshold
     vallm_pass_min: 85   # vallm validation pass rate (%) — realistic for current codebase
     coverage_min: 55     # test coverage (%) — realistic for current codebase
     completion_rate_min: 75  # percentage of passed gates required for closure — realistic threshold
@@ -117,13 +118,13 @@ pipeline:
         else
           echo "No changes to push"
         fi
-      when: after_fix
+      when: always
       optional: true
       timeout: 120
 
     - name: publish
       run: make publish
-      when: after_fix
+      when: metrics_pass
       optional: true
       timeout: 300
 

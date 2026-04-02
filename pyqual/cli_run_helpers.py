@@ -157,56 +157,65 @@ def extract_stage_summary(name: str, stdout: str, stderr: str) -> dict[str, str]
 # Artifact enrichment
 # ---------------------------------------------------------------------------
 
+def _enrich_analysis(workdir: Path, stages: list[dict[str, Any]]) -> None:
+    """Enrich analyze/code2llm stage from analysis.toon.yaml header."""
+    analysis = workdir / "project" / "analysis.toon.yaml"
+    if not analysis.exists():
+        return
+    hdr = "\n".join(analysis.read_text(errors="replace").splitlines()[:2])
+    m_f = re.search(r"(\d+)f\s+(\d+)L", hdr)
+    m_cc = re.search(r"CC\u0304?=([0-9.]+)", hdr)
+    m_cr = re.search(r"critical:(\d+)", hdr)
+    for sd in stages:
+        if sd["name"] in ("analyze", "code2llm") and sd.get("status") != "skipped":
+            if m_f:
+                sd.setdefault("files", int(m_f.group(1)))
+                sd.setdefault("lines", int(m_f.group(2)))
+            if m_cc:
+                sd.setdefault("cc", float(m_cc.group(1)))
+            if m_cr:
+                sd.setdefault("critical", int(m_cr.group(1)))
+
+
+def _enrich_validation(workdir: Path, stages: list[dict[str, Any]]) -> None:
+    """Enrich validate/vallm stage from validation.toon.yaml header."""
+    validation = workdir / "project" / "validation.toon.yaml"
+    if not validation.exists():
+        return
+    hdr = "\n".join(validation.read_text(errors="replace").splitlines()[:5])
+    m_v = re.search(r"(\d+)\u2713\s+(\d+)\u26a0\s+(\d+)\u2717", hdr)
+    m_s = re.search(r"passed:\s*\d+\s*\(([0-9.]+)%\)", hdr)
+    for sd in stages:
+        if sd["name"] in ("validate", "vallm") and sd.get("status") != "skipped":
+            if m_v:
+                sd.setdefault("vallm_passed", int(m_v.group(1)))
+                sd.setdefault("vallm_warnings", int(m_v.group(2)))
+                sd.setdefault("vallm_errors", int(m_v.group(3)))
+            if m_s:
+                sd.setdefault("vallm_pass_pct", float(m_s.group(1)))
+
+
+def _enrich_todo(workdir: Path, stages: list[dict[str, Any]]) -> None:
+    """Enrich prefact stage from TODO.md header."""
+    todo = workdir / "TODO.md"
+    if not todo.exists():
+        return
+    head = todo.read_text(errors="replace")[:TODO_HEAD_CHARS]
+    m_t = re.search(r"\*?\*?Total issues:\*?\*?\s*(\d+)\s*active(?:,\s*(\d+)\s*completed)?", head)
+    if not m_t:
+        return
+    for sd in stages:
+        if sd["name"] in ("prefact",) and sd.get("status") != "skipped":
+            sd.setdefault("tickets", int(m_t.group(1)))
+            if m_t.group(2):
+                sd.setdefault("tickets_completed", int(m_t.group(2)))
+
+
 def enrich_from_artifacts(workdir: Path, stages: list[dict[str, Any]]) -> None:
     """Enrich stage dicts with metrics read from artifact files on disk."""
-    # analysis.toon.yaml → analyze/code2llm stage
-    analysis = workdir / "project" / "analysis.toon.yaml"
-    if analysis.exists():
-        header = analysis.read_text(errors="replace").splitlines()[:2]
-        hdr = "\n".join(header)
-        # line 1: "# code2llm | 12f 4797L | python:11,shell:1"
-        m_f = re.search(r"(\d+)f\s+(\d+)L", hdr)
-        m_cc = re.search(r"CC\u0304?=([0-9.]+)", hdr)
-        m_cr = re.search(r"critical:(\d+)", hdr)
-        for sd in stages:
-            if sd["name"] in ("analyze", "code2llm") and sd.get("status") != "skipped":
-                if m_f:
-                    sd.setdefault("files", int(m_f.group(1)))
-                    sd.setdefault("lines", int(m_f.group(2)))
-                if m_cc:
-                    sd.setdefault("cc", float(m_cc.group(1)))
-                if m_cr:
-                    sd.setdefault("critical", int(m_cr.group(1)))
-
-    # validation.toon.yaml → validate/vallm stage
-    validation = workdir / "project" / "validation.toon.yaml"
-    if validation.exists():
-        header = validation.read_text(errors="replace").splitlines()[:5]
-        hdr = "\n".join(header)
-        # line 1: "# vallm batch | 86f | 36✓ 1⚠ 7✗"
-        m_v = re.search(r"(\d+)\u2713\s+(\d+)\u26a0\s+(\d+)\u2717", hdr)
-        # SUMMARY: scanned: 86  passed: 36 (41.9%)
-        m_s = re.search(r"passed:\s*\d+\s*\(([0-9.]+)%\)", hdr)
-        for sd in stages:
-            if sd["name"] in ("validate", "vallm") and sd.get("status") != "skipped":
-                if m_v:
-                    sd.setdefault("vallm_passed", int(m_v.group(1)))
-                    sd.setdefault("vallm_warnings", int(m_v.group(2)))
-                    sd.setdefault("vallm_errors", int(m_v.group(3)))
-                if m_s:
-                    sd.setdefault("vallm_pass_pct", float(m_s.group(1)))
-
-    # TODO.md → prefact stage
-    todo = workdir / "TODO.md"
-    if todo.exists():
-        head = todo.read_text(errors="replace")[:TODO_HEAD_CHARS]
-        m_t = re.search(r"\*?\*?Total issues:\*?\*?\s*(\d+)\s*active(?:,\s*(\d+)\s*completed)?", head)
-        if m_t:
-            for sd in stages:
-                if sd["name"] in ("prefact",) and sd.get("status") != "skipped":
-                    sd.setdefault("tickets", int(m_t.group(1)))
-                    if m_t.group(2):
-                        sd.setdefault("tickets_completed", int(m_t.group(2)))
+    _enrich_analysis(workdir, stages)
+    _enrich_validation(workdir, stages)
+    _enrich_todo(workdir, stages)
 
 
 # ---------------------------------------------------------------------------
@@ -228,8 +237,43 @@ def infer_fix_result(stage: dict[str, Any]) -> str:
     return "unknown"
 
 
+def _extract_todo_summary(stages: list[dict[str, Any]]) -> dict[str, Any]:
+    """Extract todo/prefact metrics from stage data."""
+    result: dict[str, Any] = {}
+    prefact_stage = next((s for s in stages if s.get("name") == "prefact"), None)
+    if not prefact_stage or prefact_stage.get("status") == "skipped":
+        return result
+    tickets = prefact_stage.get("tickets")
+    tickets_completed = prefact_stage.get("tickets_completed")
+    if isinstance(tickets, (int, float)):
+        result["todo_active"] = int(tickets)
+    if isinstance(tickets_completed, (int, float)):
+        result["todo_completed"] = int(tickets_completed)
+    if isinstance(tickets, (int, float)) and isinstance(tickets_completed, (int, float)):
+        result["todo_total"] = int(tickets) + int(tickets_completed)
+    return result
+
+
+def _extract_fix_summary(stages: list[dict[str, Any]]) -> dict[str, Any]:
+    """Extract fix-stage metrics from stage data."""
+    result: dict[str, Any] = {}
+    fix_stage = next((s for s in stages if s.get("name") == "fix"), None)
+    if not fix_stage or fix_stage.get("status") == "skipped":
+        return result
+    files_changed = fix_stage.get("files_changed")
+    if isinstance(files_changed, (int, float)):
+        result["fix_files_changed"] = int(files_changed)
+    failed = fix_stage.get("failed")
+    if isinstance(failed, (int, float)):
+        result["fix_failed"] = int(failed)
+    errors = fix_stage.get("errors")
+    if isinstance(errors, (int, float)):
+        result["fix_errors"] = int(errors)
+    result["fix_result"] = infer_fix_result(fix_stage)
+    return result
+
+
 def build_run_summary(report: dict[str, Any]) -> dict[str, Any]:
-    summary: dict[str, Any] = {}
     stages = [
         stage
         for iteration in report.get("iterations", [])
@@ -237,31 +281,9 @@ def build_run_summary(report: dict[str, Any]) -> dict[str, Any]:
         for stage in iteration.get("stages", [])
         if isinstance(stage, dict)
     ]
-
-    prefact_stage = next((stage for stage in stages if stage.get("name") == "prefact"), None)
-    if prefact_stage and prefact_stage.get("status") != "skipped":
-        tickets = prefact_stage.get("tickets")
-        tickets_completed = prefact_stage.get("tickets_completed")
-        if isinstance(tickets, (int, float)):
-            summary["todo_active"] = int(tickets)
-        if isinstance(tickets_completed, (int, float)):
-            summary["todo_completed"] = int(tickets_completed)
-        if isinstance(tickets, (int, float)) and isinstance(tickets_completed, (int, float)):
-            summary["todo_total"] = int(tickets) + int(tickets_completed)
-
-    fix_stage = next((stage for stage in stages if stage.get("name") == "fix"), None)
-    if fix_stage and fix_stage.get("status") != "skipped":
-        files_changed = fix_stage.get("files_changed")
-        if isinstance(files_changed, (int, float)):
-            summary["fix_files_changed"] = int(files_changed)
-        failed = fix_stage.get("failed")
-        if isinstance(failed, (int, float)):
-            summary["fix_failed"] = int(failed)
-        errors = fix_stage.get("errors")
-        if isinstance(errors, (int, float)):
-            summary["fix_errors"] = int(errors)
-        summary["fix_result"] = infer_fix_result(fix_stage)
-
+    summary: dict[str, Any] = {}
+    summary.update(_extract_todo_summary(stages))
+    summary.update(_extract_fix_summary(stages))
     return summary
 
 

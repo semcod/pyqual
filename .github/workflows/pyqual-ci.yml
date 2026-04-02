@@ -65,6 +65,7 @@ jobs:
         python3 << 'EOF'
         import json
         import os
+        import sys
         from pathlib import Path
         
         # Get issue number from event or workflow_dispatch input

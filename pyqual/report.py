@@ -122,68 +122,80 @@ def _read_git_commit_count(workdir: Path) -> int | None:
     return None
 
 
+_COST_FIELD_MAP = [
+    # (source_keys,          target_key,      cast)
+    (("total_cost", "cost_usd"),     "ai_cost",      float),
+    (("total_commits", "ai_commits"), "ai_commits",  int),
+    (("human_time", "human_hours"),   "human_hours",  float),
+    (("human_cost",),                 "human_cost",   float),
+    (("model",),                      "model",        str),
+]
+
+
+def _read_costs_json(workdir: Path) -> dict[str, Any]:
+    """Read AI cost data from .pyqual/costs.json."""
+    costs_path = workdir / ".pyqual" / "costs.json"
+    if not costs_path.exists():
+        return {}
+    try:
+        data = json.loads(costs_path.read_text())
+    except (json.JSONDecodeError, TypeError):
+        return {}
+    result: dict[str, Any] = {}
+    for keys, target, cast in _COST_FIELD_MAP:
+        for k in keys:
+            val = data.get(k)
+            if val is not None:
+                result[target] = cast(val)
+                break
+    return result
+
+
+def _read_costs_package(workdir: Path) -> dict[str, Any]:
+    """Estimate AI cost data via the costs package (fallback)."""
+    try:
+        from costs.git_parser import parse_commits  # type: ignore[import-untyped]
+    except ImportError:
+        return {}
+
+    try:
+        all_commits = parse_commits(str(workdir), max_count=500, ai_only=False, full_history=True)
+        ai_indicators = ["🤖", "ai:", "[ai]", "(ai)", "automat", "cascade", "claude", "gpt", "llm"]
+        ai_commits = [
+            c for c in all_commits
+            if any(ind in c[1].lower() for ind in ai_indicators)
+        ]
+        total_cost = max(len(ai_commits) * 0.15, 0.01) if ai_commits else 0.0
+
+        from collections import defaultdict
+        daily: dict[str, dict[str, list]] = defaultdict(lambda: defaultdict(list))
+        for c in all_commits:
+            try:
+                date = c[0].committed_datetime.strftime("%Y-%m-%d")
+                daily[date][c[0].author.name].append(c)
+            except Exception:
+                pass
+        human_hours = sum(
+            min(len(commits) * 0.5, 8.0)
+            for authors in daily.values()
+            for commits in authors.values()
+        )
+        return {
+            "ai_cost": total_cost,
+            "ai_commits": len(ai_commits) or len(all_commits),
+            "human_hours": human_hours,
+            "human_cost": human_hours * 100,
+        }
+    except Exception:
+        return {}
+
+
 def _read_costs_data(workdir: Path) -> dict[str, Any]:
     """Read AI cost data from .pyqual/costs.json or the costs package."""
-    result: dict[str, Any] = {}
-
-    # 1. Try .pyqual/costs.json
-    costs_path = workdir / ".pyqual" / "costs.json"
-    if costs_path.exists():
-        try:
-            data = json.loads(costs_path.read_text())
-            cost = data.get("total_cost") or data.get("cost_usd")
-            if cost is not None:
-                result["ai_cost"] = float(cost)
-            commits = data.get("total_commits") or data.get("ai_commits")
-            if commits is not None:
-                result["ai_commits"] = int(commits)
-            human = data.get("human_time") or data.get("human_hours")
-            if human is not None:
-                result["human_hours"] = float(human)
-            human_cost = data.get("human_cost")
-            if human_cost is not None:
-                result["human_cost"] = float(human_cost)
-            model = data.get("model")
-            if model:
-                result["model"] = str(model)
-        except (json.JSONDecodeError, TypeError):
-            pass
-
-    # 2. Try costs package (if installed and no data yet)
+    result = _read_costs_json(workdir)
     if "ai_cost" not in result:
-        try:
-            from costs.git_parser import parse_commits  # type: ignore[import-untyped]
-
-            all_commits = parse_commits(str(workdir), max_count=500, ai_only=False, full_history=True)
-            ai_indicators = ["🤖", "ai:", "[ai]", "(ai)", "automat", "cascade", "claude", "gpt", "llm"]
-            ai_commits = [
-                c for c in all_commits
-                if any(ind in c[1].lower() for ind in ai_indicators)
-            ]
-            total_cost = max(len(ai_commits) * 0.15, 0.01) if ai_commits else 0.0
-            result.setdefault("ai_cost", total_cost)
-            result.setdefault("ai_commits", len(ai_commits) or len(all_commits))
-
-            # Human time estimate
-            from collections import defaultdict
-            daily: dict[str, dict[str, list]] = defaultdict(lambda: defaultdict(list))
-            for c in all_commits:
-                try:
-                    date = c[0].committed_datetime.strftime("%Y-%m-%d")
-                    author = c[0].author.name
-                    daily[date][author].append(c)
-                except Exception:
-                    pass
-            human_hours = sum(
-                min(len(commits) * 0.5, 8.0)
-                for authors in daily.values()
-                for commits in authors.values()
-            )
-            result.setdefault("human_hours", human_hours)
-            result.setdefault("human_cost", human_hours * 100)
-        except Exception:
-            pass
-
+        for k, v in _read_costs_package(workdir).items():
+            result.setdefault(k, v)
     return result
 
 
