@@ -38,7 +38,7 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         fetch-depth: 0  # Full history for better analysis
     
@@ -268,7 +268,7 @@ jobs:
     
     steps:
     - name: Checkout dashboard repo
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: ${{ secrets.DASHBOARD_REPO || 'your-org/pyqual-dashboard' }}
         token: ${{ secrets.DASHBOARD_TOKEN || github.token }}
