@@ -4,8 +4,6 @@ These are pure functions with no CLI (typer/rich) dependencies, extracted from
 ``cli.py`` to reduce its size and improve testability.
 """
 
-from __future__ import annotations
-
 import re
 from pathlib import Path
 from typing import Any

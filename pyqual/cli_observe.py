@@ -4,8 +4,6 @@ Extracted from ``cli.py`` to reduce its maintainability index score.
 Register all three commands by calling ``register_observe_commands(app)``.
 """
 
-from __future__ import annotations
-
 import json
 from pathlib import Path
 

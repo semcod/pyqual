@@ -5,8 +5,6 @@ no typer/rich dependencies (except ``format_log_entry_row`` which returns
 Rich markup strings).
 """
 
-from __future__ import annotations
-
 import ast
 import sqlite3
 from pathlib import Path

@@ -61,20 +61,20 @@
 - [x] pyqual/cli.py:867 - Magic number: 50 - use named constant
 - [x] pyqual/cli.py:1009 - module execution block
 - [ ] pyqual/cli_bulk_cmds.py:7 - Unused import: 'annotations'
-- [ ] pyqual/cli_log_helpers.py:8 - Unused import: 'annotations'
-- [ ] pyqual/cli_observe.py:7 - Unused import: 'annotations'
-- [ ] pyqual/cli_observe.py:111 - Magic number: 15 - use named constant
-- [ ] pyqual/cli_observe.py:274 - Magic number: 28 - use named constant
-- [ ] pyqual/cli_observe.py:302 - Magic number: 19 - use named constant
-- [ ] pyqual/cli_run_helpers.py:7 - Unused import: 'annotations'
-- [ ] pyqual/cli_run_helpers.py:116 - Magic number: 80 - use named constant
+- [x] pyqual/cli_log_helpers.py:8 - Unused import: 'annotations'
+- [x] pyqual/cli_observe.py:7 - Unused import: 'annotations'
+- [x] pyqual/cli_observe.py:111 - Magic number: 15 - use named constant
+- [x] pyqual/cli_observe.py:274 - Magic number: 28 - use named constant
+- [x] pyqual/cli_observe.py:302 - Magic number: 19 - use named constant
+- [x] pyqual/cli_run_helpers.py:7 - Unused import: 'annotations'
+- [x] pyqual/cli_run_helpers.py:116 - Magic number: 80 - use named constant
 - [ ] pyqual/constants.py:1 - High comment-to-code ratio: 37/59
 - [ ] pyqual/constants.py:6 - Magic number: 124 - use named constant
 - [ ] pyqual/constants.py:7 - Magic number: 500 - use named constant
 - [ ] pyqual/constants.py:8 - Magic number: 2000 - use named constant
-- [ ] pyqual/custom_fix.py:8 - Unused import: 'subprocess'
-- [ ] pyqual/custom_fix.py:141 - String concatenation can be converted to f-string
-- [ ] pyqual/custom_fix.py:188 - Magic number: 6000 - use named constant
+- [x] pyqual/custom_fix.py:8 - Unused import: 'subprocess'
+- [x] pyqual/custom_fix.py:141 - String concatenation can be converted to f-string
+- [x] pyqual/custom_fix.py:188 - Magic number: 6000 - use named constant
 - [ ] pyqual/fix_tools/__init__.py:7 - Unused import: 'annotations'
 - [ ] pyqual/fix_tools/__init__.py:9 - Relative import (level=1): '.base'
 - [ ] pyqual/fix_tools/__init__.py:10 - Relative import (level=1): '.claude'
@@ -90,10 +90,10 @@
 - [ ] pyqual/fix_tools/llx.py:6 - Unused import: 'annotations'
 - [ ] pyqual/fix_tools/llx.py:10 - Relative import (level=1): '.base'
 - [ ] pyqual/fix_tools/llx.py:36 - Magic number: 600 - use named constant
-- [ ] pyqual/github_actions.py:9 - Unused import: 'annotations'
-- [ ] pyqual/github_actions.py:17 - Unused import: 'GITHUB_DEFAULT_LABEL'
-- [ ] pyqual/github_actions.py:329 - Magic number in comparison: 3000
-- [ ] pyqual/github_actions.py:329 - Magic number: 3000 - use named constant
+- [x] pyqual/github_actions.py:9 - Unused import: 'annotations'
+- [x] pyqual/github_actions.py:17 - Unused import: 'GITHUB_DEFAULT_LABEL'
+- [x] pyqual/github_actions.py:329 - Magic number in comparison: 3000
+- [x] pyqual/github_actions.py:329 - Magic number: 3000 - use named constant
 - [ ] pyqual/integrations/llx_mcp.py:100 - module execution block
 - [ ] pyqual/integrations/llx_mcp_service.py:67 - module execution block
 - [ ] pyqual/llm.py:27 - Magic number: 2000 - use named constant
@@ -137,12 +137,12 @@
 - [ ] test_github_integration.py:178 - module execution block
 - [ ] test_github_integration.py:192 - String concatenation can be converted to f-string
 - [ ] test_github_integration.py:202 - String concatenation can be converted to f-string
-- [ ] test_pyqual.py:44 - Function 'test_gate_check_fail' missing return type (suggested: -> None)
-- [ ] test_pyqual.py:51 - Function 'test_gate_check_missing_metric' missing return type (suggested: -> None)
-- [ ] test_pyqual.py:59 - Function 'test_gate_set_from_toon' missing return type (suggested: -> None)
-- [ ] test_pyqual.py:362 - Duplicate import: 'yaml' (first at line 7)
-- [ ] test_pyqual.py:480 - Duplicate import: 'json' (first at line 3)
-- [ ] test_pyqual.py:481 - Duplicate import: 'TOOL_PRESETS' (first at line 457)
+- [x] test_pyqual.py:44 - Function 'test_gate_check_fail' missing return type (suggested: -> None)
+- [x] test_pyqual.py:51 - Function 'test_gate_check_missing_metric' missing return type (suggested: -> None)
+- [x] test_pyqual.py:59 - Function 'test_gate_set_from_toon' missing return type (suggested: -> None)
+- [x] test_pyqual.py:362 - Duplicate import: 'yaml' (first at line 7)
+- [x] test_pyqual.py:480 - Duplicate import: 'json' (first at line 3)
+- [x] test_pyqual.py:481 - Duplicate import: 'TOOL_PRESETS' (first at line 457)
 
 ---
 

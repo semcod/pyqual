@@ -16,7 +16,6 @@ from pathlib import Path
 
 from pyqual.constants import (
     GITHUB_API_TIMEOUT,
-    GITHUB_DEFAULT_LABEL,
     GITHUB_SEARCH_LIMIT,
 )
 

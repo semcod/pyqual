@@ -7,7 +7,6 @@ import os
 import sys
 import json
 import re
-import subprocess
 from pathlib import Path
 
 # Load .env file if present

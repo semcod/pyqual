@@ -1,5 +1,7 @@
 """Tests for pyqual.report — metrics YAML report + README badge generation."""
 
+from __future__ import annotations
+
 import json
 import tempfile
 from pathlib import Path
