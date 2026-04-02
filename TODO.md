@@ -37,7 +37,7 @@
 - [ ] examples/multi_gate_pipeline/run_pipeline.py:121 - module execution block
 - [ ] examples/ticket_workflow/sync_tickets.py:19 - Unused import: 'annotations'
 - [ ] examples/ticket_workflow/sync_tickets.py:90 - module execution block
-- [ ] pyproject.toml:26 - Outdated dependency: nfo 0.2.13 → 0.2.20 (wheel)
+- [x] pyproject.toml:26 - Outdated dependency: nfo 0.2.13 → 0.2.20 (wheel)
 - [ ] pyqual/__init__.py:27 - Duplicate import: 'DEFAULT_MAX_TOKENS' (first at line 25)
 - [ ] pyqual/__init__.py:27 - Duplicate import: 'LLM' (first at line 25)
 - [ ] pyqual/__init__.py:27 - Duplicate import: 'LLMResponse' (first at line 25)
