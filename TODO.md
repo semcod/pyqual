@@ -40,7 +40,7 @@
 - [ ] pyqual/__init__.py:27 - Duplicate import: 'DEFAULT_MAX_TOKENS' (first at line 25)
 - [ ] pyqual/__init__.py:27 - Duplicate import: 'LLM' (first at line 25)
 - [ ] pyqual/__init__.py:27 - Duplicate import: 'LLMResponse' (first at line 25)
-- [ ] pyqual/_gate_collectors.py:7 - Unused import: 'annotations'
+- [x] pyqual/_gate_collectors.py:7 - Unused import: 'annotations'
 - [ ] pyqual/_plugin_base.py:6 - Unused import: 'annotations'
 - [x] pyqual/auto_closer.py:77 - Magic number: 5000 - use named constant
 - [x] pyqual/auto_closer.py:94 - Function 'main' missing return type (suggested: -> None)

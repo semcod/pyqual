@@ -73,6 +73,11 @@ def _from_coverage(workdir: Path) -> dict[str, float]:
             total = data.get("totals", {}).get("percent_covered")
             if total is not None:
                 result["coverage"] = float(total)
+            # Extract branch coverage if available
+            num_branches = data.get("totals", {}).get("num_branches")
+            covered_branches = data.get("totals", {}).get("covered_branches")
+            if num_branches and covered_branches is not None and num_branches > 0:
+                result["coverage_branch"] = (covered_branches / num_branches) * 100
         except (json.JSONDecodeError, TypeError, KeyError):
             pass
     return result
