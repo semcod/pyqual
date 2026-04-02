@@ -106,11 +106,12 @@ PROFILES: dict[str, PipelineProfile] = {
     ),
 
     "security": PipelineProfile(
-        description="Security-focused: analyze → audit → bandit → test",
+        description="Security-focused: analyze → audit → bandit → secrets → test",
         stages=[
             {"name": "analyze", "tool": "code2llm"},
             {"name": "audit", "tool": "pip-audit", "optional": True},
             {"name": "bandit", "tool": "bandit", "optional": True},
+            {"name": "secrets", "tool": "gitleaks", "optional": True},
             {"name": "test", "tool": "pytest", "optional": True},
         ],
         metrics={

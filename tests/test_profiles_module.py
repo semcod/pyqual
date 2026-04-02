@@ -92,6 +92,7 @@ class TestBuiltInProfiles:
         stage_names = [s["name"] for s in prof.stages]
         assert "audit" in stage_names
         assert "bandit" in stage_names
+        assert "secrets" in stage_names
 
     def test_python_full_has_push_publish(self) -> None:
         prof = PROFILES["python-full"]

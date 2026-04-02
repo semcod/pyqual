@@ -25,7 +25,7 @@ Available profiles:
 | `python-full` | + push, publish | Full pipeline with goal push & publish |
 | `ci` | analyze, validate, test | Report-only, no fix, single iteration |
 | `lint-only` | lint, typecheck, test | Ruff + mypy, no LLM |
-| `security` | analyze, audit, bandit, test | Security-focused scans |
+| `security` | analyze, audit, bandit, secrets, test | Security-focused scans with API token detection |
 
 Run `pyqual profiles` to see details. Profiles provide default stages, metrics, and loop settings — all overridable in your YAML.
 

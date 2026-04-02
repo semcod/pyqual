@@ -326,6 +326,8 @@ pipeline:
     cc_max: 15
     mypy_errors_max: 0
     ruff_errors_max: 0
+    secrets_found_max: 0
+    secrets_severity_max: 0
 """
         p = _make_config(tmp_path, yaml)
         result = validate_config(p)

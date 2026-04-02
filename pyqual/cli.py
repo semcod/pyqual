@@ -10,7 +10,6 @@ from typing import Any
 
 import typer
 from rich.console import Console
-from rich.syntax import Syntax
 from rich.table import Table
 
 from pyqual.cli_log_helpers import (
@@ -27,7 +26,6 @@ from pyqual.cli_run_helpers import (
 )
 from pyqual.config import PyqualConfig
 from pyqual.constants import (
-    BULK_LINE_TRUNCATE,
     BULK_PASS_PREVIEW,
     DEFAULT_MCP_PORT,
     STATUS_COLUMN_WIDTH,

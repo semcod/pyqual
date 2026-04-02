@@ -47,19 +47,19 @@
 - [ ] pyqual/auto_closer.py:94 - standalone main function
 - [ ] pyqual/auto_closer.py:189 - Magic number: 30 - use named constant
 - [ ] pyqual/auto_closer.py:207 - module execution block
-- [ ] pyqual/builtin_collectors.py:7 - Unused import: 'CONFIG_READ_MAX_CHARS'
-- [ ] pyqual/builtin_collectors.py:7 - Unused import: 'DEFAULT_CC_MAX'
-- [ ] pyqual/builtin_collectors.py:7 - Unused import: 'LLX_MCP_REPORT'
+- [x] pyqual/builtin_collectors.py:7 - Unused import: 'CONFIG_READ_MAX_CHARS'
+- [x] pyqual/builtin_collectors.py:7 - Unused import: 'DEFAULT_CC_MAX'
+- [x] pyqual/builtin_collectors.py:7 - Unused import: 'LLX_MCP_REPORT'
 - [ ] pyqual/bulk_run.py:222 - Magic number: 40 - use named constant
 - [ ] pyqual/bulk_run.py:387 - Magic number: 50 - use named constant
 - [ ] pyqual/bulk_run.py:431 - Magic number: 50 - use named constant
-- [ ] pyqual/cli.py:13 - Unused import: 'Syntax'
-- [ ] pyqual/cli.py:29 - Unused import: 'BULK_LINE_TRUNCATE'
-- [ ] pyqual/cli.py:312 - Duplicate import: 'LLM' (first at line 526)
-- [ ] pyqual/cli.py:573 - Magic number: 1500 - use named constant
-- [ ] pyqual/cli.py:867 - Magic number in comparison: 50
-- [ ] pyqual/cli.py:867 - Magic number: 50 - use named constant
-- [ ] pyqual/cli.py:1009 - module execution block
+- [x] pyqual/cli.py:13 - Unused import: 'Syntax'
+- [x] pyqual/cli.py:29 - Unused import: 'BULK_LINE_TRUNCATE'
+- [x] pyqual/cli.py:312 - Duplicate import: 'LLM' (first at line 526)
+- [x] pyqual/cli.py:573 - Magic number: 1500 - use named constant
+- [x] pyqual/cli.py:867 - Magic number in comparison: 50
+- [x] pyqual/cli.py:867 - Magic number: 50 - use named constant
+- [x] pyqual/cli.py:1009 - module execution block
 - [ ] pyqual/cli_bulk_cmds.py:7 - Unused import: 'annotations'
 - [ ] pyqual/cli_log_helpers.py:8 - Unused import: 'annotations'
 - [ ] pyqual/cli_observe.py:7 - Unused import: 'annotations'
@@ -101,9 +101,9 @@
 - [ ] pyqual/parallel.py:148 - Magic number: 500 - use named constant
 - [ ] pyqual/parallel.py:200 - LLM-style docstring in run
 - [ ] pyqual/parallel.py:269 - LLM-style docstring in run_parallel_fix
-- [ ] pyqual/profiles.py:14 - Unused import: 'annotations'
-- [ ] pyqual/profiles.py:69 - Magic number: 120 - use named constant
-- [ ] pyqual/profiles.py:70 - Magic number: 300 - use named constant
+- [x] pyqual/profiles.py:14 - Unused import: 'annotations'
+- [x] pyqual/profiles.py:69 - Magic number: 120 - use named constant
+- [x] pyqual/profiles.py:70 - Magic number: 300 - use named constant
 - [ ] pyqual/report.py:52 - Magic number in comparison: 70
 - [ ] pyqual/report.py:52 - Magic number: 70 - use named constant
 - [ ] pyqual/report.py:76 - Duplicate import: 'tomllib' (first at line 73)

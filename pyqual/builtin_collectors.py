@@ -5,10 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from pyqual.constants import (
-    CONFIG_READ_MAX_CHARS,
-    DEFAULT_CC_MAX,
     DEFAULT_MCP_PORT,
-    LLX_MCP_REPORT,
     PYQUAL_DIR,
 )
 from pyqual.plugins import MetricCollector, PluginMetadata, PluginRegistry
