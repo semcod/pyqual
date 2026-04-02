@@ -115,3 +115,32 @@ def test_gate_set_reads_project_toon_artifacts(tmp_path: Path) -> None:
     assert metrics["critical"] == 2.0
     assert metrics["vallm_pass"] == 48.4
     assert metrics["coverage"] == 28.9
+
+
+def test_gate_set_derives_completion_rate(tmp_path: Path) -> None:
+    """Verify completion_rate is derived from gate results."""
+    project_dir = tmp_path / "project"
+    project_dir.mkdir()
+    (project_dir / "analysis.toon.yaml").write_text(
+        "# code2llm | 11f 2692L | python:10,shell:1\n# CC̄=4.9 | critical:2/117 | dups:0 | cycles:0\n"
+    )
+    (project_dir / "validation.toon.yaml").write_text(
+        "# vallm batch | 64f | 31✓ 3⚠ 0✗\nSUMMARY:\n  scanned: 64  passed: 31 (48.4%)  warnings: 3  errors: 0  unsupported: 33\n"
+    )
+    pyqual_dir = tmp_path / ".pyqual"
+    pyqual_dir.mkdir()
+    (pyqual_dir / "coverage.json").write_text('{"totals": {"percent_covered": 28.9}}')
+
+    gate_set = GateSet([
+        GateConfig(metric="cc", operator="le", threshold=15),
+        GateConfig(metric="vallm_pass", operator="ge", threshold=90),
+        GateConfig(metric="coverage", operator="ge", threshold=80),
+        GateConfig(metric="completion_rate", operator="ge", threshold=100),
+    ])
+
+    results = gate_set.check_all(tmp_path)
+    completion_gate = next(r for r in results if r.metric == "completion_rate")
+
+    assert completion_gate.value == pytest.approx(33.3333333333)
+    assert completion_gate.passed is False
+    assert gate_set.completion_percentage(tmp_path) == pytest.approx(33.3333333333)

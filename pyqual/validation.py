@@ -246,6 +246,7 @@ KNOWN_METRICS: frozenset[str] = frozenset({
     "cc", "critical",
     "vallm_pass", "error_count",
     "coverage",
+    "completion_rate",
     "bandit_high", "bandit_medium", "bandit_low",
     "secrets_severity", "secrets_count",
     "vuln_critical", "vuln_count",

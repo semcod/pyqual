@@ -274,7 +274,7 @@ class Pipeline:
     def _execute_stage(self, stage: StageConfig, dry_run: bool) -> StageResult:
         """Execute a single stage command."""
         command = stage.run
-        allow_failure = False
+        allow_failure = stage.optional  # Optional stages allow non-zero exit codes
 
         if stage.tool:
             resolved = self._resolve_tool_stage(stage)

@@ -532,6 +532,118 @@ jobs:
           git push origin HEAD || true
         fi
 
+    - name: Close related GitHub issues on push/PR success
+      if: steps.pyqual-run.outputs.exit_code == '0' && (github.event_name == 'push' || github.event_name == 'pull_request')
+      run: |
+        echo "::group::Closing related GitHub issues"
+        python3 << 'EOF'
+        import os
+        import sys
+        import re
+        import subprocess
+        from pathlib import Path
+        sys.path.insert(0, '.')
+        
+        from pyqual.github_actions import GitHubActionsReporter
+        
+        reporter = GitHubActionsReporter()
+        if not reporter.token or not reporter.repo:
+            print("GITHUB_TOKEN or GITHUB_REPOSITORY not set - skipping issue closure")
+            sys.exit(0)
+        
+        # Parse pyqual output for metrics
+        log_file = Path(".pyqual/pyqual_output.log")
+        pyqual_output = log_file.read_text() if log_file.exists() else ""
+        
+        # Check if all gates passed
+        all_gates_passed = "all_gates_passed: true" in pyqual_output or "result: all_gates_passed" in pyqual_output
+        
+        if not all_gates_passed:
+            print("Quality gates did not pass - not auto-closing issues")
+            sys.exit(0)
+        
+        # Get changed files to find related issues
+        try:
+            result = subprocess.run(
+                ["git", "log", "-1", "--pretty=format:%s%n%b"],
+                capture_output=True, text=True, timeout=10
+            )
+            commit_msg = result.stdout
+        except Exception:
+            commit_msg = ""
+        
+        # Look for issue references in commit message (e.g., "Fixes #123", "Closes #456")
+        issue_refs = re.findall(r'(?:fixes?|closes?|resolves?)\s+#(\d+)', commit_msg, re.IGNORECASE)
+        
+        # Also check TODO.md for marked-as-done items
+        todo_path = Path("TODO.md")
+        if todo_path.exists():
+            content = todo_path.read_text()
+            # Find checked items with issue references: "- [x] #123: ..."
+            done_issues = re.findall(r'- \[x\] #(\d+):', content)
+            issue_refs.extend(done_issues)
+        
+        # Deduplicate
+        issue_refs = list(set(issue_refs))
+        
+        if not issue_refs:
+            print("No related GitHub issues found to close")
+            sys.exit(0)
+        
+        print(f"Found {len(issue_refs)} issue(s) to potentially close: {issue_refs}")
+        
+        closed_count = 0
+        for issue_num in issue_refs:
+            print(f"  Processing issue #{issue_num}...")
+            
+            # Check if issue is still open
+            check_result = subprocess.run(
+                ["gh", "issue", "view", issue_num, "--repo", reporter.repo, "--json", "state"],
+                capture_output=True, text=True, timeout=30,
+                env={**os.environ, "GH_TOKEN": reporter.token}
+            )
+            
+            if check_result.returncode != 0:
+                print(f"    Issue #{issue_num} not found or error checking status")
+                continue
+            
+            try:
+                import json
+                issue_data = json.loads(check_result.stdout)
+                if issue_data.get("state") != "open":
+                    print(f"    Issue #{issue_num} already closed")
+                    continue
+            except Exception:
+                pass
+            
+            # Post success comment
+            body = "## ✅ Automatically closed via pyqual CI\n\n"
+            body += "All quality gates passed on the associated changes.\n\n"
+            body += f"- **Commit:** {os.environ.get('GITHUB_SHA', 'unknown')[:8]}\n"
+            body += "---\n_Auto-closed by pyqual push/PR workflow_"
+            
+            reporter.post_issue_comment(body, int(issue_num))
+            
+            # Close the issue
+            close_result = subprocess.run(
+                ["gh", "issue", "close", issue_num, "--repo", reporter.repo,
+                 "--comment", "Auto-closed: All quality gates passed (push/PR workflow)"],
+                capture_output=True, text=True, timeout=30,
+                env={**os.environ, "GH_TOKEN": reporter.token}
+            )
+            
+            if close_result.returncode == 0:
+                print(f"    ✅ Closed issue #{issue_num}")
+                closed_count += 1
+            else:
+                print(f"    ⚠️ Failed to close issue #{issue_num}: {close_result.stderr[:100]}")
+        
+        print(f"\nClosed {closed_count} issue(s)")
+        EOF
+        echo "::endgroup::"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Upload artifacts
       if: always()
       uses: actions/upload-artifact@v4

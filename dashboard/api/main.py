@@ -18,8 +18,6 @@ from dashboard.constants import (
     DEFAULT_GATE_STATUS_DAYS,
     CORS_ALLOWED_ORIGINS,
     DEFAULT_INGEST_TOKEN,
-    DEFAULT_HOST,
-    DEFAULT_PORT,
     PROJECTS_BASE_DIR,
     PYQUAL_SUBDIR,
     PIPELINE_DB_NAME,
@@ -340,7 +338,3 @@ async def ingest_results(
 async def health_check():
     """Health check endpoint."""
     return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host=DEFAULT_HOST, port=DEFAULT_PORT)

@@ -173,6 +173,26 @@ def main():
 *Automatically evaluated and closed by pyqual.*"""
                 
                 reporter.post_issue_comment(comment_body, issue_num)
+                
+                # Close the GitHub issue
+                print(f"    🔒 Closing issue #{issue_num}...")
+                if not reporter.repo:
+                    print(f"    ⚠️ GITHUB_REPOSITORY not set, cannot close issue #{issue_num}")
+                else:
+                    env = os.environ.copy()
+                    if reporter.token:
+                        env["GH_TOKEN"] = reporter.token
+                    close_result = subprocess.run(
+                        ["gh", "issue", "close", str(issue_num), 
+                         "--repo", reporter.repo,
+                         "--comment", "Auto-closed: All quality gates passed"],
+                        capture_output=True, text=True, timeout=30,
+                        env=env
+                    )
+                    if close_result.returncode == 0:
+                        print(f"    ✅ Closed issue #{issue_num}")
+                    else:
+                        print(f"    ⚠️ Failed to close issue #{issue_num}: {close_result.stderr[:100]}")
             
             # 3. Mark as done locally
             store.update_ticket(ticket.id, status=TicketStatus.done)

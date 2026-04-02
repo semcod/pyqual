@@ -186,6 +186,35 @@ class TestFullPipelineFlow:
         assert "regression_report" in ran
         assert "push" in skipped
 
+    def test_fail_flow_runs_delivery_stages_after_fix(self, pipeline: Pipeline):
+        """When gates fail: fix/rerun stages run and delivery stages follow after fix."""
+        stages_config = [
+            StageConfig(name="validate", when="always"),
+            StageConfig(name="fix", when="metrics_fail"),
+            StageConfig(name="verify", when="after_fix"),
+            StageConfig(name="push", when="after_fix"),
+            StageConfig(name="publish", when="after_fix"),
+            StageConfig(name="close_tasks", when="after_fix"),
+        ]
+        ran = []
+        skipped = []
+        stages_so_far: list[StageResult] = []
+        for sc in stages_config:
+            should = pipeline._should_run_stage(
+                sc, gates_pass=False, stages_so_far=stages_so_far, iteration=1,
+            )
+            sr = _stage(sc.name, skipped=not should)
+            stages_so_far.append(sr)
+            (ran if should else skipped).append(sc.name)
+
+        assert "validate" in ran
+        assert "fix" in ran
+        assert "verify" in ran
+        assert "push" in ran
+        assert "publish" in ran
+        assert "close_tasks" in ran
+        assert not skipped
+
 
 class TestIsFixStage:
     """_is_fix_stage detects fix/repair stages by tool or command keywords."""

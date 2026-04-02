@@ -1,87 +1,98 @@
-# code2llm | 42f 9963L | python:28,typescript:11,javascript:2,shell:1 | 2026-03-31
-# CC̄=6.0 | critical:24/306 | dups:0 | cycles:0
+# code2llm | 53f 11120L | python:39,typescript:11,javascript:2,shell:1 | 2026-04-02
+# CC̄=5.5 | critical:21/346 | dups:0 | cycles:0
 
 HEALTH[20]:
-  🔴 GOD   pyqual/pipeline.py = 616L, 10 classes, 24m, max CC=29
+  🔴 GOD   pyqual/pipeline.py = 614L, 10 classes, 24m, max CC=29
   🟡 CC    RepositoryDetail CC=20 (limit:15)
   🟡 CC    _parse CC=23 (limit:15)
-  🟡 CC    get_last_run CC=15 (limit:15)
-  🟡 CC    run CC=15 (limit:15)
-  🟡 CC    bulk_run_cmd CC=19 (limit:15)
+  🟡 CC    main CC=20 (limit:15)
   🟡 CC    run CC=25 (limit:15)
-  🟡 CC    logs CC=22 (limit:15)
-  🟡 CC    watch CC=29 (limit:15)
-  🟡 CC    history CC=29 (limit:15)
-  🟡 CC    main CC=37 (limit:15)
+  🟡 CC    get_last_run CC=33 (limit:15)
+  🟡 CC    run CC=15 (limit:15)
+  🟡 CC    main CC=36 (limit:15)
   🟡 CC    _from_vulnerabilities CC=17 (limit:15)
-  🟡 CC    _classify_heuristic CC=26 (limit:15)
-  🟡 CC    bulk_init CC=18 (limit:15)
   🟡 CC    _classify_failure CC=21 (limit:15)
   🟡 CC    validate_config CC=26 (limit:15)
   🟡 CC    detect_project_facts CC=16 (limit:15)
+  🟡 CC    _classify_heuristic CC=26 (limit:15)
+  🟡 CC    bulk_init CC=18 (limit:15)
   🟡 CC    enrich_from_artifacts CC=20 (limit:15)
   🟡 CC    build_run_summary CC=20 (limit:15)
+  🟡 CC    _read_costs_data CC=22 (limit:15)
   🟡 CC    _run_single_project CC=19 (limit:15)
+  🟡 CC    _build_project_row CC=19 (limit:15)
+  🟡 CC    bulk_run CC=17 (limit:15)
 
 REFACTOR[2]:
   1. split pyqual/pipeline.py  (god module)
   2. split 19 high-CC methods  (CC>15)
 
-PIPELINES[161]:
+PIPELINES[184]:
   [1] Src [MetricsTrendChart]: MetricsTrendChart
       PURITY: 100% pure
   [2] Src [data]: data
       PURITY: 100% pure
-  [3] Src [App]: App → loadRepositories
+  [3] Src [StagesChart]: StagesChart
       PURITY: 100% pure
-  [4] Src [handleRepositorySelect]: handleRepositorySelect
+  [4] Src [data]: data
       PURITY: 100% pure
-  [5] Src [runs]: runs
+  [5] Src [App]: App → loadRepositories
       PURITY: 100% pure
 
 LAYERS:
   ./                              CC̄=7.5    ←in:0  →out:0
-  │ run_analysis                88L  0C    2m  CC=11     ←0
+  │ run_analysis                87L  0C    2m  CC=11     ←0
   │ project.sh                  36L  0C    0m  CC=0.0    ←0
   │
-  pyqual/                         CC̄=6.7    ←in:1  →out:0
-  │ !! cli                       1466L  0C   24m  CC=29     ←0
-  │ !! bulk_init                  716L  3C   15m  CC=26     ←1
-  │ !! pipeline                   616L  10C   24m  CC=29     ←0
-  │ !! bulk_run                   550L  3C    7m  CC=19     ←1
-  │ !! report                     544L  0C   16m  CC=22     ←0
-  │ !! _gate_collectors           499L  0C   22m  CC=17     ←0
-  │ !! validation                 463L  6C    6m  CC=26     ←2
-  │ builtin_collectors         432L  8C   15m  CC=14     ←0
-  │ !! run_parallel_fix           342L  0C    4m  CC=37     ←0
+  pyqual/                         CC̄=6.0    ←in:1  →out:0
+  │ !! cli                       1010L  0C   21m  CC=25     ←0
+  │ !! bulk_init                  714L  3C   15m  CC=26     ←1
+  │ !! pipeline                   614L  10C   24m  CC=29     ←0
+  │ !! bulk_run                   557L  3C    7m  CC=19     ←1
+  │ !! report                     551L  0C   16m  CC=22     ←0
+  │ !! _gate_collectors           497L  0C   22m  CC=17     ←0
+  │ !! validation                 461L  6C    6m  CC=26     ←2
+  │ builtin_collectors         437L  8C   15m  CC=14     ←0
+  │ !! run_parallel_fix           370L  0C    6m  CC=36     ←0
+  │ !! report_generator           364L  2C    8m  CC=33     ←0
+  │ github_actions             358L  2C   16m  CC=9      ←0
   │ !! parallel                   326L  4C    7m  CC=15     ←0
-  │ tools                      325L  1C   15m  CC=8      ←3
-  │ !! report_generator           321L  2C    8m  CC=15     ←0
-  │ !! cli_run_helpers            315L  0C   14m  CC=20     ←0
-  │ !! config                     263L  4C    7m  CC=23     ←5
+  │ !! cli_run_helpers            325L  0C   15m  CC=20     ←0
+  │ cli_observe                324L  0C    1m  CC=1      ←0
+  │ tools                      323L  1C   15m  CC=8      ←3
+  │ !! config                     261L  4C    7m  CC=23     ←5
+  │ cli_bulk_cmds              243L  0C    1m  CC=1      ←0
+  │ !! auto_closer                208L  0C    4m  CC=20     ←0
   │ cli_plugin_helpers         191L  0C    7m  CC=11     ←1
-  │ plugins                    130L  3C    9m  CC=5      ←4
-  │ llm                        126L  0C    0m  CC=0.0    ←0
-  │ profiles                   124L  1C    2m  CC=1      ←2
-  │ cli_log_helpers            120L  0C    3m  CC=14     ←0
-  │ llx_mcp                    102L  0C    2m  CC=6      ←0
-  │ gates                       89L  3C    6m  CC=5      ←0
+  │ profiles                   132L  1C    2m  CC=1      ←2
+  │ llm                        124L  0C    0m  CC=0.0    ←0
+  │ cli_log_helpers            119L  0C    3m  CC=14     ←0
+  │ constants                  108L  0C    0m  CC=0.0    ←0
+  │ gates                      101L  3C    7m  CC=5      ←0
+  │ llx_mcp                    101L  0C    2m  CC=6      ←0
+  │ _plugin_base                85L  3C    7m  CC=5      ←3
   │ __init__                    85L  0C    0m  CC=0.0    ←0
   │ tickets                     73L  0C    6m  CC=4      ←2
-  │ llx_mcp_service             70L  0C    4m  CC=1      ←0
-  │ constants                   41L  0C    0m  CC=0.0    ←0
+  │ llx_mcp_service             68L  0C    4m  CC=1      ←0
+  │ base                        53L  2C    5m  CC=2      ←0
+  │ plugins                     52L  0C    2m  CC=2      ←2
+  │ aider                       49L  1C    3m  CC=2      ←0
+  │ __init__                    47L  0C    1m  CC=5      ←1
+  │ llx                         36L  1C    4m  CC=2      ←0
+  │ claude                      33L  1C    3m  CC=1      ←0
   │ __init__                     1L  0C    0m  CC=0.0    ←0
   │
-  dashboard/                      CC̄=3.5    ←in:0  →out:0
-  │ main                       314L  0C   12m  CC=6      ←0
+  dashboard/                      CC̄=3.7    ←in:0  →out:0
+  │ main                       346L  0C   13m  CC=6      ←0
   │ index.ts                   205L  0C   19m  CC=11     ←0
-  │ App.tsx                    203L  0C    9m  CC=11     ←0
+  │ App.tsx                    201L  0C    9m  CC=11     ←0
   │ !! RepositoryDetail.tsx       178L  1C    6m  CC=20     ←0
   │ Overview.tsx               175L  1C    5m  CC=12     ←0
   │ Settings.tsx               129L  0C    1m  CC=2      ←0
   │ MetricsChart.tsx            82L  1C    7m  CC=6      ←0
   │ index.ts                    62L  7C    0m  CC=0.0    ←0
   │ MetricsTrendChart.tsx       60L  1C    2m  CC=6      ←0
+  │ constants                   57L  0C    0m  CC=0.0    ←0
   │ StagesChart.tsx             54L  1C    2m  CC=4      ←0
   │ vite.config.ts              20L  0C    0m  CC=0.0    ←0
   │ tailwind.config.js          11L  0C    0m  CC=0.0    ←0

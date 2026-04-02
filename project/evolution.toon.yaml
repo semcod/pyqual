@@ -1,41 +1,41 @@
-# code2llm/evolution | 288 func | 32f | 2026-03-31
+# code2llm/evolution | 328 func | 42f | 2026-04-02
 
 NEXT[10] (ranked by impact):
   [1] !! SPLIT           pyqual/cli.py
-      WHY: 1466L, 0 classes, max CC=29
-      EFFORT: ~4h  IMPACT: 42514
+      WHY: 1010L, 0 classes, max CC=25
+      EFFORT: ~4h  IMPACT: 25250
 
   [2] !! SPLIT           pyqual/bulk_init.py
-      WHY: 716L, 3 classes, max CC=26
-      EFFORT: ~4h  IMPACT: 18616
+      WHY: 714L, 3 classes, max CC=26
+      EFFORT: ~4h  IMPACT: 18564
 
   [3] !! SPLIT           pyqual/pipeline.py
-      WHY: 616L, 10 classes, max CC=29
-      EFFORT: ~4h  IMPACT: 17864
+      WHY: 614L, 10 classes, max CC=29
+      EFFORT: ~4h  IMPACT: 17806
 
-  [4] !! SPLIT-FUNC      run  CC=25  fan=50
+  [4] !! SPLIT-FUNC      main  CC=36  fan=36
+      WHY: CC=36 exceeds 15
+      EFFORT: ~1h  IMPACT: 1296
+
+  [5] !! SPLIT-FUNC      run  CC=25  fan=50
       WHY: CC=25 exceeds 15
       EFFORT: ~1h  IMPACT: 1250
 
-  [5] !! SPLIT-FUNC      main  CC=37  fan=28
-      WHY: CC=37 exceeds 15
-      EFFORT: ~1h  IMPACT: 1036
-
-  [6] !! SPLIT-FUNC      history  CC=29  fan=27
-      WHY: CC=29 exceeds 15
-      EFFORT: ~1h  IMPACT: 783
+  [6] !! SPLIT-FUNC      get_last_run  CC=33  fan=21
+      WHY: CC=33 exceeds 15
+      EFFORT: ~1h  IMPACT: 693
 
   [7] !! SPLIT-FUNC      Pipeline._execute_stage  CC=29  fan=23
       WHY: CC=29 exceeds 15
       EFFORT: ~1h  IMPACT: 667
 
-  [8] !! SPLIT-FUNC      watch  CC=29  fan=21
-      WHY: CC=29 exceeds 15
-      EFFORT: ~1h  IMPACT: 609
-
-  [9] !  SPLIT-FUNC      PyqualConfig._parse  CC=23  fan=24
+  [8] !  SPLIT-FUNC      PyqualConfig._parse  CC=23  fan=24
       WHY: CC=23 exceeds 15
       EFFORT: ~1h  IMPACT: 552
+
+  [9] !  SPLIT-FUNC      main  CC=20  fan=26
+      WHY: CC=20 exceeds 15
+      EFFORT: ~1h  IMPACT: 520
 
   [10] !! SPLIT-FUNC      validate_config  CC=26  fan=20
       WHY: CC=26 exceeds 15
@@ -43,15 +43,15 @@ NEXT[10] (ranked by impact):
 
 
 RISKS[3]:
-  ⚠ Splitting pyqual/cli.py may break 24 import paths
+  ⚠ Splitting pyqual/cli.py may break 21 import paths
   ⚠ Splitting pyqual/bulk_init.py may break 15 import paths
   ⚠ Splitting pyqual/pipeline.py may break 24 import paths
 
 METRICS-TARGET:
-  CC̄:          6.0 → ≤4.2
-  max-CC:      37 → ≤18
+  CC̄:          5.5 → ≤3.8
+  max-CC:      36 → ≤18
   god-modules: 6 → 0
-  high-CC(≥15): 24 → ≤12
+  high-CC(≥15): 21 → ≤10
   hub-types:   0 → ≤0
 
 PATTERNS (language parser shared logic):
@@ -79,4 +79,4 @@ PATTERNS (language parser shared logic):
     - Standardized FunctionInfo/ClassInfo models
 
 HISTORY:
-  prev CC̄=6.0 → now CC̄=6.0
+  prev CC̄=6.0 → now CC̄=5.5

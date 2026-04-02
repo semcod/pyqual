@@ -1,57 +1,53 @@
-# pyqual | 288 func | 32f | 14070L | python | 2026-03-31
+# pyqual | 328 func | 42f | 15991L | python | 2026-04-02
 
 HEALTH:
-  CC̄=6.0  critical=58 (limit:10)  dup=1  cycles=0
+  CC̄=5.5  critical=54 (limit:10)  dup=2  cycles=0
 
 ALERTS[20]:
   !!! high_fan_out     run = 50 (limit:10)
-  !!! cc_exceeded      main = 37 (limit:15)
-  !!! cc_exceeded      watch = 29 (limit:15)
-  !!! cc_exceeded      history = 29 (limit:15)
+  !!! high_fan_out     register_observe_commands = 41 (limit:10)
+  !!! cc_exceeded      main = 36 (limit:15)
+  !!! high_fan_out     main = 36 (limit:10)
+  !!! cc_exceeded      get_last_run = 33 (limit:15)
   !!! cc_exceeded      Pipeline._execute_stage = 29 (limit:15)
-  !!! high_fan_out     main = 28 (limit:10)
-  !!! high_fan_out     history = 27 (limit:10)
-  !!! cc_exceeded      _classify_heuristic = 26 (limit:15)
   !!! cc_exceeded      validate_config = 26 (limit:15)
+  !!! cc_exceeded      _classify_heuristic = 26 (limit:15)
+  !!! high_fan_out     main = 26 (limit:10)
   !!! cc_exceeded      run = 25 (limit:15)
 
-MODULES[42] (top by size):
-  M[pyqual/cli.py] 1466L C:0 F:24 CC↑29 D:0 (python)
-  M[pyqual/bulk_init.py] 716L C:3 F:15 CC↑26 D:1 (python)
-  M[pyqual/pipeline.py] 616L C:10 F:24 CC↑29 D:0 (python)
-  M[pyqual/bulk_run.py] 550L C:3 F:7 CC↑19 D:1 (python)
-  M[pyqual/report.py] 544L C:0 F:16 CC↑22 D:0 (python)
-  M[pyqual/_gate_collectors.py] 499L C:0 F:22 CC↑17 D:0 (python)
-  M[pyqual/validation.py] 463L C:6 F:6 CC↑26 D:2 (python)
-  M[pyqual/builtin_collectors.py] 432L C:8 F:15 CC↑14 D:0 (python)
-  M[pyqual/run_parallel_fix.py] 342L C:0 F:4 CC↑37 D:0 (python)
+MODULES[53] (top by size):
+  M[pyqual/cli.py] 1010L C:0 F:21 CC↑25 D:0 (python)
+  M[pyqual/bulk_init.py] 714L C:3 F:15 CC↑26 D:1 (python)
+  M[pyqual/pipeline.py] 614L C:10 F:24 CC↑29 D:0 (python)
+  M[pyqual/bulk_run.py] 557L C:3 F:7 CC↑19 D:1 (python)
+  M[pyqual/report.py] 551L C:0 F:16 CC↑22 D:0 (python)
+  M[pyqual/_gate_collectors.py] 497L C:0 F:22 CC↑17 D:0 (python)
+  M[pyqual/validation.py] 461L C:6 F:6 CC↑26 D:2 (python)
+  M[pyqual/builtin_collectors.py] 437L C:8 F:15 CC↑14 D:0 (python)
+  M[pyqual/run_parallel_fix.py] 370L C:0 F:6 CC↑36 D:0 (python)
+  M[pyqual/report_generator.py] 364L C:2 F:8 CC↑33 D:0 (python)
+  M[pyqual/github_actions.py] 358L C:2 F:16 CC↑9 D:0 (python)
+  M[dashboard/api/main.py] 346L C:0 F:13 CC↑6 D:0 (python)
   M[pyqual/parallel.py] 326L C:4 F:7 CC↑15 D:0 (python)
-  M[pyqual/tools.py] 325L C:1 F:15 CC↑8 D:3 (python)
-  M[pyqual/report_generator.py] 321L C:2 F:8 CC↑15 D:0 (python)
-  M[pyqual/cli_run_helpers.py] 315L C:0 F:14 CC↑20 D:0 (python)
-  M[dashboard/api/main.py] 314L C:0 F:12 CC↑6 D:0 (python)
-  M[pyqual/config.py] 263L C:4 F:7 CC↑23 D:0 (python)
-  LANGS: python:28/typescript:11/javascript:2/shell:1
+  M[pyqual/cli_run_helpers.py] 325L C:0 F:15 CC↑20 D:0 (python)
+  M[pyqual/cli_observe.py] 324L C:0 F:1 CC↑1 D:0 (python)
+  LANGS: python:39/typescript:11/javascript:2/shell:1
 
 HOTSPOTS[10]:
   ★ run fan=50  // Execute pipeline loop until quality gates pass.
 
 Output is streamed as YAML to s
-  ★ main fan=28  // Run parallel fix on TODO.md items using multiple tools.
-  ★ history fan=27  // View history of LLX/LLM fix runs from .pyqual/llx_history.jsonl.
-
-Each time a fi
+  ★ register_observe_commands fan=41  // Register logs, watch, and history commands onto *app*.
+  ★ main fan=36  // Run parallel fix on TODO.md items - configurable batch size with git push.
+  ★ main fan=26  // Orchestrates 26 calls
   ★ PyqualConfig._parse fan=24  // Orchestrates 24 calls
-  ★ fix_config fan=23  // Use LLM to auto-repair pyqual.yaml based on project structure.
-
-Scans the projec
 
 REFACTOR[15]:
   [1] H/L Split run (CC=25 → target CC<10)
-  [2] H/L Split watch (CC=29 → target CC<10)
-  [3] H/L Split history (CC=29 → target CC<10)
-  [4] H/L Split main (CC=37 → target CC<10)
+  [2] H/L Split get_last_run (CC=33 → target CC<10)
+  [3] H/L Split main (CC=36 → target CC<10)
+  [4] H/L Split validate_config (CC=26 → target CC<10)
   [5] H/L Split _classify_heuristic (CC=26 → target CC<10)
 
 EVOLUTION:
-  2026-03-31 CC̄=6.0 crit=58 14070L // Automated analysis
+  2026-04-02 CC̄=5.5 crit=54 15991L // Automated analysis

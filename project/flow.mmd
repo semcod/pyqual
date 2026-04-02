@@ -7,8 +7,6 @@ flowchart TD
         pyqual__cli___setup_logging["_setup_logging"]
         pyqual__cli__init["init"]
         pyqual__cli__profiles["profiles"]
-        pyqual__cli__bulk_init_cmd["bulk_init_cmd"]
-        pyqual__cli__bulk_run_cmd["bulk_run_cmd"]
         pyqual__cli__run["run"]
         pyqual__cli__gates["gates"]
         pyqual__cli__validate["validate"]
@@ -19,12 +17,16 @@ flowchart TD
         pyqual__cli__mcp_fix["mcp_fix"]
         pyqual__cli__mcp_refactor["mcp_refactor"]
         pyqual__cli__mcp_service["mcp_service"]
+        pyqual__cli__tickets_todo["tickets_todo"]
+        pyqual__cli__tickets_github["tickets_github"]
         ...["+33 more"]
     end
 
     subgraph Core
         dashboard__src__components__MetricsTrendChart__MetricsTrendChart["MetricsTrendChart"]
         dashboard__src__components__MetricsTrendChart__data["data"]
+        dashboard__src__components__StagesChart__StagesChart["StagesChart"]
+        dashboard__src__components__StagesChart__data["data"]
         dashboard__src__App__App["App"]
         dashboard__src__App__repos["repos"]
         dashboard__src__App__handleRepositorySelect["handleRepositorySelect"]
@@ -34,11 +36,9 @@ flowchart TD
         dashboard__src__App__statusColor["statusColor"]
         dashboard__src__App__statusIcon["statusIcon"]
         dashboard__src__components__Settings__Settings["Settings"]
-        dashboard__src__components__StagesChart__StagesChart["StagesChart"]
-        dashboard__src__components__StagesChart__data["data"]
         dashboard__src__components__Overview__Overview["Overview"]
         dashboard__src__components__Overview__totalRepos["totalRepos"]
-        ...["+146 more"]
+        ...["+176 more"]
     end
 
-    class dashboard__src__components__MetricsTrendChart__MetricsTrendChart,dashboard__src__components__MetricsTrendChart__data,dashboard__src__App__App,dashboard__src__App__repos,dashboard__src__App__handleRepositorySelect,dashboard__src__App__runs,dashboard__src__App__RepositoryCard,dashboard__src__App__lastRun,dashboard__src__App__statusColor,dashboard__src__App__statusIcon entry
+    class dashboard__src__components__MetricsTrendChart__MetricsTrendChart,dashboard__src__components__MetricsTrendChart__data,dashboard__src__components__StagesChart__StagesChart,dashboard__src__components__StagesChart__data,dashboard__src__App__App,dashboard__src__App__repos,dashboard__src__App__handleRepositorySelect,dashboard__src__App__runs,dashboard__src__App__RepositoryCard,dashboard__src__App__lastRun entry

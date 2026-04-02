@@ -59,9 +59,18 @@ class GateSet:
     def __init__(self, configs: list[GateConfig]):
         self.gates = [Gate(c) for c in configs]
 
+    def _completion_rate(self, metrics: dict[str, float]) -> float:
+        """Compute completion rate from all non-completion-rate gates."""
+        relevant_gates = [g for g in self.gates if g.config.metric != "completion_rate"]
+        if not relevant_gates:
+            return 100.0
+        passed_count = sum(1 for g in relevant_gates if g.check(metrics).passed)
+        return (passed_count / len(relevant_gates)) * 100
+
     def check_all(self, workdir: Path = Path(".")) -> list[GateResult]:
         """Collect metrics from known sources and check all gates."""
         metrics = self._collect_metrics(workdir)
+        metrics["completion_rate"] = self._completion_rate(metrics)
         return [g.check(metrics) for g in self.gates]
 
     def all_passed(self, workdir: Path = Path(".")) -> bool:
@@ -74,11 +83,8 @@ class GateSet:
         Returns percentage (0-100) indicating how complete the ticket is.
         Each gate contributes equally to the total score.
         """
-        results = self.check_all(workdir)
-        if not results:
-            return 0.0
-        passed_count = sum(1 for r in results if r.passed)
-        return (passed_count / len(results)) * 100
+        metrics = self._collect_metrics(workdir)
+        return self._completion_rate(metrics)
 
     def _collect_metrics(self, workdir: Path) -> dict[str, float]:
         """Collect metrics from .pyqual/ artifacts and .toon files."""
