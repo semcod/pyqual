@@ -30,7 +30,7 @@ pipeline:
       optional: true
 
     - name: secrets
-      tool: trufflehog
+      tool: gitleaks
       optional: true
 
     - name: sbom

@@ -18,7 +18,8 @@ Real-world usage patterns for different project types and CI/CD setups.
 | Example | Description | Tools |
 |---------|-------------|-------|
 | [linters](linters/) | Code quality gates | ruff, pylint, flake8, mypy, interrogate |
-| [security](security/) | Security scanning | bandit, pip-audit, trufflehog, sbom |
+| [security](security/) | Security scanning (full config) | bandit, pip-audit, gitleaks, sbom |
+| [security-profile](security-profile/) | Security scanning (built-in profile) | profile: security |
 | [custom_gates](custom_gates/) | Dynamic thresholds, composite scoring, metric history | pyqual API |
 | [custom_plugins](custom_plugins/) | Build your own MetricCollector plugins | pyqual plugin system |
 

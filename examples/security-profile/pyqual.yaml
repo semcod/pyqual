@@ -1,0 +1,13 @@
+pipeline:
+  profile: security
+
+  # Override default metrics from security profile:
+  # metrics:
+  #   secrets_found_max: 0
+  #   secrets_severity_max: 0
+  #   bandit_high_max: 0
+  #   vuln_critical_max: 0
+
+  # Environment (optional)
+  env:
+    LLM_MODEL: openrouter/qwen/qwen3-coder-next

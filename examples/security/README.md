@@ -19,7 +19,7 @@ pyqual run
 |------|---------|-------------|
 | bandit | Python security issues | `.pyqual/bandit.json` |
 | pip-audit | Dependency vulnerabilities | `.pyqual/vulns.json` |
-| trufflehog/gitleaks | Secret scanning | `.pyqual/secrets.json` |
+| gitleaks/trufflehog | Secret scanning | `.pyqual/secrets.json` |
 | sbom generator | SBOM generation | `.pyqual/sbom.json` |
 
 ## Metrics
@@ -31,8 +31,31 @@ pyqual run
 | `vuln_critical` | Critical vulnerabilities | ≤ 0 |
 | `vuln_high` | High severity vulnerabilities | ≤ 0 |
 | `secrets_found` | Leaked secrets count | ≤ 0 |
+| `secrets_count` | Alias for secrets_found | ≤ 0 |
+| `secrets_severity` | Max severity level (1-4) | ≤ 0 |
 | `sbom_compliance` | SBOM completeness % | ≥ 95% |
 | `license_blacklist` | Forbidden licenses | ≤ 0 |
+
+### Secrets JSON Format
+
+The secrets scanner outputs to `.pyqual/secrets.json`. Example format:
+
+```json
+[
+  {"severity": "critical", "description": "AWS Access Key"},
+  {"severity": "high", "description": "GitHub Token"},
+  {"severity": "medium", "description": "Generic API Key"}
+]
+```
+
+Severity mapping:
+- `critical` = 4
+- `high` = 3
+- `medium` = 2
+- `low` = 1
+- unknown = 0
+
+The `secrets_severity` metric returns the maximum severity level found.
 
 ## Installing Secret Scanners
 
@@ -55,14 +78,14 @@ bandit -r . -f json -o .pyqual/bandit.json || true
 # pip-audit JSON
 pip-audit --format=json --output=.pyqual/vulns.json || true
 
-# TruffleHog
-if command -v trufflehog &> /dev/null; then
-    trufflehog git file://. --json > .pyqual/secrets.json 2>/dev/null || true
-fi
-
-# Gitleaks (alternative)
+# Gitleaks (default)
 if command -v gitleaks &> /dev/null; then
     gitleaks detect --source . --report-format json --report-path .pyqual/secrets.json || true
+fi
+
+# TruffleHog (alternative)
+if command -v trufflehog &> /dev/null; then
+    trufflehog git file://. --json > .pyqual/secrets.json 2>/dev/null || true
 fi
 
 # SBOM (using cyclonedx or similar)
