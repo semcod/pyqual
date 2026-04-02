@@ -56,7 +56,7 @@
   },
   "pytest": {
     "binary": "pytest",
-    "command": "pytest --cov-report=json:.pyqual/coverage.json -q",
+    "command": "pytest --cov-branch --cov-report=json:.pyqual/coverage.json -q",
     "output": "",
     "allow_failure": false
   },
