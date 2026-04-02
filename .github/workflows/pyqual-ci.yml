@@ -122,6 +122,7 @@ jobs:
 
     - name: Process issue with Claude Code
       if: github.event_name == 'issues' || (github.event_name == 'workflow_dispatch' && github.event.inputs.issue_number != '')
+      continue-on-error: true
       id: process-claude
       run: |
         echo "::group::Processing issue with Claude Code"
@@ -133,37 +134,38 @@ jobs:
         ISSUE_BODY="${{ github.event.issue.body }}"
         
         echo "Processing issue #$ISSUE_NUM: $ISSUE_TITLE"
-        
-        # Create prompt for Claude Code
-        PROMPT=$(cat << 'PROMPT_EOF'
-        You are given a GitHub issue to implement. Read the issue details below and make the necessary changes to the codebase.
-        
-        Issue Title: $ISSUE_TITLE
-        
-        Issue Description:
-        $ISSUE_BODY
-        
-        Instructions:
-        1. Analyze the issue requirements carefully
-        2. Make the necessary code/documentation changes
-        3. Ensure all quality gates still pass after changes
-        4. Do not commit - just apply changes
-        
-        Apply changes directly to the repository files.
-        PROMPT_EOF
-        )
-        
-        # Run Claude Code with the prompt
-        if timeout 600 claude -p "$PROMPT" \
-          --model sonnet \
-          --allowedTools "Edit,Read,Write,Bash(git diff),Bash(python),Bash(pytest -x)" \
-          --output-format text; then
-          echo "✅ Claude Code successfully processed the issue"
-          echo "changes_made=true" >> $GITHUB_OUTPUT
+
+        if [[ -z "${ANTHROPIC_API_KEY:-}" ]]; then
+          echo "ANTHROPIC_API_KEY not set; skipping Claude Code processing"
+          echo "changes_made=false" >> "$GITHUB_OUTPUT"
         else
-          rc=$?
-          echo "⚠️ Claude Code exited with code $rc"
-          echo "changes_made=false" >> $GITHUB_OUTPUT
+          # Create prompt for Claude Code
+          PROMPT=$(cat << 'PROMPT_EOF'
+          You are given a GitHub issue stored in `.pyqual/triggering_issue.json`.
+          Read that file before making any changes so you use the exact issue title, body, and number.
+
+          Instructions:
+          1. Analyze the issue requirements carefully.
+          2. Make the necessary code/documentation changes.
+          3. Ensure all quality gates still pass after changes.
+          4. Do not commit - just apply changes.
+
+          Apply changes directly to the repository files.
+          PROMPT_EOF
+          )
+        
+          # Run Claude Code with the prompt
+          if timeout 600 claude -p "$PROMPT" \
+            --model sonnet \
+            --allowedTools "Edit,Read,Write,Bash(git diff),Bash(python),Bash(pytest -x)" \
+            --output-format text; then
+            echo "✅ Claude Code successfully processed the issue"
+            echo "changes_made=true" >> $GITHUB_OUTPUT
+          else
+            rc=$?
+            echo "⚠️ Claude Code exited with code $rc"
+            echo "changes_made=false" >> $GITHUB_OUTPUT
+          fi
         fi
         
         # Check if changes were made
