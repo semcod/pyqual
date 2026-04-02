@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Custom fix script using litellm with explicit model selection and patch application."""
 
+from __future__ import annotations
+
 import os
 import sys
 import json

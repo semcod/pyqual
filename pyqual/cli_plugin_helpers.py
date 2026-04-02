@@ -1,5 +1,7 @@
 """Plugin command helper functions for pyqual CLI."""
 
+from __future__ import annotations
+
 from pathlib import Path
 
 import typer
