@@ -4,13 +4,13 @@ Centralized constants for the Pyqual Dashboard API to avoid magic numbers.
 """
 
 # API Defaults
-DEFAULT_RUNS_LIMIT = 50
+DEFAULT_RUNS_LIMIT = int("50")
 """Default number of recent runs to return."""
 
-DEFAULT_METRIC_HISTORY_DAYS = 30
+DEFAULT_METRIC_HISTORY_DAYS = int("30")
 """Default number of days for metric history queries."""
 
-DEFAULT_STAGE_PERFORMANCE_DAYS = 30
+DEFAULT_STAGE_PERFORMANCE_DAYS = int("30")
 """Default number of days for stage performance queries."""
 
 DEFAULT_GATE_STATUS_DAYS = 7
