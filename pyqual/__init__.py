@@ -39,6 +39,16 @@ from pyqual.tools import (
     load_entry_point_presets,
     TOOL_PRESETS,
 )
+from pyqual.plugins.git import (
+    GitCollector,
+    SECRET_PATTERNS,
+    git_status,
+    git_add,
+    git_commit,
+    git_push,
+    scan_for_secrets,
+    preflight_push_check,
+)
 
 try:
     from llx.llm import DEFAULT_MAX_TOKENS, LLM, LLMResponse, get_api_key, get_llm, get_llm_model
@@ -108,6 +118,15 @@ __all__ = [
     "build_fix_prompt",
     "run_llx_fix_workflow",
     "run_llx_refactor_workflow",
+    # Git plugin
+    "GitCollector",
+    "SECRET_PATTERNS",
+    "git_status",
+    "git_add",
+    "git_commit",
+    "git_push",
+    "scan_for_secrets",
+    "preflight_push_check",
     # Tool presets
     "ToolPreset",
     "get_preset",

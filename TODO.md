@@ -54,7 +54,7 @@
 - [ ] pyqual/bulk_run.py:224 - Magic number: 40 - use named constant
 - [ ] pyqual/bulk_run.py:389 - Magic number: 50 - use named constant
 - [ ] pyqual/bulk_run.py:433 - Magic number: 50 - use named constant
-- [ ] pyqual/cli.py:3 - Unused import: 'annotations'
+- [x] pyqual/cli.py:3 - Unused import: 'annotations'
 - [x] pyqual/cli.py:312 - Duplicate import: 'LLM' (first at line 526)
 - [x] pyqual/cli.py:573 - Magic number: 1500 - use named constant
 - [x] pyqual/cli.py:867 - Magic number in comparison: 50
