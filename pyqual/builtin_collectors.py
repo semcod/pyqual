@@ -466,6 +466,8 @@ stages:
         result: dict[str, float] = {}
         self._collect_pip_audit(workdir, result)
         self._collect_ruff(workdir, result)
+        self._collect_secrets(workdir, result)
+        self._collect_mypy(workdir, result)
         return result
 
     def _collect_pip_audit(self, workdir: Path, result: dict[str, float]) -> None:
@@ -522,6 +524,52 @@ stages:
                 result["ruff_errors"] = float(total)
         except (json.JSONDecodeError, TypeError, OSError):
             pass
+
+    def _collect_secrets(self, workdir: Path, result: dict[str, float]) -> None:
+        """Parse detect-secrets JSON output for secret count."""
+        secrets_path = workdir / ".pyqual" / "secrets.json"
+        if not secrets_path.exists():
+            return
+        try:
+            data = json.loads(secrets_path.read_text())
+            if not isinstance(data, dict):
+                return
+            # detect-secrets format: {"results": {"file.py": [{"type": "..."}, ...]}}
+            results = data.get("results", {})
+            if not isinstance(results, dict):
+                return
+            total = 0
+            for file_findings in results.values():
+                if isinstance(file_findings, list):
+                    total += len(file_findings)
+            result["secrets_found"] = float(total)
+        except (json.JSONDecodeError, TypeError, OSError):
+            pass
+
+    def _collect_mypy(self, workdir: Path, result: dict[str, float]) -> None:
+        """Parse mypy JSON or text output for error count."""
+        # Try JSON output first
+        mypy_json = workdir / ".pyqual" / "mypy.json"
+        if mypy_json.exists():
+            try:
+                data = json.loads(mypy_json.read_text())
+                if isinstance(data, list):
+                    result["mypy_errors"] = float(len(data))
+                    return
+                elif isinstance(data, dict) and "errors" in data:
+                    result["mypy_errors"] = float(len(data["errors"]))
+                    return
+            except (json.JSONDecodeError, TypeError, OSError):
+                pass
+        # Fallback to text output (count lines with ": error:")
+        mypy_txt = workdir / ".pyqual" / "mypy.txt"
+        if mypy_txt.exists():
+            try:
+                text = mypy_txt.read_text()
+                count = sum(1 for line in text.splitlines() if ": error:" in line)
+                result["mypy_errors"] = float(count)
+            except OSError:
+                pass
 
     def get_config_example(self) -> str:
         """Return a ready-to-use YAML snippet for security pipeline."""

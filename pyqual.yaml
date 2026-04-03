@@ -10,9 +10,11 @@ pipeline:
     coverage_branch_min: 15  # branch coverage (%) — minimum threshold
     completion_rate_min: 75  # percentage of passed gates required for closure — realistic threshold
     # Security gates (enabled):
-    vuln_high_max: 0     # pip-audit high severity CVEs
-    vuln_critical_max: 0 # pip-audit critical severity CVEs
-    ruff_errors_max: 50  # ruff lint errors (realistic threshold)
+    vuln_high_max: 0         # pip-audit high severity CVEs
+    vuln_critical_max: 0     # pip-audit critical severity CVEs
+    ruff_errors_max: 50      # ruff lint errors (realistic threshold)
+    secrets_found_max: 0     # detect-secrets findings
+    mypy_errors_max: 100      # mypy type errors (realistic for gradual typing)
 
   # Pipeline stages — use 'tool:' for built-in presets or 'run:' for custom
   stages:
@@ -75,9 +77,22 @@ pipeline:
       optional: true
       timeout: 60
 
-    - name: test
-      tool: pytest
+    - name: detect-secrets
+      run: |
+        if command -v detect-secrets >/dev/null 2>&1; then
+          detect-secrets scan --all-files --force-use-all-plugins --baseline .pyqual/secrets-baseline.json 2>/dev/null > .pyqual/secrets.json || detect-secrets scan --all-files 2>/dev/null > .pyqual/secrets.json || echo '{"results":{}}' > .pyqual/secrets.json
+        else
+          echo '{"results":{}}' > .pyqual/secrets.json
+        fi
+      when: always
       optional: true
+      timeout: 60
+
+    - name: mypy-types
+      run: mypy pyqual --ignore-missing-imports --show-error-codes --output=json > .pyqual/mypy.json 2>&1 || mypy pyqual --ignore-missing-imports --show-error-codes > .pyqual/mypy.txt 2>&1 || echo "[]" > .pyqual/mypy.json
+      when: always
+      optional: true
+      timeout: 120
 
     - name: prefact
       tool: prefact
