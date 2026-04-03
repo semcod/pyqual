@@ -11,10 +11,10 @@
 - [x] dashboard/constants.py:34 - Magic number: 8000 - use named constant
 - [x] dashboard/constants.py:54 - Magic number: 200 - use named constant
 - [x] dashboard/constants.py:55 - Magic number: 400 - use named constant
-- [ ] examples/custom_gates/composite_gates.py:33 - Magic number: 75.0 - use named constant
-- [ ] examples/custom_gates/composite_gates.py:35 - Magic number: 80.0 - use named constant
-- [ ] examples/custom_gates/composite_gates.py:36 - Magic number: 15.0 - use named constant
-- [ ] examples/custom_gates/composite_gates.py:125 - module execution block
+- [x] examples/custom_gates/composite_gates.py:33 - Magic number: 75.0 - use named constant
+- [x] examples/custom_gates/composite_gates.py:35 - Magic number: 80.0 - use named constant
+- [x] examples/custom_gates/composite_gates.py:36 - Magic number: 15.0 - use named constant
+- [x] examples/custom_gates/composite_gates.py:125 - module execution block
 - [ ] examples/custom_gates/dynamic_thresholds.py:8 - Magic number: 80.0 - use named constant
 - [ ] examples/custom_gates/dynamic_thresholds.py:11 - Magic number: 75.0 - use named constant
 - [ ] examples/custom_gates/dynamic_thresholds.py:53 - module execution block
@@ -37,9 +37,9 @@
 - [ ] examples/multi_gate_pipeline/run_pipeline.py:121 - module execution block
 - [ ] examples/ticket_workflow/sync_tickets.py:19 - Unused import: 'annotations'
 - [ ] examples/ticket_workflow/sync_tickets.py:90 - module execution block
-- [ ] pyqual/__init__.py:27 - Duplicate import: 'DEFAULT_MAX_TOKENS' (first at line 25)
-- [ ] pyqual/__init__.py:27 - Duplicate import: 'LLM' (first at line 25)
-- [ ] pyqual/__init__.py:27 - Duplicate import: 'LLMResponse' (first at line 25)
+- [x] pyqual/__init__.py:27 - Duplicate import: 'DEFAULT_MAX_TOKENS' (first at line 25)
+- [x] pyqual/__init__.py:27 - Duplicate import: 'LLM' (first at line 25)
+- [x] pyqual/__init__.py:27 - Duplicate import: 'LLMResponse' (first at line 25)
 - [x] pyqual/_gate_collectors.py:7 - Unused import: 'annotations'
 - [ ] pyqual/_plugin_base.py:6 - Unused import: 'annotations'
 - [x] pyqual/auto_closer.py:77 - Magic number: 5000 - use named constant
@@ -81,11 +81,11 @@
 - [ ] pyqual/documentation.py:206 - Magic number: 20 - use named constant
 - [ ] pyqual/documentation.py:351 - Magic number: 50.0 - use named constant
 - [ ] pyqual/documentation.py:362 - boilerplate copyright
-- [ ] pyqual/fix_tools/__init__.py:7 - Unused import: 'annotations'
-- [ ] pyqual/fix_tools/__init__.py:9 - Relative import (level=1): '.base'
-- [ ] pyqual/fix_tools/__init__.py:10 - Relative import (level=1): '.claude'
-- [ ] pyqual/fix_tools/__init__.py:11 - Relative import (level=1): '.llx'
-- [ ] pyqual/fix_tools/__init__.py:17 - LLM-style docstring in get_available_tools
+- [x] pyqual/fix_tools/__init__.py:7 - Unused import: 'annotations'
+- [x] pyqual/fix_tools/__init__.py:9 - Relative import (level=1): '.base'
+- [x] pyqual/fix_tools/__init__.py:10 - Relative import (level=1): '.claude'
+- [x] pyqual/fix_tools/__init__.py:11 - Relative import (level=1): '.llx'
+- [x] pyqual/fix_tools/__init__.py:17 - LLM-style docstring in get_available_tools
 - [ ] pyqual/fix_tools/aider.py:6 - Unused import: 'annotations'
 - [ ] pyqual/fix_tools/aider.py:12 - Relative import (level=1): '.base'
 - [ ] pyqual/fix_tools/aider.py:49 - Magic number: 900 - use named constant

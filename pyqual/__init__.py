@@ -1,5 +1,24 @@
 """pyqual — declarative quality gate loops for AI-assisted development."""
 
+# Re-export the public API module for easy access
+from pyqual import api
+
+from pyqual.api import (
+    load_config,
+    validate_config,
+    create_default_config,
+    run_pipeline,
+    run,
+    check_gates,
+    dry_run,
+    run_stage,
+    get_tool_command,
+    format_result_summary,
+    export_results_json,
+    shell,
+    shell_check,
+)
+
 from pyqual.config import PyqualConfig, GateConfig, StageConfig, LoopConfig
 from pyqual.gates import Gate, GateSet, GateResult
 from pyqual.pipeline import Pipeline, PipelineResult, StageResult, IterationResult
@@ -44,6 +63,23 @@ except Exception:  # pragma: no cover - llx MCP modules are optional
 __version__ = "0.1.98"
 
 __all__ = [
+    # Public API module
+    "api",
+    # High-level API functions
+    "load_config",
+    "validate_config",
+    "create_default_config",
+    "run_pipeline",
+    "run",
+    "check_gates",
+    "dry_run",
+    "run_stage",
+    "get_tool_command",
+    "format_result_summary",
+    "export_results_json",
+    "shell",
+    "shell_check",
+    # Core classes
     "PyqualConfig",
     "GateConfig",
     "StageConfig",

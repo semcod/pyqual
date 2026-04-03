@@ -12,7 +12,6 @@ Usage:
 """
 
 import json
-import sys
 import tempfile
 from pathlib import Path
 
@@ -122,7 +121,8 @@ def run_composite_check(workdir: Path) -> bool:
 # ---------------------------------------------------------------------------
 # Self-test with synthetic data
 # ---------------------------------------------------------------------------
-if __name__ == "__main__":
+def main() -> int:
+    """Run the composite gate self-test with synthetic data."""
     with tempfile.TemporaryDirectory() as tmpdir:
         p = Path(tmpdir)
         pyqual_dir = p / ".pyqual"
@@ -151,4 +151,8 @@ if __name__ == "__main__":
 
         print("Running composite gates with synthetic data...\n")
         passed = run_composite_check(p)
-        sys.exit(0 if passed else 1)
+        return 0 if passed else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
