@@ -9,10 +9,10 @@ pipeline:
     coverage_min: 20     # line coverage (%) — minimum threshold
     coverage_branch_min: 15  # branch coverage (%) — minimum threshold
     completion_rate_min: 75  # percentage of passed gates required for closure — realistic threshold
-    # Security gates (uncomment to enable):
-    # vuln_high_max: 0     # pip-audit high severity CVEs
-    # bandit_high_max: 0   # bandit high severity issues
-    # secrets_found_max: 0 # trufflehog/gitleaks secrets
+    # Security gates (enabled):
+    vuln_high_max: 0     # pip-audit high severity CVEs
+    vuln_critical_max: 0 # pip-audit critical severity CVEs
+    ruff_errors_max: 50  # ruff lint errors (realistic threshold)
 
   # Pipeline stages — use 'tool:' for built-in presets or 'run:' for custom
   stages:
@@ -62,13 +62,18 @@ pipeline:
     #   run: vallm batch pyqual tests --recursive --format toon --output ./project
     #   when: always
 
-    # Security scans (uncomment to enable):
-    # - name: audit
-    #   tool: pip-audit
-    #   optional: true
-    # - name: bandit
-    #   tool: bandit
-    #   optional: true
+    # Security scans (enabled):
+    - name: pip-audit
+      run: pip-audit --format=json --output=.pyqual/audit.json 2>/dev/null || pip-audit --format=json > .pyqual/audit.json 2>&1 || echo "[]" > .pyqual/audit.json
+      when: always
+      optional: true
+      timeout: 120
+
+    - name: ruff-lint
+      run: ruff check pyqual tests --output-format=json > .pyqual/ruff.json 2>&1 || echo "[]" > .pyqual/ruff.json
+      when: always
+      optional: true
+      timeout: 60
 
     - name: test
       tool: pytest

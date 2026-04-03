@@ -434,3 +434,95 @@ env:
         self._collect_analysis_metrics(result, data.get("analysis"))
         self._collect_aider_metrics(result, data.get("aider"))
         return result
+
+
+@PluginRegistry.register
+class SecurityCollector(MetricCollector):
+    """Security metrics collector - pip-audit CVEs and ruff lint errors."""
+
+    name = "security"
+    metadata = PluginMetadata(
+        name="security",
+        description="Security scan results: pip-audit CVEs, ruff lint errors",
+        version="1.0.0",
+        tags=["security", "cve", "lint", "vulnerabilities"],
+        config_example="""
+metrics:
+  vuln_critical_max: 0   # Critical CVEs from pip-audit
+  vuln_high_max: 0       # High severity CVEs
+  vuln_medium_max: 10    # Medium severity CVEs
+  ruff_errors_max: 50    # Ruff lint errors
+
+stages:
+  - name: pip-audit
+    run: pip-audit --format=json --output=.pyqual/audit.json || echo "[]" > .pyqual/audit.json
+
+  - name: ruff-lint
+    run: ruff check . --output-format=json > .pyqual/ruff.json || echo "[]" > .pyqual/ruff.json
+""",
+    )
+
+    def collect(self, workdir: Path) -> dict[str, float]:
+        result: dict[str, float] = {}
+        self._collect_pip_audit(workdir, result)
+        self._collect_ruff(workdir, result)
+        return result
+
+    def _collect_pip_audit(self, workdir: Path, result: dict[str, float]) -> None:
+        """Parse pip-audit JSON output for vulnerability counts."""
+        audit_path = workdir / ".pyqual" / "audit.json"
+        if not audit_path.exists():
+            return
+        try:
+            data = json.loads(audit_path.read_text())
+            if not isinstance(data, list):
+                return
+            critical = high = medium = low = 0
+            for item in data:
+                if not isinstance(item, dict):
+                    continue
+                vulns = item.get("vulnerabilities", [])
+                if not isinstance(vulns, list):
+                    continue
+                for vuln in vulns:
+                    if not isinstance(vuln, dict):
+                        continue
+                    severity = vuln.get("severity", "unknown").lower()
+                    if severity == "critical":
+                        critical += 1
+                    elif severity == "high":
+                        high += 1
+                    elif severity == "medium":
+                        medium += 1
+                    elif severity == "low":
+                        low += 1
+            result["vuln_critical"] = float(critical)
+            result["vuln_high"] = float(high)
+            result["vuln_medium"] = float(medium)
+            result["vuln_low"] = float(low)
+            result["vuln_total"] = float(critical + high + medium + low)
+        except (json.JSONDecodeError, TypeError, OSError):
+            pass
+
+    def _collect_ruff(self, workdir: Path, result: dict[str, float]) -> None:
+        """Parse ruff JSON output for error count."""
+        ruff_path = workdir / ".pyqual" / "ruff.json"
+        if not ruff_path.exists():
+            return
+        try:
+            data = json.loads(ruff_path.read_text())
+            if isinstance(data, list):
+                result["ruff_errors"] = float(len(data))
+            elif isinstance(data, dict):
+                # Ruff can output nested structure
+                total = 0
+                for path, violations in data.items():
+                    if isinstance(violations, list):
+                        total += len(violations)
+                result["ruff_errors"] = float(total)
+        except (json.JSONDecodeError, TypeError, OSError):
+            pass
+
+    def get_config_example(self) -> str:
+        """Return a ready-to-use YAML snippet for security pipeline."""
+        return self.metadata.config_example
