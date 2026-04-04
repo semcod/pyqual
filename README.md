@@ -15,7 +15,7 @@ Generated on 2026-04-04 using [openrouter/qwen/qwen3-coder-next](https://openrou
 ---
 
 <!-- pyqual:badges:start -->
-![Version](https://img.shields.io/badge/version-0.1.127-blue) ![Python](https://img.shields.io/badge/python-%3E%3D3.9-blue) ![License](https://img.shields.io/badge/license-Apache-2.0-green) ![AI Cost](https://img.shields.io/badge/AI%20Cost-%2428.95%20%28193%20commits%29-red) ![Human Time](https://img.shields.io/badge/Human%20Time-66.0h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fopenai%2Fgpt-5-mini-lightgrey)
+![Version](https://img.shields.io/badge/version-0.1.128-blue) ![Python](https://img.shields.io/badge/python-%3E%3D3.9-blue) ![License](https://img.shields.io/badge/license-Apache-2.0-green) ![AI Cost](https://img.shields.io/badge/AI%20Cost-%2429.10%20%28194%20commits%29-red) ![Human Time](https://img.shields.io/badge/Human%20Time-66.0h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fopenai%2Fgpt-5-mini-lightgrey)
 ![pyqual](https://img.shields.io/badge/pyqual-pass-brightgreen) ![gates](https://img.shields.io/badge/gates-11%2F11-brightgreen) ![CC̄](https://img.shields.io/badge/CC%CC%84-5.5-brightgreen) ![coverage](https://img.shields.io/badge/coverage-37%25-red) ![vallm](https://img.shields.io/badge/vallm-53%25-orange) ![critical](https://img.shields.io/badge/critical-25-red) ![errors](https://img.shields.io/badge/errors-5-orange) ![MI](https://img.shields.io/badge/MI-0-red) ![ruff](https://img.shields.io/badge/ruff-0-brightgreen) ![mypy](https://img.shields.io/badge/mypy-0-brightgreen) ![bandit](https://img.shields.io/badge/bandit-0%20high-brightgreen) ![docstrings](https://img.shields.io/badge/docstrings-0%25-red)
 <!-- pyqual:badges:end -->
 
