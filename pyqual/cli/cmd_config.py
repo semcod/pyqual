@@ -93,9 +93,21 @@ def validate(
     for issue in result.issues:
         badge, style = SEV_STYLE[issue.severity]
         location = f" [dim][{issue.stage}][/dim]" if issue.stage else ""
-        console.print(f"  {badge}{location}  [{style}]{issue.message}[/{style}]")
-        if issue.suggestion:
+
+        # Check if this is an auto-fixed issue
+        fixed_indicator = ""
+        if fix and issue.suggestion and "Auto-fixed:" in issue.suggestion:
+            fixed_indicator = " [green][fixed][/green]"
+
+        console.print(f"  {badge}{location}{fixed_indicator}  [{style}]{issue.message}[/{style}]")
+        if issue.suggestion and not issue.suggestion.startswith("Auto-fixed:"):
             console.print(f"          [dim]→ {issue.suggestion}[/dim]")
+
+    # Show summary of fixes if any were applied
+    if fix:
+        fixed_count = sum(1 for i in result.issues if "Auto-fixed:" in (i.suggestion or ""))
+        if fixed_count:
+            console.print(f"\n[green]✓ Auto-fixed {fixed_count} syntax issue(s)[/green] (backup: {cfg_path.name}.bak)")
 
     console.print()
     nerr = len(result.errors)

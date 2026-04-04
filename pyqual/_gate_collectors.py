@@ -2,6 +2,9 @@
 
 Each function takes a workdir Path and returns a dict[str, float].
 ``_COLLECTORS`` is the ordered list used by GateSet._collect_metrics.
+
+NOTE: This module is being migrated to the plugin system. New collectors
+should be implemented as plugins in pyqual/plugins/.
 """
 
 from __future__ import annotations
@@ -9,6 +12,35 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pyqual.plugins import MetricCollector
+
+# Import plugin collectors (new plugin-based approach)
+try:
+    from pyqual.plugins.coverage import CoverageCollector
+    _coverage_collector: CoverageCollector | None = CoverageCollector()
+except ImportError:
+    _coverage_collector = None
+
+try:
+    from pyqual.plugins.lint import LintCollector
+    _lint_collector: LintCollector | None = LintCollector()
+except ImportError:
+    _lint_collector = None
+
+try:
+    from pyqual.plugins.security import SecurityCollector
+    _security_collector: SecurityCollector | None = SecurityCollector()
+except ImportError:
+    _security_collector = None
+
+try:
+    from pyqual.plugins.code_health import CodeHealthCollector
+    _code_health_collector: CodeHealthCollector | None = CodeHealthCollector()
+except ImportError:
+    _code_health_collector = None
 
 
 def _read_artifact_text(workdir: Path, filenames: list[str]) -> str | None:
@@ -62,7 +94,10 @@ def _from_vallm(workdir: Path) -> dict[str, float]:
 
 
 def _from_coverage(workdir: Path) -> dict[str, float]:
-    """Extract test coverage from coverage.json."""
+    """Extract test coverage using plugin if available, fallback to legacy."""
+    if _coverage_collector:
+        return _coverage_collector.collect(workdir)
+    # Legacy fallback
     result: dict[str, float] = {}
     cov_path = workdir / ".pyqual" / "coverage.json"
     if not cov_path.exists():
@@ -73,7 +108,6 @@ def _from_coverage(workdir: Path) -> dict[str, float]:
             total = data.get("totals", {}).get("percent_covered")
             if total is not None:
                 result["coverage"] = float(total)
-            # Extract branch coverage if available
             num_branches = data.get("totals", {}).get("num_branches")
             covered_branches = data.get("totals", {}).get("covered_branches")
             if num_branches and covered_branches is not None and num_branches > 0:
@@ -84,7 +118,16 @@ def _from_coverage(workdir: Path) -> dict[str, float]:
 
 
 def _from_bandit(workdir: Path) -> dict[str, float]:
-    """Extract security issue counts from bandit JSON output."""
+    """Extract security metrics using plugin if available."""
+    if _security_collector:
+        metrics = _security_collector.collect(workdir)
+        # Map plugin names to legacy names
+        return {
+            "bandit_high": metrics.get("security_bandit_high", 0.0),
+            "bandit_medium": metrics.get("security_bandit_medium", 0.0),
+            "bandit_low": metrics.get("security_bandit_low", 0.0),
+        }
+    # Legacy fallback""
     result: dict[str, float] = {}
     p = workdir / ".pyqual" / "bandit.json"
     if p.exists():
@@ -103,7 +146,11 @@ def _from_bandit(workdir: Path) -> dict[str, float]:
 
 
 def _from_secrets(workdir: Path) -> dict[str, float]:
-    """Extract secrets scan metrics from secrets.json."""
+    """Extract secrets metrics using plugin if available."""
+    if _security_collector:
+        metrics = _security_collector.collect(workdir)
+        return {"secrets_found": metrics.get("security_secrets_found", 0.0)}
+    # Legacy fallback""
     result: dict[str, float] = {}
     sec_path = workdir / ".pyqual" / "secrets.json"
     if sec_path.exists():
@@ -124,7 +171,15 @@ def _from_secrets(workdir: Path) -> dict[str, float]:
 
 
 def _from_vulnerabilities(workdir: Path) -> dict[str, float]:
-    """Extract vulnerability metrics from vulns.json."""
+    """Extract vulnerability metrics using plugin if available."""
+    if _security_collector:
+        metrics = _security_collector.collect(workdir)
+        return {
+            "vuln_critical": metrics.get("security_vuln_critical", 0.0),
+            "vuln_high": metrics.get("security_vuln_high", 0.0),
+            "vuln_medium": metrics.get("security_vuln_moderate", 0.0),
+        }
+    # Legacy fallback""
     result: dict[str, float] = {}
     vuln_path = workdir / ".pyqual" / "vulns.json"
     if vuln_path.exists():
@@ -176,7 +231,11 @@ def _from_sbom(workdir: Path) -> dict[str, float]:
 
 
 def _from_vulture(workdir: Path) -> dict[str, float]:
-    """Extract code health metrics from vulture.json."""
+    """Extract code health metrics using plugin if available."""
+    if _code_health_collector:
+        metrics = _code_health_collector.collect(workdir)
+        return {"unused_count": metrics.get("unused_count", 0.0)}
+    # Legacy fallback""
     result: dict[str, float] = {}
     vul_path = workdir / ".pyqual" / "vulture.json"
     if vul_path.exists():
@@ -190,7 +249,11 @@ def _from_vulture(workdir: Path) -> dict[str, float]:
 
 
 def _from_pyroma(workdir: Path) -> dict[str, float]:
-    """Extract packaging quality from pyroma.json."""
+    """Extract packaging quality using plugin if available."""
+    if _code_health_collector:
+        metrics = _code_health_collector.collect(workdir)
+        return {"pyroma_score": metrics.get("pyroma_score", 0.0)}
+    # Legacy fallback""
     result: dict[str, float] = {}
     pyr_path = workdir / ".pyqual" / "pyroma.json"
     if pyr_path.exists():
@@ -326,7 +389,11 @@ def _from_memory_profile(workdir: Path) -> dict[str, float]:
 
 
 def _from_radon(workdir: Path) -> dict[str, float]:
-    """Extract maintainability index from radon JSON output."""
+    """Extract maintainability using plugin if available."""
+    if _code_health_collector:
+        metrics = _code_health_collector.collect(workdir)
+        return {"maintainability_index": metrics.get("maintainability_index", 0.0)}
+    # Legacy fallback""
     result: dict[str, float] = {}
     p = workdir / ".pyqual" / "radon.json"
     if not p.exists():
@@ -354,7 +421,11 @@ def _from_radon(workdir: Path) -> dict[str, float]:
 
 
 def _from_mypy(workdir: Path) -> dict[str, float]:
-    """Extract mypy type error count from JSON output."""
+    """Extract lint metrics using plugin if available."""
+    if _lint_collector:
+        metrics = _lint_collector.collect(workdir)
+        return {"mypy_errors": metrics.get("mypy_errors", 0.0)}
+    # Legacy fallback""
     result: dict[str, float] = {}
     p = workdir / ".pyqual" / "mypy.json"
     if p.exists():
@@ -373,7 +444,15 @@ def _from_mypy(workdir: Path) -> dict[str, float]:
 
 
 def _from_ruff(workdir: Path) -> dict[str, float]:
-    """Extract ruff linter error counts from JSON output."""
+    """Extract lint metrics using plugin if available."""
+    if _lint_collector:
+        metrics = _lint_collector.collect(workdir)
+        return {
+            "ruff_errors": metrics.get("ruff_errors", 0.0),
+            "ruff_fatal": metrics.get("ruff_fatal", 0.0),
+            "ruff_warnings": metrics.get("ruff_warnings", 0.0),
+        }
+    # Legacy fallback""
     result: dict[str, float] = {}
     p = workdir / ".pyqual" / "ruff.json"
     if p.exists():
@@ -403,7 +482,16 @@ def _count_pylint_by_type(messages: list, type_name: str, symbol_prefix: str) ->
 
 
 def _from_pylint(workdir: Path) -> dict[str, float]:
-    """Extract pylint score and error counts from JSON output."""
+    """Extract lint metrics using plugin if available."""
+    if _lint_collector:
+        metrics = _lint_collector.collect(workdir)
+        return {
+            "pylint_errors": metrics.get("pylint_errors", 0.0),
+            "pylint_fatal": metrics.get("pylint_fatal", 0.0),
+            "pylint_warnings": metrics.get("pylint_warnings", 0.0),
+            "pylint_score": metrics.get("pylint_score", 0.0),
+        }
+    # Legacy fallback""
     result: dict[str, float] = {}
     p = workdir / ".pyqual" / "pylint.json"
     if not p.exists():
@@ -429,7 +517,15 @@ def _from_pylint(workdir: Path) -> dict[str, float]:
 
 
 def _from_flake8(workdir: Path) -> dict[str, float]:
-    """Extract flake8 violation count from JSON output."""
+    """Extract lint metrics using plugin if available."""
+    if _lint_collector:
+        metrics = _lint_collector.collect(workdir)
+        return {
+            "flake8_violations": metrics.get("flake8_violations", 0.0),
+            "flake8_errors": metrics.get("flake8_errors", 0.0),
+            "flake8_warnings": metrics.get("flake8_warnings", 0.0),
+        }
+    # Legacy fallback""
     result: dict[str, float] = {}
     p = workdir / ".pyqual" / "flake8.json"
     if p.exists():
@@ -453,7 +549,15 @@ def _from_flake8(workdir: Path) -> dict[str, float]:
 
 
 def _from_interrogate(workdir: Path) -> dict[str, float]:
-    """Extract docstring coverage from interrogate JSON output."""
+    """Extract docstring metrics using plugin if available."""
+    if _code_health_collector:
+        metrics = _code_health_collector.collect(workdir)
+        return {
+            "docstring_coverage": metrics.get("docstring_coverage", 0.0),
+            "docstring_total": metrics.get("docstring_total", 0.0),
+            "docstring_missing": metrics.get("docstring_missing", 0.0),
+        }
+    # Legacy fallback""
     result: dict[str, float] = {}
     p = workdir / ".pyqual" / "interrogate.json"
     if p.exists():

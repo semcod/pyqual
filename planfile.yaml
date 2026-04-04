@@ -2699,3 +2699,133 @@ sprints:
     model_hints:
       planning: balanced
       implementation: balanced
+  - id: ticket-ad5b8605
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/plugins/code_health/__init__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/code_health/__init__.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-44510902
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/plugins/code_health/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/code_health/main.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-fae3d379
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/plugins/coverage/__init__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/coverage/__init__.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-de2f599e
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/plugins/coverage/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/coverage/main.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4ad327ef
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/plugins/lint/__init__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/lint/__init__.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e1197bfc
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/plugins/lint/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/lint/main.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-6962229d
+    name: Fix string-concat issues
+    description: Resolve 3 string-concat issues in pyqual/yaml_fixer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/yaml_fixer.py
+    rule_id: string-concat
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e28f36c8
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in pyqual/yaml_fixer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - pyqual/yaml_fixer.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-cddfee1f
+    name: Fix llm-generated-code issues
+    description: Resolve 1 llm-generated-code issues in pyqual/yaml_fixer.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/yaml_fixer.py
+    rule_id: llm-generated-code
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-32d59862
+    name: Fix llm-generated-code issues
+    description: Resolve 2 llm-generated-code issues in pyqual/validation.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/validation.py
+    rule_id: llm-generated-code
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced

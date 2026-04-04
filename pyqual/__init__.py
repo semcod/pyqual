@@ -70,6 +70,14 @@ except Exception:  # pragma: no cover - llx MCP modules are optional
     run_llx_fix_workflow = None  # type: ignore[assignment]
     run_llx_refactor_workflow = None  # type: ignore[assignment]
 
+from pyqual.yaml_fixer import (
+    YamlErrorType,
+    YamlFixResult,
+    YamlSyntaxIssue,
+    analyze_yaml_syntax,
+    fix_yaml_file,
+)
+
 __version__ = "0.1.125"
 
 __all__ = [
