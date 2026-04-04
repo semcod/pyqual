@@ -146,18 +146,13 @@ def _from_bandit(workdir: Path) -> dict[str, float]:
 
 
 def _from_secrets(workdir: Path) -> dict[str, float]:
-    """Extract secrets metrics using plugin if available."""
+    """Extract secrets metrics from secrets.json."""
     sec_path = workdir / ".pyqual" / "secrets.json"
     
     # Only process if secrets.json exists
     if not sec_path.exists():
         return {}
     
-    if _security_collector:
-        metrics = _security_collector.collect(workdir)
-        return {"secrets_found": metrics.get("security_secrets_found", 0.0)}
-    
-    # Legacy fallback"""
     result: dict[str, float] = {}
     try:
         data = json.loads(sec_path.read_text())
@@ -170,6 +165,14 @@ def _from_secrets(workdir: Path) -> dict[str, float]:
             result["secrets_severity"] = float(max_sev)
             result["secrets_count"] = float(len(data))
             result["secrets_found"] = result["secrets_count"]
+        elif isinstance(data, dict):
+            # Handle dict format (e.g., detect-secrets output)
+            findings = data.get("results", {})
+            if isinstance(findings, dict):
+                count = sum(len(v) for v in findings.values() if isinstance(v, list))
+                result["secrets_count"] = float(count)
+                result["secrets_found"] = float(count)
+                result["secrets_severity"] = 3.0  # High severity for secrets
     except (json.JSONDecodeError, TypeError):
         pass
     return result

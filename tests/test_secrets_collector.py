@@ -120,21 +120,25 @@ class TestSecretsCollector:
         # HIGH -> high=3, critical=4, Medium not found
         assert result["secrets_severity"] == 4.0
 
-    def test_dict_format_not_supported(self, tmp_path: Path) -> None:
-        """Dict format (e.g., with 'findings' key) is not supported yet."""
+    def test_dict_format_supported(self, tmp_path: Path) -> None:
+        """Dict format (e.g., detect-secrets with 'results' key) is now supported."""
         pyqual_dir = tmp_path / ".pyqual"
         pyqual_dir.mkdir()
 
-        # Dict format is not processed - only list format
+        # Dict format with results key (detect-secrets format)
         secrets_data = {
-            "findings": [
-                {"severity": "high"},
-                {"severity": "critical"},
-            ]
+            "results": {
+                "file1.py": [
+                    {"type": "AWS Access Key"},
+                    {"type": "Private Key"},
+                ]
+            }
         }
 
         (pyqual_dir / "secrets.json").write_text(json.dumps(secrets_data))
 
         result = _from_secrets(tmp_path)
-        # Dict format returns empty - not processed
-        assert result == {}
+        # Dict format now returns proper metrics
+        assert result["secrets_count"] == 2.0
+        assert result["secrets_found"] == 2.0
+        assert result["secrets_severity"] == 3.0  # High severity for secrets
