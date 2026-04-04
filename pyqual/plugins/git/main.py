@@ -11,9 +11,19 @@ import re
 import shutil
 import subprocess
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from pyqual.plugins import MetricCollector, PluginMetadata, PluginRegistry
+
+
+def _count_by_severity(secrets: list[dict[str, Any]]) -> dict[str, int]:
+    """Count secrets by severity level."""
+    return {
+        "CRITICAL": len([s for s in secrets if s.get("severity") == "CRITICAL"]),
+        "HIGH": len([s for s in secrets if s.get("severity") == "HIGH"]),
+        "MEDIUM": len([s for s in secrets if s.get("severity") == "MEDIUM"]),
+        "LOW": len([s for s in secrets if s.get("severity") == "LOW"]),
+    }
 
 
 @PluginRegistry.register
@@ -108,16 +118,12 @@ stages:
         if isinstance(secrets, list):
             result["git_secrets_found"] = float(len(secrets))
             
-            # Count by severity
-            critical = len([s for s in secrets if s.get("severity") == "CRITICAL"])
-            high = len([s for s in secrets if s.get("severity") == "HIGH"])
-            medium = len([s for s in secrets if s.get("severity") == "MEDIUM"])
-            low = len([s for s in secrets if s.get("severity") == "LOW"])
-            
-            result["git_secrets_critical"] = float(critical)
-            result["git_secrets_high"] = float(high)
-            result["git_secrets_medium"] = float(medium)
-            result["git_secrets_low"] = float(low)
+            # Count by severity using helper
+            severity_counts = _count_by_severity(secrets)
+            result["git_secrets_critical"] = float(severity_counts["CRITICAL"])
+            result["git_secrets_high"] = float(severity_counts["HIGH"])
+            result["git_secrets_medium"] = float(severity_counts["MEDIUM"])
+            result["git_secrets_low"] = float(severity_counts["LOW"])
         
         # Scanners used
         scanners = data.get("scanners_used", [])
@@ -126,8 +132,7 @@ stages:
         
         # Files scanned
         files_scanned = data.get("total_files_scanned", 0)
-        if files_scanned is not None:
-            result["git_files_scanned"] = float(files_scanned)
+        result["git_files_scanned"] = float(files_scanned)
         
         # Success (no secrets found)
         success = data.get("success", True)
@@ -135,92 +140,56 @@ stages:
 
     def _collect_preflight_metrics(self, result: dict[str, float], data: dict[str, Any]) -> None:
         """Extract metrics from pre-flight check results."""
-        can_push = data.get("can_push", True)
-        result["git_preflight_can_push"] = 1.0 if can_push else 0.0
+        result["git_preflight_can_push"] = 1.0 if data.get("can_push", True) else 0.0
         
         # Blockers and warnings
         blockers = data.get("blockers", [])
         warnings = data.get("warnings", [])
-        
-        if isinstance(blockers, list):
-            result["git_preflight_blockers"] = float(len(blockers))
-        if isinstance(warnings, list):
-            result["git_preflight_warnings"] = float(len(warnings))
+        result["git_preflight_blockers"] = float(len(blockers)) if isinstance(blockers, list) else 0.0
+        result["git_preflight_warnings"] = float(len(warnings)) if isinstance(warnings, list) else 0.0
         
         # Secrets scan from preflight
         secrets_scan = data.get("secrets_scan", {})
         if secrets_scan:
             secrets = secrets_scan.get("secrets_found", [])
-            if isinstance(secrets, list):
-                result["git_preflight_secrets_found"] = float(len(secrets))
+            result["git_preflight_secrets_found"] = float(len(secrets)) if isinstance(secrets, list) else 0.0
 
     def _collect_status_metrics(self, result: dict[str, float], data: dict[str, Any]) -> None:
         """Extract metrics from git status output."""
-        # Count uncommitted files
-        uncommitted = data.get("uncommitted_files", [])
-        if isinstance(uncommitted, list):
-            result["git_uncommitted_files"] = float(len(uncommitted))
-
-        # Count unstaged files
-        unstaged = data.get("unstaged_files", [])
-        if isinstance(unstaged, list):
-            result["git_unstaged_files"] = float(len(unstaged))
-
-        # Count staged files
-        staged = data.get("staged_files", [])
-        if isinstance(staged, list):
-            result["git_staged_files"] = float(len(staged))
-
-        # Count untracked files
-        untracked = data.get("untracked_files", [])
-        if isinstance(untracked, list):
-            result["git_untracked_files"] = float(len(untracked))
+        # Count files by status
+        for key in ["uncommitted_files", "unstaged_files", "staged_files", "untracked_files"]:
+            files = data.get(key, [])
+            result[f"git_{key}"] = float(len(files)) if isinstance(files, list) else 0.0
 
         # Branch ahead/behind
-        ahead = data.get("ahead", 0)
-        if ahead is not None:
-            result["git_commits_ahead"] = float(ahead)
-
-        behind = data.get("behind", 0)
-        if behind is not None:
-            result["git_commits_behind"] = float(behind)
+        result["git_commits_ahead"] = float(data.get("ahead", 0) or 0)
+        result["git_commits_behind"] = float(data.get("behind", 0) or 0)
 
         # Is clean working directory
-        is_clean = data.get("is_clean", False)
-        result["git_is_clean"] = 1.0 if is_clean else 0.0
+        result["git_is_clean"] = 1.0 if data.get("is_clean", False) else 0.0
 
     def _collect_push_metrics(self, result: dict[str, float], data: dict[str, Any]) -> None:
         """Extract metrics from git push output."""
-        success = data.get("success", False)
-        result["git_push_success"] = 1.0 if success else 0.0
-
-        # Push protection detection
-        push_protected = data.get("push_protection_violation", False)
-        result["git_push_protection_violation"] = 1.0 if push_protected else 0.0
+        result["git_push_success"] = 1.0 if data.get("success", False) else 0.0
+        result["git_push_protection_violation"] = 1.0 if data.get("push_protection_violation", False) else 0.0
 
         # Error count
         errors = data.get("errors", [])
-        if isinstance(errors, list):
-            result["git_push_errors"] = float(len(errors))
+        result["git_push_errors"] = float(len(errors)) if isinstance(errors, list) else 0.0
 
         # Commits pushed
-        commits = data.get("commits_pushed", 0)
-        if commits is not None:
-            result["git_commits_pushed"] = float(commits)
+        result["git_commits_pushed"] = float(data.get("commits_pushed", 0) or 0)
 
     def _collect_commit_metrics(self, result: dict[str, float], data: dict[str, Any]) -> None:
         """Extract metrics from git commit output."""
-        success = data.get("success", False)
-        result["git_commit_success"] = 1.0 if success else 0.0
+        result["git_commit_success"] = 1.0 if data.get("success", False) else 0.0
 
         # Files committed
         files = data.get("files_committed", [])
-        if isinstance(files, list):
-            result["git_files_committed"] = float(len(files))
+        result["git_files_committed"] = float(len(files)) if isinstance(files, list) else 0.0
 
         # Commit created
-        commit_hash = data.get("commit_hash")
-        result["git_commit_created"] = 1.0 if commit_hash else 0.0
+        result["git_commit_created"] = 1.0 if data.get("commit_hash") else 0.0
 
     def get_config_example(self) -> str:
         """Return a ready-to-use YAML snippet for git operations."""
@@ -681,29 +650,29 @@ def scan_for_secrets(
     result["total_files_scanned"] = len(paths)
     workdir = cwd or Path(".")
 
-    # Try trufflehog first (most comprehensive)
-    if use_trufflehog and shutil.which("trufflehog"):
-        result["scanners_used"].append("trufflehog")
-        th_result = _scan_with_trufflehog(paths, workdir)
-        result["secrets_found"].extend(th_result.get("findings", []))
+    # Build scanner dispatch table: (name, check_func, scan_func)
+    scanners: list[tuple[str, Callable[[], bool], Callable[[list[str], Path], dict[str, Any]]]] = [
+        ("trufflehog", lambda: shutil.which("trufflehog") is not None, _scan_with_trufflehog),
+        ("gitleaks", lambda: shutil.which("gitleaks") is not None, _scan_with_gitleaks),
+    ]
+    
+    # Run enabled external scanners
+    for name, check_fn, scan_fn in scanners:
+        if use_trufflehog and name == "trufflehog" and check_fn():
+            result["scanners_used"].append(name)
+            scan_result = scan_fn(paths, workdir)
+            result["secrets_found"].extend(scan_result.get("findings", []))
+        elif use_gitleaks and name == "gitleaks" and check_fn():
+            result["scanners_used"].append(name)
+            scan_result = scan_fn(paths, workdir)
+            result["secrets_found"].extend(scan_result.get("findings", []))
 
-    # Try gitleaks
-    if use_gitleaks and shutil.which("gitleaks"):
-        result["scanners_used"].append("gitleaks")
-        gl_result = _scan_with_gitleaks(paths, workdir)
-        result["secrets_found"].extend(gl_result.get("findings", []))
-
-    # Fallback to built-in patterns
-    if use_patterns and not result["scanners_used"]:
-        result["scanners_used"].append("builtin_patterns")
+    # Fallback or supplemental pattern scan
+    if use_patterns:
+        if not result["scanners_used"]:
+            result["scanners_used"].append("builtin_patterns")
         pattern_result = _scan_with_patterns(paths, workdir)
-        result["secrets_found"].extend(pattern_result.get("findings", []))
-
-    # Additional pattern scan even if other scanners found something
-    # (catches things they might miss)
-    if use_patterns and result["scanners_used"]:
-        pattern_result = _scan_with_patterns(paths, workdir)
-        # Add only findings not already detected
+        # Add only unique findings (not already detected by other scanners)
         existing = {(s["file"], s["line"]) for s in result["secrets_found"]}
         for finding in pattern_result.get("findings", []):
             key = (finding["file"], finding["line"])

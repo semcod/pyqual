@@ -209,6 +209,100 @@ Environment:
     return parser.parse_args()
 
 
+def _check_git_changes(workdir: Path) -> list[str]:
+    """Check git status and return list of changed files (excluding artifacts)."""
+    git_status = subprocess.run(
+        ["git", "status", "--porcelain"],
+        cwd=workdir,
+        capture_output=True,
+        text=True,
+    )
+    changed_files = []
+    if git_status.stdout.strip():
+        for line in git_status.stdout.strip().splitlines():
+            parts = line.split()
+            if len(parts) >= 2:
+                filename = parts[-1]
+                if not filename.endswith(('.db', '.jsonl')) and not filename.startswith('.aider'):
+                    changed_files.append(filename)
+    return changed_files
+
+
+def _determine_tool_status(result: ToolResult) -> str:
+    """Determine tool status based on result."""
+    if result.success:
+        return "passed"
+    if result.returncode == -1:
+        return "timeout"
+    combined = (result.stdout + result.stderr).lower()
+    if "rate limit" in combined or "hit your limit" in combined:
+        return "rate_limited"
+    if "not found" in combined:
+        return "tool_missing"
+    return "error"
+
+
+def _print_yaml_results(
+    results: list[ToolResult],
+    changed_files: list[str],
+    total_pending: int,
+    completed_count: int,
+    max_items: int,
+    batch_size: int,
+    duration: float,
+    pushed: bool,
+) -> None:
+    """Print YAML formatted results."""
+    succeeded = sum(1 for r in results if r.success)
+    failed = len(results) - succeeded
+    remaining = total_pending - completed_count
+
+    print("\n# parallel_fix results")
+    print(f"todo_items_total: {total_pending}")
+    print(f"todo_items_batch: {batch_size}")
+    print(f"max_per_cycle: {max_items}")
+    print(f"todos_completed: {completed_count}")
+    print(f"todos_remaining: {remaining}")
+    print(f"duration: {duration:.1f}")
+    print("tools:")
+
+    for r in results:
+        status = _determine_tool_status(r)
+        print(f"  - name: {r.name}")
+        print(f"    status: {status}")
+        print(f"    returncode: {r.returncode}")
+        print(f"    duration: {r.duration:.1f}")
+
+        if not r.success:
+            err = r.stderr.strip() or r.stdout.strip() or "unknown"
+            err = err[:120].replace("\n", " ").replace('"', "'")
+            print(f'    error: "{err}"')
+
+    print("summary:")
+    print(f"  succeeded: {succeeded}")
+    print(f"  failed: {failed}")
+    print(f"  files_changed: {len(changed_files)}")
+    print(f"  todos_completed: {completed_count}")
+    print(f"  todos_remaining: {remaining}")
+    print(f"  git_pushed: {pushed}")
+
+    if changed_files:
+        print("  changed:")
+        for f in changed_files[:10]:
+            print(f"    - {f}")
+        if len(changed_files) > 10:
+            print(f"    # ... and {len(changed_files) - 10} more")
+
+
+def _print_cycle_completion(remaining: int, max_items: int) -> None:
+    """Print cycle completion message."""
+    if remaining > 0:
+        print(f"\n🔄 Cycle complete. {remaining} items remaining for next cycle.")
+        print(f"   Run again: pyqual run (will process next {min(max_items, remaining)} items)")
+    else:
+        print("\n✅ All TODO items processed!")
+
+
 def main() -> int:
     """Run parallel fix on TODO.md items - configurable batch size with git push."""
     args = parse_args()
@@ -277,20 +371,7 @@ def main() -> int:
     total_duration = time.monotonic() - start_time
     
     # Check if any changes were made
-    git_status = subprocess.run(
-        ["git", "status", "--porcelain"],
-        cwd=workdir,
-        capture_output=True,
-        text=True,
-    )
-    changed_files = []
-    if git_status.stdout.strip():
-        for line in git_status.stdout.strip().splitlines():
-            parts = line.split()
-            if len(parts) >= 2:
-                filename = parts[-1]
-                if not filename.endswith(('.db', '.jsonl')) and not filename.startswith('.aider'):
-                    changed_files.append(filename)
+    changed_files = _check_git_changes(workdir)
     
     # Mark completed TODO items based on changed files
     completed_count = mark_completed_todos(todo_path, changed_files)
@@ -305,64 +386,16 @@ def main() -> int:
         batch_file.unlink()
     
     # Generate YAML output
-    succeeded = sum(1 for r in results if r.success)
-    failed = len(results) - succeeded
-    remaining = total_pending - completed_count
-    
-    print("\n# parallel_fix results")
-    print(f"todo_items_total: {total_pending}")
-    print(f"todo_items_batch: {len(batch_items)}")
-    print(f"max_per_cycle: {args.max_items}")
-    print(f"todos_completed: {completed_count}")
-    print(f"todos_remaining: {remaining}")
-    print(f"duration: {total_duration:.1f}")
-    print("tools:")
-    
-    for r in results:
-        combined = (r.stdout + r.stderr).lower()
-        if r.success:
-            status = "passed"
-        elif r.returncode == -1:
-            status = "timeout"
-        elif "rate limit" in combined or "hit your limit" in combined:
-            status = "rate_limited"
-        elif "not found" in combined:
-            status = "tool_missing"
-        else:
-            status = "error"
-        
-        print(f"  - name: {r.name}")
-        print(f"    status: {status}")
-        print(f"    returncode: {r.returncode}")
-        print(f"    duration: {r.duration:.1f}")
-        
-        if not r.success:
-            err = r.stderr.strip() or r.stdout.strip() or "unknown"
-            err = err[:120].replace("\n", " ").replace('"', "'")
-            print(f'    error: "{err}"')
-    
-    print("summary:")
-    print(f"  succeeded: {succeeded}")
-    print(f"  failed: {failed}")
-    print(f"  files_changed: {len(changed_files)}")
-    print(f"  todos_completed: {completed_count}")
-    print(f"  todos_remaining: {remaining}")
-    print(f"  git_pushed: {pushed}")
-    
-    if changed_files:
-        print("  changed:")
-        for f in changed_files[:10]:
-            print(f"    - {f}")
-        if len(changed_files) > 10:
-            print(f"    # ... and {len(changed_files) - 10} more")
+    _print_yaml_results(
+        results, changed_files, total_pending, completed_count,
+        args.max_items, len(batch_items), total_duration, pushed
+    )
     
     # Cycle completion message
-    if remaining > 0:
-        print(f"\n🔄 Cycle complete. {remaining} items remaining for next cycle.")
-        print(f"   Run again: pyqual run (will process next {min(args.max_items, remaining)} items)")
-    else:
-        print("\n✅ All TODO items processed!")
+    remaining = total_pending - completed_count
+    _print_cycle_completion(remaining, args.max_items)
     
+    failed = sum(1 for r in results if not r.success)
     return 0 if failed == 0 else 1
 
 

@@ -12,6 +12,7 @@ pipeline:
 
     - name: validate
       tool: vallm
+      optional: true
 
     - name: llx_mcp_refactor
       run: pyqual mcp-refactor --workdir . --project-path /workspace/project --issues .pyqual/errors.json --output .pyqual/llx_mcp.json

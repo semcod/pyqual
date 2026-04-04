@@ -374,16 +374,14 @@ def classify_with_llm(fp: ProjectFingerprint, model: str | None = None) -> Proje
 # Heuristic fallback (no LLM)
 # ---------------------------------------------------------------------------
 
-def _classify_heuristic(fp: ProjectFingerprint) -> ProjectConfig:
-    """Rule-based classification when LLM is unavailable."""
-    # Skip non-projects
+def _check_skip_conditions(fp: ProjectFingerprint) -> ProjectConfig | None:
+    """Check if directory should be skipped. Returns ProjectConfig if skip, None otherwise."""
     skip_names = {"venv", ".venv", "node_modules", "__pycache__", "dist", "build"}
     if fp.name in skip_names:
         return ProjectConfig(skip=True, skip_reason="common artifact directory")
     if not fp.manifests and not fp.file_extensions:
         return ProjectConfig(skip=True, skip_reason="empty or data-only directory")
 
-    # Skip directories that have no code manifests and only data/doc/config files
     _DATA_EXTS = {
         ".md", ".rst", ".txt", ".csv", ".json", ".yaml", ".yml", ".xml",
         ".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".ico",
@@ -394,9 +392,18 @@ def _classify_heuristic(fp: ProjectFingerprint) -> ProjectConfig:
     if not fp.manifests and set(fp.file_extensions) <= _DATA_EXTS:
         return ProjectConfig(skip=True, skip_reason="data/documentation-only directory")
 
-    # Skip year-named archive directories (e.g. "2025") without manifests
     if fp.name.isdigit() and not fp.manifests:
         return ProjectConfig(skip=True, skip_reason="archive directory")
+
+    return None
+
+
+def _classify_heuristic(fp: ProjectFingerprint) -> ProjectConfig:
+    """Rule-based classification when LLM is unavailable."""
+    # Use shared skip conditions checker
+    skip_result = _check_skip_conditions(fp)
+    if skip_result:
+        return skip_result
 
     has_python = "pyproject.toml" in fp.manifests or "setup.py" in fp.manifests
     has_node = "package.json" in fp.manifests
@@ -625,6 +632,35 @@ class BulkInitResult:
         return len(self.created) + len(self.skipped_existing) + len(self.skipped_nonproject) + len(self.errors)
 
 
+def _validate_yaml_content(yaml_content: str, project_name: str) -> None:
+    """Validate that YAML content is parseable and has required structure."""
+    try:
+        parsed = yaml.safe_load(yaml_content)
+        if not parsed or "pipeline" not in parsed:
+            raise ValueError("missing 'pipeline' key")
+    except Exception as exc:
+        raise ValueError(f"YAML validation error: {exc}") from exc
+
+
+def _write_pyqual_yaml(project_dir: Path, yaml_content: str) -> None:
+    """Write pyqual.yaml to project directory and ensure .pyqual exists."""
+    target = project_dir / "pyqual.yaml"
+    target.write_text(yaml_content)
+    (project_dir / ".pyqual").mkdir(exist_ok=True)
+
+
+def _classify_project(fp: ProjectFingerprint, use_llm: bool, model: str | None, project_name: str) -> ProjectConfig:
+    """Classify project using LLM or heuristic fallback."""
+    if not use_llm:
+        return _classify_heuristic(fp)
+    
+    try:
+        return classify_with_llm(fp, model=model)
+    except Exception as exc:
+        logger.warning("LLM classification failed for %s, using heuristic: %s", project_name, exc)
+        return _classify_heuristic(fp)
+
+
 def bulk_init(
     root: Path,
     *,
@@ -670,16 +706,9 @@ def bulk_init(
             result.skipped_existing.append(name)
             continue
 
-        # Classify
+        # Classify with LLM or heuristic
         try:
-            if use_llm:
-                try:
-                    cfg = classify_with_llm(fp, model=model)
-                except Exception as exc:
-                    logger.warning("LLM classification failed for %s, using heuristic: %s", name, exc)
-                    cfg = _classify_heuristic(fp)
-            else:
-                cfg = _classify_heuristic(fp)
+            cfg = _classify_project(fp, use_llm, model, name)
         except Exception as exc:
             result.errors.append((name, f"classification error: {exc}"))
             continue
@@ -698,18 +727,14 @@ def bulk_init(
 
         # Validate generated YAML
         try:
-            parsed = yaml.safe_load(yaml_content)
-            if not parsed or "pipeline" not in parsed:
-                raise ValueError("missing 'pipeline' key")
+            _validate_yaml_content(yaml_content, name)
         except Exception as exc:
-            result.errors.append((name, f"YAML validation error: {exc}"))
+            result.errors.append((name, str(exc)))
             continue
 
         # Write
         if not dry_run:
-            target = project_dir / "pyqual.yaml"
-            target.write_text(yaml_content)
-            (project_dir / ".pyqual").mkdir(exist_ok=True)
+            _write_pyqual_yaml(project_dir, yaml_content)
 
         result.created.append(name)
 

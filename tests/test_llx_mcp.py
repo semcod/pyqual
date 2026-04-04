@@ -9,6 +9,7 @@ import pytest
 from typer.testing import CliRunner
 
 import pyqual.cli as cli_module
+import pyqual.cli.cmd_mcp as cmd_mcp_module
 import llx.mcp.workflows as llx_workflows_module
 import pyqual.integrations.llx_mcp as llx_module
 from pyqual.cli import app
@@ -271,7 +272,7 @@ def test_mcp_fix_cli_invokes_workflow(tmp_path: Path, monkeypatch: pytest.Monkey
             model="claude-sonnet-4",
         )
 
-    monkeypatch.setattr(cli_module, "run_llx_fix_workflow", fake_run_llx_fix_workflow)
+    monkeypatch.setattr(cmd_mcp_module, "run_llx_fix_workflow", fake_run_llx_fix_workflow)
 
     runner = CliRunner()
     result = runner.invoke(
@@ -317,7 +318,7 @@ def test_mcp_refactor_cli_invokes_workflow(tmp_path: Path, monkeypatch: pytest.M
             model="claude-sonnet-4",
         )
 
-    monkeypatch.setattr(cli_module, "run_llx_refactor_workflow", fake_run_llx_refactor_workflow)
+    monkeypatch.setattr(cmd_mcp_module, "run_llx_refactor_workflow", fake_run_llx_refactor_workflow)
 
     runner = CliRunner()
     result = runner.invoke(
@@ -346,7 +347,7 @@ def test_mcp_service_cli_shows_friendly_error(monkeypatch: pytest.MonkeyPatch) -
     def fake_run_llx_mcp_service(*_args: object, **_kwargs: object) -> None:
         raise RuntimeError("pyqual mcp-service requires `uvicorn`")
 
-    monkeypatch.setattr(cli_module, "run_llx_mcp_service", fake_run_llx_mcp_service)
+    monkeypatch.setattr(cmd_mcp_module, "run_llx_mcp_service", fake_run_llx_mcp_service)
 
     runner = CliRunner()
     result = runner.invoke(app, ["mcp-service"])

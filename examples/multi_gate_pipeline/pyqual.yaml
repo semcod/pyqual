@@ -72,6 +72,7 @@ pipeline:
     # Phase 4: AI validation
     - name: validate
       tool: vallm
+      optional: true
 
     # Phase 5: AI fix (only on failure)
     - name: fix

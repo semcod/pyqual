@@ -79,7 +79,8 @@ def test_tickets_todo_cli_invokes_sync_helper(tmp_path: Path, monkeypatch: pytes
     def fake_sync_todo_tickets(*, workdir: Path, dry_run: bool, direction: str) -> None:
         captured.update({"workdir": workdir, "dry_run": dry_run, "direction": direction})
 
-    monkeypatch.setattr(cli_module, "sync_todo_tickets", fake_sync_todo_tickets)
+    import pyqual.cli.cmd_tickets as cmd_tickets_module
+    monkeypatch.setattr(cmd_tickets_module, "sync_todo_tickets", fake_sync_todo_tickets)
 
     runner = CliRunner()
     result = runner.invoke(
@@ -133,15 +134,15 @@ def test_run_on_fail_create_ticket_syncs_todo_tickets(tmp_path: Path, monkeypatc
     def fake_sync_planfile_tickets(source: str, workdir: Path, dry_run: bool, direction: str, show_header: bool = True) -> None:
         captured.update({"source": source, "workdir": workdir, "dry_run": dry_run, "direction": direction})
 
-    # Patch in cli_module where Pipeline is used, and patch tickets module directly
-    import pyqual.cli as cli_mod
+    # Patch in cli.cmd_run where Pipeline is used, and patch tickets module directly
+    import pyqual.cli.cmd_run as cmd_run_module
     import pyqual.tickets as tickets_mod
-    monkeypatch.setattr(cli_mod, "Pipeline", FakePipeline)
+    monkeypatch.setattr(cmd_run_module, "Pipeline", FakePipeline)
     monkeypatch.setattr(tickets_mod, "sync_planfile_tickets", fake_sync_planfile_tickets)
 
     runner = CliRunner()
     result = runner.invoke(
-        cli_mod.app,
+        app,
         [
             "run",
             "--config",
@@ -218,7 +219,8 @@ def test_run_report_includes_todo_and_fix_summary(tmp_path: Path, monkeypatch: p
                 total_duration=3.0,
             )
 
-    monkeypatch.setattr(cli_module, "Pipeline", FakePipeline)
+    import pyqual.cli.cmd_run as cmd_run_module
+    monkeypatch.setattr(cmd_run_module, "Pipeline", FakePipeline)
 
     runner = CliRunner()
     result = runner.invoke(

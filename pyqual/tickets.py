@@ -71,3 +71,53 @@ def sync_all_tickets(
 ) -> None:
     """Sync TODO.md and GitHub tickets through planfile."""
     sync_planfile_tickets("all", workdir=workdir, dry_run=dry_run, direction=direction)
+
+
+def sync_from_gates(
+    workdir: Path = Path("."),
+    dry_run: bool = False,
+    backends: list[str] | None = None,
+) -> dict:
+    """Check gates and sync tickets only if gates fail.
+
+    This is what pyqual does internally when `on_fail: create_ticket` is set.
+    Use this for programmatic gate-based ticket creation.
+
+    Args:
+        workdir: Project directory containing pyqual.yaml
+        dry_run: Preview without making changes
+        backends: List of backends to sync (default: ["markdown"])
+
+    Returns:
+        dict with {synced: bool, failures: list[str], backends: list[str]}
+    """
+    from pyqual.config import PyqualConfig
+    from pyqual.gates import GateSet
+
+    config_path = workdir / "pyqual.yaml"
+    if not config_path.exists():
+        raise FileNotFoundError(f"pyqual.yaml not found in {workdir}")
+
+    config = PyqualConfig.load(config_path)
+    gate_set = GateSet(config.gates)
+    results = gate_set.check_all(workdir)
+
+    failures = [r for r in results if not r.passed]
+
+    if not failures:
+        return {"synced": False, "failures": [], "backends": [], "all_passed": True}
+
+    backends = backends or ["markdown"]
+
+    if "all" in backends:
+        sync_all_tickets(workdir=workdir, dry_run=dry_run, direction="from")
+    else:
+        for backend in backends:
+            sync_planfile_tickets(backend, workdir=workdir, dry_run=dry_run, direction="from")
+
+    return {
+        "synced": True,
+        "failures": [f.metric for f in failures],
+        "backends": backends,
+        "all_passed": False,
+    }

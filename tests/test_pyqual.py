@@ -33,7 +33,7 @@ def test_llm_exports_use_llx_when_available() -> None:
     assert pyqual.get_llm_model is llx.get_llm_model
 
 
-from pyqual.cli import _extract_stage_summary as _ess
+from pyqual.cli_run_helpers import extract_stage_summary as _ess
 
 
 class TestExtractStageSummary:
