@@ -129,6 +129,14 @@ pipeline:
       optional: true
       timeout: 1800
 
+    - name: close_tasks
+      run: |
+        export PYTHONPATH=$PYTHONPATH:.
+        python3 pyqual/auto_closer.py
+        planfile sync all
+      when: after_fix
+      optional: true
+
     # Simple git push (goal push had "Argument list too long" issue with many files)
     - name: push
       run: |
@@ -148,14 +156,6 @@ pipeline:
       when: metrics_pass
       optional: true
       timeout: 300
-
-    - name: close_tasks
-      run: |
-        export PYTHONPATH=$PYTHONPATH:.
-        python3 pyqual/auto_closer.py
-        planfile sync all
-      when: after_fix
-      optional: true
 
     # Generate comprehensive markdown report with Mermaid diagram and ASCII flow
     - name: markdown_report
