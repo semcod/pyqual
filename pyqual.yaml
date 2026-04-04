@@ -129,6 +129,37 @@ pipeline:
       optional: true
       timeout: 1800
 
+    # Auto-merge attack mode - pull remote changes first
+    - name: automerge
+      run: |
+        export PYTHONPATH=$PYTHONPATH:.
+        python3 -c "
+          from pyqual.plugins.attack import attack_check, attack_merge
+          import json
+          import sys
+
+          check = attack_check()
+          with open('.pyqual/attack_check.json', 'w') as f:
+            json.dump(check, f)
+
+          if not check['success']:
+            print('Attack check failed:', check.get('error'))
+            sys.exit(0)
+
+          print(f'Conflicts: {check['conflicts_detected']}, Behind: {check['branches_behind']}')
+
+          if check['branches_behind'] > 0 or check['conflicts_detected'] > 0:
+            merge = attack_merge(strategy='theirs', dry_run=False)
+            with open('.pyqual/attack_merge.json', 'w') as f:
+              json.dump(merge, f)
+            print(f'Merge result: success={merge.get('success')}')
+          else:
+            print('Already up to date')
+        "
+      when: always
+      optional: true
+      timeout: 120
+
     - name: close_tasks
       run: |
         export PYTHONPATH=$PYTHONPATH:.
@@ -137,7 +168,7 @@ pipeline:
       when: always
       optional: true
 
-    # Simple git push (goal push had "Argument list too long" issue with many files)
+    # Push must be after close_tasks to include VERSION changes
     - name: push
       run: |
         if [ -n "$(git status --porcelain)" ]; then
@@ -157,7 +188,7 @@ pipeline:
       optional: true
       timeout: 300
 
-    # Auto-merge attack mode - aggressive conflict resolution
+    # Auto-merge attack mode - aggressive conflict resolution (runs before push to pull changes)
     - name: automerge
       run: |
         export PYTHONPATH=$PYTHONPATH:.
@@ -186,15 +217,12 @@ pipeline:
 
             if merge['success']:
               print(f'Merge successful! Resolved {merge[\"conflicts_resolved\"]} conflicts')
-              # Push the merge
-              import subprocess
-              subprocess.run(['git', 'push', 'origin', 'HEAD'], check=False)
             else:
               print('Merge failed:', merge.get('error'))
           else:
             print('Already up to date, no merge needed')
         "
-      when: metrics_pass
+      when: always
       optional: true
       timeout: 120
 
