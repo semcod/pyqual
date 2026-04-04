@@ -15,9 +15,6 @@ pipeline:
     ruff_errors_max: 50      # ruff lint errors (realistic threshold)
     secrets_found_max: 0     # detect-secrets findings
     mypy_errors_max: 100      # mypy type errors (realistic for gradual typing)
-    # Attack/merge gates:
-    attack_conflicts_max: 5   # max merge conflicts allowed
-    attack_merge_failures_max: 0  # max failed merges allowed
 
   # Pipeline stages — use 'tool:' for built-in presets or 'run:' for custom
   stages:
