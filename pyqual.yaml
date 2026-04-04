@@ -134,7 +134,7 @@ pipeline:
         export PYTHONPATH=$PYTHONPATH:.
         python3 pyqual/auto_closer.py
         planfile sync all
-      when: after_fix
+      when: always
       optional: true
 
     # Simple git push (goal push had "Argument list too long" issue with many files)
