@@ -22,6 +22,7 @@ from pyqual.constants import (
     LLX_MCP_REPORT,
     PIPELINE_DB,
     PIPELINE_TABLE,
+    RUNTIME_ERRORS_FILE,
     STDERR_TAIL_CHARS,
     STDOUT_TAIL_CHARS,
     TIMEOUT_EXIT_CODE,
@@ -300,6 +301,10 @@ class Pipeline:
 
         self._log_stage(stage, result)
 
+        # Capture runtime errors for failed stages
+        if not result.passed and not result.skipped and result.original_returncode != 0:
+            self._capture_runtime_error(stage, result)
+
         if not result.passed and not result.skipped and self.on_stage_error:
             from pyqual.validation import StageFailure
             failure = StageFailure(
@@ -560,3 +565,103 @@ class Pipeline:
     def _ensure_pyqual_dir(self) -> None:
         """Create .pyqual/ working directory."""
         (self.workdir / ".pyqual").mkdir(exist_ok=True)
+
+    def _capture_runtime_error(self, stage: StageConfig, result: StageResult) -> None:
+        """Capture runtime error details to .pyqual/runtime_errors.json."""
+        errors_path = self.workdir / RUNTIME_ERRORS_FILE
+        errors_list: list[dict[str, Any]] = []
+        
+        # Load existing errors
+        if errors_path.exists():
+            try:
+                errors_list = _json.loads(errors_path.read_text())
+                if not isinstance(errors_list, list):
+                    errors_list = []
+            except (_json.JSONDecodeError, OSError):
+                errors_list = []
+        
+        # Create error entry
+        error_entry = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "stage": stage.name,
+            "command": result.command or stage.run,
+            "tool": stage.tool,
+            "returncode": result.original_returncode,
+            "duration_s": round(result.duration, 3),
+            "error_type": self._classify_error(result),
+            "message": self._extract_error_message(result),
+            "stdout_tail": result.stdout[-500:] if result.stdout else "",
+            "stderr_tail": result.stderr[-500:] if result.stderr else "",
+        }
+        
+        errors_list.append(error_entry)
+        
+        # Keep only last 100 errors to avoid file bloat
+        if len(errors_list) > 100:
+            errors_list = errors_list[-100:]
+        
+        try:
+            errors_path.write_text(_json.dumps(errors_list, indent=2, ensure_ascii=False))
+            log.info("runtime_errors: captured error from stage '%s' in %s", stage.name, errors_path)
+        except OSError as exc:
+            log.warning("runtime_errors: failed to write to %s: %s", errors_path, exc)
+    
+    def _classify_error(self, result: StageResult) -> str:
+        """Classify the type of runtime error based on return code and stderr."""
+        rc = result.original_returncode
+        stderr = (result.stderr or "").lower()
+        
+        if rc == TIMEOUT_EXIT_CODE:
+            return "timeout"
+        elif rc == 124:  # timeout command
+            return "timeout"
+        elif rc == 125:  # timeout command error
+            return "timeout"
+        elif rc >= 128 and rc <= 129:
+            return "signal"
+        elif rc == 127:
+            return "command_not_found"
+        elif rc == 126:
+            return "permission_denied"
+        elif "importerror" in stderr or "modulenotfounderror" in stderr:
+            return "import_error"
+        elif "syntaxerror" in stderr:
+            return "syntax_error"
+        elif "keyerror" in stderr or "attributeerror" in stderr:
+            return "runtime_exception"
+        elif "assertionerror" in stderr:
+            return "assertion_failed"
+        elif "test failed" in stderr or "failed tests" in stderr:
+            return "test_failed"
+        else:
+            return "unknown"
+    
+    def _extract_error_message(self, result: StageResult) -> str:
+        """Extract the most relevant error message from stderr/stdout."""
+        # Prefer stderr for error messages
+        if result.stderr:
+            lines = result.stderr.strip().split("\n")
+            # Look for common error patterns
+            for i, line in enumerate(lines):
+                line_lower = line.lower()
+                if any(pattern in line_lower for pattern in [
+                    "error:", "exception:", "failed:", "traceback",
+                    "file ","line ","in ","traceback (most recent call last)",
+                ]):
+                    # Return the line and maybe the next one for context
+                    if i + 1 < len(lines) and lines[i + 1].strip():
+                        return f"{line.strip()}\n{lines[i + 1].strip()}"
+                    return line.strip()
+            # If no pattern matched, return the last non-empty line
+            for line in reversed(lines):
+                if line.strip():
+                    return line.strip()
+        
+        # Fallback to stdout if stderr is empty
+        if result.stdout:
+            lines = result.stdout.strip().split("\n")
+            for line in reversed(lines):
+                if line.strip():
+                    return line.strip()
+        
+        return f"Command exited with code {result.original_returncode}"

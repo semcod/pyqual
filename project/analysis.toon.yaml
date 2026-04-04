@@ -8,35 +8,35 @@ HEALTH[20]:
   🟡 CC    get_last_run CC=15 (limit:15)
   🟡 CC    run CC=15 (limit:15)
   🟡 CC    _bulk_run_impl CC=19 (limit:15)
+  🟡 CC    main CC=18 (limit:15)
   🟡 CC    _run_single_project CC=19 (limit:15)
   🟡 CC    _build_project_row CC=19 (limit:15)
   🟡 CC    bulk_run CC=17 (limit:15)
+  🟡 CC    _load_yaml_config CC=17 (limit:15)
   🟡 CC    _from_vulnerabilities CC=18 (limit:15)
   🟡 CC    _from_radon CC=15 (limit:15)
-  🟡 CC    main CC=18 (limit:15)
   🟡 CC    _classify_heuristic CC=20 (limit:15)
-  🟡 CC    _execute_stage CC=18 (limit:15)
   🟡 CC    _logs_impl CC=22 (limit:15)
+  🟡 CC    _execute_stage CC=18 (limit:15)
   🟡 CC    git_status_cmd CC=15 (limit:15)
   🟡 CC    git_scan_cmd CC=17 (limit:15)
   🟡 CC    git_push_cmd CC=19 (limit:15)
-  🟡 CC    _load_yaml_config CC=17 (limit:15)
-  🟡 CC    validate CC=19 (limit:15)
+  🟡 CC    run CC=23 (limit:15)
 
 REFACTOR[2]:
   1. split pyqual/validation.py  (god module)
   2. split 19 high-CC methods  (CC>15)
 
 PIPELINES[281]:
-  [1] Src [App]: App → loadRepositories
+  [1] Src [MetricsTrendChart]: MetricsTrendChart
       PURITY: 100% pure
-  [2] Src [handleRepositorySelect]: handleRepositorySelect
+  [2] Src [data]: data
       PURITY: 100% pure
-  [3] Src [runs]: runs
+  [3] Src [StagesChart]: StagesChart
       PURITY: 100% pure
-  [4] Src [RepositoryCard]: RepositoryCard
+  [4] Src [data]: data
       PURITY: 100% pure
-  [5] Src [MetricsTrendChart]: MetricsTrendChart
+  [5] Src [App]: App → loadRepositories
       PURITY: 100% pure
 
 LAYERS:
@@ -104,8 +104,8 @@ LAYERS:
   │ aider                       49L  1C    3m  CC=2      ←0
   │ __init__                    47L  0C    1m  CC=5      ←1
   │ main                        45L  0C    1m  CC=2      ←1
-  │ pipeline_protocols          44L  6C    6m  CC=1      ←0
   │ cmd_plugin                  44L  0C    1m  CC=8      ←0
+  │ pipeline_protocols          44L  6C    6m  CC=1      ←0
   │ __init__                    43L  0C    0m  CC=0.0    ←0
   │ llx                         36L  1C    4m  CC=2      ←0
   │ claude                      33L  1C    3m  CC=1      ←0

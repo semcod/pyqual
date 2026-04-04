@@ -29,8 +29,8 @@ flowchart TD
     pyqual__cli ==>|6| pyqual__tickets
     pyqual__config ==>|5| pyqual__tools
     examples__ticket_workflow ==>|4| pyqual__tickets
-    pyqual__cli ==>|4| pyqual__config
     pyqual__validation ==>|4| pyqual__tools
+    pyqual__cli ==>|4| pyqual__config
     pyqual__cli ==>|4| pyqual__api
     pyqual__cli -->|3| pyqual__github_tasks
     pyqual__config -->|2| pyqual__profiles
@@ -39,17 +39,17 @@ flowchart TD
     pyqual__cli -->|2| pyqual__profiles
     pyqual__cli -->|2| pyqual__validation
     run_analysis -->|1| pyqual__config
-    examples__ticket_workflow -->|1| pyqual__config
     examples__multi_gate_pipeline -->|1| pyqual__config
+    examples__ticket_workflow -->|1| pyqual__config
     pyqual__gates -->|1| pyqual__plugins
     pyqual__tickets -->|1| pyqual__config
     pyqual__cli_bulk_cmds -->|1| pyqual__bulk_init
     pyqual__api -->|1| pyqual__config
     pyqual__api -->|1| pyqual__profiles
-    pyqual__bulk_run -->|1| pyqual__api
     pyqual__run_parallel_fix -->|1| pyqual__fix_tools
+    pyqual__bulk_run -->|1| pyqual__api
+    pyqual__validation -->|1| pyqual__yaml_fixer
     pyqual__bulk_init -->|1| pyqual__bulk_init_classify
     pyqual__bulk_init -->|1| pyqual__bulk_init_fingerprint
     pyqual__report -->|1| pyqual__plugins
     pyqual__report -->|1| pyqual__config
-    pyqual__validation -->|1| pyqual__yaml_fixer

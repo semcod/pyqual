@@ -1,4 +1,4 @@
-# pyqual | 96f 18175L | shell:4,javascript:2,typescript:11,python:79 | 2026-04-04
+# pyqual | 96f 18175L | shell:4,typescript:11,javascript:2,python:79 | 2026-04-04
 # stats: 534 func | 0 cls | 96 mod | CC̄=5.5 | critical:27 | cycles:0
 # alerts[5]: fan-out run=31; fan-out register_observe_commands=29; fan-out main=27; fan-out get_last_run=26; fan-out main=26
 # hotspots[5]: run fan=31; register_observe_commands fan=29; main fan=27; main fan=26; get_last_run fan=26
@@ -185,6 +185,18 @@ D:
     fix_config(config;workdir;dry_run;model)
     status(config;workdir)
     report(config;workdir;readme)
+  pyqual/run_parallel_fix.py:
+    e: get_todo_batch,mark_completed_todos,run_tool,git_commit_and_push,parse_args,_check_git_changes,_determine_tool_status,_print_yaml_results,_print_cycle_completion,main
+    get_todo_batch(todo_path;max_items)
+    mark_completed_todos(todo_path;changed_files)
+    run_tool(name;command;workdir;timeout)
+    git_commit_and_push(workdir;completed_count)
+    parse_args()
+    _check_git_changes(workdir)
+    _determine_tool_status(result)
+    _print_yaml_results(results;changed_files;total_pending;completed_count;max_items;batch_size;duration;pushed)
+    _print_cycle_completion(remaining;max_items)
+    main()
   pyqual/_gate_collectors.py:
     e: _read_artifact_text,_from_toon,_from_vallm,_from_coverage,_from_bandit,_from_secrets,_from_vulnerabilities,_from_security,_from_sbom,_from_vulture,_from_pyroma,_from_code_health,_from_git_health,_from_llm_quality,_from_ai_cost,_from_benchmark,_from_memory_profile,_from_radon,_from_mypy,_from_lint,_from_ruff,_count_pylint_by_type,_from_pylint,_from_flake8,_from_interrogate
     _read_artifact_text(workdir;filenames)
@@ -212,18 +224,6 @@ D:
     _from_pylint(workdir)
     _from_flake8(workdir)
     _from_interrogate(workdir)
-  pyqual/run_parallel_fix.py:
-    e: get_todo_batch,mark_completed_todos,run_tool,git_commit_and_push,parse_args,_check_git_changes,_determine_tool_status,_print_yaml_results,_print_cycle_completion,main
-    get_todo_batch(todo_path;max_items)
-    mark_completed_todos(todo_path;changed_files)
-    run_tool(name;command;workdir;timeout)
-    git_commit_and_push(workdir;completed_count)
-    parse_args()
-    _check_git_changes(workdir)
-    _determine_tool_status(result)
-    _print_yaml_results(results;changed_files;total_pending;completed_count;max_items;batch_size;duration;pushed)
-    _print_cycle_completion(remaining;max_items)
-    main()
   pyqual/pipeline.py:
     e: Pipeline
     Pipeline: __init__(9),run(1),check_gates(0),_run_iteration(2),_iteration_stagnated(0),_should_run_stage(4),_resolve_tool_stage(1),_resolve_env(0),_check_optional_binary(0),_execute_stage(2),_execute_captured(5),_execute_streaming(5),_init_nfo(0),_nfo_emit(4),_is_fix_stage(1),_log_stage(2),_archive_llx_report(2),_log_gates(2),_log_event(1),_ensure_pyqual_dir(0)  # Execute pipeline stages in a loop until quality gates pass...
@@ -299,12 +299,6 @@ D:
     attack_check(cwd)
     attack_merge(strategy;cwd;dry_run)
     auto_merge_pr(pr_number;branch;cwd)
-  pyqual/plugins/documentation/main.py:
-    e: DocumentationCollector
-    DocumentationCollector(MetricCollector): _find_file(2),_check_file_exists(2),_read_pyproject(1),_parse_pyproject_fallback(1),_check_pyproject_metadata(1),_analyze_readme(1),_check_docs_folder(1),_check_required_files(1),_get_docstring_coverage(1),_check_license_type(1),collect(1)  # Documentation completeness and quality metrics.
-
-Measures:
--...
   pyqual/plugins/deps/main.py:
     e: DepsCollector,get_outdated_packages,get_dependency_tree,check_requirements,deps_health_check
     DepsCollector(MetricCollector): collect(1),_collect_outdated(2),_collect_deptree(2),_collect_requirements(2),_collect_licenses(2),get_config_example(0)  # Dependency management metrics collector...
@@ -312,6 +306,12 @@ Measures:
     get_dependency_tree(cwd)
     check_requirements(req_file;cwd)
     deps_health_check(cwd)
+  pyqual/plugins/documentation/main.py:
+    e: DocumentationCollector
+    DocumentationCollector(MetricCollector): _find_file(2),_check_file_exists(2),_read_pyproject(1),_parse_pyproject_fallback(1),_check_pyproject_metadata(1),_analyze_readme(1),_check_docs_folder(1),_check_required_files(1),_get_docstring_coverage(1),_check_license_type(1),collect(1)  # Documentation completeness and quality metrics.
+
+Measures:
+-...
   pyqual/cli_run_helpers.py:
     e: count_todo_items,extract_pytest_stage_summary,extract_lint_stage_summary,extract_prefact_stage_summary,extract_code2llm_stage_summary,extract_validation_stage_summary,extract_fix_stage_summary,extract_mypy_stage_summary,extract_bandit_stage_summary,extract_stage_summary,_enrich_analysis,_enrich_validation,_enrich_todo,enrich_from_artifacts,infer_fix_result,_extract_todo_summary,_extract_fix_summary,build_run_summary,format_run_summary,get_last_error_line
     count_todo_items(todo_path)
@@ -492,18 +492,6 @@ Measures:
     format_result_summary(result)
     export_results_json(result;output_path)
     shell_check(command)
-  pyqual/bulk_init_fingerprint.py:
-    e: ProjectFingerprint,_collect_top_level_entries,_collect_manifests,_collect_file_extensions,_load_json_object,_collect_json_scripts,_collect_makefile_targets,_collect_pyproject_metadata,_collect_readme_excerpt,collect_fingerprint
-    ProjectFingerprint:  # Lightweight summary of a project directory sent to LLM for c...
-    _collect_top_level_entries(project_dir;fp)
-    _collect_manifests(project_dir;fp)
-    _collect_file_extensions(project_dir)
-    _load_json_object(path)
-    _collect_json_scripts(project_dir;filename)
-    _collect_makefile_targets(project_dir)
-    _collect_pyproject_metadata(project_dir;fp)
-    _collect_readme_excerpt(project_dir)
-    collect_fingerprint(project_dir)
   pyqual/yaml_fixer.py:
     e: YamlErrorType,YamlSyntaxIssue,YamlFixResult,_detect_indentation_issues,_detect_quote_issues,_is_multiline_quote,_detect_bracket_issues,_detect_colon_issues,_detect_trailing_spaces,_detect_bom,_get_context,analyze_yaml_syntax,_try_parse_yaml,_parse_pyyaml_error,fix_yaml_file
     YamlErrorType(str,Enum):  # Types of YAML syntax errors we can detect and fix...
@@ -521,6 +509,18 @@ Measures:
     _try_parse_yaml(content)
     _parse_pyyaml_error(error_str;lines)
     fix_yaml_file(config_path;dry_run)
+  pyqual/bulk_init_fingerprint.py:
+    e: ProjectFingerprint,_collect_top_level_entries,_collect_manifests,_collect_file_extensions,_load_json_object,_collect_json_scripts,_collect_makefile_targets,_collect_pyproject_metadata,_collect_readme_excerpt,collect_fingerprint
+    ProjectFingerprint:  # Lightweight summary of a project directory sent to LLM for c...
+    _collect_top_level_entries(project_dir;fp)
+    _collect_manifests(project_dir;fp)
+    _collect_file_extensions(project_dir)
+    _load_json_object(path)
+    _collect_json_scripts(project_dir;filename)
+    _collect_makefile_targets(project_dir)
+    _collect_pyproject_metadata(project_dir;fp)
+    _collect_readme_excerpt(project_dir)
+    collect_fingerprint(project_dir)
   pyqual/gates.py:
     e: GateResult,Gate,GateSet,CompositeGateSet
     GateResult: __str__(0)  # Result of a single gate check...
@@ -542,6 +542,10 @@ Exa...
     e: GitHubTask,GitHubActionsReporter
     GitHubTask: to_todo_item(0),__str__(0)  # Represents a task from GitHub (issue or PR)...
     GitHubActionsReporter: __init__(2),create_issue(3),ensure_issue_exists(3),is_running_in_github_actions(0),get_pr_number(0),fetch_issues(2),fetch_pull_requests(1),post_pr_comment(2),post_issue_comment(2),close_issue(2),close_pull_request(2),generate_failure_report(4),set_output(2),set_failed(1)  # Reports pyqual results to GitHub Actions and PRs...
+  pyqual/bulk_init_classify.py:
+    e: ProjectConfig,check_skip_conditions
+    ProjectConfig:  # Parsed LLM response — project-specific config decisions...
+    check_skip_conditions(fp)
   pyqual/tools.py:
     e: ToolPreset,_preset_from_dict,_load_json_presets,_load_default_presets,get_preset,list_presets,is_builtin,register_preset,load_user_tools,preset_to_dict,dump_presets_json,register_custom_tools_from_yaml,load_entry_point_presets,resolve_stage_command
     ToolPreset: is_available(0),shell_command(1)  # Definition of a built-in tool invocation preset...
@@ -558,10 +562,6 @@ Exa...
     register_custom_tools_from_yaml(custom_tools)
     load_entry_point_presets()
     resolve_stage_command(tool_name;workdir)
-  pyqual/bulk_init_classify.py:
-    e: ProjectConfig,check_skip_conditions
-    ProjectConfig:  # Parsed LLM response — project-specific config decisions...
-    check_skip_conditions(fp)
   pyqual/cli/cmd_plugin.py:
     e: plugin
     plugin(action;name;workdir;tag)
@@ -668,14 +668,6 @@ This demonstrat...
   pyqual/cli/main.py:
     e: setup_logging
     setup_logging(verbose;workdir)
-  pyqual/pipeline_protocols.py:
-    e: OnStageStart,OnIterationStart,OnStageError,OnStageDone,OnStageOutput,OnIterationDone
-    OnStageStart(Protocol): __call__(1)
-    OnIterationStart(Protocol): __call__(1)
-    OnStageError(Protocol): __call__(1)
-    OnStageDone(Protocol): __call__(1)  # Called after each stage completes. Receives the full StageRe...
-    OnStageOutput(Protocol): __call__(3)  # Called with each line of streaming output from a stage...
-    OnIterationDone(Protocol): __call__(1)  # Called after each iteration completes. Receives the full Ite...
   pyqual/profiles.py:
     e: PipelineProfile,get_profile,list_profiles
     PipelineProfile:  # A reusable pipeline template with default stages and metrics...
@@ -684,6 +676,14 @@ This demonstrat...
   pyqual/fix_tools/claude.py:
     e: ClaudeTool
     ClaudeTool(FixTool): is_available(0),get_command(0),get_timeout(0)  # Claude Code CLI tool...
+  pyqual/pipeline_protocols.py:
+    e: OnStageStart,OnIterationStart,OnStageError,OnStageDone,OnStageOutput,OnIterationDone
+    OnStageStart(Protocol): __call__(1)
+    OnIterationStart(Protocol): __call__(1)
+    OnStageError(Protocol): __call__(1)
+    OnStageDone(Protocol): __call__(1)  # Called after each stage completes. Receives the full StageRe...
+    OnStageOutput(Protocol): __call__(3)  # Called with each line of streaming output from a stage...
+    OnIterationDone(Protocol): __call__(1)  # Called after each iteration completes. Receives the full Ite...
   pyqual/integrations/llx_mcp_service.py:
     e: create_app,run_server,build_parser,main
     create_app(state;llx_server)
@@ -692,9 +692,9 @@ This demonstrat...
     main(argv)
   SUGGESTED_COMMANDS.sh:
   project.sh:
-  dashboard/tailwind.config.js:
   dashboard/vite.config.ts:
     i: @vitejs/plugin-react,vite
+  dashboard/tailwind.config.js:
   dashboard/src/main.tsx:
     i: ./App,react,react-dom/client
   dashboard/postcss.config.js:

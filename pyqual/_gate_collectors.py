@@ -147,26 +147,31 @@ def _from_bandit(workdir: Path) -> dict[str, float]:
 
 def _from_secrets(workdir: Path) -> dict[str, float]:
     """Extract secrets metrics using plugin if available."""
+    sec_path = workdir / ".pyqual" / "secrets.json"
+    
+    # Only process if secrets.json exists
+    if not sec_path.exists():
+        return {}
+    
     if _security_collector:
         metrics = _security_collector.collect(workdir)
         return {"secrets_found": metrics.get("security_secrets_found", 0.0)}
-    # Legacy fallback""
+    
+    # Legacy fallback"""
     result: dict[str, float] = {}
-    sec_path = workdir / ".pyqual" / "secrets.json"
-    if sec_path.exists():
-        try:
-            data = json.loads(sec_path.read_text())
-            if isinstance(data, list):
-                severities = {"critical": 4, "high": 3, "medium": 2, "low": 1}
-                max_sev = 0
-                for finding in data:
-                    sev = finding.get("severity", "").lower()
-                    max_sev = max(max_sev, severities.get(sev, 0))
-                result["secrets_severity"] = float(max_sev)
-                result["secrets_count"] = float(len(data))
-                result["secrets_found"] = result["secrets_count"]
-        except (json.JSONDecodeError, TypeError):
-            pass
+    try:
+        data = json.loads(sec_path.read_text())
+        if isinstance(data, list):
+            severities = {"critical": 4, "high": 3, "medium": 2, "low": 1}
+            max_sev = 0
+            for finding in data:
+                sev = finding.get("severity", "").lower()
+                max_sev = max(max_sev, severities.get(sev, 0))
+            result["secrets_severity"] = float(max_sev)
+            result["secrets_count"] = float(len(data))
+            result["secrets_found"] = result["secrets_count"]
+    except (json.JSONDecodeError, TypeError):
+        pass
     return result
 
 
@@ -598,6 +603,39 @@ def _from_flake8(workdir: Path) -> dict[str, float]:
     return result
 
 
+def _from_runtime_errors(workdir: Path) -> dict[str, float]:
+    """Extract runtime error metrics from runtime_errors.json."""
+    result: dict[str, float] = {}
+    errors_path = workdir / ".pyqual" / "runtime_errors.json"
+    if errors_path.exists():
+        try:
+            errors = json.loads(errors_path.read_text())
+            if isinstance(errors, list):
+                result["runtime_errors"] = float(len(errors))
+                # Count by error type
+                error_types = {}
+                for error in errors:
+                    error_type = error.get("error_type", "unknown")
+                    error_types[error_type] = error_types.get(error_type, 0) + 1
+                
+                # Expose common error types as metrics
+                for error_type, count in error_types.items():
+                    metric_name = f"runtime_{error_type}"
+                    result[metric_name] = float(count)
+                
+                # Check for recent errors (last hour)
+                from datetime import datetime, timezone, timedelta
+                one_hour_ago = datetime.now(timezone.utc) - timedelta(hours=1)
+                recent_count = sum(
+                    1 for error in errors
+                    if datetime.fromisoformat(error.get("timestamp", "").replace("Z", "+00:00")) > one_hour_ago
+                )
+                result["runtime_errors_recent"] = float(recent_count)
+        except (json.JSONDecodeError, TypeError, ValueError, OSError):
+            pass
+    return result
+
+
 def _from_interrogate(workdir: Path) -> dict[str, float]:
     """Extract docstring metrics using plugin if available."""
     if _code_health_collector:
@@ -640,6 +678,7 @@ _COLLECTORS = [
     _from_coverage,
     _from_benchmark,
     _from_memory_profile,
+    _from_runtime_errors,
     _from_secrets,
     _from_vulnerabilities,
     _from_bandit,

@@ -16,6 +16,7 @@ PIPELINE_DB = ".pyqual/pipeline.db"
 PIPELINE_TABLE = "pipeline_logs"
 LLX_MCP_REPORT = ".pyqual/llx_mcp.json"
 LLX_HISTORY_FILE = ".pyqual/llx_history.jsonl"
+RUNTIME_ERRORS_FILE = ".pyqual/runtime_errors.json"
 
 # ---------------------------------------------------------------------------
 # CLI defaults
