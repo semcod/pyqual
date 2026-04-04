@@ -4,20 +4,18 @@
 
 ## AI Cost Tracking
 
-![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.98-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
-![AI Cost](https://img.shields.io/badge/AI%20Cost-$7.50-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-51.1h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
+![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.125-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![AI Cost](https://img.shields.io/badge/AI%20Cost-$7.50-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-73.7h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
 
-- 🤖 **LLM usage:** $7.5000 (130 commits)
-- 👤 **Human dev:** ~$5112 (51.1h @ $100/h, 30min dedup)
+- 🤖 **LLM usage:** $7.5000 (184 commits)
+- 👤 **Human dev:** ~$7370 (73.7h @ $100/h, 30min dedup)
 
-Generated on 2026-04-02 using [openrouter/qwen/qwen3-coder-next](https://openrouter.ai/qwen/qwen3-coder-next)
+Generated on 2026-04-04 using [openrouter/qwen/qwen3-coder-next](https://openrouter.ai/qwen/qwen3-coder-next)
 
 ---
 
-
-
 <!-- pyqual:badges:start -->
-![Version](https://img.shields.io/badge/version-0.1.123-blue) ![Python](https://img.shields.io/badge/python-%3E%3D3.9-blue) ![License](https://img.shields.io/badge/license-Apache-2.0-green) ![AI Cost](https://img.shields.io/badge/AI%20Cost-%2427.45%20%28183%20commits%29-red) ![Human Time](https://img.shields.io/badge/Human%20Time-63.5h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fopenai%2Fgpt-5-mini-lightgrey)
+![Version](https://img.shields.io/badge/version-0.1.125-blue) ![Python](https://img.shields.io/badge/python-%3E%3D3.9-blue) ![License](https://img.shields.io/badge/license-Apache-2.0-green) ![AI Cost](https://img.shields.io/badge/AI%20Cost-%2427.45%20%28183%20commits%29-red) ![Human Time](https://img.shields.io/badge/Human%20Time-63.5h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fopenai%2Fgpt-5-mini-lightgrey)
 ![pyqual](https://img.shields.io/badge/pyqual-pass-brightgreen) ![gates](https://img.shields.io/badge/gates-11%2F11-brightgreen) ![CC̄](https://img.shields.io/badge/CC%CC%84-5.4-brightgreen) ![coverage](https://img.shields.io/badge/coverage-37%25-red) ![vallm](https://img.shields.io/badge/vallm-52%25-orange) ![critical](https://img.shields.io/badge/critical-22-red) ![errors](https://img.shields.io/badge/errors-5-orange) ![ruff](https://img.shields.io/badge/ruff-0-brightgreen) ![mypy](https://img.shields.io/badge/mypy-0-brightgreen)
 <!-- pyqual:badges:end -->
 
