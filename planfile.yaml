@@ -1993,3 +1993,107 @@ sprints:
     model_hints:
       planning: balanced
       implementation: balanced
+  - id: ticket-718dafcb
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/plugins/attack/__init__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/attack/__init__.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ef1a02f7
+    name: Fix smart-return-type issues
+    description: Resolve 13 smart-return-type issues in pyqual/plugins/attack/test.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - pyqual/plugins/attack/test.py
+    rule_id: smart-return-type
+    count: 13
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-bce8e253
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in pyqual/plugins/attack/test.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - pyqual/plugins/attack/test.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ef36b022
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in pyqual/plugins/attack/test.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/attack/test.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-229ee317
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in pyqual/plugins/attack/test.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/attack/test.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b5f10c40
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in pyqual/plugins/attack/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - pyqual/plugins/attack/main.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-32eaf846
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in pyqual/plugins/attack/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/attack/main.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b1611c84
+    name: Fix llm-generated-code issues
+    description: Resolve 2 llm-generated-code issues in pyqual/plugins/attack/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/attack/main.py
+    rule_id: llm-generated-code
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced

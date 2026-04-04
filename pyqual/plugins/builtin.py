@@ -10,7 +10,7 @@ from pyqual.constants import (
     DEFAULT_MCP_PORT,
     PYQUAL_DIR,
 )
-from pyqual.plugins import MetricCollector, PluginMetadata, PluginRegistry
+from pyqual.plugins._base import MetricCollector, PluginMetadata, PluginRegistry
 
 
 @PluginRegistry.register

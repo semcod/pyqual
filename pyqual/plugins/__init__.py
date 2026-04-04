@@ -18,7 +18,7 @@ import importlib
 import pkgutil
 from pathlib import Path
 
-from pyqual._plugin_base import MetricCollector, PluginMetadata, PluginRegistry
+from pyqual.plugins._base import MetricCollector, PluginMetadata, PluginRegistry
 
 # Auto-discover and import all plugins from subdirectories
 def _discover_plugins() -> None:
@@ -35,8 +35,8 @@ def _discover_plugins() -> None:
                 import warnings
                 warnings.warn(f"Failed to load plugin '{name}': {e}", RuntimeWarning)
 
-# Import built-in collectors first
-from pyqual.builtin_collectors import (  # noqa: E402
+# Import built-in collectors from plugins package
+from pyqual.plugins.builtin import (  # noqa: E402
     A11yCollector,
     HallucinationCollector,
     I18nCollector,

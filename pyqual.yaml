@@ -15,6 +15,9 @@ pipeline:
     ruff_errors_max: 50      # ruff lint errors (realistic threshold)
     secrets_found_max: 0     # detect-secrets findings
     mypy_errors_max: 100      # mypy type errors (realistic for gradual typing)
+    # Attack/merge gates:
+    attack_conflicts_max: 5   # max merge conflicts allowed
+    attack_merge_failures_max: 0  # max failed merges allowed
 
   # Pipeline stages — use 'tool:' for built-in presets or 'run:' for custom
   stages:
@@ -156,6 +159,47 @@ pipeline:
       when: metrics_pass
       optional: true
       timeout: 300
+
+    # Auto-merge attack mode - aggressive conflict resolution
+    - name: automerge
+      run: |
+        export PYTHONPATH=$PYTHONPATH:.
+        python3 -c "
+          from pyqual.plugins.attack import attack_check, attack_merge
+          import json
+          import sys
+
+          # First check if merge is possible
+          check = attack_check()
+          with open('.pyqual/attack_check.json', 'w') as f:
+            json.dump(check, f)
+
+          if not check['success']:
+            print('Attack check failed:', check.get('error'))
+            sys.exit(0)  # Don't fail pipeline, just skip
+
+          print(f'Conflicts detected: {check[\"conflicts_detected\"]}')
+          print(f'Can fast-forward: {check[\"can_fast_forward\"]}')
+
+          # Perform attack merge if needed
+          if check['branches_behind'] > 0 or check['conflicts_detected'] > 0:
+            merge = attack_merge(strategy='theirs', dry_run=False)
+            with open('.pyqual/attack_merge.json', 'w') as f:
+              json.dump(merge, f)
+
+            if merge['success']:
+              print(f'Merge successful! Resolved {merge[\"conflicts_resolved\"]} conflicts')
+              # Push the merge
+              import subprocess
+              subprocess.run(['git', 'push', 'origin', 'HEAD'], check=False)
+            else:
+              print('Merge failed:', merge.get('error'))
+          else:
+            print('Already up to date, no merge needed')
+        "
+      when: metrics_pass
+      optional: true
+      timeout: 120
 
     # Generate comprehensive markdown report with Mermaid diagram and ASCII flow
     - name: markdown_report
