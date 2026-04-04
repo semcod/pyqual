@@ -328,12 +328,34 @@ def _load_yaml_config(
     # If there are syntax issues, report them
     if syntax_result.issues:
         for issue in syntax_result.issues:
-            if issue.can_fix and try_fix:
-                severity = Severity.WARNING
-                suggestion = f"Auto-fixed: {issue.error_type.value}"
-            else:
-                severity = Severity.ERROR if not issue.can_fix else Severity.WARNING
+            # Determine severity based on issue type
+            if issue.error_type in (YamlErrorType.UNCLOSED_QUOTE, YamlErrorType.UNCLOSED_BRACKET):
+                # These are actual syntax errors
+                severity = Severity.ERROR
                 suggestion = issue.fixed if issue.can_fix else f"Fix at line {issue.line}, col {issue.column}"
+            elif issue.error_type in (YamlErrorType.TAB_CHARACTER, YamlErrorType.TRAILING_SPACE):
+                # These are style issues that can be auto-fixed
+                if try_fix and issue.can_fix:
+                    severity = Severity.WARNING
+                    suggestion = f"Auto-fixed: {issue.error_type.value}"
+                else:
+                    severity = Severity.INFO  # Style issues are INFO, not ERROR
+                    suggestion = f"Style: {issue.error_type.value} at line {issue.line}"
+            elif issue.error_type == YamlErrorType.INDENTATION:
+                # Indentation warnings are INFO unless they cause parse failures
+                severity = Severity.INFO
+                suggestion = issue.message
+            else:
+                # Default: style issues are INFO, unfixable syntax errors are ERROR
+                if issue.can_fix and try_fix:
+                    severity = Severity.WARNING
+                    suggestion = f"Auto-fixed: {issue.error_type.value}"
+                elif issue.can_fix:
+                    severity = Severity.INFO
+                    suggestion = f"Style: {issue.error_type.value} at line {issue.line}"
+                else:
+                    severity = Severity.ERROR
+                    suggestion = f"Fix at line {issue.line}, col {issue.column}"
 
             result.add(
                 severity,

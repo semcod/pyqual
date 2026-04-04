@@ -52,9 +52,9 @@
 - [ ] examples/ticket_workflow/sync_tickets.py:19 - Unused import: 'annotations'
 - [ ] examples/ticket_workflow/sync_tickets.py:90 - module execution block
 - [x] pyproject.toml:24 - Outdated dependency: litellm 1.83.0 → 1.83.2 (wheel)
-- [ ] pyqual/__init__.py:56 - Duplicate import: 'DEFAULT_MAX_TOKENS' (first at line 54)
-- [ ] pyqual/__init__.py:56 - Duplicate import: 'LLM' (first at line 54)
-- [ ] pyqual/__init__.py:56 - Duplicate import: 'LLMResponse' (first at line 54)
+- [x] pyqual/__init__.py:56 - Duplicate import: 'DEFAULT_MAX_TOKENS' (first at line 54)
+- [x] pyqual/__init__.py:56 - Duplicate import: 'LLM' (first at line 54)
+- [x] pyqual/__init__.py:56 - Duplicate import: 'LLMResponse' (first at line 54)
 - [ ] pyqual/__main__.py:5 - module execution block
 - [x] pyqual/_gate_collectors.py:7 - Unused import: 'annotations'
 - [ ] pyqual/api.py:17 - Unused import: 'annotations'
@@ -77,9 +77,9 @@
 - [ ] pyqual/bulk_run.py:224 - Magic number: 40 - use named constant
 - [ ] pyqual/bulk_run.py:389 - Magic number: 50 - use named constant
 - [ ] pyqual/bulk_run.py:433 - Magic number: 50 - use named constant
-- [ ] pyqual/cli/__init__.py:8 - Unused import: 'annotations'
-- [ ] pyqual/cli/__init__.py:15 - Unused import: 'cmd_init'
-- [ ] pyqual/cli/__init__.py:15 - Unused import: 'cmd_run'
+- [x] pyqual/cli/__init__.py:8 - Unused import: 'annotations'
+- [x] pyqual/cli/__init__.py:15 - Unused import: 'cmd_init'
+- [x] pyqual/cli/__init__.py:15 - Unused import: 'cmd_run'
 - [ ] pyqual/cli/cmd_config.py:4 - Unused import: 'annotations'
 - [ ] pyqual/cli/cmd_config.py:190 - Magic number: 1500 - use named constant
 - [ ] pyqual/cli/cmd_git.py:4 - Unused import: 'annotations'
@@ -148,9 +148,9 @@
 - [x] pyqual/pipeline.py:3 - Unused import: 'annotations'
 - [ ] pyqual/pipeline_protocols.py:3 - Unused import: 'annotations'
 - [ ] pyqual/pipeline_results.py:3 - Unused import: 'annotations'
-- [ ] pyqual/plugins/__init__.py:15 - Unused import: 'annotations'
+- [x] pyqual/plugins/__init__.py:15 - Unused import: 'annotations'
 - [ ] pyqual/plugins/_base.py:6 - Unused import: 'annotations'
-- [ ] pyqual/plugins/attack/__init__.py:6 - Unused import: 'annotations'
+- [x] pyqual/plugins/attack/__init__.py:6 - Unused import: 'annotations'
 - [ ] pyqual/plugins/attack/main.py:9 - Unused import: 'annotations'
 - [ ] pyqual/plugins/attack/main.py:12 - Unused import: 're'
 - [ ] pyqual/plugins/attack/main.py:122 - Magic number: 127 - use named constant
@@ -167,11 +167,11 @@
 - [ ] pyqual/plugins/builtin.py:3 - Unused import: 'annotations'
 - [ ] pyqual/plugins/builtin.py:9 - Unused import: 'PYQUAL_DIR'
 - [ ] pyqual/plugins/cli_helpers.py:3 - Unused import: 'annotations'
-- [ ] pyqual/plugins/code_health/__init__.py:3 - Unused import: 'annotations'
+- [x] pyqual/plugins/code_health/__init__.py:3 - Unused import: 'annotations'
 - [ ] pyqual/plugins/code_health/main.py:6 - Unused import: 'annotations'
-- [ ] pyqual/plugins/coverage/__init__.py:3 - Unused import: 'annotations'
+- [x] pyqual/plugins/coverage/__init__.py:3 - Unused import: 'annotations'
 - [ ] pyqual/plugins/coverage/main.py:6 - Unused import: 'annotations'
-- [ ] pyqual/plugins/deps/__init__.py:6 - Unused import: 'annotations'
+- [x] pyqual/plugins/deps/__init__.py:6 - Unused import: 'annotations'
 - [ ] pyqual/plugins/deps/main.py:10 - Unused import: 'annotations'
 - [ ] pyqual/plugins/deps/main.py:14 - Unused import: 'datetime'
 - [ ] pyqual/plugins/deps/main.py:60 - boilerplate copyright
@@ -186,7 +186,7 @@
 - [ ] pyqual/plugins/deps/test.py:22 - Function 'test_collector_name' missing return type (suggested: -> None)
 - [ ] pyqual/plugins/deps/test.py:25 - Function 'test_collector_metadata' missing return type (suggested: -> None)
 - [ ] pyqual/plugins/deps/test.py:30 - Function 'test_collect_empty_workdir' missing return type (suggested: -> None)
-- [ ] pyqual/plugins/docker/__init__.py:6 - Unused import: 'annotations'
+- [x] pyqual/plugins/docker/__init__.py:6 - Unused import: 'annotations'
 - [ ] pyqual/plugins/docker/main.py:10 - Unused import: 'annotations'
 - [ ] pyqual/plugins/docker/main.py:192 - LLM-style docstring in run_hadolint
 - [ ] pyqual/plugins/docker/main.py:252 - LLM-style docstring in run_trivy_scan
@@ -199,7 +199,7 @@
 - [ ] pyqual/plugins/docker/test.py:22 - Function 'test_collector_name' missing return type (suggested: -> None)
 - [ ] pyqual/plugins/docker/test.py:25 - Function 'test_collector_metadata' missing return type (suggested: -> None)
 - [ ] pyqual/plugins/docker/test.py:31 - Function 'test_collect_empty_workdir' missing return type (suggested: -> None)
-- [ ] pyqual/plugins/docs/__init__.py:6 - Unused import: 'annotations'
+- [x] pyqual/plugins/docs/__init__.py:6 - Unused import: 'annotations'
 - [ ] pyqual/plugins/docs/main.py:10 - Unused import: 'annotations'
 - [ ] pyqual/plugins/docs/main.py:213 - Magic number: 999.0 - use named constant
 - [ ] pyqual/plugins/docs/main.py:221 - LLM-style docstring in check_readme
@@ -218,7 +218,7 @@
 - [ ] pyqual/plugins/docs/test.py:80 - Magic number in comparison: 75.5
 - [ ] pyqual/plugins/docs/test.py:80 - Magic number: 75.5 - use named constant
 - [ ] pyqual/plugins/docs/test.py:130 - boilerplate copyright
-- [ ] pyqual/plugins/documentation/__init__.py:6 - Unused import: 'annotations'
+- [x] pyqual/plugins/documentation/__init__.py:6 - Unused import: 'annotations'
 - [ ] pyqual/plugins/documentation/main.py:14 - Unused import: 'annotations'
 - [ ] pyqual/plugins/documentation/main.py:47 - boilerplate copyright
 - [ ] pyqual/plugins/documentation/main.py:112 - Duplicate import: 'tomllib' (first at line 109)
@@ -236,8 +236,8 @@
 - [ ] pyqual/plugins/documentation/test.py:78 - Magic number in comparison: 80.0
 - [ ] pyqual/plugins/documentation/test.py:78 - Magic number: 80.0 - use named constant
 - [ ] pyqual/plugins/documentation/test.py:132 - boilerplate copyright
-- [ ] pyqual/plugins/example_plugin/__init__.py:3 - Unused import: 'annotations'
-- [ ] pyqual/plugins/example_plugin/__init__.py:5 - Suspicious import: from pyqual.plugins.example_plugin.main
+- [x] pyqual/plugins/example_plugin/__init__.py:3 - Unused import: 'annotations'
+- [x] pyqual/plugins/example_plugin/__init__.py:5 - Suspicious import: from pyqual.plugins.example_plugin.main
 - [ ] pyqual/plugins/example_plugin/main.py:7 - Unused import: 'annotations'
 - [ ] pyqual/plugins/example_plugin/main.py:17 - Example class in production code
 - [ ] pyqual/plugins/example_plugin/main.py:60 - Suspicious function name: example_helper_function
@@ -249,7 +249,7 @@
 - [ ] pyqual/plugins/example_plugin/test.py:39 - Function 'test_config_example' missing return type (suggested: -> None)
 - [ ] pyqual/plugins/example_plugin/test.py:93 - Suspicious function name: test_example_helper_function
 - [ ] pyqual/plugins/example_plugin/test.py:101 - module execution block
-- [ ] pyqual/plugins/git/__init__.py:6 - Unused import: 'annotations'
+- [x] pyqual/plugins/git/__init__.py:6 - Unused import: 'annotations'
 - [ ] pyqual/plugins/git/main.py:7 - Unused import: 'annotations'
 - [ ] pyqual/plugins/git/main.py:226 - Magic number: 127 - use named constant
 - [ ] pyqual/plugins/git/main.py:327 - LLM-style docstring in git_commit
@@ -271,9 +271,9 @@
 - [ ] pyqual/plugins/git/test.py:168 - Magic number: 40 - use named constant
 - [ ] pyqual/plugins/git/test.py:186 - Suspicious function name: temp_repo_with_secrets
 - [ ] pyqual/plugins/git/test.py:407 - module execution block
-- [ ] pyqual/plugins/lint/__init__.py:3 - Unused import: 'annotations'
+- [x] pyqual/plugins/lint/__init__.py:3 - Unused import: 'annotations'
 - [ ] pyqual/plugins/lint/main.py:6 - Unused import: 'annotations'
-- [ ] pyqual/plugins/security/__init__.py:6 - Unused import: 'annotations'
+- [x] pyqual/plugins/security/__init__.py:6 - Unused import: 'annotations'
 - [ ] pyqual/plugins/security/main.py:10 - Unused import: 'annotations'
 - [ ] pyqual/plugins/security/main.py:182 - LLM-style docstring in run_bandit_check
 - [ ] pyqual/plugins/security/main.py:212 - Magic number: 300 - use named constant
@@ -317,10 +317,10 @@
 - [ ] pyqual/run_parallel_fix.py:402 - module execution block
 - [ ] pyqual/tickets.py:76 - LLM-style docstring in sync_from_gates
 - [x] pyqual/validation.py:25 - Unused import: 'annotations'
-- [ ] pyqual/validation.py:35 - Unused import: 'YamlErrorType'
-- [ ] pyqual/validation.py:35 - Unused import: 'YamlFixResult'
-- [ ] pyqual/validation.py:305 - LLM-style docstring in _load_yaml_config
-- [ ] pyqual/validation.py:478 - LLM-style docstring in validate_config
+- [x] pyqual/validation.py:35 - Unused import: 'YamlErrorType'
+- [x] pyqual/validation.py:35 - Unused import: 'YamlFixResult'
+- [x] pyqual/validation.py:305 - LLM-style docstring in _load_yaml_config
+- [x] pyqual/validation.py:478 - LLM-style docstring in validate_config
 - [ ] pyqual/yaml_fixer.py:8 - Unused import: 'annotations'
 - [ ] pyqual/yaml_fixer.py:14 - Unused import: 'Any'
 - [ ] pyqual/yaml_fixer.py:130 - String concatenation can be converted to f-string

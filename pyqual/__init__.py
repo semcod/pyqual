@@ -144,5 +144,11 @@ __all__ = [
     "register_custom_tools_from_yaml",
     "load_entry_point_presets",
     "TOOL_PRESETS",
+    # YAML fixer
+    "YamlErrorType",
+    "YamlFixResult",
+    "YamlSyntaxIssue",
+    "analyze_yaml_syntax",
+    "fix_yaml_file",
     "__version__",
 ]

@@ -179,7 +179,7 @@ def _from_vulnerabilities(workdir: Path) -> dict[str, float]:
             "vuln_high": metrics.get("security_vuln_high", 0.0),
             "vuln_medium": metrics.get("security_vuln_moderate", 0.0),
         }
-    # Legacy fallback""
+    # Legacy fallback
     result: dict[str, float] = {}
     vuln_path = workdir / ".pyqual" / "vulns.json"
     if vuln_path.exists():
@@ -204,6 +204,29 @@ def _from_vulnerabilities(workdir: Path) -> dict[str, float]:
                 result["vuln_count"] = float(len(vulns))
         except (json.JSONDecodeError, TypeError):
             pass
+    return result
+
+
+def _from_security(workdir: Path) -> dict[str, float]:
+    """Aggregate all security metrics using plugin if available."""
+    if _security_collector:
+        metrics = _security_collector.collect(workdir)
+        # Map plugin metric names to legacy names
+        return {
+            "bandit_high": metrics.get("security_bandit_high", 0.0),
+            "bandit_medium": metrics.get("security_bandit_medium", 0.0),
+            "bandit_low": metrics.get("security_bandit_low", 0.0),
+            "vuln_critical": metrics.get("security_vuln_critical", 0.0),
+            "vuln_high": metrics.get("security_vuln_high", 0.0),
+            "vuln_medium": metrics.get("security_vuln_moderate", 0.0),
+            "secrets_found": metrics.get("security_secrets_found", 0.0),
+            "safety_issues": metrics.get("security_safety_issues", 0.0),
+        }
+    # Aggregate legacy security metrics
+    result: dict[str, float] = {}
+    result.update(_from_bandit(workdir))
+    result.update(_from_vulnerabilities(workdir))
+    result.update(_from_secrets(workdir))
     return result
 
 
@@ -253,7 +276,7 @@ def _from_pyroma(workdir: Path) -> dict[str, float]:
     if _code_health_collector:
         metrics = _code_health_collector.collect(workdir)
         return {"pyroma_score": metrics.get("pyroma_score", 0.0)}
-    # Legacy fallback""
+    # Legacy fallback
     result: dict[str, float] = {}
     pyr_path = workdir / ".pyqual" / "pyroma.json"
     if pyr_path.exists():
@@ -268,6 +291,19 @@ def _from_pyroma(workdir: Path) -> dict[str, float]:
                 result["pyroma_score"] = float(6 - ord(score.upper()[0]) + ord("A"))
         except (json.JSONDecodeError, TypeError):
             pass
+    return result
+
+
+def _from_code_health(workdir: Path) -> dict[str, float]:
+    """Aggregate all code health metrics using plugin if available."""
+    if _code_health_collector:
+        return _code_health_collector.collect(workdir)
+    # Aggregate legacy code health metrics
+    result: dict[str, float] = {}
+    result.update(_from_vulture(workdir))
+    result.update(_from_pyroma(workdir))
+    result.update(_from_radon(workdir))
+    result.update(_from_interrogate(workdir))
     return result
 
 
@@ -443,6 +479,20 @@ def _from_mypy(workdir: Path) -> dict[str, float]:
     return result
 
 
+def _from_lint(workdir: Path) -> dict[str, float]:
+    """Extract lint metrics using plugin if available."""
+    if _lint_collector:
+        return _lint_collector.collect(workdir)
+    # Aggregate legacy lint metrics
+    result: dict[str, float] = {}
+    result.update(_from_ruff(workdir))
+    result.update(_from_mypy(workdir))
+    result.update(_from_pylint(workdir))
+    result.update(_from_flake8(workdir))
+    return result
+
+
+# Legacy individual lint collectors (used by _from_lint fallback)
 def _from_ruff(workdir: Path) -> dict[str, float]:
     """Extract lint metrics using plugin if available."""
     if _lint_collector:

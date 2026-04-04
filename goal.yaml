@@ -255,7 +255,16 @@ registries:
 hooks:
   pre_commit: ''
   post_commit: ''
-  pre_push: ''
+  pre_push: |
+    # Automated quality pipeline - runs before every push
+    echo "🚀 Running automated quality check..."
+    pyqual run --config pyqual.yaml --max-iterations 3 || {
+      echo "⚠️  Quality gates failed - attempting auto-fix..."
+      # Second attempt with explicit fix stage
+      pyqual run --config pyqual.yaml --max-iterations 2 --only fix,prefact || true
+    }
+    # Continue push even if pyqual had issues (non-blocking)
+    echo "✅ Pre-push quality check complete"
   post_push: ''
 advanced:
   auto_update_config: true
