@@ -1,0 +1,23 @@
+# GitHub Issues only ticket sync
+# Requires GITHUB_TOKEN environment variable
+
+pipeline:
+  name: github-only-tickets
+
+  metrics:
+    coverage_min: 80
+    cc_max: 15
+
+  stages:
+    - name: test
+      tool: pytest
+
+  loop:
+    max_iterations: 2
+    on_fail: create_ticket
+    ticket_backends:
+      - github
+
+  env:
+    # GitHub token for issue creation
+    GITHUB_TOKEN: ${GITHUB_TOKEN}

@@ -1,0 +1,19 @@
+# Markdown-only ticket sync
+# Default behavior - syncs failed gates to TODO.md only
+
+pipeline:
+  name: markdown-only-tickets
+
+  metrics:
+    coverage_min: 80
+    cc_max: 15
+
+  stages:
+    - name: test
+      tool: pytest
+
+  loop:
+    max_iterations: 2
+    on_fail: create_ticket
+    ticket_backends:
+      - markdown

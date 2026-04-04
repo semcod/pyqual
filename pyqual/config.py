@@ -103,6 +103,7 @@ class LoopConfig:
     """Loop iteration settings."""
     max_iterations: int = 3
     on_fail: str = "report"  # report | create_ticket | block
+    ticket_backends: list[str] = field(default_factory=lambda: ["markdown"])  # markdown | github | all
 
 
 @dataclass
@@ -262,6 +263,9 @@ pipeline:
   loop:
     max_iterations: 3
     on_fail: report      # report | create_ticket | block
+    ticket_backends:     # backends to sync when on_fail = create_ticket
+      - markdown        # TODO.md (default)
+      # - github        # GitHub Issues (requires GITHUB_TOKEN)
 
   # Environment (optional)
   env:

@@ -46,6 +46,7 @@ Real-world usage patterns for different project types and CI/CD setups.
 |---------|-------------|-------------|
 | [multi_gate_pipeline](multi_gate_pipeline/) | 21-gate production pipeline | Linters + security + AI + testing combined |
 | [ticket_workflow](ticket_workflow/) | Planfile ticket sync on gate failures | Auto TODO.md + GitHub Issues |
+| [ticket_backends](ticket_backends/) | Multi-backend ticket configuration | markdown, github, all backends |
 
 ## Quick Reference
 

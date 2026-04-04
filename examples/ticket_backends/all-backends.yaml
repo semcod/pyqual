@@ -1,0 +1,23 @@
+# Use 'all' shorthand for all configured backends
+# Automatically syncs to all configured planfile integrations
+
+pipeline:
+  name: all-backends-tickets
+
+  metrics:
+    coverage_min: 80
+    cc_max: 15
+
+  stages:
+    - name: test
+      tool: pytest
+
+  loop:
+    max_iterations: 2
+    on_fail: create_ticket
+    ticket_backends:
+      - all   # Syncs to all configured backends (markdown, github, etc.)
+
+  env:
+    # Required for GitHub sync (if GitHub is configured)
+    GITHUB_TOKEN: ${GITHUB_TOKEN}

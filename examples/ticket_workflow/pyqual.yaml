@@ -18,4 +18,7 @@ pipeline:
 
   loop:
     max_iterations: 2
-    on_fail: create_ticket   # auto-sync TODO.md via planfile on gate failure
+    on_fail: create_ticket       # auto-sync tickets via planfile on gate failure
+    ticket_backends:             # backends to sync (markdown=TODO.md, github=GitHub Issues)
+      - markdown                 # sync to TODO.md (always available)
+      # - github                 # uncomment to also sync to GitHub Issues (needs GITHUB_TOKEN)

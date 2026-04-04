@@ -413,9 +413,15 @@ def run(
 
     if not result.final_passed:
         if cfg.loop.on_fail == "create_ticket":
-            _sc.print("[yellow]Creating planfile tickets from TODO.md...[/yellow]")
+            backends = cfg.loop.ticket_backends or ["markdown"]
+            _sc.print(f"[yellow]Creating planfile tickets (backends: {', '.join(backends)})...[/yellow]")
             try:
-                sync_todo_tickets(workdir=workdir, dry_run=False, direction="from")
+                if "all" in backends:
+                    sync_all_tickets(workdir=workdir, dry_run=False, direction="from")
+                else:
+                    from pyqual.tickets import sync_planfile_tickets
+                    for backend in backends:
+                        sync_planfile_tickets(backend, workdir=workdir, dry_run=False, direction="from")
             except RuntimeError as exc:
                 _sc.print(f"[red]{exc}[/red]")
                 raise typer.Exit(1)
@@ -622,6 +628,9 @@ def status(
     console.print(f"Gates:  {len(cfg.gates)}")
     console.print(f"Max iterations: {cfg.loop.max_iterations}")
     console.print(f"On fail: {cfg.loop.on_fail}")
+    if cfg.loop.on_fail == "create_ticket":
+        backends = cfg.loop.ticket_backends or ["markdown"]
+        console.print(f"Ticket backends: {', '.join(backends)}")
     console.print()
 
     if metrics:

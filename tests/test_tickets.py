@@ -130,15 +130,14 @@ def test_run_on_fail_create_ticket_syncs_todo_tickets(tmp_path: Path, monkeypatc
                 total_duration=0.0,
             )
 
-    def fake_sync_todo_tickets(*, workdir: Path, dry_run: bool, direction: str) -> None:
-        captured.update({"workdir": workdir, "dry_run": dry_run, "direction": direction})
+    def fake_sync_planfile_tickets(source: str, workdir: Path, dry_run: bool, direction: str, show_header: bool = True) -> None:
+        captured.update({"source": source, "workdir": workdir, "dry_run": dry_run, "direction": direction})
 
-    # Patch in cli_module where Pipeline and sync_todo_tickets are used
-    # (cli.py does: from pyqual.pipeline import Pipeline)
-    # (cli.py does: from pyqual.tickets import sync_todo_tickets)
+    # Patch in cli_module where Pipeline is used, and patch tickets module directly
     import pyqual.cli as cli_mod
+    import pyqual.tickets as tickets_mod
     monkeypatch.setattr(cli_mod, "Pipeline", FakePipeline)
-    monkeypatch.setattr(cli_mod, "sync_todo_tickets", fake_sync_todo_tickets)
+    monkeypatch.setattr(tickets_mod, "sync_planfile_tickets", fake_sync_planfile_tickets)
 
     runner = CliRunner()
     result = runner.invoke(
@@ -153,7 +152,7 @@ def test_run_on_fail_create_ticket_syncs_todo_tickets(tmp_path: Path, monkeypatc
     )
 
     assert result.exit_code == 1
-    assert captured == {"workdir": tmp_path, "dry_run": False, "direction": "from"}
+    assert captured == {"source": "markdown", "workdir": tmp_path, "dry_run": False, "direction": "from"}
 
 
 def test_run_report_includes_todo_and_fix_summary(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

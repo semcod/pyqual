@@ -1,0 +1,24 @@
+# Both TODO.md and GitHub Issues
+# Syncs to both backends when gates fail
+
+pipeline:
+  name: both-backends-tickets
+
+  metrics:
+    coverage_min: 80
+    cc_max: 15
+
+  stages:
+    - name: test
+      tool: pytest
+
+  loop:
+    max_iterations: 2
+    on_fail: create_ticket
+    ticket_backends:
+      - markdown   # Creates/updates TODO.md
+      - github     # Creates/updates GitHub Issues
+
+  env:
+    # Required for GitHub sync
+    GITHUB_TOKEN: ${GITHUB_TOKEN}
