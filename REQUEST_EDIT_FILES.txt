@@ -1,0 +1,21 @@
+I need the source files you want me to edit before I can make SEARCH/REPLACE changes.
+
+Please add (paste) the exact files that contain the 5 issues you want fixed. I specifically need the Python files that have:
+- unused imports,
+- magic numbers that should be replaced with named constants,
+- duplicate imports.
+
+If you are not sure which files, please add all .py files in the project (or the package/directory you want cleaned). Example paths you can paste/include:
+- main.py
+- package/module.py
+- package/helpers.py
+- scripts/cli.py
+- tests/test_*.py
+
+What I'll do once you add the files:
+1. Remove or consolidate duplicate/unused imports.
+2. Replace magic numbers with clear module-level constants (with short names and comments).
+3. Ensure imports follow PEP8 ordering and no unused imports remain.
+4. Provide SEARCH/REPLACE blocks for each file changed and a short summary of edits.
+
+Please paste the files (use their full repo paths) and then reply "go ahead" and I'll produce the edits.

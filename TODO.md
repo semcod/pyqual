@@ -52,7 +52,7 @@
 - [ ] examples/multi_gate_pipeline/run_pipeline.py:121 - module execution block
 - [ ] examples/ticket_workflow/sync_tickets.py:19 - Unused import: 'annotations'
 - [ ] examples/ticket_workflow/sync_tickets.py:90 - module execution block
-- [ ] pyproject.toml:24 - Outdated dependency: litellm 1.83.0 → 1.83.2 (wheel)
+- [x] pyproject.toml:24 - Outdated dependency: litellm 1.83.0 → 1.83.2 (wheel)
 - [ ] pyqual/__init__.py:56 - Duplicate import: 'DEFAULT_MAX_TOKENS' (first at line 54)
 - [ ] pyqual/__init__.py:56 - Duplicate import: 'LLM' (first at line 54)
 - [ ] pyqual/__init__.py:56 - Duplicate import: 'LLMResponse' (first at line 54)
