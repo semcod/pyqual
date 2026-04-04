@@ -2136,3 +2136,549 @@ sprints:
     model_hints:
       planning: balanced
       implementation: balanced
+  - id: ticket-e46a910c
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in pyqual/bulk_init_classify.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - pyqual/bulk_init_classify.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-cc15ef28
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/bulk_init_fingerprint.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/bulk_init_fingerprint.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-04de0a29
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/pipeline_protocols.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/pipeline_protocols.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-db3b283c
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/pipeline_results.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/pipeline_results.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7e7e6006
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/plugins/deps/__init__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/deps/__init__.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-5c06fbbc
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in pyqual/plugins/deps/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - pyqual/plugins/deps/main.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0584d526
+    name: Fix magic-numbers issues
+    description: Resolve 3 magic-numbers issues in pyqual/plugins/deps/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/deps/main.py
+    rule_id: magic-numbers
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-638743aa
+    name: Fix llm-generated-code issues
+    description: Resolve 3 llm-generated-code issues in pyqual/plugins/deps/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/deps/main.py
+    rule_id: llm-generated-code
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-af2d7e4f
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in pyqual/plugins/deps/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/deps/main.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2978f9be
+    name: Fix smart-return-type issues
+    description: Resolve 14 smart-return-type issues in pyqual/plugins/deps/test.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - pyqual/plugins/deps/test.py
+    rule_id: smart-return-type
+    count: 14
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-414b1352
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in pyqual/plugins/deps/test.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - pyqual/plugins/deps/test.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ff95ff8c
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/plugins/docker/__init__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/docker/__init__.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-75bc8eb0
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/plugins/docker/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/docker/main.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-401d6043
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in pyqual/plugins/docker/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/docker/main.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-23f72954
+    name: Fix llm-generated-code issues
+    description: Resolve 4 llm-generated-code issues in pyqual/plugins/docker/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - pyqual/plugins/docker/main.py
+    rule_id: llm-generated-code
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f35074c1
+    name: Fix smart-return-type issues
+    description: Resolve 11 smart-return-type issues in pyqual/plugins/docker/test.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - pyqual/plugins/docker/test.py
+    rule_id: smart-return-type
+    count: 11
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2fa9f19e
+    name: Fix unused-imports issues
+    description: Resolve 6 unused-imports issues in pyqual/plugins/docker/test.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - pyqual/plugins/docker/test.py
+    rule_id: unused-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a84538f1
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/plugins/docs/__init__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/docs/__init__.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-839aa0c3
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/plugins/docs/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/docs/main.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-3a8ee2b9
+    name: Fix magic-numbers issues
+    description: Resolve 12 magic-numbers issues in pyqual/plugins/docs/main.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - pyqual/plugins/docs/main.py
+    rule_id: magic-numbers
+    count: 12
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7a0c962c
+    name: Fix llm-generated-code issues
+    description: Resolve 3 llm-generated-code issues in pyqual/plugins/docs/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/docs/main.py
+    rule_id: llm-generated-code
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-81856fc0
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in pyqual/plugins/docs/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/docs/main.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-cc28fb86
+    name: Fix smart-return-type issues
+    description: Resolve 12 smart-return-type issues in pyqual/plugins/docs/test.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - pyqual/plugins/docs/test.py
+    rule_id: smart-return-type
+    count: 12
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d22a3193
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in pyqual/plugins/docs/test.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - pyqual/plugins/docs/test.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-5e6c677a
+    name: Fix magic-numbers issues
+    description: Resolve 3 magic-numbers issues in pyqual/plugins/docs/test.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/docs/test.py
+    rule_id: magic-numbers
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-76a68560
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in pyqual/plugins/docs/test.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/docs/test.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ed7b89ba
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/plugins/documentation/__init__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/documentation/__init__.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2f47dd79
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/plugins/documentation/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/documentation/main.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a1c031be
+    name: Fix duplicate-imports issues
+    description: Resolve 1 duplicate-imports issues in pyqual/plugins/documentation/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/documentation/main.py
+    rule_id: duplicate-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-cd7f08c0
+    name: Fix magic-numbers issues
+    description: Resolve 5 magic-numbers issues in pyqual/plugins/documentation/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - pyqual/plugins/documentation/main.py
+    rule_id: magic-numbers
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9d5b6098
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in pyqual/plugins/documentation/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/documentation/main.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1fb6f84d
+    name: Fix smart-return-type issues
+    description: Resolve 9 smart-return-type issues in pyqual/plugins/documentation/test.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - pyqual/plugins/documentation/test.py
+    rule_id: smart-return-type
+    count: 9
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e16a57ea
+    name: Fix unused-imports issues
+    description: Resolve 6 unused-imports issues in pyqual/plugins/documentation/test.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - pyqual/plugins/documentation/test.py
+    rule_id: unused-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-19a298e6
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in pyqual/plugins/documentation/test.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/documentation/test.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-33cae668
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in pyqual/plugins/documentation/test.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/documentation/test.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9da108b5
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/plugins/security/__init__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/security/__init__.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8fe596d8
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/plugins/security/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/security/main.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1546a36b
+    name: Fix magic-numbers issues
+    description: Resolve 3 magic-numbers issues in pyqual/plugins/security/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/security/main.py
+    rule_id: magic-numbers
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4b0a0de1
+    name: Fix llm-generated-code issues
+    description: Resolve 3 llm-generated-code issues in pyqual/plugins/security/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/security/main.py
+    rule_id: llm-generated-code
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-aad5597c
+    name: Fix duplicate-imports issues
+    description: Resolve 12 duplicate-imports issues in pyqual/plugins/security/test.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - pyqual/plugins/security/test.py
+    rule_id: duplicate-imports
+    count: 12
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-04bc7a8a
+    name: Fix smart-return-type issues
+    description: Resolve 13 smart-return-type issues in pyqual/plugins/security/test.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - pyqual/plugins/security/test.py
+    rule_id: smart-return-type
+    count: 13
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c97e3aac
+    name: Fix unused-imports issues
+    description: Resolve 6 unused-imports issues in pyqual/plugins/security/test.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - pyqual/plugins/security/test.py
+    rule_id: unused-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced

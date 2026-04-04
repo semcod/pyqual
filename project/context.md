@@ -4,18 +4,14 @@
 
 - **Project**: /home/tom/github/semcod/pyqual
 - **Primary Language**: python
-- **Languages**: python: 61, typescript: 11, shell: 5, javascript: 2
+- **Languages**: python: 80, typescript: 11, shell: 5, javascript: 2
 - **Analysis Mode**: static
-- **Total Functions**: 442
-- **Total Classes**: 74
-- **Modules**: 79
-- **Entry Points**: 288
+- **Total Functions**: 526
+- **Total Classes**: 79
+- **Modules**: 98
+- **Entry Points**: 334
 
 ## Architecture by Module
-
-### pyqual.cli
-- **Functions**: 27
-- **File**: `cli.py`
 
 ### pyqual.pipeline
 - **Functions**: 26
@@ -30,19 +26,24 @@
 - **Functions**: 22
 - **File**: `_gate_collectors.py`
 
-### pyqual.builtin_collectors
+### pyqual.plugins.builtin
 - **Functions**: 21
 - **Classes**: 9
-- **File**: `builtin_collectors.py`
+- **File**: `builtin.py`
+
+### pyqual.plugins.git.main
+- **Functions**: 21
+- **Classes**: 1
+- **File**: `main.py`
 
 ### pyqual.cli_run_helpers
 - **Functions**: 20
 - **File**: `cli_run_helpers.py`
 
-### pyqual.plugins.git.main
-- **Functions**: 20
-- **Classes**: 1
-- **File**: `main.py`
+### pyqual.bulk_init
+- **Functions**: 19
+- **Classes**: 3
+- **File**: `bulk_init.py`
 
 ### pyqual.report
 - **Functions**: 18
@@ -63,13 +64,18 @@
 - **Classes**: 1
 - **File**: `api.py`
 
-### pyqual.bulk_init
-- **Functions**: 15
-- **Classes**: 3
-- **File**: `bulk_init.py`
-
 ### dashboard.api.main
 - **Functions**: 13
+- **File**: `main.py`
+
+### pyqual.plugins.docker.main
+- **Functions**: 13
+- **Classes**: 1
+- **File**: `main.py`
+
+### pyqual.plugins.docs.main
+- **Functions**: 12
+- **Classes**: 1
 - **File**: `main.py`
 
 ### pyqual.gates
@@ -82,28 +88,23 @@
 - **Classes**: 1
 - **File**: `documentation.py`
 
-### dashboard.src.App
-- **Functions**: 9
-- **File**: `App.tsx`
+### pyqual.cli_observe
+- **Functions**: 11
+- **File**: `cli_observe.py`
 
-### pyqual.validation
-- **Functions**: 9
-- **Classes**: 6
-- **File**: `validation.py`
+### pyqual.plugins.security.main
+- **Functions**: 11
+- **Classes**: 1
+- **File**: `main.py`
 
-### pyqual.config
-- **Functions**: 8
-- **Classes**: 4
-- **File**: `config.py`
+### pyqual.run_parallel_fix
+- **Functions**: 10
+- **File**: `run_parallel_fix.py`
 
-### pyqual.report_generator
-- **Functions**: 8
-- **Classes**: 2
-- **File**: `report_generator.py`
-
-### integration.run_matrix
-- **Functions**: 8
-- **File**: `run_matrix.sh`
+### pyqual.plugins.deps.main
+- **Functions**: 10
+- **Classes**: 1
+- **File**: `main.py`
 
 ## Key Entry Points
 
@@ -113,22 +114,14 @@ Main execution flows into the system:
 > Register logs, watch, and history commands onto *app*.
 - **Calls**: app.command, app.command, app.command, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option
 
-### pyqual.cli.run
+### pyqual.cli.cmd_run.run
 > Execute pipeline loop until quality gates pass.
 
 Output is streamed as YAML to stdout as each stage completes.
 Diagnostic messages go to stderr.
-- **Calls**: app.command, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, pyqual.cli._setup_logging
+- **Calls**: app.command, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, pyqual.cli.main.setup_logging
 
-### pyqual.cli_bulk_cmds.register_bulk_commands
-> Register bulk-init and bulk-run commands onto *app*.
-- **Calls**: app.command, app.command, typer.Argument, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option
-
-### pyqual.run_parallel_fix.main
-> Run parallel fix on TODO.md items - configurable batch size with git push.
-- **Calls**: pyqual.run_parallel_fix.parse_args, Path.cwd, pyqual.run_parallel_fix.get_todo_batch, print, enumerate, batch_file.parent.mkdir, batch_file.write_text, print
-
-### pyqual.cli.git_scan_cmd
+### pyqual.cli.cmd_git.git_scan_cmd
 > Scan files for secrets before push.
 
 Runs multiple scanners in order:
@@ -136,11 +129,11 @@ Runs multiple scanners in order:
 2. gitleaks (if available) - f
 - **Calls**: git_app.command, typer.Argument, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option
 
-### pyqual.cli.git_push_cmd
+### pyqual.cli.cmd_git.git_push_cmd
 > Push commits to remote with push protection detection.
 - **Calls**: git_app.command, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option
 
-### pyqual.cli.fix_config
+### pyqual.cli.cmd_config.fix_config
 > Use LLM to auto-repair pyqual.yaml based on project structure.
 
 Scans the project (language, available tools, test framework) and asks the
@@ -156,11 +149,15 @@ LLM to prod
 Does NOT run any stages — this is a static pre-flight check.
 - **Calls**: ValidationResult, raw.get, pipeline.get, pipeline.get, metrics_raw.items, pipeline.get, config_path.exists, result.add
 
+### pyqual.run_parallel_fix.main
+> Run parallel fix on TODO.md items - configurable batch size with git push.
+- **Calls**: pyqual.run_parallel_fix.parse_args, Path.cwd, pyqual.run_parallel_fix.get_todo_batch, print, enumerate, batch_file.parent.mkdir, batch_file.write_text, print
+
 ### pyqual.cli_log_helpers.format_log_entry_row
 > Return (ts, event_name, name, status, details) for one log entry.
 - **Calls**: entry.get, entry.get, None.replace, entry.get, entry.get, None.join, entry.get, entry.get
 
-### pyqual.cli.git_status_cmd
+### pyqual.cli.cmd_git.git_status_cmd
 > Show git repository status.
 - **Calls**: git_app.command, typer.Option, typer.Option, pyqual.plugins.git.main.git_status, console.print, Path, console.print, typer.Exit
 
@@ -178,6 +175,10 @@ Does NOT run any stages — this is a static pre-flight check.
 ### pyqual.config.PyqualConfig._parse
 - **Calls**: raw.get, pyqual.tools.load_entry_point_presets, pyqual.tools.load_user_tools, pipeline.get, pipeline.get, pipeline.get, cls._validate_stages, cls
 
+### pyqual.plugins.docs.main.DocsCollector._collect_readme_metrics
+> Extract README quality metrics.
+- **Calls**: readme_json_path.exists, readme_path.exists, self._set_zero_readme, json.loads, float, float, float, readme_path.read_text
+
 ### pyqual._gate_collectors._from_flake8
 > Extract flake8 violation count from JSON output.
 - **Calls**: p.exists, json.loads, isinstance, p.read_text, len, sum, sum, sum
@@ -190,11 +191,11 @@ Args:
     group_similar: If True, group similar issues for batc
 - **Calls**: time.monotonic, enumerate, len, log.info, sum, sum, sum, log.info
 
-### pyqual.cli.git_commit_cmd
+### pyqual.cli.cmd_git.git_commit_cmd
 > Create a git commit.
 - **Calls**: git_app.command, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, pyqual.plugins.git.main.git_commit, result.get
 
-### pyqual.cli.tickets_sync
+### pyqual.cli.cmd_tickets.tickets_sync
 > Sync tickets from gate failures or explicitly.
 
 Examples:
@@ -202,23 +203,19 @@ Examples:
     pyqual tic
 - **Calls**: tickets_app.command, typer.Option, typer.Option, typer.Option, typer.Option, Path, console.print, console.print
 
-### pyqual.cli.status
-> Show current metrics and pipeline config.
-- **Calls**: app.command, typer.Option, typer.Option, PyqualConfig.load, GateSet, gate_set._collect_metrics, console.print, console.print
-
 ### pyqual._gate_collectors._from_ruff
 > Extract ruff linter error counts from JSON output.
 - **Calls**: p.exists, json.loads, isinstance, p.read_text, len, sum, sum, float
 
-### pyqual.plugins.git.main.GitCollector._collect_scan_metrics
-> Extract metrics from secret scan results.
-- **Calls**: data.get, isinstance, data.get, isinstance, data.get, data.get, float, len
+### pyqual.cli.cmd_config.status
+> Show current metrics and pipeline config.
+- **Calls**: app.command, typer.Option, typer.Option, PyqualConfig.load, GateSet, gate_set._collect_metrics, console.print, console.print
 
 ### pyqual.pipeline.Pipeline._execute_streaming
 > Execute stage with real-time output streaming via Popen.
 - **Calls**: subprocess.Popen, proc.wait, StageResult, StageResult, select.select, fd.readline, None.append, None.join
 
-### pyqual.cli.init
+### pyqual.cli.cmd_init.init
 > Create pyqual.yaml with sensible defaults.
 
 Use --profile for a minimal config based on a built-in profile:
@@ -230,7 +227,11 @@ Use --profile for a minimal config based on a built-in profile:
 > Parse LLM suggestions and apply patches.
 - **Calls**: re.findall, Path, print, re.search, file_path.exists, print, file_path.read_text, re.search
 
-### pyqual.cli.validate
+### pyqual.cli_bulk_cmds.register_bulk_commands
+> Register bulk-init and bulk-run commands onto *app*.
+- **Calls**: app.command, app.command, typer.Argument, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option
+
+### pyqual.cli.cmd_config.validate
 > Validate pyqual.yaml without running the pipeline.
 
 Checks for:
@@ -239,17 +240,19 @@ Checks for:
 - Gate metric names that no col
 - **Calls**: app.command, typer.Option, typer.Option, typer.Option, pyqual.api.validate_config, console.print, console.print, len
 
-### pyqual.plugins.git.main.GitCollector._collect_status_metrics
-> Extract metrics from git status output.
-- **Calls**: data.get, isinstance, data.get, isinstance, data.get, isinstance, data.get, isinstance
+### pyqual.plugins.deps.main.deps_health_check
+> Run comprehensive dependency health check.
 
-### pyqual.cli.gates
-> Check quality gates without running stages.
-- **Calls**: app.command, typer.Option, typer.Option, PyqualConfig.load, GateSet, gate_set.check_all, Table, table.add_column
+Returns aggregated metrics from all dependency checks.
+- **Calls**: pyqual.plugins.deps.main.get_outdated_packages, pyqual.plugins.deps.main.get_dependency_tree, pyqual.plugins.deps.main.check_requirements, DepsCollector, collector.collect, outdated.get, Path.cwd, reqs.get
 
 ### pyqual.documentation.DocumentationCollector._check_docs_folder
 > Check docs/ folder presence and content.
 - **Calls**: any, next, float, any, list, len, any, p.exists
+
+### pyqual.cli.cmd_config.gates
+> Check quality gates without running stages.
+- **Calls**: app.command, typer.Option, typer.Option, PyqualConfig.load, GateSet, gate_set.check_all, Table, table.add_column
 
 ### pyqual.plugins.git.main.GitCollector.collect
 > Collect git metrics from .pyqual/git_*.json artifacts.
@@ -266,52 +269,50 @@ register_observe_commands [pyqual.cli_observe]
 
 ### Flow 2: run
 ```
-run [pyqual.cli]
+run [pyqual.cli.cmd_run]
 ```
 
-### Flow 3: register_bulk_commands
+### Flow 3: git_scan_cmd
 ```
-register_bulk_commands [pyqual.cli_bulk_cmds]
-```
-
-### Flow 4: main
-```
-main [pyqual.run_parallel_fix]
-  └─> parse_args
-  └─> get_todo_batch
+git_scan_cmd [pyqual.cli.cmd_git]
 ```
 
-### Flow 5: git_scan_cmd
+### Flow 4: git_push_cmd
 ```
-git_scan_cmd [pyqual.cli]
-```
-
-### Flow 6: git_push_cmd
-```
-git_push_cmd [pyqual.cli]
+git_push_cmd [pyqual.cli.cmd_git]
 ```
 
-### Flow 7: fix_config
+### Flow 5: fix_config
 ```
-fix_config [pyqual.cli]
+fix_config [pyqual.cli.cmd_config]
 ```
 
-### Flow 8: validate_config
+### Flow 6: main
+```
+main [pyqual.auto_closer]
+```
+
+### Flow 7: validate_config
 ```
 validate_config [pyqual.validation]
 ```
 
-### Flow 9: format_log_entry_row
+### Flow 8: format_log_entry_row
 ```
 format_log_entry_row [pyqual.cli_log_helpers]
 ```
 
-### Flow 10: git_status_cmd
+### Flow 9: git_status_cmd
 ```
-git_status_cmd [pyqual.cli]
+git_status_cmd [pyqual.cli.cmd_git]
   └─ →> git_status
       └─> run_git_command
       └─> run_git_command
+```
+
+### Flow 10: _from_vulnerabilities
+```
+_from_vulnerabilities [pyqual._gate_collectors]
 ```
 
 ## Key Classes
@@ -335,10 +336,28 @@ Measures:
 - **Key Methods**: pyqual.documentation.DocumentationCollector._find_file, pyqual.documentation.DocumentationCollector._check_file_exists, pyqual.documentation.DocumentationCollector._read_pyproject, pyqual.documentation.DocumentationCollector._parse_pyproject_fallback, pyqual.documentation.DocumentationCollector._check_pyproject_metadata, pyqual.documentation.DocumentationCollector._analyze_readme, pyqual.documentation.DocumentationCollector._check_docs_folder, pyqual.documentation.DocumentationCollector._check_required_files, pyqual.documentation.DocumentationCollector._get_docstring_coverage, pyqual.documentation.DocumentationCollector._check_license_type
 - **Inherits**: MetricCollector
 
-### pyqual.builtin_collectors.LlxMcpFixCollector
+### pyqual.plugins.docker.main.DockerCollector
+> Docker security and quality metrics collector.
+- **Methods**: 9
+- **Key Methods**: pyqual.plugins.docker.main.DockerCollector.collect, pyqual.plugins.docker.main.DockerCollector._collect_trivy, pyqual.plugins.docker.main.DockerCollector._count_trivy_vulns, pyqual.plugins.docker.main.DockerCollector._set_zero_trivy, pyqual.plugins.docker.main.DockerCollector._collect_hadolint, pyqual.plugins.docker.main.DockerCollector._collect_grype, pyqual.plugins.docker.main.DockerCollector._get_grype_severity, pyqual.plugins.docker.main.DockerCollector._collect_image_info, pyqual.plugins.docker.main.DockerCollector.get_config_example
+- **Inherits**: MetricCollector
+
+### pyqual.plugins.builtin.LlxMcpFixCollector
 > Dockerized llx MCP fix/refactor workflow results.
 - **Methods**: 8
-- **Key Methods**: pyqual.builtin_collectors.LlxMcpFixCollector._tier_rank, pyqual.builtin_collectors.LlxMcpFixCollector._load_report, pyqual.builtin_collectors.LlxMcpFixCollector._assign_float, pyqual.builtin_collectors.LlxMcpFixCollector._count_lines, pyqual.builtin_collectors.LlxMcpFixCollector._collect_analysis_metrics, pyqual.builtin_collectors.LlxMcpFixCollector._collect_aider_metrics, pyqual.builtin_collectors.LlxMcpFixCollector.get_config_example, pyqual.builtin_collectors.LlxMcpFixCollector.collect
+- **Key Methods**: pyqual.plugins.builtin.LlxMcpFixCollector._tier_rank, pyqual.plugins.builtin.LlxMcpFixCollector._load_report, pyqual.plugins.builtin.LlxMcpFixCollector._assign_float, pyqual.plugins.builtin.LlxMcpFixCollector._count_lines, pyqual.plugins.builtin.LlxMcpFixCollector._collect_analysis_metrics, pyqual.plugins.builtin.LlxMcpFixCollector._collect_aider_metrics, pyqual.plugins.builtin.LlxMcpFixCollector.get_config_example, pyqual.plugins.builtin.LlxMcpFixCollector.collect
+- **Inherits**: MetricCollector
+
+### pyqual.plugins.security.main.SecurityCollector
+> Security metrics collector — aggregates findings from security scanners.
+- **Methods**: 7
+- **Key Methods**: pyqual.plugins.security.main.SecurityCollector.collect, pyqual.plugins.security.main.SecurityCollector._collect_bandit, pyqual.plugins.security.main.SecurityCollector._collect_audit, pyqual.plugins.security.main.SecurityCollector._get_severity, pyqual.plugins.security.main.SecurityCollector._collect_secrets, pyqual.plugins.security.main.SecurityCollector._collect_safety, pyqual.plugins.security.main.SecurityCollector.get_config_example
+- **Inherits**: MetricCollector
+
+### pyqual.plugins.docs.main.DocsCollector
+> Documentation quality metrics collector.
+- **Methods**: 7
+- **Key Methods**: pyqual.plugins.docs.main.DocsCollector.collect, pyqual.plugins.docs.main.DocsCollector._collect_readme_metrics, pyqual.plugins.docs.main.DocsCollector._set_zero_readme, pyqual.plugins.docs.main.DocsCollector._collect_docstring_metrics, pyqual.plugins.docs.main.DocsCollector._collect_link_metrics, pyqual.plugins.docs.main.DocsCollector._collect_changelog_metrics, pyqual.plugins.docs.main.DocsCollector.get_config_example
 - **Inherits**: MetricCollector
 
 ### pyqual.plugins.git.main.GitCollector
@@ -352,10 +371,16 @@ Measures:
 - **Methods**: 6
 - **Key Methods**: pyqual.gates.GateSet.__init__, pyqual.gates.GateSet._completion_rate, pyqual.gates.GateSet.check_all, pyqual.gates.GateSet.all_passed, pyqual.gates.GateSet.completion_percentage, pyqual.gates.GateSet._collect_metrics
 
-### pyqual.builtin_collectors.SecurityCollector
+### pyqual.plugins.builtin.SecurityCollector
 > Security metrics collector - pip-audit CVEs and ruff lint errors.
 - **Methods**: 6
-- **Key Methods**: pyqual.builtin_collectors.SecurityCollector.collect, pyqual.builtin_collectors.SecurityCollector._collect_pip_audit, pyqual.builtin_collectors.SecurityCollector._collect_ruff, pyqual.builtin_collectors.SecurityCollector._collect_secrets, pyqual.builtin_collectors.SecurityCollector._collect_mypy, pyqual.builtin_collectors.SecurityCollector.get_config_example
+- **Key Methods**: pyqual.plugins.builtin.SecurityCollector.collect, pyqual.plugins.builtin.SecurityCollector._collect_pip_audit, pyqual.plugins.builtin.SecurityCollector._collect_ruff, pyqual.plugins.builtin.SecurityCollector._collect_secrets, pyqual.plugins.builtin.SecurityCollector._collect_mypy, pyqual.plugins.builtin.SecurityCollector.get_config_example
+- **Inherits**: MetricCollector
+
+### pyqual.plugins.deps.main.DepsCollector
+> Dependency management metrics collector.
+- **Methods**: 6
+- **Key Methods**: pyqual.plugins.deps.main.DepsCollector.collect, pyqual.plugins.deps.main.DepsCollector._collect_outdated, pyqual.plugins.deps.main.DepsCollector._collect_deptree, pyqual.plugins.deps.main.DepsCollector._collect_requirements, pyqual.plugins.deps.main.DepsCollector._collect_licenses, pyqual.plugins.deps.main.DepsCollector.get_config_example
 - **Inherits**: MetricCollector
 
 ### pyqual.config.PyqualConfig
@@ -369,15 +394,16 @@ Measures:
 - **Key Methods**: pyqual.fix_tools.base.FixTool.__init__, pyqual.fix_tools.base.FixTool.is_available, pyqual.fix_tools.base.FixTool.get_command, pyqual.fix_tools.base.FixTool.get_timeout, pyqual.fix_tools.base.FixTool.to_config
 - **Inherits**: ABC
 
+### pyqual.plugins.attack.main.AttackCollector
+> Attack merge collector — automerge with aggressive conflict resolution.
+- **Methods**: 5
+- **Key Methods**: pyqual.plugins.attack.main.AttackCollector.collect, pyqual.plugins.attack.main.AttackCollector._collect_check_metrics, pyqual.plugins.attack.main.AttackCollector._collect_merge_metrics, pyqual.plugins.attack.main.AttackCollector._strategy_to_int, pyqual.plugins.attack.main.AttackCollector.get_config_example
+- **Inherits**: MetricCollector
+
 ### pyqual.parallel.ParallelExecutor
 > Executes tasks across multiple fix tools in parallel.
 - **Methods**: 4
 - **Key Methods**: pyqual.parallel.ParallelExecutor.__init__, pyqual.parallel.ParallelExecutor._run_tool_task, pyqual.parallel.ParallelExecutor._tool_worker, pyqual.parallel.ParallelExecutor.run
-
-### pyqual._plugin_base.PluginRegistry
-> Registry for metric collector plugins.
-- **Methods**: 4
-- **Key Methods**: pyqual._plugin_base.PluginRegistry.register, pyqual._plugin_base.PluginRegistry.get, pyqual._plugin_base.PluginRegistry.list_plugins, pyqual._plugin_base.PluginRegistry.create_instance
 
 ### pyqual.validation.ValidationResult
 > Aggregated result of validating one pyqual.yaml.
@@ -389,6 +415,11 @@ Measures:
 - **Methods**: 4
 - **Key Methods**: pyqual.fix_tools.llx.LlxTool.__init__, pyqual.fix_tools.llx.LlxTool.is_available, pyqual.fix_tools.llx.LlxTool.get_command, pyqual.fix_tools.llx.LlxTool.get_timeout
 - **Inherits**: FixTool
+
+### pyqual.plugins._base.PluginRegistry
+> Registry for metric collector plugins.
+- **Methods**: 4
+- **Key Methods**: pyqual.plugins._base.PluginRegistry.register, pyqual.plugins._base.PluginRegistry.get, pyqual.plugins._base.PluginRegistry.list_plugins, pyqual.plugins._base.PluginRegistry.create_instance
 
 ### pyqual.gates.CompositeGateSet
 > Weighted composite quality scoring from multiple gates.
@@ -404,35 +435,6 @@ Example:
 > Shell helper utilities for external tool integration.
 - **Methods**: 3
 - **Key Methods**: pyqual.api.ShellHelper.run, pyqual.api.ShellHelper.check, pyqual.api.ShellHelper.output
-
-### pyqual.bulk_run.ProjectRunState
-> Mutable state for a single project's pyqual run.
-- **Methods**: 3
-- **Key Methods**: pyqual.bulk_run.ProjectRunState.progress_pct, pyqual.bulk_run.ProjectRunState.elapsed, pyqual.bulk_run.ProjectRunState.gates_label
-
-### pyqual.fix_tools.claude.ClaudeTool
-> Claude Code CLI tool.
-- **Methods**: 3
-- **Key Methods**: pyqual.fix_tools.claude.ClaudeTool.is_available, pyqual.fix_tools.claude.ClaudeTool.get_command, pyqual.fix_tools.claude.ClaudeTool.get_timeout
-- **Inherits**: FixTool
-
-### pyqual.fix_tools.aider.AiderTool
-> Aider tool via Docker (paulgauthier/aider).
-- **Methods**: 3
-- **Key Methods**: pyqual.fix_tools.aider.AiderTool.is_available, pyqual.fix_tools.aider.AiderTool.get_command, pyqual.fix_tools.aider.AiderTool.get_timeout
-- **Inherits**: FixTool
-
-### examples.custom_plugins.code_health_collector.CodeHealthCollector
-> Weighted composite health score from multiple code quality signals.
-- **Methods**: 2
-- **Key Methods**: examples.custom_plugins.code_health_collector.CodeHealthCollector.collect, examples.custom_plugins.code_health_collector.CodeHealthCollector.get_config_example
-- **Inherits**: MetricCollector
-
-### examples.custom_plugins.performance_collector.PerformanceCollector
-> Collect latency and throughput metrics from load test results.
-- **Methods**: 2
-- **Key Methods**: examples.custom_plugins.performance_collector.PerformanceCollector.collect, examples.custom_plugins.performance_collector.PerformanceCollector.get_config_example
-- **Inherits**: MetricCollector
 
 ## Data Transformation Functions
 
@@ -461,14 +463,6 @@ Key functions that process and transform data:
 > Parse unchecked items from TODO.md.
 - **Output to**: todo_path.read_text, content.splitlines, todo_path.exists, line.strip, line.startswith
 
-### pyqual.cli.validate
-> Validate pyqual.yaml without running the pipeline.
-
-Checks for:
-- YAML parse errors
-- Unknown or mis
-- **Output to**: app.command, typer.Option, typer.Option, typer.Option, pyqual.api.validate_config
-
 ### pyqual.documentation.DocumentationCollector._parse_pyproject_fallback
 > Minimal regex parser for pyproject.toml.
 - **Output to**: path.read_text, re.search, m.group
@@ -490,9 +484,9 @@ Ret
 > Parse command line arguments.
 - **Output to**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.add_argument, parser.parse_args
 
-### pyqual.cli_plugin_helpers.plugin_validate
-> Validate that configured plugins in pyqual.yaml are available.
-- **Output to**: config_path.read_text, console.print, console.print, set, set
+### pyqual.bulk_init._validate_yaml_content
+> Validate that YAML content is parseable and has required structure.
+- **Output to**: yaml.safe_load, ValueError, ValueError
 
 ### pyqual.validation.validate_config
 > Validate a pyqual.yaml file and return structured issues.
@@ -515,6 +509,18 @@ Does NOT run any stages — this is a stati
 > Minimal regex parser for pyproject.toml when tomllib is unavailable.
 - **Output to**: path.read_text, re.search, re.search, m.group, m.group
 
+### pyqual.plugins.cli_helpers.plugin_validate
+> Validate that configured plugins in pyqual.yaml are available.
+- **Output to**: config_path.read_text, console.print, console.print, set, set
+
+### pyqual.cli.cmd_config.validate
+> Validate pyqual.yaml without running the pipeline.
+
+Checks for:
+- YAML parse errors
+- Unknown or mis
+- **Output to**: app.command, typer.Option, typer.Option, typer.Option, pyqual.api.validate_config
+
 ### pyqual.integrations.llx_mcp_service.build_parser
 > Build the CLI parser for the MCP service.
 - **Output to**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, os.getenv, int
@@ -534,46 +540,46 @@ Does NOT run any stages — this is a stati
 
 Functions exposed as public API (no underscore prefix):
 
-- `pyqual.cli_observe.register_observe_commands` - 180 calls
-- `pyqual.cli.run` - 117 calls
-- `pyqual.cli_bulk_cmds.register_bulk_commands` - 91 calls
-- `pyqual.run_parallel_fix.main` - 86 calls
+- `pyqual.cli_observe.register_observe_commands` - 90 calls
 - `pyqual.bulk_init.generate_pyqual_yaml` - 77 calls
-- `pyqual.cli.git_scan_cmd` - 55 calls
-- `pyqual.cli.git_push_cmd` - 48 calls
-- `pyqual.cli.fix_config` - 46 calls
+- `pyqual.cli.cmd_run.run` - 65 calls
+- `pyqual.cli.cmd_git.git_scan_cmd` - 55 calls
+- `pyqual.cli.cmd_git.git_push_cmd` - 48 calls
+- `pyqual.cli.cmd_config.fix_config` - 46 calls
 - `pyqual.auto_closer.main` - 45 calls
 - `pyqual.validation.validate_config` - 45 calls
+- `pyqual.run_parallel_fix.main` - 44 calls
 - `run_analysis.run_project` - 38 calls
 - `pyqual.cli_log_helpers.format_log_entry_row` - 38 calls
-- `pyqual.cli.git_status_cmd` - 35 calls
+- `pyqual.cli.cmd_git.git_status_cmd` - 35 calls
 - `pyqual.report_generator.get_last_run` - 33 calls
 - `examples.multi_gate_pipeline.run_pipeline.main` - 30 calls
 - `examples.custom_gates.metric_history.main` - 29 calls
 - `pyqual.bulk_init.classify_with_llm` - 26 calls
 - `pyqual.parallel.ParallelExecutor.run` - 25 calls
-- `pyqual.cli.git_commit_cmd` - 25 calls
-- `pyqual.cli_plugin_helpers.plugin_search` - 25 calls
-- `pyqual.cli.tickets_sync` - 24 calls
-- `pyqual.plugins.git.main.scan_for_secrets` - 24 calls
-- `pyqual.cli.status` - 23 calls
-- `pyqual.cli.init` - 22 calls
+- `pyqual.cli.cmd_git.git_commit_cmd` - 25 calls
+- `pyqual.plugins.cli_helpers.plugin_search` - 25 calls
+- `pyqual.cli.cmd_tickets.tickets_sync` - 24 calls
+- `pyqual.plugins.attack.main.attack_merge` - 24 calls
+- `pyqual.cli.cmd_config.status` - 23 calls
+- `pyqual.plugins.git.main.scan_for_secrets` - 23 calls
 - `pyqual.bulk_run.bulk_run` - 22 calls
-- `pyqual.bulk_init.bulk_init` - 22 calls
+- `pyqual.cli.cmd_init.init` - 22 calls
 - `pyqual.plugins.git.main.git_push` - 22 calls
 - `pyqual.custom_fix.parse_and_apply_suggestions` - 21 calls
-- `pyqual.cli.validate` - 21 calls
+- `pyqual.cli_bulk_cmds.register_bulk_commands` - 21 calls
+- `pyqual.cli.cmd_config.validate` - 21 calls
+- `pyqual.plugins.deps.main.deps_health_check` - 21 calls
 - `pyqual.plugins.git.main.preflight_push_check` - 21 calls
-- `pyqual.cli.gates` - 20 calls
 - `pyqual.cli_run_helpers.extract_fix_stage_summary` - 20 calls
+- `pyqual.cli.cmd_config.gates` - 20 calls
 - `pyqual.plugins.git.main.GitCollector.collect` - 20 calls
 - `pyqual.plugins.git.main.git_status` - 20 calls
-- `pyqual.cli.tools` - 19 calls
 - `pyqual.documentation.DocumentationCollector.collect` - 19 calls
 - `pyqual.run_parallel_fix.mark_completed_todos` - 19 calls
-- `pyqual.cli_plugin_helpers.plugin_list` - 19 calls
-- `pyqual.cli_plugin_helpers.plugin_add` - 19 calls
-- `pyqual.cli.mcp_fix` - 18 calls
+- `pyqual.cli.cmd_info.tools` - 19 calls
+- `pyqual.plugins.cli_helpers.plugin_list` - 19 calls
+- `pyqual.plugins.cli_helpers.plugin_add` - 19 calls
 
 ## System Interactions
 
@@ -585,14 +591,6 @@ graph TD
     register_observe_com --> Option
     run --> command
     run --> Option
-    register_bulk_comman --> command
-    register_bulk_comman --> Argument
-    register_bulk_comman --> Option
-    main --> parse_args
-    main --> cwd
-    main --> get_todo_batch
-    main --> print
-    main --> enumerate
     git_scan_cmd --> command
     git_scan_cmd --> Argument
     git_scan_cmd --> Option
@@ -600,17 +598,25 @@ graph TD
     git_push_cmd --> Option
     fix_config --> command
     fix_config --> Option
+    main --> cwd
     main --> get
+    main --> print
     main --> PlanfileStore
     validate_config --> ValidationResult
     validate_config --> get
     validate_config --> items
+    main --> parse_args
+    main --> get_todo_batch
+    main --> enumerate
     format_log_entry_row --> get
     format_log_entry_row --> replace
     git_status_cmd --> command
     git_status_cmd --> Option
     git_status_cmd --> git_status
     git_status_cmd --> print
+    _from_vulnerabilitie --> exists
+    _from_vulnerabilitie --> loads
+    _from_vulnerabilitie --> isinstance
 ```
 
 ## Reverse Engineering Guidelines

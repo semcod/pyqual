@@ -1,4 +1,4 @@
-"""Documentation completeness and quality collector for pyqual.
+"""Documentation plugin for pyqual — documentation completeness and quality.
 
 Checks for:
 - README.md presence and content quality

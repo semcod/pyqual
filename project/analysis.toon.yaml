@@ -1,34 +1,34 @@
-# code2llm | 65f 14452L | python:48,typescript:11,shell:4,javascript:2 | 2026-04-04
-# CC̄=5.4 | critical:22/442 | dups:0 | cycles:0
+# code2llm | 84f 17059L | python:67,typescript:11,shell:4,javascript:2 | 2026-04-04
+# CC̄=5.5 | critical:25/526 | dups:0 | cycles:0
 
 HEALTH[20]:
-  🔴 GOD   pyqual/builtin_collectors.py = 576L, 8 classes, 20m, max CC=13
+  🔴 GOD   pyqual/plugins/builtin.py = 576L, 8 classes, 20m, max CC=13
   🔴 GOD   pyqual/pipeline.py = 623L, 10 classes, 26m, max CC=18
   🟡 CC    RepositoryDetail CC=20 (limit:15)
   🟡 CC    main CC=20 (limit:15)
   🟡 CC    get_last_run CC=33 (limit:15)
   🟡 CC    run CC=15 (limit:15)
-  🟡 CC    run CC=28 (limit:15)
-  🟡 CC    git_status_cmd CC=15 (limit:15)
-  🟡 CC    git_scan_cmd CC=17 (limit:15)
-  🟡 CC    git_push_cmd CC=19 (limit:15)
+  🟡 CC    _bulk_run_impl CC=19 (limit:15)
   🟡 CC    _check_docs_folder CC=15 (limit:15)
-  🟡 CC    main CC=36 (limit:15)
+  🟡 CC    main CC=18 (limit:15)
   🟡 CC    _from_vulnerabilities CC=17 (limit:15)
+  🟡 CC    _classify_heuristic CC=20 (limit:15)
   🟡 CC    validate_config CC=26 (limit:15)
+  🟡 CC    _logs_impl CC=22 (limit:15)
   🟡 CC    _run_single_project CC=19 (limit:15)
   🟡 CC    _build_project_row CC=19 (limit:15)
   🟡 CC    bulk_run CC=17 (limit:15)
-  🟡 CC    _classify_heuristic CC=26 (limit:15)
-  🟡 CC    bulk_init CC=18 (limit:15)
-  🟡 CC    git_status CC=18 (limit:15)
+  🟡 CC    git_status_cmd CC=15 (limit:15)
+  🟡 CC    git_scan_cmd CC=17 (limit:15)
+  🟡 CC    git_push_cmd CC=19 (limit:15)
+  🟡 CC    run CC=23 (limit:15)
 
 REFACTOR[3]:
-  1. split pyqual/builtin_collectors.py  (god module)
+  1. split pyqual/plugins/builtin.py  (god module)
   2. split pyqual/pipeline.py  (god module)
   3. split 18 high-CC methods  (CC>15)
 
-PIPELINES[240]:
+PIPELINES[279]:
   [1] Src [MetricsTrendChart]: MetricsTrendChart
       PURITY: 100% pure
   [2] Src [data]: data
@@ -46,39 +46,50 @@ LAYERS:
   │ project.sh                  35L  0C    0m  CC=0.0    ←0
   │ SUGGESTED_COMMANDS.sh        4L  0C    0m  CC=0.0    ←0
   │
-  pyqual/                         CC̄=5.8    ←in:1  →out:6
-  │ !! cli                       1375L  0C   27m  CC=28     ←0
-  │ !! main                       992L  1C   20m  CC=18     ←1
-  │ !! bulk_init                  716L  3C   15m  CC=26     ←1
+  pyqual/                         CC̄=5.8    ←in:27  →out:3
+  │ !! main                       961L  1C   21m  CC=18     ←1
+  │ !! bulk_init                  741L  3C   19m  CC=20     ←1
   │ !! pipeline                   623L  10C   26m  CC=18     ←0
-  │ !! builtin_collectors         576L  8C   20m  CC=13     ←0
+  │ !! builtin                    576L  8C   20m  CC=13     ←0
   │ !! report                     565L  0C   18m  CC=12     ←0
   │ !! bulk_run                   559L  3C    7m  CC=19     ←1
-  │ !! api                        519L  1C   15m  CC=10     ←3
+  │ !! api                        519L  1C   15m  CC=10     ←4
   │ !! _gate_collectors           504L  0C   22m  CC=17     ←0
-  │ !! validation                 481L  6C    9m  CC=26     ←1
+  │ main                       485L  1C   12m  CC=11     ←0
+  │ !! validation                 481L  6C    9m  CC=26     ←2
+  │ !! main                       464L  1C   10m  CC=15     ←0
+  │ !! cli_observe                446L  0C   11m  CC=22     ←0
+  │ main                       427L  1C   13m  CC=14     ←0
+  │ main                       410L  1C   11m  CC=11     ←0
+  │ !! run_parallel_fix           403L  0C   10m  CC=18     ←0
   │ !! documentation              388L  1C   11m  CC=15     ←0
-  │ !! run_parallel_fix           370L  0C    6m  CC=36     ←0
   │ !! report_generator           366L  2C    8m  CC=33     ←0
   │ github_actions             357L  2C   16m  CC=9      ←0
+  │ !! main                       354L  1C    9m  CC=15     ←0
+  │ !! cmd_run                    349L  0C    9m  CC=23     ←0
   │ cli_run_helpers            345L  0C   20m  CC=14     ←0
   │ !! parallel                   328L  4C    7m  CC=15     ←0
   │ tools                      323L  1C   15m  CC=8      ←4
-  │ cli_observe                322L  0C    1m  CC=1      ←0
-  │ config                     273L  4C    8m  CC=13     ←7
-  │ cli_bulk_cmds              243L  0C    1m  CC=1      ←0
+  │ !! cmd_git                    321L  0C    5m  CC=19     ←0
+  │ config                     273L  4C    8m  CC=13     ←9
+  │ cmd_config                 250L  0C    5m  CC=13     ←0
+  │ !! cli_bulk_cmds              246L  0C    3m  CC=19     ←0
   │ custom_fix                 218L  0C    3m  CC=13     ←0
   │ !! auto_closer                208L  0C    4m  CC=20     ←0
   │ gates                      197L  4C   11m  CC=9      ←0
-  │ cli_plugin_helpers         193L  0C    7m  CC=11     ←1
+  │ cli_helpers                193L  0C    7m  CC=11     ←1
+  │ cmd_mcp                    176L  0C    4m  CC=12     ←0
+  │ cmd_tickets                169L  0C    6m  CC=7      ←0
   │ __init__                   140L  0C    0m  CC=0.0    ←0
   │ profiles                   133L  1C    2m  CC=1      ←3
   │ llm                        126L  0C    0m  CC=0.0    ←0
-  │ tickets                    123L  0C    7m  CC=9      ←2
+  │ tickets                    123L  0C    7m  CC=9      ←3
   │ cli_log_helpers            117L  0C    3m  CC=14     ←0
   │ constants                  106L  0C    0m  CC=0.0    ←0
   │ llx_mcp                    101L  0C    2m  CC=6      ←0
-  │ _plugin_base                87L  3C    7m  CC=5      ←3
+  │ cmd_info                    91L  0C    2m  CC=5      ←0
+  │ cmd_init                    90L  0C    2m  CC=7      ←0
+  │ _base                       87L  3C    7m  CC=5      ←3
   │ __init__                    86L  0C    3m  CC=5      ←2
   │ llx_mcp_service             68L  0C    4m  CC=1      ←0
   │ github_tasks                64L  0C    3m  CC=6      ←1
@@ -86,9 +97,17 @@ LAYERS:
   │ base                        53L  2C    5m  CC=2      ←0
   │ aider                       49L  1C    3m  CC=2      ←0
   │ __init__                    47L  0C    1m  CC=5      ←1
+  │ main                        45L  0C    1m  CC=2      ←1
+  │ cmd_plugin                  44L  0C    1m  CC=8      ←0
+  │ __init__                    43L  0C    0m  CC=0.0    ←0
   │ llx                         36L  1C    4m  CC=2      ←0
   │ claude                      33L  1C    3m  CC=1      ←0
   │ __init__                    28L  0C    0m  CC=0.0    ←0
+  │ __init__                    22L  0C    0m  CC=0.0    ←0
+  │ __init__                    22L  0C    0m  CC=0.0    ←0
+  │ __init__                    22L  0C    0m  CC=0.0    ←0
+  │ __init__                    22L  0C    0m  CC=0.0    ←0
+  │ __init__                    22L  0C    0m  CC=0.0    ←0
   │ __init__                    13L  0C    0m  CC=0.0    ←0
   │ __main__                     6L  0C    0m  CC=0.0    ←0
   │ __init__                     1L  0C    0m  CC=0.0    ←0
@@ -116,12 +135,15 @@ LAYERS:
   │
 
 COUPLING:
-                          pyqual  pyqual.plugins    run_analysis
-          pyqual              ──               6              ←1
-  pyqual.plugins              ←6              ──                  hub
-    run_analysis               1                              ──
+                      pyqual.cli          pyqual  pyqual.plugins    run_analysis
+      pyqual.cli              ──              22              13                  !! fan-out
+          pyqual             ←22              ──               3              ←1  hub
+  pyqual.plugins             ←13               4              ──                  hub
+    run_analysis                               1                              ──
   CYCLES: none
-  HUB: pyqual.plugins/ (fan-in=6)
+  HUB: pyqual/ (fan-in=27)
+  HUB: pyqual.plugins/ (fan-in=16)
+  SMELL: pyqual.cli/ fan-out=35 → split needed
 
 EXTERNAL:
   validation: run `vallm batch .` → validation.toon

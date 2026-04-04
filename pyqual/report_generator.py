@@ -51,6 +51,93 @@ class PipelineRun:
     metrics: dict[str, Any]
 
 
+def _should_skip_stage(stage_name: str) -> bool:
+    """Check if stage should be skipped (empty or unknown name)."""
+    return not stage_name or stage_name == 'unknown'
+
+
+def _get_stage_status(kwargs: dict[str, Any]) -> str:
+    """Determine stage status from kwargs."""
+    if kwargs.get('skipped', False):
+        return 'skipped'
+    if kwargs.get('ok', False):
+        return 'passed'
+    return 'failed'
+
+
+def _extract_metrics_from_kwargs(kwargs: dict[str, Any]) -> dict[str, Any]:
+    """Extract metrics from stage kwargs."""
+    metrics: dict[str, Any] = {}
+    metric_keys = [
+        ('vallm_pass_pct', 'vallm_pass_pct'),
+        ('cc', 'cc'),
+        ('files', 'files'),
+    ]
+    for key, metric_name in metric_keys:
+        if key in kwargs:
+            metrics[metric_name] = kwargs[key]
+
+    if 'passed' in kwargs and isinstance(kwargs['passed'], int):
+        metrics['tests_passed'] = kwargs['passed']
+
+    # Coverage extraction
+    if 'coverage' in kwargs:
+        metrics['coverage'] = kwargs['coverage']
+    elif 'coverage_percent' in kwargs:
+        metrics['coverage'] = kwargs['coverage_percent']
+
+    return metrics
+
+
+def _read_coverage_from_file(db_path: Path) -> float | None:
+    """Read coverage from coverage.json file if available."""
+    coverage_file = db_path.parent / "coverage.json"
+    if not coverage_file.exists():
+        return None
+    try:
+        cov_data = json.loads(coverage_file.read_text())
+        if 'totals' in cov_data and 'percent_covered' in cov_data['totals']:
+            return float(cov_data['totals']['percent_covered'])
+        elif 'percent_covered' in cov_data:
+            return float(cov_data['percent_covered'])
+    except (json.JSONDecodeError, KeyError, ValueError):
+        pass
+    return None
+
+
+def _build_gate(metric: str, value: float, threshold: float, operator: str) -> dict[str, Any]:
+    """Build a gate dictionary."""
+    op_func = {
+        '<=': lambda v, t: v <= t,
+        '>=': lambda v, t: v >= t,
+        '==': lambda v, t: v == t,
+        '<': lambda v, t: v < t,
+        '>': lambda v, t: v > t,
+    }
+    passed = op_func.get(operator, lambda v, t: False)(value, threshold)
+    return {
+        'metric': metric,
+        'value': value,
+        'threshold': threshold,
+        'operator': operator,
+        'passed': passed
+    }
+
+
+def _build_gates_from_metrics(metrics: dict[str, Any]) -> list[dict[str, Any]]:
+    """Build gates list from metrics."""
+    gates = []
+    gate_configs = [
+        ('cc', 'cc', 15.0, '<='),
+        ('vallm_pass_pct', 'vallm_pass', 90.0, '>='),
+        ('coverage', 'coverage', 55.0, '>='),
+    ]
+    for metric_key, gate_name, threshold, operator in gate_configs:
+        if metric_key in metrics:
+            gates.append(_build_gate(gate_name, metrics[metric_key], threshold, operator))
+    return gates
+
+
 def get_last_run(db_path: Path) -> PipelineRun | None:
     """Get the last pipeline run from database."""
     if not db_path.exists():
@@ -81,29 +168,22 @@ def get_last_run(db_path: Path) -> PipelineRun | None:
     total_duration = 0.0
     gates = []
     metrics = {}
-    
+    seen_names: set[str] = set()
+
     for row in rows[:20]:  # Last 20 stages max
         kwargs = parse_kwargs(row['kwargs'])
         stage_name = kwargs.get('stage', '')
-        
-        # Skip entries without proper stage name (filter out 'unknown')
-        if not stage_name or stage_name == 'unknown':
+
+        if _should_skip_stage(stage_name):
             continue
-        
+
         # Skip duplicate stages (keep most recent)
-        if any(s.name == stage_name for s in stages):
+        if stage_name in seen_names:
             continue
-            
-        is_ok = kwargs.get('ok', False)
-        is_skipped = kwargs.get('skipped', False)
-        
-        if is_skipped:
-            status = 'skipped'
-        elif is_ok:
-            status = 'passed'
-        else:
-            status = 'failed'
-        
+        seen_names.add(stage_name)
+
+        status = _get_stage_status(kwargs)
+
         stages.append(StageResult(
             name=stage_name,
             status=status,
@@ -112,29 +192,13 @@ def get_last_run(db_path: Path) -> PipelineRun | None:
             details=kwargs
         ))
         total_duration += kwargs.get('duration_s', 0.0)
-        
-        # Extract metrics from certain stages
-        if 'vallm_pass_pct' in kwargs:
-            metrics['vallm_pass_pct'] = kwargs['vallm_pass_pct']
-        if 'cc' in kwargs:
-            metrics['cc'] = kwargs['cc']
-        if 'files' in kwargs:
-            metrics['files'] = kwargs['files']
-        if 'passed' in kwargs and isinstance(kwargs['passed'], int):
-            metrics['tests_passed'] = kwargs['passed']
-        # Extract coverage from coverage.json if available
-        if 'coverage' in kwargs:
-            metrics['coverage'] = kwargs['coverage']
-        elif 'coverage_percent' in kwargs:
-            metrics['coverage'] = kwargs['coverage_percent']
-    
-    # Build gates from metrics with proper thresholds from config
-    if 'cc' in metrics:
-        gates.append({'metric': 'cc', 'value': metrics['cc'], 'threshold': 15.0, 'operator': '<=', 'passed': metrics['cc'] <= 15.0})
-    if 'vallm_pass_pct' in metrics:
-        gates.append({'metric': 'vallm_pass', 'value': metrics['vallm_pass_pct'], 'threshold': 90.0, 'operator': '>=', 'passed': metrics['vallm_pass_pct'] >= 90.0})
-    if 'coverage' in metrics:
-        gates.append({'metric': 'coverage', 'value': metrics['coverage'], 'threshold': 55.0, 'operator': '>=', 'passed': metrics['coverage'] >= 55.0})
+
+        # Extract metrics from stage kwargs
+        stage_metrics = _extract_metrics_from_kwargs(kwargs)
+        metrics.update(stage_metrics)
+
+    # Build gates from metrics with proper thresholds
+    gates = _build_gates_from_metrics(metrics)
     
     # Calculate all_gates_passed based on actual gates, not stages
     all_gates_passed = all(gate.get('passed', False) for gate in gates) if gates else True
@@ -146,20 +210,13 @@ def get_last_run(db_path: Path) -> PipelineRun | None:
     
     # Read coverage from file if available and not already extracted
     if 'coverage' not in metrics:
-        coverage_file = db_path.parent / "coverage.json"
-        if coverage_file.exists():
-            try:
-                cov_data = json.loads(coverage_file.read_text())
-                if 'totals' in cov_data and 'percent_covered' in cov_data['totals']:
-                    metrics['coverage'] = cov_data['totals']['percent_covered']
-                elif 'percent_covered' in cov_data:
-                    metrics['coverage'] = cov_data['percent_covered']
-            except (json.JSONDecodeError, KeyError):
-                pass
-    
+        coverage = _read_coverage_from_file(db_path)
+        if coverage is not None:
+            metrics['coverage'] = coverage
+
     # Rebuild gates with coverage if now available
     if 'coverage' in metrics and not any(g.get('metric') == 'coverage' for g in gates):
-        gates.append({'metric': 'coverage', 'value': metrics['coverage'], 'threshold': 55.0, 'operator': '>=', 'passed': metrics['coverage'] >= 55.0})
+        gates.append(_build_gate('coverage', metrics['coverage'], 55.0, '>='))
         # Recalculate all_gates_passed
         all_gates_passed = all(gate.get('passed', False) for gate in gates) if gates else True
     

@@ -4,22 +4,22 @@ flowchart TD
     classDef entry fill:#4dabf7,stroke:#1971c2,color:#fff
 
     subgraph CLI
-        pyqual__cli___setup_logging["_setup_logging"]
-        pyqual__cli__init["init"]
-        pyqual__cli__profiles["profiles"]
-        pyqual__cli__run["run"]
-        pyqual__cli__gates["gates"]
-        pyqual__cli__validate["validate"]
-        pyqual__cli__fix_config["fix_config"]
-        pyqual__cli__status["status"]
-        pyqual__cli__report["report"]
-        pyqual__cli___run_mcp_workflow["_run_mcp_workflow"]
-        pyqual__cli__mcp_fix["mcp_fix"]
-        pyqual__cli__mcp_refactor["mcp_refactor"]
-        pyqual__cli__mcp_service["mcp_service"]
-        pyqual__cli__tickets_sync["tickets_sync"]
-        pyqual__cli__tickets_todo["tickets_todo"]
-        ...["+44 more"]
+        pyqual__cli_bulk_cmds___bulk_init_impl["_bulk_init_impl"]
+        pyqual__cli_bulk_cmds___bulk_run_impl["_bulk_run_impl"]
+        pyqual__cli_bulk_cmds__register_bulk_commands["register_bulk_commands"]
+        pyqual__cli_observe___logs_impl["_logs_impl"]
+        pyqual__cli_observe___watch_impl["_watch_impl"]
+        pyqual__cli_observe___poll_pipeline_db["_poll_pipeline_db"]
+        pyqual__cli_observe___poll_history_file["_poll_history_file"]
+        pyqual__cli_observe___history_impl["_history_impl"]
+        pyqual__cli_observe___load_history_entries["_load_history_entries"]
+        pyqual__cli_observe___print_history_table["_print_history_table"]
+        pyqual__cli_observe___print_history_prompts["_print_history_prompts"]
+        pyqual__cli_observe___print_history_stdout["_print_history_stdout"]
+        pyqual__cli_observe___print_history_summary["_print_history_summary"]
+        pyqual__cli_observe__register_observe_commands["register_observe_commands"]
+        pyqual__cli_run_helpers__count_todo_items["count_todo_items"]
+        ...["+57 more"]
     end
 
     subgraph Core
@@ -38,7 +38,7 @@ flowchart TD
         dashboard__src__components__Settings__Settings["Settings"]
         dashboard__src__components__Overview__Overview["Overview"]
         dashboard__src__components__Overview__totalRepos["totalRepos"]
-        ...["+228 more"]
+        ...["+281 more"]
     end
 
     subgraph Exporters

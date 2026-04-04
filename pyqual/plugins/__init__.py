@@ -44,7 +44,6 @@ from pyqual.plugins.builtin import (  # noqa: E402
     LlxMcpFixCollector,
     RepoMetricsCollector,
     SBOMCollector,
-    SecurityCollector,
 )
 
 # Auto-discover plugins from plugins/ directory
@@ -60,7 +59,6 @@ __all__ = [
     "I18nCollector",
     "A11yCollector",
     "RepoMetricsCollector",
-    "SecurityCollector",
     "LlxMcpFixCollector",
     "get_available_plugins",
     "install_plugin_config",

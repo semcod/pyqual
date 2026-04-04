@@ -8,10 +8,9 @@ import os
 import shutil
 import subprocess
 import time
-from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Any
 
 from nfo import Logger as NfoLogger
 from nfo.models import LogEntry
@@ -27,82 +26,22 @@ from pyqual.constants import (
     STDOUT_TAIL_CHARS,
     TIMEOUT_EXIT_CODE,
 )
-from pyqual.gates import GateSet, GateResult
+from pyqual.gates import GateSet
+from pyqual.pipeline_protocols import (
+    OnIterationDone,
+    OnIterationStart,
+    OnStageDone,
+    OnStageError,
+    OnStageOutput,
+    OnStageStart,
+)
+from pyqual.pipeline_results import IterationResult, PipelineResult, StageResult
 from pyqual.tools import get_preset
 
+if TYPE_CHECKING:
+    from pyqual.gates import GateResult
+
 log = logging.getLogger("pyqual.pipeline")
-
-
-# ---------------------------------------------------------------------------
-# Callback protocols — used by Pipeline.__init__ for type safety
-# ---------------------------------------------------------------------------
-
-@runtime_checkable
-class OnStageStart(Protocol):
-    def __call__(self, name: str) -> None: ...
-
-@runtime_checkable
-class OnIterationStart(Protocol):
-    def __call__(self, iteration: int) -> None: ...
-
-@runtime_checkable
-class OnStageError(Protocol):
-    def __call__(self, failure: Any) -> None: ...
-
-@runtime_checkable
-class OnStageDone(Protocol):
-    """Called after each stage completes. Receives the full StageResult."""
-    def __call__(self, result: "StageResult") -> None: ...
-
-@runtime_checkable
-class OnStageOutput(Protocol):
-    """Called with each line of streaming output from a stage."""
-    def __call__(self, stage_name: str, stream: str, line: str) -> None: ...
-
-@runtime_checkable
-class OnIterationDone(Protocol):
-    """Called after each iteration completes. Receives the full IterationResult."""
-    def __call__(self, result: "IterationResult") -> None: ...
-
-
-@dataclass
-class StageResult:
-    """Result of running a single stage."""
-    name: str
-    returncode: int
-    stdout: str
-    stderr: str
-    duration: float
-    skipped: bool = False
-    original_returncode: int = 0
-    command: str = ""
-    tool: str = ""
-
-    @property
-    def passed(self) -> bool:
-        return self.returncode == 0 or self.skipped
-
-
-@dataclass
-class IterationResult:
-    """Result of one full pipeline iteration."""
-    iteration: int
-    stages: list[StageResult] = field(default_factory=list)
-    gates: list[GateResult] = field(default_factory=list)
-    all_gates_passed: bool = False
-    duration: float = 0.0
-
-
-@dataclass
-class PipelineResult:
-    """Result of the complete pipeline run (all iterations)."""
-    iterations: list[IterationResult] = field(default_factory=list)
-    final_passed: bool = False
-    total_duration: float = 0.0
-
-    @property
-    def iteration_count(self) -> int:
-        return len(self.iterations)
 
 
 class Pipeline:
