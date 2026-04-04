@@ -13,6 +13,7 @@ import pytest
 from pyqual.config import StageConfig
 from pyqual.constants import LLX_HISTORY_FILE, LLX_MCP_REPORT
 from pyqual.pipeline import Pipeline, StageResult
+from pyqual.pipeline_results import IterationResult
 
 
 def _stage(name: str, skipped: bool = False, passed: bool = True) -> StageResult:
@@ -51,6 +52,11 @@ class TestAfterFix:
     def test_auto_fix_name(self, pipeline: Pipeline):
         sc = StageConfig(name="verify", when="after_fix")
         stages = [_stage("auto_fix")]
+        assert pipeline._should_run_stage(sc, gates_pass=False, stages_so_far=stages) is True
+
+    def test_repair_name(self, pipeline: Pipeline):
+        sc = StageConfig(name="verify", when="after_fix")
+        stages = [_stage("repair")]
         assert pipeline._should_run_stage(sc, gates_pass=False, stages_so_far=stages) is True
 
     def test_no_fix_ran(self, pipeline: Pipeline):
@@ -129,6 +135,25 @@ class TestAlwaysAndFirstIteration:
     def test_first_iteration_on_second(self, pipeline: Pipeline):
         sc = StageConfig(name="baseline", when="first_iteration")
         assert pipeline._should_run_stage(sc, gates_pass=False, iteration=2) is False
+
+
+class TestIterationStagnated:
+    """_iteration_stagnated should treat repair-like stages as fix stages."""
+
+    def test_repair_without_diff_is_stagnated(self, pipeline: Pipeline):
+        iteration = IterationResult(
+            iteration=2,
+            stages=[
+                StageResult(
+                    name="repair",
+                    returncode=0,
+                    stdout="Applied 2 changes",
+                    stderr="",
+                    duration=0.1,
+                )
+            ],
+        )
+        assert pipeline._iteration_stagnated(iteration) is True
 
 
 class TestFullPipelineFlow:
@@ -231,8 +256,12 @@ class TestIsFixStage:
         sc = StageConfig(name="fix", run="llx fix . --apply")
         assert pipeline._is_fix_stage(sc) is True
 
-    def test_repair_in_run_command(self, pipeline: Pipeline):
+    def test_auto_repair_in_run_command(self, pipeline: Pipeline):
         sc = StageConfig(name="auto_repair", run="python repair.py")
+        assert pipeline._is_fix_stage(sc) is True
+
+    def test_repair_stage_name(self, pipeline: Pipeline):
+        sc = StageConfig(name="repair", run="python3 scripts/cleanup.py")
         assert pipeline._is_fix_stage(sc) is True
 
     def test_non_fix_stage(self, pipeline: Pipeline):
@@ -413,6 +442,10 @@ class TestSmartStageDefaults:
     def test_verify_fix_defaults_to_after_fix(self):
         s = StageConfig(name="verify_fix", run="echo ok")
         assert s.when == "after_fix"
+
+    def test_repair_defaults_to_metrics_fail(self):
+        s = StageConfig(name="repair", run="python3 scripts/cleanup.py")
+        assert s.when == "metrics_fail"
 
     def test_analyze_defaults_to_first_iteration(self):
         s = StageConfig(name="analyze", tool="code2llm")

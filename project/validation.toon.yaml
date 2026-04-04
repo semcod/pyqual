@@ -1,17 +1,9 @@
-# vallm batch | 108f | 100✓ 15⚠ 0✗ | 2026-04-04
+# vallm batch | 109f | 64✓ 8⚠ 37✗ | 2026-04-04
 
 SUMMARY:
-  scanned: 108  passed: 100 (92.6%)  warnings: 15  errors: 0  unsupported: 8
+  scanned: 109  passed: 64 (58.7%)  warnings: 8  errors: 37  unsupported: 8
 
-WARNINGS[15]{path,score}:
-  pyqual/bulk_run.py,0.90
-    issues[6]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,_run_single_project has cyclomatic complexity 19 (max: 15),231
-      complexity.cyclomatic,warning,_build_project_row has cyclomatic complexity 19 (max: 15),340
-      complexity.cyclomatic,warning,bulk_run has cyclomatic complexity 17 (max: 15),469
-      complexity.lizard_cc,warning,_run_single_project: CC=19 exceeds limit 15,231
-      complexity.lizard_cc,warning,_build_project_row: CC=19 exceeds limit 15,340
-      complexity.lizard_cc,warning,bulk_run: CC=17 exceeds limit 15,469
+WARNINGS[8]{path,score}:
   pyqual/plugins/git/main.py,0.90
     issues[7]{rule,severity,message,line}:
       complexity.cyclomatic,warning,git_status has cyclomatic complexity 18 (max: 15),232
@@ -33,52 +25,149 @@ WARNINGS[15]{path,score}:
       complexity.maintainability,warning,Low maintainability index: 19.5 (threshold: 20),
       complexity.lizard_cc,warning,_logs_impl: CC=22 exceeds limit 15,32
       complexity.lizard_cc,warning,register_observe_commands.history: CC=28 exceeds limit 15,345
-  pyqual/pipeline.py,0.93
-    issues[5]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,_execute_stage has cyclomatic complexity 21 (max: 15),246
-      complexity.cyclomatic,warning,_classify_error has cyclomatic complexity 17 (max: 15),609
-      complexity.maintainability,warning,Low maintainability index: 8.0 (threshold: 20),
-      complexity.lizard_cc,warning,_execute_stage: CC=21 exceeds limit 15,246
-      complexity.lizard_cc,warning,_classify_error: CC=17 exceeds limit 15,609
   pyqual/_gate_collectors.py,0.96
     issues[3]{rule,severity,message,line}:
       complexity.cyclomatic,warning,_from_vulnerabilities has cyclomatic complexity 18 (max: 15),181
       complexity.maintainability,warning,Low maintainability index: 2.7 (threshold: 20),
       complexity.lizard_cc,warning,_from_vulnerabilities: CC=18 exceeds limit 15,181
-  pyqual/auto_closer.py,0.97
-    issues[2]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,main has cyclomatic complexity 20 (max: 15),94
-      complexity.lizard_cc,warning,main: CC=19 exceeds limit 15,94
-  pyqual/bulk_init.py,0.97
-    issues[2]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,_classify_heuristic has cyclomatic complexity 20 (max: 15),224
-      complexity.lizard_cc,warning,_classify_heuristic: CC=20 exceeds limit 15,224
   pyqual/cli/cmd_config.py,0.97
     issues[2]{rule,severity,message,line}:
       complexity.cyclomatic,warning,validate has cyclomatic complexity 19 (max: 15),54
       complexity.lizard_cc,warning,validate: CC=19 exceeds limit 15,54
-  pyqual/cli/cmd_run.py,0.97
-    issues[2]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,run has cyclomatic complexity 23 (max: 15),194
-      complexity.lizard_cc,warning,run: CC=21 exceeds limit 15,194
   pyqual/cli_bulk_cmds.py,0.97
     issues[2]{rule,severity,message,line}:
       complexity.cyclomatic,warning,_bulk_run_impl has cyclomatic complexity 19 (max: 15),99
       complexity.lizard_cc,warning,_bulk_run_impl: CC=19 exceeds limit 15,99
+  pyqual/cli_run_helpers.py,0.97
+    issues[2]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,format_run_summary has cyclomatic complexity 19 (max: 15),322
+      complexity.lizard_cc,warning,format_run_summary: CC=18 exceeds limit 15,322
   pyqual/run_parallel_fix.py,0.97
     issues[2]{rule,severity,message,line}:
       complexity.cyclomatic,warning,main has cyclomatic complexity 18 (max: 15),306
       complexity.lizard_cc,warning,main: CC=17 exceeds limit 15,306
-  pyqual/validation.py,0.97
+
+ERRORS[37]{path,score}:
+  tests/test_profiles.py,0.83
     issues[2]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,_load_yaml_config has cyclomatic complexity 17 (max: 15),305
-      complexity.lizard_cc,warning,_load_yaml_config: CC=17 exceeds limit 15,305
-  tests/test_bulk_init.py,0.98
+      python.import.resolvable,error,Module 'yaml' not found,5
+      python.import.resolvable,error,Module 'pytest' not found,6
+  pyqual/integrations/llx_mcp.py,0.86
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'llx.mcp.client' not found,15
+      python.import.resolvable,error,Module 'llx.mcp.workflows' not found,16
+      python.import.resolvable,error,Module 'llx.utils.issues' not found,23
+  tests/test_profiles_module.py,0.86
     issues[1]{rule,severity,message,line}:
-      complexity.maintainability,warning,Low maintainability index: 19.2 (threshold: 20),
-  tests/test_pipeline_stages.py,0.98
+      python.import.resolvable,error,Module 'pytest' not found,5
+  tests/test_bulk_init.py,0.88
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,9
+      python.import.resolvable,error,Module 'yaml' not found,10
+  pyqual/integrations/llx_mcp_service.py,0.89
     issues[1]{rule,severity,message,line}:
-      complexity.maintainability,warning,Low maintainability index: 1.7 (threshold: 20),
+      python.import.resolvable,error,Module 'llx.mcp.service' not found,13
+  tests/test_cli_run_helpers.py,0.89
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,7
+  tests/test_secrets_collector.py,0.89
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,6
+  tests/test_validation.py,0.89
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,7
+  pyqual/plugins/deps/test.py,0.91
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,8
+  pyqual/plugins/docker/test.py,0.91
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,8
+  pyqual/plugins/docs/test.py,0.91
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,8
+  pyqual/plugins/documentation/test.py,0.91
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,8
+  tests/test_bulk_run.py,0.91
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,10
+      python.import.resolvable,error,Module 'yaml' not found,11
+  pyqual/auto_closer.py,0.93
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'yaml' not found,17
+  tests/test_llx_mcp.py,0.93
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'httpx' not found,7
+      python.import.resolvable,error,Module 'pytest' not found,8
+      python.import.resolvable,error,Module 'llx.mcp.workflows' not found,13
+  pyqual/llm.py,0.94
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'llx.llm' not found,12
+  pyqual/pipeline.py,0.94
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'nfo' not found,15
+      python.import.resolvable,error,Module 'nfo.models' not found,16
+      python.import.resolvable,error,Module 'nfo.sinks' not found,17
+  pyqual/plugins/example_plugin/test.py,0.94
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,12
+  pyqual/plugins/security/test.py,0.94
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,9
+  pyqual/yaml_fixer.py,0.94
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'yaml' not found,351
+  tests/test_github_actions.py,0.94
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,10
+  pyqual/plugins/attack/test.py,0.95
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,10
+  pyqual/plugins/git/test.py,0.95
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,14
+  tests/test_pyqual.py,0.95
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,7
+  tests/test_report.py,0.95
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'yaml' not found,9
+  pyqual/__init__.py,0.96
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'llx.llm' not found,54
+  pyqual/bulk_init.py,0.96
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'yaml' not found,32
+  pyqual/cli/cmd_tune.py,0.96
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'yaml' not found,9
+  pyqual/config.py,0.96
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'yaml' not found,10
+  pyqual/validation.py,0.96
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'yaml' not found,377
+  tests/test_runtime_errors.py,0.96
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,10
+  pyqual/bulk_run.py,0.97
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'yaml' not found,34
+  pyqual/cli/main.py,0.97
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'yaml' not found,12
+  tests/test_pipeline_stages.py,0.97
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,11
+  tests/test_tickets.py,0.97
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,7
+  pyqual/cli/cmd_run.py,0.98
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'yaml' not found,14
+  pyqual/report.py,0.98
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'yaml' not found,27
 
 UNSUPPORTED[1]{bucket,count}:
   *.md,8

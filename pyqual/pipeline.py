@@ -28,6 +28,7 @@ from pyqual.constants import (
     TIMEOUT_EXIT_CODE,
 )
 from pyqual.gates import GateSet
+from pyqual.stage_names import is_fix_stage_name, is_verify_stage_name
 from pyqual.pipeline_protocols import (
     OnIterationDone,
     OnIterationStart,
@@ -148,7 +149,7 @@ class Pipeline:
     def _iteration_stagnated(iteration: IterationResult) -> bool:
         """Return True if a fix stage ran but produced no changes (no diff output)."""
         for stage in iteration.stages:
-            if "fix" in stage.name.lower() and not stage.skipped:
+            if is_fix_stage_name(stage.name) and not stage.skipped:
                 combined = (stage.stdout or "") + (stage.stderr or "")
                 if combined and "+++ b/" not in combined:
                     return True
@@ -162,9 +163,9 @@ class Pipeline:
         iteration: int = 1,
     ) -> bool:
         """Determine if a stage should run based on its 'when' condition."""
-        def _has_matching_stage(keyword: str) -> bool:
+        def _has_matching_stage(predicate: Any) -> bool:
             return bool(stages_so_far) and any(
-                keyword in s.name.lower() and not s.skipped for s in stages_so_far
+                predicate(s.name) and not s.skipped for s in stages_so_far
             )
 
         handlers = {
@@ -175,8 +176,8 @@ class Pipeline:
             "any_stage_fail": lambda: bool(stages_so_far) and any(
                 not s.passed and not s.skipped for s in stages_so_far
             ),
-            "after_fix": lambda: _has_matching_stage("fix"),
-            "after_verify_fix": lambda: _has_matching_stage("verify"),
+            "after_fix": lambda: _has_matching_stage(is_fix_stage_name),
+            "after_verify_fix": lambda: _has_matching_stage(is_verify_stage_name),
         }
         return handlers.get(stage.when, lambda: True)()
 
@@ -246,7 +247,9 @@ class Pipeline:
     def _execute_stage(self, stage: StageConfig, dry_run: bool) -> StageResult:
         """Execute a single stage command."""
         command = stage.run
-        allow_failure = stage.optional  # Optional stages allow non-zero exit codes
+        # `optional` means best-effort discovery / binary skipping, not silent success.
+        # Command failures should still surface so publish/push errors are visible.
+        allow_failure = False
 
         if stage.tool:
             resolved = self._resolve_tool_stage(stage)
@@ -286,10 +289,7 @@ class Pipeline:
         if self.on_stage_start:
             self.on_stage_start(stage.name)
 
-        is_fix_stage = bool(
-            (stage.run and any(kw in stage.run for kw in ("llx", "aider", "fix", "repair")))
-            or (stage.tool and stage.tool in ("llx-fix", "aider"))
-        )
+        is_fix_stage = self._is_fix_stage(stage)
 
         env = {**os.environ, **self._resolve_env()}
         start = time.monotonic()
@@ -456,6 +456,8 @@ class Pipeline:
 
     def _is_fix_stage(self, stage: StageConfig) -> bool:
         """Return True if *stage* is a fix/repair stage (llx, aider, etc.)."""
+        if is_fix_stage_name(stage.name):
+            return True
         if stage.tool and stage.tool in ("llx-fix", "aider"):
             return True
         run_cmd = stage.run or ""

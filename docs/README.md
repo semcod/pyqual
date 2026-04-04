@@ -1,7 +1,7 @@
 <!-- code2docs:start --># pyqual
 
-![version](https://img.shields.io/badge/version-0.1.0-blue) ![python](https://img.shields.io/badge/python-%3E%3D3.9-blue) ![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey) ![functions](https://img.shields.io/badge/functions-560-green)
-> **560** functions | **84** classes | **110** files | CC̄ = 5.5
+![version](https://img.shields.io/badge/version-0.1.132-blue) ![python](https://img.shields.io/badge/python-%3E%3D3.9-blue) ![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey) ![functions](https://img.shields.io/badge/functions-414-green)
+> **414** functions | **85** classes | **85** files | CC̄ = 5.5
 
 > Auto-generated project documentation from source code analysis.
 

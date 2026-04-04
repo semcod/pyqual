@@ -5,7 +5,7 @@ Save this as prollama/quality.py or similar.
 """
 
 # Option 1: Simple high-level API usage
-from pyqual import run_pipeline, load_config
+from pyqual import run_pipeline
 
 def run_quality_check(config_path: str = "pyqual.yaml", workdir: str = ".") -> bool:
     """Run pyqual quality pipeline and return True if all gates pass."""
@@ -16,7 +16,7 @@ def run_quality_check(config_path: str = "pyqual.yaml", workdir: str = ".") -> b
 # Option 2: Using the api module for more control
 from pyqual import api
 
-def run_with_callbacks(workdir: str = "."):
+def run_with_callbacks(workdir: str = ".") -> bool:
     """Run pipeline with progress callbacks."""
     config = api.load_config("pyqual.yaml", workdir)
     
@@ -42,7 +42,7 @@ def run_with_callbacks(workdir: str = "."):
 # Option 3: Shell helpers for quick checks
 from pyqual import shell, shell_check
 
-def check_prerequisites():
+def check_prerequisites() -> dict[str, bool]:
     """Check if required tools are available."""
     checks = {
         "python": shell_check("which python3"),
@@ -52,7 +52,7 @@ def check_prerequisites():
     return checks
 
 
-def run_shell_command_example():
+def run_shell_command_example() -> None:
     """Run a shell command through pyqual's shell helper."""
     # Run and capture output
     result = shell.run("git status --short", cwd=".")
@@ -71,13 +71,18 @@ def run_shell_command_example():
 
 
 # Option 4: Run individual stages
-def run_single_stage(stage_name: str, tool: str, workdir: str = "."):
+# Timeout and output limits
+STAGE_TIMEOUT_SECONDS = 300
+MAX_ERROR_OUTPUT_CHARS = 500
+
+
+def run_single_stage(stage_name: str, tool: str, workdir: str = ".") -> bool:
     """Run a single stage without full pipeline."""
     result = api.run_stage(
         stage_name=stage_name,
         tool=tool,
         workdir=workdir,
-        timeout=300,
+        timeout=STAGE_TIMEOUT_SECONDS,
     )
     
     print(f"Stage: {result['name']}")
@@ -85,7 +90,7 @@ def run_single_stage(stage_name: str, tool: str, workdir: str = "."):
     print(f"Duration: {result['duration']}s")
     
     if not result['passed']:
-        print(f"Error: {result['stderr'][:500]}")
+        print(f"Error: {result['stderr'][:MAX_ERROR_OUTPUT_CHARS]}")
     
     return result['passed']
 

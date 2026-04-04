@@ -11,6 +11,7 @@ import yaml
 from dotenv import load_dotenv
 
 from pyqual.constants import DEFAULT_STAGE_TIMEOUT
+from pyqual.stage_names import STAGE_WHEN_DEFAULTS, get_stage_when_default
 from pyqual.tools import (
     get_preset,
     list_presets,
@@ -39,24 +40,7 @@ def _normalize_env_values(env: Optional[dict[str, Any]]) -> dict[str, str]:
             normalized[str(key)] = str(value)
     return normalized
 
-
-_STAGE_WHEN_DEFAULTS: dict[str, str] = {
-    "analyze": "first_iteration",
-    "baseline": "first_iteration",
-    "code2llm": "first_iteration",
-    "prefact": "metrics_fail",
-    "fix": "metrics_fail",
-    "fix_regression": "metrics_fail",
-    "auto_fix": "metrics_fail",
-    "repair": "metrics_fail",
-    "verify": "after_fix",
-    "verify_fix": "after_fix",
-    "regression_report": "after_verify_fix",
-    "report": "metrics_pass",
-    "push": "metrics_pass",
-    "publish": "metrics_pass",
-    "deploy": "metrics_pass",
-}
+_STAGE_WHEN_DEFAULTS: dict[str, str] = STAGE_WHEN_DEFAULTS
 """Smart defaults for ``when:`` based on stage name.
 
 Users can still override with explicit ``when:`` in their YAML.
@@ -77,7 +61,7 @@ class StageConfig:
 
     def __post_init__(self) -> None:
         if not self.when:
-            self.when = _STAGE_WHEN_DEFAULTS.get(self.name, "always")
+            self.when = get_stage_when_default(self.name)
 
 
 @dataclass

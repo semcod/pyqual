@@ -100,6 +100,11 @@ class TestExtractFixStageSummary:
         result = extract_fix_stage_summary("fix", text)
         assert result.get("files_changed") == 7
 
+    def test_extracts_repair_stage(self) -> None:
+        text = "Applied 2 changes"
+        result = extract_fix_stage_summary("repair", text)
+        assert result.get("files_changed") == 2
+
 
 class TestExtractMypyStageSummary:
     """Tests for mypy output extraction."""
@@ -214,6 +219,49 @@ class TestBuildRunSummary:
         assert summary["fix_files_changed"] == 2
         assert summary["fix_result"] == "changed"
 
+    def test_extracts_repair_fix_results(self) -> None:
+        report = {
+            "iterations": [
+                {
+                    "stages": [
+                        {"name": "repair", "status": "passed", "files_changed": 4, "failed": 0}
+                    ]
+                }
+            ]
+        }
+        summary = build_run_summary(report)
+        assert summary["fix_files_changed"] == 4
+        assert summary["fix_result"] == "changed"
+
+    def test_extracts_delivery_failures(self) -> None:
+        report = {
+            "iterations": [
+                {
+                    "stages": [
+                        {"name": "publish", "status": "failed", "rc": 2, "stderr": "make: *** [Makefile:129: publish] Error 1"},
+                        {"name": "push", "status": "passed"},
+                    ]
+                }
+            ]
+        }
+        summary = build_run_summary(report)
+        assert summary["delivery_failures"] == [
+            "publish failed (rc=2): make: *** [Makefile:129: publish] Error 1"
+        ]
+
+    def test_extracts_deploy_failures(self) -> None:
+        report = {
+            "iterations": [
+                {
+                    "stages": [
+                        {"name": "deploy", "status": "failed", "rc": 1, "stderr": "deployment failed"},
+                    ]
+                }
+            ]
+        }
+        summary = build_run_summary(report)
+        assert summary["delivery_failures"] == ["deploy failed (rc=1): deployment failed"]
+
 
 class TestFormatRunSummary:
     """Tests for summary formatting."""
@@ -229,6 +277,13 @@ class TestFormatRunSummary:
         text = format_run_summary(summary)
         assert "fix" in text
         assert "result=changed" in text
+
+    def test_includes_delivery_failures(self) -> None:
+        summary = {"delivery_failures": ["publish failed (rc=2): make: *** Error 1", "deploy failed (rc=1): deployment failed"]}
+        text = format_run_summary(summary)
+        assert "delivery" in text
+        assert "publish failed" in text
+        assert "deploy failed" in text
 
     def test_returns_empty_for_empty_summary(self) -> None:
         assert format_run_summary({}) == ""

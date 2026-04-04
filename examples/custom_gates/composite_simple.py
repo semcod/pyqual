@@ -10,16 +10,29 @@ from pathlib import Path
 from pyqual.config import GateConfig
 from pyqual.gates import CompositeGateSet
 
+# Gate thresholds
+COVERAGE_THRESHOLD = 80
+CC_THRESHOLD = 15
+RUFF_ERRORS_THRESHOLD = 10
+
+# Weights for composite scoring
+WEIGHT_COVERAGE = 0.4
+WEIGHT_CC = 0.3
+WEIGHT_RUFF_ERRORS = 0.3
+
+# Composite pass threshold
+PASS_THRESHOLD = 75.0
+
 # Define gates with weights
 gates = [
-    GateConfig(metric="coverage", operator="ge", threshold=80),
-    GateConfig(metric="cc", operator="le", threshold=15),
-    GateConfig(metric="ruff_errors", operator="le", threshold=10),
+    GateConfig(metric="coverage", operator="ge", threshold=COVERAGE_THRESHOLD),
+    GateConfig(metric="cc", operator="le", threshold=CC_THRESHOLD),
+    GateConfig(metric="ruff_errors", operator="le", threshold=RUFF_ERRORS_THRESHOLD),
 ]
-weights = {"coverage": 0.4, "cc": 0.3, "ruff_errors": 0.3}
+weights = {"coverage": WEIGHT_COVERAGE, "cc": WEIGHT_CC, "ruff_errors": WEIGHT_RUFF_ERRORS}
 
-# Create composite gate set with 75% pass threshold
-composite = CompositeGateSet(gates, weights, pass_threshold=75.0)
+# Create composite gate set with pass threshold
+composite = CompositeGateSet(gates, weights, pass_threshold=PASS_THRESHOLD)
 
 # Test with synthetic data
 with tempfile.TemporaryDirectory() as tmpdir:

@@ -278,6 +278,34 @@ class TestRuntimeErrorCollection:
             errors_file = workdir / RUNTIME_ERRORS_FILE
             assert not errors_file.exists()
 
+    def test_optional_run_stage_failure_is_captured(self) -> None:
+        """Optional run stages should not hide real command failures."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            workdir = Path(tmpdir)
+
+            config = PyqualConfig(
+                name="test",
+                stages=[
+                    StageConfig(name="publish", run="false", optional=True),
+                ],
+                gates=[],
+                loop=Mock(max_iterations=1),
+            )
+
+            pipeline = Pipeline(config, workdir=workdir)
+            result = pipeline.run(dry_run=False)
+
+            stage_result = result.iterations[0].stages[0]
+            assert stage_result.passed is False
+            assert stage_result.original_returncode == 1
+
+            errors_file = workdir / RUNTIME_ERRORS_FILE
+            assert errors_file.exists()
+            errors = json.loads(errors_file.read_text())
+            assert len(errors) == 1
+            assert errors[0]["stage"] == "publish"
+            assert errors[0]["returncode"] == 1
+
     def test_no_error_capture_on_skipped(self) -> None:
         """Test that skipped stages don't create runtime errors."""
         with tempfile.TemporaryDirectory() as tmpdir:

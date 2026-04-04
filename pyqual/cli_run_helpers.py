@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from pyqual.constants import STAGE_OUTPUT_MAX_CHARS, TODO_HEAD_CHARS
+from pyqual.stage_names import is_delivery_stage_name, is_fix_stage_name
 
 
 def count_todo_items(todo_path: Path) -> int:
@@ -88,7 +89,7 @@ def extract_validation_stage_summary(name: str, text: str) -> dict[str, Any]:
 
 
 def extract_fix_stage_summary(name: str, text: str) -> dict[str, Any]:
-    if "fix" not in name.lower():
+    if not is_fix_stage_name(name):
         return {}
     out: dict[str, Any] = {}
     m = re.search(r"Selected:\s*\S+\s*\u2192\s*(.+)", text)
@@ -257,8 +258,14 @@ def _extract_todo_summary(stages: list[dict[str, Any]]) -> dict[str, Any]:
 def _extract_fix_summary(stages: list[dict[str, Any]]) -> dict[str, Any]:
     """Extract fix-stage metrics from stage data."""
     result: dict[str, Any] = {}
-    fix_stage = next((s for s in stages if s.get("name") == "fix"), None)
-    if not fix_stage or fix_stage.get("status") == "skipped":
+    fix_stage = next(
+        (
+            s for s in stages
+            if is_fix_stage_name(str(s.get("name", ""))) and s.get("status") != "skipped"
+        ),
+        None,
+    )
+    if not fix_stage:
         return result
     files_changed = fix_stage.get("files_changed")
     if isinstance(files_changed, (int, float)):
@@ -273,6 +280,30 @@ def _extract_fix_summary(stages: list[dict[str, Any]]) -> dict[str, Any]:
     return result
 
 
+def _extract_delivery_summary(stages: list[dict[str, Any]]) -> dict[str, Any]:
+    """Extract publish/push failure details from stage data."""
+    failures: list[str] = []
+    for stage in stages:
+        name = str(stage.get("name", "")).strip().lower()
+        if not is_delivery_stage_name(name):
+            continue
+        if stage.get("status") != "failed":
+            continue
+
+        parts = [f"{name} failed"]
+        rc = stage.get("rc")
+        if isinstance(rc, (int, float)):
+            parts[0] = f"{name} failed (rc={int(rc)})"
+        stderr = str(stage.get("stderr", "")).strip()
+        if stderr:
+            parts.append(f": {stderr}")
+        failures.append("".join(parts))
+
+    if failures:
+        return {"delivery_failures": failures}
+    return {}
+
+
 def build_run_summary(report: dict[str, Any]) -> dict[str, Any]:
     stages = [
         stage
@@ -284,47 +315,68 @@ def build_run_summary(report: dict[str, Any]) -> dict[str, Any]:
     summary: dict[str, Any] = {}
     summary.update(_extract_todo_summary(stages))
     summary.update(_extract_fix_summary(stages))
+    summary.update(_extract_delivery_summary(stages))
     return summary
 
 
 def format_run_summary(summary: dict[str, Any]) -> str:
+    """Format run summary dict into human-readable string with ticket outcomes."""
     if not summary:
         return ""
 
     parts: list[str] = []
 
-    todo_bits: list[str] = []
-    if "todo_active" in summary:
-        todo_bits.append(f"{summary['todo_active']} active")
-    if "todo_completed" in summary:
-        todo_bits.append(f"{summary['todo_completed']} completed")
-    if "todo_total" in summary:
-        todo_bits.append(f"{summary['todo_total']} total")
-    if todo_bits:
-        parts.append(f"TODO {', '.join(todo_bits)}")
+    # Ticket outcomes: completed vs remaining vs active
+    todo_active = summary.get("todo_active", 0)
+    todo_completed = summary.get("todo_completed", 0)
+    todo_total = summary.get("todo_total", 0)
+    todo_remaining = todo_total - todo_completed
 
-    fix_bits: list[str] = []
-    if "fix_result" in summary:
-        fix_bits.append(f"result={summary['fix_result']}")
-    if "fix_files_changed" in summary:
-        fix_bits.append(f"{summary['fix_files_changed']} files changed")
-    if "fix_failed" in summary:
-        fix_bits.append(f"{summary['fix_failed']} failed")
-    if "fix_errors" in summary:
-        fix_bits.append(f"{summary['fix_errors']} errors")
-    if fix_bits:
-        parts.append(f"fix {', '.join(fix_bits)}")
+    if todo_total > 0:
+        ticket_parts = []
+        if todo_completed > 0:
+            ticket_parts.append(f"✓ {todo_completed} completed")
+        if todo_remaining > 0:
+            ticket_parts.append(f"○ {todo_remaining} remaining")
+        if todo_active > 0 and todo_active != todo_remaining:
+            ticket_parts.append(f"⚡ {todo_active} active")
 
-    if "fix_result" in summary:
-        if summary["fix_result"] == "changed":
-            outcome = "changes applied"
-        elif summary["fix_result"] == "no_changes":
-            outcome = "no changes applied"
+        parts.append(f"Tickets: {', '.join(ticket_parts)}")
+
+        # Progress percentage
+        if todo_total > 0:
+            pct = (todo_completed / todo_total) * 100
+            parts.append(f"Progress: {pct:.0f}% ({todo_completed}/{todo_total})")
+
+    # Fix stage outcomes
+    fix_result = summary.get("fix_result")
+    if fix_result and fix_result != "unknown":
+        fix_parts = []
+        files_changed = summary.get("fix_files_changed", 0)
+        fix_failed = summary.get("fix_failed", 0)
+        fix_errors = summary.get("fix_errors", 0)
+
+        if files_changed > 0:
+            fix_parts.append(f"✓ {files_changed} files changed")
+        if fix_failed > 0:
+            fix_parts.append(f"✗ {fix_failed} failed")
+        if fix_errors > 0:
+            fix_parts.append(f"⚠ {fix_errors} errors")
+
+        if fix_parts:
+            parts.append(f"Fix ({fix_result}): {' | '.join(fix_parts)}")
         else:
-            outcome = "change status unknown"
-        parts.append(f"outcome: {outcome}")
+            parts.append(f"Fix: {fix_result}")
 
-    return f"[bold]Run summary[/bold]: {'; '.join(parts)}"
+    # Delivery/push outcomes
+    if "delivery_failures" in summary:
+        failures = summary["delivery_failures"]
+        if isinstance(failures, list) and failures:
+            parts.append(f"✗ Delivery failed: {'; '.join(str(item) for item in failures)}")
+        else:
+            parts.append("✓ Delivered")
+
+    return f"[bold]Run summary[/bold]: {'; '.join(parts)}" if parts else ""
 
 
 def get_last_error_line(text: str) -> str:

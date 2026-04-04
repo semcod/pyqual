@@ -23,6 +23,22 @@ from typing import ClassVar
 from pyqual.plugins import MetricCollector, PluginMetadata, PluginRegistry
 
 
+# Sample data constants (for self-test)
+SAMPLE_P50_MS = 12.5
+SAMPLE_P95_MS = 45.0
+SAMPLE_P99_MS = 120.3
+SAMPLE_AVG_MS = 18.7
+SAMPLE_RPS = 850.0
+SAMPLE_ERRORS = 3
+SAMPLE_TOTAL_REQUESTS = 5000
+
+# Expected values for assertions
+EXPECTED_P99_MS = 120.3
+EXPECTED_RPS = 850.0
+EXPECTED_ERROR_RATE = 0.06
+ERROR_TOLERANCE = 0.01
+
+
 class PerformanceCollector(MetricCollector):
     """Collect latency and throughput metrics from load test results."""
 
@@ -103,13 +119,13 @@ if __name__ == "__main__":
 
         # Write sample performance data
         sample = {
-            "p50_ms": 12.5,
-            "p95_ms": 45.0,
-            "p99_ms": 120.3,
-            "avg_ms": 18.7,
-            "requests_per_second": 850.0,
-            "errors": 3,
-            "total_requests": 5000,
+            "p50_ms": SAMPLE_P50_MS,
+            "p95_ms": SAMPLE_P95_MS,
+            "p99_ms": SAMPLE_P99_MS,
+            "avg_ms": SAMPLE_AVG_MS,
+            "requests_per_second": SAMPLE_RPS,
+            "errors": SAMPLE_ERRORS,
+            "total_requests": SAMPLE_TOTAL_REQUESTS,
         }
         (pyqual_dir / "performance.json").write_text(json.dumps(sample))
 
@@ -120,8 +136,8 @@ if __name__ == "__main__":
         for k, v in sorted(metrics.items()):
             print(f"  {k}: {v}")
 
-        assert metrics["perf_p99_ms"] == 120.3
-        assert metrics["perf_rps"] == 850.0
-        assert abs(metrics["perf_error_rate"] - 0.06) < 0.01
+        assert metrics["perf_p99_ms"] == EXPECTED_P99_MS
+        assert metrics["perf_rps"] == EXPECTED_RPS
+        assert abs(metrics["perf_error_rate"] - EXPECTED_ERROR_RATE) < ERROR_TOLERANCE
         print("✅ All assertions passed")
         sys.exit(0)

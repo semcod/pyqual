@@ -15,8 +15,8 @@ Generated on 2026-04-04 using [openrouter/qwen/qwen3-coder-next](https://openrou
 ---
 
 <!-- pyqual:badges:start -->
-![Version](https://img.shields.io/badge/version-0.1.132-blue) ![Python](https://img.shields.io/badge/python-%3E%3D3.9-blue) ![License](https://img.shields.io/badge/license-Apache-2.0-green) ![AI Cost](https://img.shields.io/badge/AI%20Cost-%2430.00%20%28200%20commits%29-red) ![Human Time](https://img.shields.io/badge/Human%20Time-66.0h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fopenai%2Fgpt-5-mini-lightgrey)
-![pyqual](https://img.shields.io/badge/pyqual-fail-red) ![gates](https://img.shields.io/badge/gates-10%2F11-green) ![CC̄](https://img.shields.io/badge/CC%CC%84-5.5-brightgreen) ![coverage](https://img.shields.io/badge/coverage-37%25-red) ![vallm](https://img.shields.io/badge/vallm-93%25-brightgreen) ![critical](https://img.shields.io/badge/critical-27-red) ![errors](https://img.shields.io/badge/errors-5-orange) ![MI](https://img.shields.io/badge/MI-0-red) ![ruff](https://img.shields.io/badge/ruff-0-brightgreen) ![mypy](https://img.shields.io/badge/mypy-0-brightgreen) ![bandit](https://img.shields.io/badge/bandit-0%20high-brightgreen) ![docstrings](https://img.shields.io/badge/docstrings-0%25-red)
+![Version](https://img.shields.io/badge/version-0.1.132-blue) ![Python](https://img.shields.io/badge/python-%3E%3D3.9-blue) ![License](https://img.shields.io/badge/license-Apache-2.0-green) ![AI Cost](https://img.shields.io/badge/AI%20Cost-%2430.15%20%28201%20commits%29-red) ![Human Time](https://img.shields.io/badge/Human%20Time-66.0h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fopenai%2Fgpt-5-mini-lightgrey)
+![pyqual](https://img.shields.io/badge/pyqual-fail-red) ![gates](https://img.shields.io/badge/gates-10%2F11-green) ![CC̄](https://img.shields.io/badge/CC%CC%84-5.5-brightgreen) ![coverage](https://img.shields.io/badge/coverage-37%25-red) ![vallm](https://img.shields.io/badge/vallm-59%25-orange) ![critical](https://img.shields.io/badge/critical-27-red) ![errors](https://img.shields.io/badge/errors-5-orange) ![MI](https://img.shields.io/badge/MI-0-red) ![ruff](https://img.shields.io/badge/ruff-0-brightgreen) ![mypy](https://img.shields.io/badge/mypy-0-brightgreen) ![bandit](https://img.shields.io/badge/bandit-0%20high-brightgreen) ![docstrings](https://img.shields.io/badge/docstrings-0%25-red)
 <!-- pyqual:badges:end -->
 
 
@@ -109,7 +109,7 @@ pipeline:
 | `tool` | string | — | Built-in tool preset (alternative to `run`) |
 | `when` | string | `always` | `always`, `metrics_fail`, `metrics_pass` |
 | `timeout` | int | 0 | Seconds (0 = no limit) |
-| `optional` | bool | `false` | Allow failure without failing the pipeline |
+| `optional` | bool | `false` | Allow failure without failing the pipeline (only skips if command doesn't exist) |
 
 ### Loop options
 
@@ -164,6 +164,28 @@ Options:
 ```
 
 Check quality gates against currently collected metrics without running any stages. Useful after a manual tool run.
+
+---
+
+### `pyqual tune`
+
+```bash
+pyqual tune [OPTIONS]
+
+Options:
+  -a, --aggressive      More ambitious thresholds (90% of current)
+  -c, --conservative    Safer thresholds with margin (120% of current)
+  -d, --dry-run         Show changes without applying
+  -f, --config PATH     Config file  [default: pyqual.yaml]
+```
+
+Auto-tune quality gate thresholds based on collected metrics from recent pipeline runs. Analyzes current values and suggests optimal thresholds for `cc_max`, `vallm_pass_min`, `coverage_min`, and `secrets_found_max`.
+
+```bash
+pyqual tune --dry-run          # Preview suggested changes
+pyqual tune --aggressive       # Apply tighter thresholds
+pyqual tune --conservative     # Apply safer thresholds
+```
 
 ---
 

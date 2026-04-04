@@ -10,6 +10,8 @@ When a pipeline stage fails (non-zero exit code), pyqual automatically:
 2. **Classifies** the error type based on return codes and stderr patterns
 3. **Exposes** metrics for quality gates
 
+**Note**: Runtime errors are captured from all failed stages, including optional stages (like `publish` or `push`). Optional stages are only skipped if the command doesn't exist, not if they fail with an error.
+
 ## Error classification
 
 Runtime errors are automatically classified into these types:
@@ -101,6 +103,27 @@ stages:
 ```
 
 This allows AI-powered tools to automatically attempt fixing runtime errors.
+
+## Auto-tuning thresholds
+
+Use the `pyqual tune` command to automatically optimize gate thresholds based on collected metrics:
+
+```bash
+# Preview suggested changes
+pyqual tune --dry-run
+
+# Apply aggressive thresholds (90% of current values)
+pyqual tune --aggressive
+
+# Apply conservative thresholds (with safety margin)
+pyqual tune --conservative
+```
+
+The tune command analyzes your recent pipeline runs and suggests optimal thresholds for:
+- `cc_max` - Cyclomatic complexity
+- `vallm_pass_min` - Code quality score
+- `coverage_min` - Test coverage
+- `secrets_found_max` - Always set to 0
 
 ## Viewing runtime errors
 
