@@ -2097,3 +2097,42 @@ sprints:
     model_hints:
       planning: balanced
       implementation: balanced
+  - id: ticket-9df9c84e
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/plugins/_base.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/_base.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-bf8516fb
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in pyqual/plugins/builtin.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - pyqual/plugins/builtin.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b2857df0
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/plugins/cli_helpers.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/plugins/cli_helpers.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
