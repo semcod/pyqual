@@ -135,29 +135,29 @@ pipeline:
     - name: automerge
       run: |
         export PYTHONPATH=$PYTHONPATH:.
-        python3 -c "
-          from pyqual.plugins.attack import attack_check, attack_merge
-          import json
-          import sys
+        python3 - <<'PY'
+        from pyqual.plugins.attack import attack_check, attack_merge
+        import json
+        import sys
 
-          check = attack_check()
-          with open('.pyqual/attack_check.json', 'w') as f:
+        check = attack_check()
+        with open('.pyqual/attack_check.json', 'w') as f:
             json.dump(check, f)
 
-          if not check['success']:
+        if not check['success']:
             print('Attack check failed:', check.get('error'))
             sys.exit(0)
 
-          print(f'Conflicts: {check['conflicts_detected']}, Behind: {check['branches_behind']}')
+        print(f"Conflicts: {check['conflicts_detected']}, Behind: {check['branches_behind']}")
 
-          if check['branches_behind'] > 0 or check['conflicts_detected'] > 0:
+        if check['branches_behind'] > 0 or check['conflicts_detected'] > 0:
             merge = attack_merge(strategy='theirs', dry_run=False)
             with open('.pyqual/attack_merge.json', 'w') as f:
-              json.dump(merge, f)
-            print(f'Merge result: success={merge.get('success')}')
-          else:
+                json.dump(merge, f)
+            print(f"Merge result: success={merge.get('success')}")
+        else:
             print('Already up to date')
-        "
+        PY
       when: always
       optional: true
       timeout: 120
@@ -194,36 +194,36 @@ pipeline:
     - name: automerge
       run: |
         export PYTHONPATH=$PYTHONPATH:.
-        python3 -c "
-          from pyqual.plugins.attack import attack_check, attack_merge
-          import json
-          import sys
+        python3 - <<'PY'
+        from pyqual.plugins.attack import attack_check, attack_merge
+        import json
+        import sys
 
-          # First check if merge is possible
-          check = attack_check()
-          with open('.pyqual/attack_check.json', 'w') as f:
+        # First check if merge is possible
+        check = attack_check()
+        with open('.pyqual/attack_check.json', 'w') as f:
             json.dump(check, f)
 
-          if not check['success']:
+        if not check['success']:
             print('Attack check failed:', check.get('error'))
             sys.exit(0)  # Don't fail pipeline, just skip
 
-          print(f'Conflicts detected: {check[\"conflicts_detected\"]}')
-          print(f'Can fast-forward: {check[\"can_fast_forward\"]}')
+        print(f"Conflicts detected: {check['conflicts_detected']}")
+        print(f"Can fast-forward: {check['can_fast_forward']}")
 
-          # Perform attack merge if needed
-          if check['branches_behind'] > 0 or check['conflicts_detected'] > 0:
+        # Perform attack merge if needed
+        if check['branches_behind'] > 0 or check['conflicts_detected'] > 0:
             merge = attack_merge(strategy='theirs', dry_run=False)
             with open('.pyqual/attack_merge.json', 'w') as f:
-              json.dump(merge, f)
+                json.dump(merge, f)
 
             if merge['success']:
-              print(f'Merge successful! Resolved {merge[\"conflicts_resolved\"]} conflicts')
+                print(f"Merge successful! Resolved {merge['conflicts_resolved']} conflicts")
             else:
-              print('Merge failed:', merge.get('error'))
-          else:
+                print('Merge failed:', merge.get('error'))
+        else:
             print('Already up to date, no merge needed')
-        "
+        PY
       when: always
       optional: true
       timeout: 120
