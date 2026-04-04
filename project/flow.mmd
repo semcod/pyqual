@@ -7,26 +7,22 @@ flowchart TD
         pyqual__cli_bulk_cmds___bulk_init_impl["_bulk_init_impl"]
         pyqual__cli_bulk_cmds___bulk_run_impl["_bulk_run_impl"]
         pyqual__cli_bulk_cmds__register_bulk_commands["register_bulk_commands"]
-        pyqual__cli_observe___logs_impl["_logs_impl"]
-        pyqual__cli_observe___watch_impl["_watch_impl"]
-        pyqual__cli_observe___poll_pipeline_db["_poll_pipeline_db"]
-        pyqual__cli_observe___poll_history_file["_poll_history_file"]
-        pyqual__cli_observe___history_impl["_history_impl"]
-        pyqual__cli_observe___load_history_entries["_load_history_entries"]
-        pyqual__cli_observe___print_history_table["_print_history_table"]
-        pyqual__cli_observe___print_history_prompts["_print_history_prompts"]
-        pyqual__cli_observe___print_history_stdout["_print_history_stdout"]
-        pyqual__cli_observe___print_history_summary["_print_history_summary"]
-        pyqual__cli_observe__register_observe_commands["register_observe_commands"]
         pyqual__cli_run_helpers__count_todo_items["count_todo_items"]
+        pyqual__cli_run_helpers__extract_pytest_stage_summary["extract_pytest_stage_summary"]
+        pyqual__cli_run_helpers__extract_lint_stage_summary["extract_lint_stage_summary"]
+        pyqual__cli_run_helpers__extract_prefact_stage_summary["extract_prefact_stage_summary"]
+        pyqual__cli_run_helpers__extract_code2llm_stage_summary["extract_code2llm_stage_summary"]
+        pyqual__cli_run_helpers__extract_validation_stage_summary["extract_validation_stage_summa"]
+        pyqual__cli_run_helpers__extract_fix_stage_summary["extract_fix_stage_summary"]
+        pyqual__cli_run_helpers__extract_mypy_stage_summary["extract_mypy_stage_summary"]
+        pyqual__cli_run_helpers__extract_bandit_stage_summary["extract_bandit_stage_summary"]
+        pyqual__cli_run_helpers__extract_stage_summary["extract_stage_summary"]
+        pyqual__cli_run_helpers___enrich_analysis["_enrich_analysis"]
+        pyqual__cli_run_helpers___enrich_validation["_enrich_validation"]
         ...["+57 more"]
     end
 
     subgraph Core
-        dashboard__src__components__MetricsTrendChart__MetricsTrendChart["MetricsTrendChart"]
-        dashboard__src__components__MetricsTrendChart__data["data"]
-        dashboard__src__components__StagesChart__StagesChart["StagesChart"]
-        dashboard__src__components__StagesChart__data["data"]
         dashboard__src__App__App["App"]
         dashboard__src__App__repos["repos"]
         dashboard__src__App__handleRepositorySelect["handleRepositorySelect"]
@@ -35,14 +31,18 @@ flowchart TD
         dashboard__src__App__lastRun["lastRun"]
         dashboard__src__App__statusColor["statusColor"]
         dashboard__src__App__statusIcon["statusIcon"]
-        dashboard__src__components__Settings__Settings["Settings"]
+        dashboard__src__components__MetricsTrendChart__MetricsTrendChart["MetricsTrendChart"]
+        dashboard__src__components__MetricsTrendChart__data["data"]
+        dashboard__src__components__StagesChart__StagesChart["StagesChart"]
+        dashboard__src__components__StagesChart__data["data"]
         dashboard__src__components__Overview__Overview["Overview"]
         dashboard__src__components__Overview__totalRepos["totalRepos"]
-        ...["+281 more"]
+        dashboard__src__components__Overview__passingRepos["passingRepos"]
+        ...["+285 more"]
     end
 
     subgraph Exporters
         pyqual__api__export_results_json["export_results_json"]
     end
 
-    class dashboard__src__components__MetricsTrendChart__MetricsTrendChart,dashboard__src__components__MetricsTrendChart__data,dashboard__src__components__StagesChart__StagesChart,dashboard__src__components__StagesChart__data,dashboard__src__App__App,dashboard__src__App__repos,dashboard__src__App__handleRepositorySelect,dashboard__src__App__runs,dashboard__src__App__RepositoryCard,dashboard__src__App__lastRun entry
+    class dashboard__src__App__App,dashboard__src__App__repos,dashboard__src__App__handleRepositorySelect,dashboard__src__App__runs,dashboard__src__App__RepositoryCard,dashboard__src__App__lastRun,dashboard__src__App__statusColor,dashboard__src__App__statusIcon,dashboard__src__components__MetricsTrendChart__MetricsTrendChart,dashboard__src__components__MetricsTrendChart__data entry
