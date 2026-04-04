@@ -1,37 +1,37 @@
-# pyqual | 500 func | 62f | 23393L | python | 2026-04-04
+# pyqual | 534 func | 69f | 24827L | python | 2026-04-04
 
 HEALTH:
-  CC̄=5.5  critical=88 (limit:10)  dup=3  cycles=0
+  CC̄=5.5  critical=93 (limit:10)  dup=2  cycles=0
 
 ALERTS[20]:
-  !!! cc_exceeded      get_last_run = 33 (limit:15)
   !!! high_fan_out     run = 31 (limit:10)
   !!! high_fan_out     register_observe_commands = 29 (limit:10)
   !!! high_fan_out     main = 27 (limit:10)
-  !!! cc_exceeded      validate_config = 26 (limit:15)
   !!! high_fan_out     main = 26 (limit:10)
+  !!! high_fan_out     get_last_run = 26 (limit:10)
   !!! high_fan_out     fix_config = 23 (limit:10)
-  !!! high_fan_out     get_last_run = 21 (limit:10)
-  !!! high_fan_out     _logs_impl = 21 (limit:10)
   !!! high_fan_out     _run_single_project = 21 (limit:10)
+  !!! high_fan_out     _logs_impl = 21 (limit:10)
+  !!! high_fan_out     bulk_run = 20 (limit:10)
+  !!  cc_exceeded      run = 23 (limit:15)
 
-MODULES[84] (top by size):
+MODULES[96] (top by size):
   M[pyqual/plugins/git/main.py] 961L C:1 F:21 CC↑18 D:1 (python)
-  M[pyqual/bulk_init.py] 741L C:3 F:19 CC↑20 D:1 (python)
-  M[pyqual/pipeline.py] 623L C:10 F:26 CC↑18 D:0 (python)
+  M[pyqual/_gate_collectors.py] 658L C:0 F:25 CC↑18 D:0 (python)
+  M[pyqual/validation.py] 600L C:6 F:14 CC↑17 D:2 (python)
   M[pyqual/report.py] 565L C:0 F:18 CC↑12 D:0 (python)
+  M[pyqual/bulk_init.py] 564L C:1 F:9 CC↑20 D:1 (python)
+  M[pyqual/pipeline.py] 562L C:1 F:20 CC↑18 D:0 (python)
   M[pyqual/bulk_run.py] 559L C:3 F:7 CC↑19 D:1 (python)
   M[pyqual/api.py] 519L C:1 F:15 CC↑10 D:4 (python)
-  M[pyqual/_gate_collectors.py] 504L C:0 F:22 CC↑17 D:0 (python)
   M[pyqual/plugins/docs/main.py] 485L C:1 F:12 CC↑11 D:0 (python)
-  M[pyqual/validation.py] 481L C:6 F:9 CC↑26 D:2 (python)
   M[pyqual/plugins/deps/main.py] 464L C:1 F:10 CC↑15 D:0 (python)
   M[pyqual/cli_observe.py] 446L C:0 F:11 CC↑22 D:0 (python)
   M[pyqual/plugins/docker/main.py] 427L C:1 F:13 CC↑14 D:0 (python)
+  M[pyqual/report_generator.py] 423L C:2 F:14 CC↑15 D:0 (python)
+  M[pyqual/yaml_fixer.py] 419L C:3 F:12 CC↑10 D:1 (python)
   M[pyqual/plugins/security/main.py] 410L C:1 F:11 CC↑11 D:0 (python)
-  M[pyqual/run_parallel_fix.py] 403L C:0 F:10 CC↑18 D:0 (python)
-  M[pyqual/plugins/builtin.py] 399L C:8 F:20 CC↑13 D:0 (python)
-  LANGS: python:67/typescript:11/shell:4/javascript:2
+  LANGS: python:79/typescript:11/shell:4/javascript:2
 
 HOTSPOTS[10]:
   ★ run fan=31  // Execute pipeline loop until quality gates pass.
@@ -40,16 +40,14 @@ Output is streamed as YAML to s
   ★ register_observe_commands fan=29  // Register logs, watch, and history commands onto *app*.
   ★ main fan=27  // Run parallel fix on TODO.md items - configurable batch size with git push.
   ★ main fan=26  // Orchestrates 26 calls
-  ★ fix_config fan=23  // Use LLM to auto-repair pyqual.yaml based on project structure.
-
-Scans the projec
+  ★ get_last_run fan=26  // Get the last pipeline run from database.
 
 REFACTOR[15]:
-  [1] H/L Split get_last_run (CC=33 → target CC<10)
-  [2] H/L Split validate_config (CC=26 → target CC<10)
-  [3] H/H Split god module pyqual/bulk_init.py (741L, 3 classes)
-  [4] H/H Split god module pyqual/bulk_run.py (559L, 3 classes)
-  [5] H/H Split god module pyqual/pipeline.py (623L, 10 classes)
+  [1] H/H Split god module pyqual/bulk_init.py (564L, 1 classes)
+  [2] H/H Split god module pyqual/bulk_run.py (559L, 3 classes)
+  [3] H/H Split god module pyqual/_gate_collectors.py (658L, 0 classes)
+  [4] H/H Split god module pyqual/pipeline.py (562L, 1 classes)
+  [5] H/H Split god module pyqual/plugins/git/main.py (961L, 1 classes)
 
 EVOLUTION:
-  2026-04-04 CC̄=5.5 crit=88 23393L // Automated analysis
+  2026-04-04 CC̄=5.5 crit=93 24827L // Automated analysis
