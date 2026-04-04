@@ -10,6 +10,23 @@ goals:
 quality_gates:
 - metric: Prefact Issues
   threshold: '0'
+commands:
+- name: quality-check
+  description: Run full pyqual quality pipeline
+  run: pyqual run --config pyqual.yaml
+- name: quality-status
+  description: Check current quality gates status
+  run: pyqual status --config pyqual.yaml
+- name: quality-validate
+  description: Validate pyqual configuration without running
+  run: pyqual validate --config pyqual.yaml
+- name: quality-loop
+  description: Run pyqual with iteration limit 1 for quick check
+  run: 'echo "Running quality check..."
+
+    pyqual run --config pyqual.yaml --max-iterations 1
+
+    '
 sprints:
 - id: sprint-1
   name: Code Quality Improvements

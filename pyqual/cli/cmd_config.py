@@ -55,22 +55,26 @@ def validate(
     config: Path = typer.Option("pyqual.yaml", "--config", "-c"),
     workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
     strict: bool = typer.Option(False, "--strict", "-s", help="Exit 1 on warnings too."),
+    fix: bool = typer.Option(False, "--fix", "-f", help="Auto-fix YAML syntax errors (creates .bak backup)."),
 ) -> None:
     """Validate pyqual.yaml without running the pipeline.
 
     Checks for:
-    - YAML parse errors
+    - YAML parse errors (with line/column positions)
     - Unknown or missing tool binaries
     - Gate metric names that no collector produces
     - Stage configuration mistakes
+
+    Use --fix to auto-repair common syntax errors (tabs, unclosed quotes, etc.)
 
     Examples:
         pyqual validate
         pyqual validate --config path/to/pyqual.yaml
         pyqual validate --strict
+        pyqual validate --fix
     """
     cfg_path = Path(workdir) / config if not Path(config).is_absolute() else Path(config)
-    result = validate_config(cfg_path)
+    result = validate_config(cfg_path, try_fix=fix)
 
     SEV_STYLE = {
         Severity.ERROR:   ("[bold red]ERROR  [/]", "red"),

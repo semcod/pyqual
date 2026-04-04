@@ -32,6 +32,13 @@ from pathlib import Path
 from typing import Any
 
 from pyqual.constants import CONFIG_READ_MAX_CHARS
+from pyqual.yaml_fixer import (
+    YamlErrorType,
+    YamlFixResult,
+    YamlSyntaxIssue,
+    analyze_yaml_syntax,
+    fix_yaml_file,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -295,21 +302,62 @@ def _resolve_gate_metric(gate_key: str) -> str:
 # Validation helpers
 # ---------------------------------------------------------------------------
 
-def _load_yaml_config(config_path: Path, result: ValidationResult) -> dict[str, Any] | None:
-    """Load and parse YAML config file. Returns None on error (already added to result)."""
+def _load_yaml_config(
+    config_path: Path,
+    result: ValidationResult,
+    try_fix: bool = False,
+) -> dict[str, Any] | None:
+    """Load and parse YAML config file. Returns None on error (already added to result).
+
+    Args:
+        config_path: Path to YAML file
+        result: ValidationResult to populate with issues
+        try_fix: If True, attempt to auto-fix syntax errors
+    """
     if not config_path.exists():
         result.add(Severity.ERROR, EC.CONFIG_NOT_FOUND,
                    f"pyqual.yaml not found: {config_path}",
                    suggestion="Run 'pyqual init' to create one.")
         return None
 
+    content = config_path.read_text()
+
+    # First, run detailed syntax analysis
+    syntax_result = analyze_yaml_syntax(content)
+
+    # If there are syntax issues, report them
+    if syntax_result.issues:
+        for issue in syntax_result.issues:
+            if issue.can_fix and try_fix:
+                severity = Severity.WARNING
+                suggestion = f"Auto-fixed: {issue.error_type.value}"
+            else:
+                severity = Severity.ERROR if not issue.can_fix else Severity.WARNING
+                suggestion = issue.fixed if issue.can_fix else f"Fix at line {issue.line}, col {issue.column}"
+
+            result.add(
+                severity,
+                EC.CONFIG_YAML_PARSE,
+                issue.message,
+                suggestion=suggestion,
+            )
+
+    # If trying to fix, use fixed content
+    if try_fix and syntax_result.was_fixed:
+        content = syntax_result.fixed_content
+        # Backup original
+        backup = config_path.with_suffix(".yaml.bak")
+        config_path.rename(backup)
+        config_path.write_text(content)
+
+    # Try to parse with PyYAML
     try:
         import yaml
-        raw = yaml.safe_load(config_path.read_text())
+        raw = yaml.safe_load(content)
     except Exception as exc:
         result.add(Severity.ERROR, EC.CONFIG_YAML_PARSE,
                    f"YAML parse error: {exc}",
-                   suggestion="Fix the YAML syntax in pyqual.yaml.")
+                   suggestion="Fix the YAML syntax in pyqual.yaml or run 'pyqual validate --fix' to auto-repair.")
         return None
 
     if not isinstance(raw, dict):
@@ -427,15 +475,19 @@ def _validate_loop_config(loop_raw: dict[str, Any], result: ValidationResult) ->
 # Main validation function
 # ---------------------------------------------------------------------------
 
-def validate_config(config_path: Path) -> ValidationResult:
+def validate_config(config_path: Path, try_fix: bool = False) -> ValidationResult:
     """Validate a pyqual.yaml file and return structured issues.
 
     Does NOT run any stages — this is a static pre-flight check.
+
+    Args:
+        config_path: Path to the config file
+        try_fix: If True, attempt to auto-fix syntax errors
     """
     result = ValidationResult()
 
     # --- YAML parse ---
-    raw = _load_yaml_config(config_path, result)
+    raw = _load_yaml_config(config_path, result, try_fix=try_fix)
     if raw is None:
         return result
 
