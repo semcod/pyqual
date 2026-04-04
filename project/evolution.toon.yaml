@@ -1,57 +1,57 @@
-# code2llm/evolution | 500 func | 62f | 2026-04-04
+# code2llm/evolution | 534 func | 69f | 2026-04-04
 
 NEXT[10] (ranked by impact):
   [1] !! SPLIT           pyqual/plugins/git/main.py
       WHY: 961L, 1 classes, max CC=18
       EFFORT: ~4h  IMPACT: 17298
 
-  [2] !! SPLIT           pyqual/bulk_init.py
-      WHY: 741L, 3 classes, max CC=20
-      EFFORT: ~4h  IMPACT: 14820
+  [2] !! SPLIT           pyqual/_gate_collectors.py
+      WHY: 658L, 0 classes, max CC=18
+      EFFORT: ~4h  IMPACT: 11844
 
-  [3] !! SPLIT           pyqual/pipeline.py
-      WHY: 623L, 10 classes, max CC=18
-      EFFORT: ~4h  IMPACT: 11214
+  [3] !! SPLIT           pyqual/validation.py
+      WHY: 600L, 6 classes, max CC=17
+      EFFORT: ~4h  IMPACT: 10200
 
   [4] !  SPLIT-FUNC      run  CC=23  fan=31
       WHY: CC=23 exceeds 15
       EFFORT: ~1h  IMPACT: 713
 
-  [5] !! SPLIT-FUNC      get_last_run  CC=33  fan=21
-      WHY: CC=33 exceeds 15
-      EFFORT: ~1h  IMPACT: 693
-
-  [6] !  SPLIT-FUNC      main  CC=20  fan=26
+  [5] !  SPLIT-FUNC      main  CC=20  fan=26
       WHY: CC=20 exceeds 15
       EFFORT: ~1h  IMPACT: 520
 
-  [7] !! SPLIT-FUNC      validate_config  CC=26  fan=20
-      WHY: CC=26 exceeds 15
-      EFFORT: ~1h  IMPACT: 520
-
-  [8] !  SPLIT-FUNC      main  CC=18  fan=27
+  [6] !  SPLIT-FUNC      main  CC=18  fan=27
       WHY: CC=18 exceeds 15
       EFFORT: ~1h  IMPACT: 486
 
-  [9] !  SPLIT-FUNC      _logs_impl  CC=22  fan=21
+  [7] !  SPLIT-FUNC      _logs_impl  CC=22  fan=21
       WHY: CC=22 exceeds 15
       EFFORT: ~1h  IMPACT: 462
 
-  [10] !  SPLIT-FUNC      _run_single_project  CC=19  fan=21
+  [8] !  SPLIT-FUNC      _run_single_project  CC=19  fan=21
       WHY: CC=19 exceeds 15
       EFFORT: ~1h  IMPACT: 399
+
+  [9] !  SPLIT-FUNC      get_last_run  CC=15  fan=26
+      WHY: CC=15 exceeds 15
+      EFFORT: ~1h  IMPACT: 390
+
+  [10] !  SPLIT-FUNC      RepositoryDetail  CC=20  fan=17
+      WHY: CC=20 exceeds 15
+      EFFORT: ~1h  IMPACT: 340
 
 
 RISKS[3]:
   ⚠ Splitting pyqual/plugins/git/main.py may break 21 import paths
-  ⚠ Splitting pyqual/bulk_init.py may break 19 import paths
-  ⚠ Splitting pyqual/pipeline.py may break 26 import paths
+  ⚠ Splitting pyqual/_gate_collectors.py may break 25 import paths
+  ⚠ Splitting pyqual/validation.py may break 14 import paths
 
 METRICS-TARGET:
   CC̄:          5.5 → ≤3.8
-  max-CC:      33 → ≤16
-  god-modules: 8 → 0
-  high-CC(≥15): 25 → ≤12
+  max-CC:      23 → ≤11
+  god-modules: 9 → 0
+  high-CC(≥15): 27 → ≤13
   hub-types:   0 → ≤0
 
 PATTERNS (language parser shared logic):
@@ -79,4 +79,4 @@ PATTERNS (language parser shared logic):
     - Standardized FunctionInfo/ClassInfo models
 
 HISTORY:
-  prev CC̄=5.4 → now CC̄=5.5
+  prev CC̄=5.5 → now CC̄=5.5
