@@ -91,6 +91,11 @@ pipeline:
       when: always
       optional: true
 
+    - name: release-check
+      tool: release-check
+      when: metrics_pass
+      timeout: 60
+
     - name: publish
       tool: make-publish
       when: metrics_pass

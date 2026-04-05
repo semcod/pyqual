@@ -78,7 +78,7 @@ from pyqual.yaml_fixer import (
     fix_yaml_file,
 )
 
-__version__ = "0.1.132"
+__version__ = "0.1.133"
 
 __all__ = [
     # Public API module

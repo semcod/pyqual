@@ -3072,3 +3072,81 @@ sprints:
     model_hints:
       planning: balanced
       implementation: balanced
+  - id: ticket-0560918d
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/release_check.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/release_check.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-cb3bed1e
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in pyqual/release_check.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/release_check.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a6559570
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in pyqual/validation/release.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/validation/release.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-95ac4e75
+    name: Fix duplicate-imports issues
+    description: Resolve 1 duplicate-imports issues in pyqual/validation/release.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/validation/release.py
+    rule_id: duplicate-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-01606929
+    name: Fix magic-numbers issues
+    description: Resolve 5 magic-numbers issues in pyqual/validation/release.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - pyqual/validation/release.py
+    rule_id: magic-numbers
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f53b9099
+    name: Fix llm-generated-code issues
+    description: Resolve 1 llm-generated-code issues in pyqual/validation/release.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - pyqual/validation/release.py
+    rule_id: llm-generated-code
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced

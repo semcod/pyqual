@@ -73,9 +73,9 @@ bump-minor:
 	sed -i "s/version = \"$$CURRENT\"/version = \"$$NEW_VERSION\"/" pyproject.toml; \
 	echo "Version bumped: $$CURRENT -> $$NEW_VERSION"
 
-# Build and publish to PyPI (auto-bumps patch version)
+# Build and publish to PyPI (auto-bumps patch version, skips if version exists)
 publish: bump-patch build
-	python3 -m twine upload dist/*
+	python3 -m twine upload dist/* --skip-existing
 
 # Upload to PyPI (alias)
 upload: publish

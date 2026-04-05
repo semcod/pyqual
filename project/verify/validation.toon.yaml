@@ -1,7 +1,7 @@
-# vallm batch | 328f | 170✓ 2⚠ 40✗ | 2026-04-05
+# vallm batch | 331f | 172✓ 2⚠ 41✗ | 2026-04-05
 
 SUMMARY:
-  scanned: 328  passed: 170 (51.8%)  warnings: 2  errors: 40  unsupported: 117
+  scanned: 331  passed: 172 (52.0%)  warnings: 2  errors: 41  unsupported: 117
 
 WARNINGS[2]{path,score}:
   dashboard/vite.config.ts,0.79
@@ -11,7 +11,7 @@ WARNINGS[2]{path,score}:
     issues[1]{rule,severity,message,line}:
       js.import.resolvable,warning,Module 'vitest/config' not found,1
 
-ERRORS[40]{path,score}:
+ERRORS[41]{path,score}:
   .pyqual/attack_merge.json,0.00
     issues[1]{rule,severity,message,line}:
       syntax.tree_sitter,error,tree-sitter found 6 parse error(s) in json,
@@ -127,6 +127,9 @@ ERRORS[40]{path,score}:
   pyqual/config.py,0.96
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'yaml' not found,10
+  tests/test_release_validation.py,0.96
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,12
   tests/test_runtime_errors.py,0.96
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'pytest' not found,10
