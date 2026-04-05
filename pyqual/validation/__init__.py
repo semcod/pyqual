@@ -7,6 +7,12 @@ Validates config files before running the pipeline, detecting:
 - Gate metric names that no collector can produce
 - Stage configuration mistakes
 
+Release-state validation
+------------------------
+The ``validate_release_state`` function checks whether the package is
+ready to publish (clean git, synchronized version files, unique version
+on PyPI). Add ``tool: release-check`` as a stage before publishing.
+
 Standardized error codes
 ------------------------
 All codes use the format  ``E_PYQUAL_<DOMAIN>_<SPECIFIC>``:
@@ -16,10 +22,11 @@ All codes use the format  ``E_PYQUAL_<DOMAIN>_<SPECIFIC>``:
   E_PYQUAL_PROJECT_*  — project code issue (test failure, lint error, …)
   E_PYQUAL_PIPELINE_* — pipeline execution problem (timeout, I/O error, …)
   E_PYQUAL_LLM_*      — LLM / fix-stage problem (API key, network, model, …)
+  E_PYQUAL_RELEASE_*  — release-state problem (git dirty, version exists on PyPI, …)
 
 The domain is the first component after ``E_PYQUAL_``.  Use it to decide
 whether to auto-fix the config (CONFIG/ENV) or let the fix-stage handle it
-(PROJECT) or surface it to the user (PIPELINE/LLM).
+(PROJECT) or surface it to the user (PIPELINE/LLM/RELEASE).
 """
 
 from __future__ import annotations
@@ -52,6 +59,11 @@ from pyqual.validation.project import (
     detect_project_facts,
 )
 
+# Release-state validation
+from pyqual.validation.release import (
+    validate_release_state,
+)
+
 __all__ = [
     # Error taxonomy
     "EC",
@@ -69,4 +81,6 @@ __all__ = [
     "validate_config",
     # Project detection
     "detect_project_facts",
+    # Release-state validation
+    "validate_release_state",
 ]

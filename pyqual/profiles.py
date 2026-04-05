@@ -101,8 +101,8 @@ PROFILES: dict[str, PipelineProfile] = {
 
     "python-publish": PipelineProfile(
         description=(
-            "Full Python pipeline with PyPI publish: analyze → validate → test → fix → verify → push → publish. "
-            "Uses git-push and make-publish built-in tools — no push/publish boilerplate needed."
+            "Full Python pipeline with PyPI publish: analyze → validate → test → fix → verify → push → release-check → publish. "
+            "Uses git-push, release-check (version uniqueness + git clean), and make-publish built-in tools."
         ),
         stages=[
             {"name": "analyze", "tool": "code2llm-filtered", "optional": True, "timeout": 0},
@@ -113,6 +113,7 @@ PROFILES: dict[str, PipelineProfile] = {
             {"name": "fix", "tool": "llx-fix", "optional": True, "timeout": FIX_TIMEOUT},
             {"name": "verify", "tool": "vallm-verify", "optional": True},
             {"name": "push", "tool": "git-push", "optional": True, "timeout": 120},
+            {"name": "release-check", "tool": "release-check", "when": "metrics_pass", "timeout": 60},
             {"name": "publish", "tool": "make-publish", "optional": True, "timeout": 300},
         ],
         metrics={

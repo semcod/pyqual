@@ -172,6 +172,12 @@
     "output": "",
     "allow_failure": true
   },
+  "release-check": {
+    "binary": "python3",
+    "command": "python3 -m pyqual.release_check --workdir {workdir}",
+    "output": "",
+    "allow_failure": false
+  },
   "attack-merge": {
     "binary": "python3",
     "command": "python3 -m pyqual.plugins.attack",

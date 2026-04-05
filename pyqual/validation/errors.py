@@ -17,6 +17,7 @@ class ErrorDomain(str, Enum):
     PROJECT  = "PROJECT"   # project code issue (test / lint / gate failure)
     PIPELINE = "PIPELINE"  # subprocess timeout / I/O crash
     LLM      = "LLM"       # LLM / fix-stage problem
+    RELEASE  = "RELEASE"   # release-state (git / registry / version) preflight
 
 
 # Full error codes  (domain_name : specific_name)
@@ -56,6 +57,17 @@ class EC:
     LLM_NETWORK_ERROR       = "E_PYQUAL_LLM_NETWORK_ERROR"
     LLM_FIX_FAILED          = "E_PYQUAL_LLM_FIX_FAILED"
     LLM_GENERIC             = "E_PYQUAL_LLM_GENERIC"
+    # RELEASE (preflight release-state validation)
+    RELEASE_GIT_NOT_REPO      = "E_PYQUAL_RELEASE_GIT_NOT_REPO"
+    RELEASE_GIT_DIRTY         = "E_PYQUAL_RELEASE_GIT_DIRTY"
+    RELEASE_GIT_BEHIND        = "E_PYQUAL_RELEASE_GIT_BEHIND"
+    RELEASE_METADATA_MISSING  = "E_PYQUAL_RELEASE_METADATA_MISSING"
+    RELEASE_VERSION_MISMATCH  = "E_PYQUAL_RELEASE_VERSION_MISMATCH"
+    RELEASE_MODULE_VERSION_MISMATCH = "E_PYQUAL_RELEASE_MODULE_VERSION_MISMATCH"
+    RELEASE_INVALID_VERSION   = "E_PYQUAL_RELEASE_INVALID_VERSION"
+    RELEASE_REGISTRY_UNSUPPORTED = "E_PYQUAL_RELEASE_REGISTRY_UNSUPPORTED"
+    RELEASE_REGISTRY_UNAVAILABLE = "E_PYQUAL_RELEASE_REGISTRY_UNAVAILABLE"
+    RELEASE_VERSION_EXISTS    = "E_PYQUAL_RELEASE_VERSION_EXISTS"
 
 
 def error_domain(code: str) -> ErrorDomain | None:
