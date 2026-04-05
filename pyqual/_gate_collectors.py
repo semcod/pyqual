@@ -178,6 +178,11 @@ def _from_secrets(workdir: Path) -> dict[str, float]:
     return result
 
 
+def _count_by_severity(items: list, severity: str) -> int:
+    """Count items with given severity level."""
+    return sum(1 for v in items if v.get("severity", "").lower() == severity)
+
+
 def _from_vulnerabilities(workdir: Path) -> dict[str, float]:
     """Extract vulnerability metrics using plugin if available."""
     if _security_collector:
@@ -190,28 +195,23 @@ def _from_vulnerabilities(workdir: Path) -> dict[str, float]:
     # Legacy fallback
     result: dict[str, float] = {}
     vuln_path = workdir / ".pyqual" / "vulns.json"
-    if vuln_path.exists():
-        try:
-            data = json.loads(vuln_path.read_text())
-            if isinstance(data, list):
-                critical = sum(1 for v in data if v.get("severity", "").lower() == "critical")
-                high = sum(1 for v in data if v.get("severity", "").lower() == "high")
-                medium = sum(1 for v in data if v.get("severity", "").lower() == "medium")
-                result["vuln_critical"] = float(critical)
-                result["vuln_high"] = float(high)
-                result["vuln_medium"] = float(medium)
-                result["vuln_count"] = float(len(data))
-            elif isinstance(data, dict):
-                vulns = data.get("vulnerabilities", [])
-                critical = sum(1 for v in vulns if v.get("severity", "").lower() == "critical")
-                high = sum(1 for v in vulns if v.get("severity", "").lower() == "high")
-                medium = sum(1 for v in vulns if v.get("severity", "").lower() == "medium")
-                result["vuln_critical"] = float(critical)
-                result["vuln_high"] = float(high)
-                result["vuln_medium"] = float(medium)
-                result["vuln_count"] = float(len(vulns))
-        except (json.JSONDecodeError, TypeError):
-            pass
+    if not vuln_path.exists():
+        return result
+    try:
+        data = json.loads(vuln_path.read_text())
+        if isinstance(data, list):
+            result["vuln_critical"] = float(_count_by_severity(data, "critical"))
+            result["vuln_high"] = float(_count_by_severity(data, "high"))
+            result["vuln_medium"] = float(_count_by_severity(data, "medium"))
+            result["vuln_count"] = float(len(data))
+        elif isinstance(data, dict):
+            vulns = data.get("vulnerabilities", [])
+            result["vuln_critical"] = float(_count_by_severity(vulns, "critical"))
+            result["vuln_high"] = float(_count_by_severity(vulns, "high"))
+            result["vuln_medium"] = float(_count_by_severity(vulns, "medium"))
+            result["vuln_count"] = float(len(vulns))
+    except (json.JSONDecodeError, TypeError):
+        pass
     return result
 
 

@@ -303,19 +303,44 @@ def _print_cycle_completion(remaining: int, max_items: int) -> None:
         print("\n✅ All TODO items processed!")
 
 
+def _setup_batch(workdir: Path, batch_items: list[tuple[str, str]]) -> Path:
+    """Create temp batch file with TODO items."""
+    batch_file = workdir / ".pyqual" / "todo_batch.md"
+    batch_file.parent.mkdir(parents=True, exist_ok=True)
+    content = "# TODO Batch (auto-generated)\n\n"
+    for _, text in batch_items:
+        content += f"- [ ] {text}\n"
+    batch_file.write_text(content)
+    return batch_file
+
+
+def _run_tools_parallel(
+    tool_configs: list[dict],
+    workdir: Path,
+) -> list[ToolResult]:
+    """Run tools in parallel and return results."""
+    results = []
+    with ThreadPoolExecutor(max_workers=len(tool_configs)) as executor:
+        futures = {
+            executor.submit(run_tool, cfg["name"], cfg["command"], workdir, cfg["timeout"]): cfg["name"]
+            for cfg in tool_configs
+        }
+        for future in as_completed(futures):
+            results.append(future.result())
+    return results
+
+
 def main() -> int:
     """Run parallel fix on TODO.md items - configurable batch size with git push."""
     args = parse_args()
     
     workdir = Path.cwd()
     todo_path = workdir / "TODO.md"
-    batch_file = workdir / ".pyqual" / "todo_batch.md"
     
     if not todo_path.exists():
         print("No TODO.md found — skipping")
         return 0
     
-    # Get batch of items
     batch_items, total_pending = get_todo_batch(todo_path, args.max_items)
     
     if not batch_items:
@@ -323,31 +348,23 @@ def main() -> int:
         return 0
     
     print(f"Processing {len(batch_items)}/{total_pending} TODO items (max {args.max_items} per cycle)")
-    for i, (line, text) in enumerate(batch_items, 1):
+    for i, (_, text) in enumerate(batch_items, 1):
         print(f"  {i}. {text[:60]}{'...' if len(text) > 60 else ''}")
     
-    # Create temp batch file with only these items
-    batch_file.parent.mkdir(parents=True, exist_ok=True)
-    batch_content = "# TODO Batch (auto-generated)\n\n"
-    for line, text in batch_items:
-        batch_content += f"- [ ] {text}\n"
-    batch_file.write_text(batch_content)
+    batch_file = _setup_batch(workdir, batch_items)
     print(f"\nCreated batch file: {batch_file}")
     
-    # Get available tools
     llm_model = os.environ.get("LLM_MODEL")
     tools = get_available_tools(str(batch_file), len(batch_items), llm_model, skip_claude=args.skip_claude)
     
     if not tools:
         print("\nNo fix tools available — skipping")
-        if batch_file.exists():
-            batch_file.unlink()
+        batch_file.unlink()
         return 0
     
     print(f"\nRunning {len(tools)} tool(s) in parallel...")
     start_time = time.monotonic()
     
-    # Convert tools to configs
     tool_configs = [tool.to_config() for tool in tools]
     
     if args.dry_run:
@@ -355,43 +372,24 @@ def main() -> int:
         for cfg in tool_configs:
             print(f"  - {cfg['name']}: timeout={cfg['timeout']}s")
         print("\n[DRY RUN] Skipping actual execution")
+        batch_file.unlink()
         return 0
     
-    # Run tools in parallel
-    results = []
-    with ThreadPoolExecutor(max_workers=len(tool_configs)) as executor:
-        futures = {
-            executor.submit(run_tool, cfg["name"], cfg["command"], workdir, cfg["timeout"]): cfg["name"]
-            for cfg in tool_configs
-        }
-        
-        for future in as_completed(futures):
-            results.append(future.result())
-    
+    results = _run_tools_parallel(tool_configs, workdir)
     total_duration = time.monotonic() - start_time
     
-    # Check if any changes were made
     changed_files = _check_git_changes(workdir)
-    
-    # Mark completed TODO items based on changed files
     completed_count = mark_completed_todos(todo_path, changed_files)
     
-    # Git commit and push if there are changes
-    pushed = False
-    if changed_files:
-        pushed = git_commit_and_push(workdir, completed_count)
+    pushed = git_commit_and_push(workdir, completed_count) if changed_files else False
     
-    # Cleanup batch file
-    if batch_file.exists():
-        batch_file.unlink()
+    batch_file.unlink()
     
-    # Generate YAML output
     _print_yaml_results(
         results, changed_files, total_pending, completed_count,
         args.max_items, len(batch_items), total_duration, pushed
     )
     
-    # Cycle completion message
     remaining = total_pending - completed_count
     _print_cycle_completion(remaining, args.max_items)
     

@@ -128,35 +128,12 @@ def git_scan_cmd(
         console.print("[green]✓ No secrets found[/green]")
         raise typer.Exit(0)
     
-    # Group by severity
-    critical = [s for s in secrets if s.get("severity") == "CRITICAL"]
-    high = [s for s in secrets if s.get("severity") == "HIGH"]
-    medium = [s for s in secrets if s.get("severity") == "MEDIUM"]
-    low = [s for s in secrets if s.get("severity") == "LOW"]
-    
     console.print(f"\n[red]Found {len(secrets)} potential secret(s):[/red]")
     
-    def show_findings(findings: list[dict], color: str, label: str) -> None:
-        if not findings:
-            return
-        console.print(f"\n[{color}]{label} ({len(findings)}):[/{color}]")
-        for f in findings[:10]:  # Show first 10
-            file = f.get("file", "unknown")
-            line = f.get("line", 0)
-            type_ = f.get("type", "unknown")
-            provider = f.get("provider", "Unknown")
-            raw = f.get("raw", "")[:30]
-            scanner = f.get("scanner", "builtin")
-            console.print(f"  [{color}]• {file}:{line} - {type_} ({provider}) via {scanner}[/{color}]")
-            if raw:
-                console.print(f"    [dim]{raw}[/dim]")
-        if len(findings) > 10:
-            console.print(f"  [dim]... and {len(findings) - 10} more[/dim]")
-    
-    show_findings(critical, "red", "CRITICAL")
-    show_findings(high, "yellow", "HIGH")
-    show_findings(medium, "dim", "MEDIUM")
-    show_findings(low, "dim", "LOW")
+    _print_severity_group(secrets, "CRITICAL", "red", console)
+    _print_severity_group(secrets, "HIGH", "yellow", console)
+    _print_severity_group(secrets, "MEDIUM", "dim", console)
+    _print_severity_group(secrets, "LOW", "dim", console)
     
     # Recommendations
     console.print("\n[yellow]Recommendations:[/yellow]")
@@ -164,7 +141,10 @@ def git_scan_cmd(
     console.print("  2. Add to .gitignore if these are test/example values")
     console.print("  3. Use git filter-repo to remove from history if committed")
     
-    if fail_on_findings and (critical or high):
+    has_critical = any(s.get("severity") == "CRITICAL" for s in secrets)
+    has_high = any(s.get("severity") == "HIGH" for s in secrets)
+    
+    if fail_on_findings and (has_critical or has_high):
         console.print("\n[red]✗ Critical/High severity secrets found - failing[/red]")
         raise typer.Exit(1)
     
