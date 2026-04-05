@@ -76,6 +76,79 @@ PROFILES: dict[str, PipelineProfile] = {
         },
     ),
 
+    "python-minimal": PipelineProfile(
+        description=(
+            "Minimal Python quality loop with filtered tools — replaces custom_tools boilerplate. "
+            "Stages: analyze → validate → lint → fix → test. "
+            "Uses code2llm-filtered and vallm-filtered with sensible default excludes "
+            "(skips .git, .venv, build, dist, __pycache__, node_modules, etc.)."
+        ),
+        stages=[
+            {"name": "analyze", "tool": "code2llm-filtered", "optional": True, "timeout": 0},
+            {"name": "validate", "tool": "vallm-filtered", "optional": True, "timeout": 0},
+            {"name": "lint", "tool": "ruff", "optional": True},
+            {"name": "prefact", "tool": "prefact", "optional": True, "timeout": PREFACT_TIMEOUT},
+            {"name": "fix", "tool": "llx-fix", "optional": True, "timeout": FIX_TIMEOUT},
+            {"name": "test", "run": "python3 -m pytest -q", "when": "always"},
+        ],
+        metrics={
+            "cc_max": DEFAULT_CC_MAX,
+            "critical_max": 0,
+        },
+        loop={"max_iterations": 3, "on_fail": "report"},
+        env={"LLM_MODEL": "openrouter/qwen/qwen3-coder-next"},
+    ),
+
+    "python-publish": PipelineProfile(
+        description=(
+            "Full Python pipeline with PyPI publish: analyze → validate → test → fix → verify → push → publish. "
+            "Uses git-push and make-publish built-in tools — no push/publish boilerplate needed."
+        ),
+        stages=[
+            {"name": "analyze", "tool": "code2llm-filtered", "optional": True, "timeout": 0},
+            {"name": "validate", "tool": "vallm-filtered", "optional": True, "timeout": 0},
+            {"name": "lint", "tool": "ruff", "optional": True},
+            {"name": "test", "run": "python3 -m pytest -q", "when": "always"},
+            {"name": "prefact", "tool": "prefact", "optional": True, "timeout": PREFACT_TIMEOUT},
+            {"name": "fix", "tool": "llx-fix", "optional": True, "timeout": FIX_TIMEOUT},
+            {"name": "verify", "tool": "vallm-verify", "optional": True},
+            {"name": "push", "tool": "git-push", "optional": True, "timeout": 120},
+            {"name": "publish", "tool": "make-publish", "optional": True, "timeout": 300},
+        ],
+        metrics={
+            "cc_max": DEFAULT_CC_MAX,
+            "coverage_min": DEFAULT_COVERAGE_MIN,
+        },
+        loop={"max_iterations": 3, "on_fail": "report"},
+        env={"LLM_MODEL": "openrouter/qwen/qwen3-coder-next"},
+    ),
+
+    "python-secure": PipelineProfile(
+        description=(
+            "Security-hardened Python pipeline: analyze → validate → audit → bandit → secrets → test → fix. "
+            "Adds pip-audit, bandit and detect-secrets scans to the standard quality loop."
+        ),
+        stages=[
+            {"name": "analyze", "tool": "code2llm-filtered", "optional": True, "timeout": 0},
+            {"name": "validate", "tool": "vallm-filtered", "optional": True, "timeout": 0},
+            {"name": "lint", "tool": "ruff", "optional": True},
+            {"name": "audit", "tool": "pip-audit", "optional": True, "timeout": 120},
+            {"name": "bandit", "tool": "bandit", "optional": True, "timeout": 60},
+            {"name": "secrets", "tool": "detect-secrets", "optional": True, "timeout": 60},
+            {"name": "test", "run": "python3 -m pytest -q", "when": "always"},
+            {"name": "prefact", "tool": "prefact", "optional": True, "timeout": PREFACT_TIMEOUT},
+            {"name": "fix", "tool": "llx-fix", "optional": True, "timeout": FIX_TIMEOUT},
+            {"name": "verify", "tool": "vallm-verify", "optional": True},
+        ],
+        metrics={
+            "cc_max": DEFAULT_CC_MAX,
+            "vuln_high_max": 0,
+            "vuln_critical_max": 0,
+        },
+        loop={"max_iterations": 3, "on_fail": "report"},
+        env={"LLM_MODEL": "openrouter/qwen/qwen3-coder-next"},
+    ),
+
     "lint-only": PipelineProfile(
         description="Lint-only pipeline: ruff → mypy (no LLM, no fix)",
         stages=[

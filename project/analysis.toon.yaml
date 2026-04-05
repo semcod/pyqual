@@ -1,33 +1,32 @@
-# code2llm | 98f 18848L | python:81,typescript:11,shell:4,javascript:2 | 2026-04-05
-# CC̄=5.6 | critical:29/582 | dups:0 | cycles:0
+# code2llm | 102f 18937L | python:85,typescript:11,shell:4,javascript:2 | 2026-04-05
+# CC̄=5.5 | critical:28/588 | dups:0 | cycles:0
 
 HEALTH[20]:
-  🔴 GOD   pyqual/validation.py = 600L, 6 classes, 14m, max CC=17
   🟡 CC    RepositoryDetail CC=20 (limit:15)
-  🟡 CC    get_last_run CC=15 (limit:15)
   🟡 CC    main CC=20 (limit:15)
+  🟡 CC    get_last_run CC=15 (limit:15)
   🟡 CC    run CC=15 (limit:15)
   🟡 CC    _bulk_run_impl CC=19 (limit:15)
   🟡 CC    main CC=18 (limit:15)
   🟡 CC    _from_vulnerabilities CC=18 (limit:15)
   🟡 CC    _from_radon CC=15 (limit:15)
-  🟡 CC    _load_yaml_config CC=17 (limit:15)
   🟡 CC    _run_single_project CC=19 (limit:15)
   🟡 CC    _build_project_row CC=19 (limit:15)
   🟡 CC    bulk_run CC=17 (limit:15)
-  🟡 CC    _classify_heuristic CC=20 (limit:15)
+  🟡 CC    format_run_summary CC=19 (limit:15)
   🟡 CC    _logs_impl CC=22 (limit:15)
+  🟡 CC    _execute_stage CC=17 (limit:15)
+  🟡 CC    _classify_error CC=17 (limit:15)
   🟡 CC    git_status_cmd CC=15 (limit:15)
   🟡 CC    git_scan_cmd CC=17 (limit:15)
   🟡 CC    git_push_cmd CC=19 (limit:15)
-  🟡 CC    format_run_summary CC=19 (limit:15)
-  🟡 CC    _execute_stage CC=17 (limit:15)
+  🟡 CC    run CC=23 (limit:15)
+  🟡 CC    validate CC=19 (limit:15)
 
-REFACTOR[2]:
-  1. split pyqual/validation.py  (god module)
-  2. split 19 high-CC methods  (CC>15)
+REFACTOR[1]:
+  1. split 20 high-CC methods  (CC>15)
 
-PIPELINES[289]:
+PIPELINES[295]:
   [1] Src [MetricsTrendChart]: MetricsTrendChart
       PURITY: 100% pure
   [2] Src [data]: data
@@ -45,13 +44,12 @@ LAYERS:
   │ project.sh                  35L  0C    0m  CC=0.0    ←0
   │ SUGGESTED_COMMANDS.sh        4L  0C    0m  CC=0.0    ←0
   │
-  pyqual/                         CC̄=5.8    ←in:29  →out:3
+  pyqual/                         CC̄=5.8    ←in:32  →out:3
   │ !! main                       961L  1C   21m  CC=18     ←1
   │ !! _gate_collectors           700L  0C   26m  CC=18     ←0
   │ !! pipeline                   669L  1C   23m  CC=17     ←0
-  │ !! validation                 600L  6C   14m  CC=17     ←2
+  │ !! bulk_init                  567L  1C   15m  CC=14     ←1
   │ !! report                     565L  0C   18m  CC=12     ←0
-  │ !! bulk_init                  564L  1C    9m  CC=20     ←1
   │ !! bulk_run                   559L  3C    7m  CC=19     ←1
   │ !! api                        519L  1C   15m  CC=10     ←4
   │ main                       485L  1C   12m  CC=11     ←0
@@ -72,12 +70,14 @@ LAYERS:
   │ tools                      323L  1C   15m  CC=8      ←4
   │ !! cmd_git                    321L  0C    5m  CC=19     ←0
   │ !! cmd_config                 266L  0C    5m  CC=19     ←0
+  │ !! config_check               265L  0C    6m  CC=17     ←0
   │ config                     257L  4C    8m  CC=13     ←11
   │ !! cli_bulk_cmds              246L  0C    3m  CC=19     ←0
   │ cmd_tune                   240L  0C    7m  CC=12     ←0
   │ main                       231L  0C    6m  CC=8      ←1
   │ custom_fix                 218L  0C    3m  CC=13     ←0
   │ !! auto_closer                208L  0C    4m  CC=20     ←0
+  │ errors                     198L  4C    4m  CC=11     ←0
   │ gates                      197L  4C   11m  CC=9      ←0
   │ cli_helpers                193L  0C    7m  CC=11     ←1
   │ cmd_mcp                    176L  0C    4m  CC=12     ←0
@@ -93,15 +93,18 @@ LAYERS:
   │ constants                  107L  0C    0m  CC=0.0    ←0
   │ llx_mcp                    101L  0C    2m  CC=6      ←0
   │ cmd_info                    91L  0C    2m  CC=5      ←0
+  │ schema                      91L  2C    2m  CC=3      ←1
   │ cmd_init                    90L  0C    2m  CC=7      ←0
   │ _base                       87L  3C    7m  CC=5      ←3
   │ __init__                    84L  0C    3m  CC=5      ←2
   │ main                        77L  1C    2m  CC=8      ←0
+  │ __init__                    72L  0C    0m  CC=0.0    ←0
   │ llx_mcp_service             68L  0C    4m  CC=1      ←0
   │ github_tasks                64L  0C    3m  CC=6      ←1
   │ main                        62L  1C    3m  CC=4      ←0
   │ bulk_init_classify          61L  1C    1m  CC=8      ←1
   │ stage_names                 61L  0C    5m  CC=7      ←3
+  │ project                     60L  0C    2m  CC=8      ←2
   │ base                        53L  2C    5m  CC=2      ←0
   │ pipeline_results            52L  3C    0m  CC=0.0    ←0
   │ aider                       49L  1C    3m  CC=2      ←0
@@ -148,14 +151,15 @@ LAYERS:
   │
 
 COUPLING:
-                      pyqual.cli          pyqual  pyqual.plugins    run_analysis
-      pyqual.cli              ──              24              13                  !! fan-out
-          pyqual             ←24              ──               3              ←1  hub
-  pyqual.plugins             ←13               4              ──                  hub
-    run_analysis                               1                              ──
+                            pyqual.cli             pyqual     pyqual.plugins  pyqual.validation       run_analysis
+         pyqual.cli                 ──                 22                 13                  2                     !! fan-out
+             pyqual                ←22                 ──                  3                 ←5                 ←1  hub
+     pyqual.plugins                ←13                  4                 ──                                        hub
+  pyqual.validation                 ←2                  5                                    ──                   
+       run_analysis                                     1                                                       ──
   CYCLES: none
+  HUB: pyqual/ (fan-in=32)
   HUB: pyqual.plugins/ (fan-in=16)
-  HUB: pyqual/ (fan-in=29)
   SMELL: pyqual.cli/ fan-out=37 → split needed
 
 EXTERNAL:

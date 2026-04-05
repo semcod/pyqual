@@ -58,6 +58,7 @@ class StageConfig:
     when: str = ""            # auto-inferred from name if empty; see _STAGE_WHEN_DEFAULTS
     timeout: int = DEFAULT_STAGE_TIMEOUT
     capture_output: bool = True
+    exclude: list[str] = field(default_factory=list)  # extra --exclude args appended to tool command
 
     def __post_init__(self) -> None:
         if not self.when:
@@ -180,6 +181,8 @@ class PyqualConfig:
     def _validate_stages(raw_stages: list[dict[str, Any]]) -> list["StageConfig"]:
         """Validate and construct StageConfig list from raw dicts."""
         _stage_fields = {f.name for f in StageConfig.__dataclass_fields__.values()}
+        # Fields silently ignored (kept for forward-compat / user clarity in YAML)
+        _ignored_fields = {"config", "env", "description", "doc"}
         stages = []
         for s in raw_stages:
             filtered = {k: v for k, v in s.items() if k in _stage_fields}
@@ -209,6 +212,14 @@ class PyqualConfig:
 pipeline:
   name: quality-loop
 
+  # Quickstart: replace all of this with a single profile line:
+  #   profile: python-minimal   # analyze → validate → lint → fix → test
+  #   profile: python-publish   # + git-push and make-publish
+  #   profile: python-secure    # + pip-audit, bandit, detect-secrets
+  #   profile: python           # standard (needs manual stage config)
+  #   profile: ci               # CI-only, no fix
+  # See: pyqual profiles
+
   # Quality gates — pipeline iterates until ALL pass
   metrics:
     cc_max: 15           # cyclomatic complexity per function
@@ -223,10 +234,10 @@ pipeline:
   # when: after_fix         — run only after the fix stage ran in this iteration
   stages:
     - name: analyze
-      tool: code2llm
+      tool: code2llm-filtered   # uses sensible exclude defaults
 
     - name: validate
-      tool: vallm
+      tool: vallm-filtered      # uses sensible exclude defaults
 
     - name: prefact
       tool: prefact
@@ -242,6 +253,11 @@ pipeline:
 
     - name: test
       tool: pytest
+
+    - name: push
+      tool: git-push            # built-in: git add + commit + push
+      optional: true
+      timeout: 120
 
   # Loop behavior
   loop:

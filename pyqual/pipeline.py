@@ -189,6 +189,9 @@ class Pipeline:
         If the tool is missing and ``stage.optional`` is set, returns
         empty command to signal the stage should be skipped.
         Raises RuntimeError for missing non-optional tools.
+
+        When ``stage.exclude`` is set, the entries are appended to the
+        resolved command as ``--exclude item1 item2 ...``.
         """
         preset = get_preset(stage.tool)
         if preset is None:
@@ -206,7 +209,16 @@ class Pipeline:
                 f"not found on PATH. Install it or set 'optional: true'."
             )
 
-        return preset.shell_command("."), preset.allow_failure
+        command = preset.shell_command(".")
+
+        # Append extra --exclude args if stage has exclude: list defined
+        if stage.exclude:
+            exclude_str = " ".join(stage.exclude)
+            command = f"{command} --exclude {exclude_str}"
+            log.debug("stage=%s: appended --exclude %s", stage.name, exclude_str)
+
+        return command, preset.allow_failure
+
 
     def _resolve_env(self) -> dict[str, str]:
         """Resolve ${VAR} references in config env values against os.environ.

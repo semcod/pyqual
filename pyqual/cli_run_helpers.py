@@ -319,6 +319,64 @@ def build_run_summary(report: dict[str, Any]) -> dict[str, Any]:
     return summary
 
 
+def _format_ticket_summary(summary: dict[str, Any]) -> str | None:
+    """Format ticket/TODO progress section."""
+    todo_active = summary.get("todo_active", 0)
+    todo_completed = summary.get("todo_completed", 0)
+    todo_total = summary.get("todo_total", 0)
+    todo_remaining = todo_total - todo_completed
+
+    if todo_total == 0:
+        return None
+
+    ticket_parts = []
+    if todo_completed > 0:
+        ticket_parts.append(f"✓ {todo_completed} completed")
+    if todo_remaining > 0:
+        ticket_parts.append(f"○ {todo_remaining} remaining")
+    if todo_active > 0 and todo_active != todo_remaining:
+        ticket_parts.append(f"⚡ {todo_active} active")
+
+    parts = [f"Tickets: {', '.join(ticket_parts)}"]
+    pct = (todo_completed / todo_total) * 100
+    parts.append(f"Progress: {pct:.0f}% ({todo_completed}/{todo_total})")
+    return "; ".join(parts)
+
+
+def _format_fix_summary(summary: dict[str, Any]) -> str | None:
+    """Format fix stage outcomes section."""
+    fix_result = summary.get("fix_result")
+    if not fix_result or fix_result == "unknown":
+        return None
+
+    fix_parts = []
+    files_changed = summary.get("fix_files_changed", 0)
+    fix_failed = summary.get("fix_failed", 0)
+    fix_errors = summary.get("fix_errors", 0)
+
+    if files_changed > 0:
+        fix_parts.append(f"✓ {files_changed} files changed")
+    if fix_failed > 0:
+        fix_parts.append(f"✗ {fix_failed} failed")
+    if fix_errors > 0:
+        fix_parts.append(f"⚠ {fix_errors} errors")
+
+    if fix_parts:
+        return f"Fix ({fix_result}): {' | '.join(fix_parts)}"
+    return f"Fix: {fix_result}"
+
+
+def _format_delivery_summary(summary: dict[str, Any]) -> str | None:
+    """Format delivery/push outcomes section."""
+    if "delivery_failures" not in summary:
+        return None
+
+    failures = summary["delivery_failures"]
+    if isinstance(failures, list) and failures:
+        return f"✗ Delivery failed: {'; '.join(str(item) for item in failures)}"
+    return "✓ Delivered"
+
+
 def format_run_summary(summary: dict[str, Any]) -> str:
     """Format run summary dict into human-readable string with ticket outcomes."""
     if not summary:
@@ -326,55 +384,18 @@ def format_run_summary(summary: dict[str, Any]) -> str:
 
     parts: list[str] = []
 
-    # Ticket outcomes: completed vs remaining vs active
-    todo_active = summary.get("todo_active", 0)
-    todo_completed = summary.get("todo_completed", 0)
-    todo_total = summary.get("todo_total", 0)
-    todo_remaining = todo_total - todo_completed
+    # Each section is a separate helper
+    ticket_section = _format_ticket_summary(summary)
+    if ticket_section:
+        parts.append(ticket_section)
 
-    if todo_total > 0:
-        ticket_parts = []
-        if todo_completed > 0:
-            ticket_parts.append(f"✓ {todo_completed} completed")
-        if todo_remaining > 0:
-            ticket_parts.append(f"○ {todo_remaining} remaining")
-        if todo_active > 0 and todo_active != todo_remaining:
-            ticket_parts.append(f"⚡ {todo_active} active")
+    fix_section = _format_fix_summary(summary)
+    if fix_section:
+        parts.append(fix_section)
 
-        parts.append(f"Tickets: {', '.join(ticket_parts)}")
-
-        # Progress percentage
-        if todo_total > 0:
-            pct = (todo_completed / todo_total) * 100
-            parts.append(f"Progress: {pct:.0f}% ({todo_completed}/{todo_total})")
-
-    # Fix stage outcomes
-    fix_result = summary.get("fix_result")
-    if fix_result and fix_result != "unknown":
-        fix_parts = []
-        files_changed = summary.get("fix_files_changed", 0)
-        fix_failed = summary.get("fix_failed", 0)
-        fix_errors = summary.get("fix_errors", 0)
-
-        if files_changed > 0:
-            fix_parts.append(f"✓ {files_changed} files changed")
-        if fix_failed > 0:
-            fix_parts.append(f"✗ {fix_failed} failed")
-        if fix_errors > 0:
-            fix_parts.append(f"⚠ {fix_errors} errors")
-
-        if fix_parts:
-            parts.append(f"Fix ({fix_result}): {' | '.join(fix_parts)}")
-        else:
-            parts.append(f"Fix: {fix_result}")
-
-    # Delivery/push outcomes
-    if "delivery_failures" in summary:
-        failures = summary["delivery_failures"]
-        if isinstance(failures, list) and failures:
-            parts.append(f"✗ Delivery failed: {'; '.join(str(item) for item in failures)}")
-        else:
-            parts.append("✓ Delivered")
+    delivery_section = _format_delivery_summary(summary)
+    if delivery_section:
+        parts.append(delivery_section)
 
     return f"[bold]Run summary[/bold]: {'; '.join(parts)}" if parts else ""
 

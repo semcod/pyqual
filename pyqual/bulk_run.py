@@ -337,6 +337,41 @@ def _run_single_project(
 # Dashboard table builder
 # ---------------------------------------------------------------------------
 
+def _build_progress_bar(s: ProjectRunState) -> str:
+    """Build progress bar/percentage string."""
+    pct = s.progress_pct
+    if s.status == RunStatus.PASSED:
+        return "[green]100%[/]"
+    if s.status in (RunStatus.QUEUED, RunStatus.SKIPPED):
+        return ""
+    if s.status in (RunStatus.FAILED, RunStatus.ERROR, RunStatus.TIMEOUT):
+        return f"[red]{pct}%[/]"
+    filled = pct // 10
+    bar = "█" * filled + "░" * (10 - filled)
+    return f"[cyan]{bar}[/]"
+
+
+def _build_gates_text(s: ProjectRunState) -> str:
+    """Build gates status string."""
+    if s.gates_total == 0:
+        return ""
+    if s.gates_passed == s.gates_total:
+        return f"[green]{s.gates_label}[/]"
+    if s.gates_passed > 0:
+        return f"[yellow]{s.gates_label}[/]"
+    return f"[red]{s.gates_label}[/]"
+
+
+def _build_time_text(s: ProjectRunState) -> str:
+    """Build elapsed time string."""
+    elapsed = s.elapsed
+    if elapsed > 60:
+        return f"{elapsed / 60:.1f}m"
+    if elapsed > 0:
+        return f"{elapsed:.1f}s"
+    return ""
+
+
 def _build_project_row(s: ProjectRunState, show_last_line: bool,
                         show_analysis: bool = False) -> list:
     """Build a single dashboard table row for one project state."""
@@ -344,49 +379,25 @@ def _build_project_row(s: ProjectRunState, show_last_line: bool,
     style = STATUS_STYLE.get(s.status, "")
     status_text = Text(f"{icon} {s.status.value}", style=style)
 
-    if s.max_iterations > 0 and s.status not in (RunStatus.QUEUED, RunStatus.SKIPPED):
-        iter_text = f"{s.iteration}/{s.max_iterations}"
-    else:
-        iter_text = ""
+    iter_text = f"{s.iteration}/{s.max_iterations}" if s.max_iterations > 0 and s.status not in (RunStatus.QUEUED, RunStatus.SKIPPED) else ""
 
     stage_text = s.current_stage
-
-    pct = s.progress_pct
-    if s.status == RunStatus.PASSED:
-        progress = "[green]100%[/]"
-    elif s.status in (RunStatus.QUEUED, RunStatus.SKIPPED):
-        progress = ""
-    elif s.status in (RunStatus.FAILED, RunStatus.ERROR, RunStatus.TIMEOUT):
-        progress = f"[red]{pct}%[/]"
-    else:
-        filled = pct // 10
-        bar = "█" * filled + "░" * (10 - filled)
-        progress = f"[cyan]{bar}[/]"
-
-    if s.gates_total > 0:
-        if s.gates_passed == s.gates_total:
-            gates_text = f"[green]{s.gates_label}[/]"
-        elif s.gates_passed > 0:
-            gates_text = f"[yellow]{s.gates_label}[/]"
-        else:
-            gates_text = f"[red]{s.gates_label}[/]"
-    else:
-        gates_text = ""
-
-    elapsed = s.elapsed
-    if elapsed > 60:
-        time_text = f"{elapsed / 60:.1f}m"
-    elif elapsed > 0:
-        time_text = f"{elapsed:.1f}s"
-    else:
-        time_text = ""
-
     if s.error_msg and s.status in (RunStatus.ERROR, RunStatus.TIMEOUT):
         stage_text = f"[red]{s.error_msg[:ERROR_MSG_PREVIEW_CHARS]}[/]"
 
-    row: list = [s.name, status_text, iter_text, stage_text, progress, gates_text, time_text]
+    row: list = [
+        s.name,
+        status_text,
+        iter_text,
+        stage_text,
+        _build_progress_bar(s),
+        _build_gates_text(s),
+        _build_time_text(s),
+    ]
+
     if show_last_line:
         row.append(s.last_line[:50] if s.last_line else "")
+
     if show_analysis:
         if s.analysis.startswith("🤔"):
             row.append(f"[dim]{s.analysis}[/]")
@@ -395,6 +406,7 @@ def _build_project_row(s: ProjectRunState, show_last_line: bool,
             row.append(f"[{color}]{s.analysis[:60]}[/]")
         else:
             row.append("")
+
     return row
 
 

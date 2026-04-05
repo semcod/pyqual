@@ -4,12 +4,12 @@
 
 - **Project**: /home/tom/github/semcod/pyqual
 - **Primary Language**: python
-- **Languages**: python: 94, typescript: 11, shell: 5, javascript: 2
+- **Languages**: python: 98, typescript: 11, shell: 5, javascript: 2
 - **Analysis Mode**: static
-- **Total Functions**: 582
+- **Total Functions**: 588
 - **Total Classes**: 84
-- **Modules**: 112
-- **Entry Points**: 343
+- **Modules**: 116
+- **Entry Points**: 349
 
 ## Architecture by Module
 
@@ -54,15 +54,15 @@
 - **Classes**: 1
 - **File**: `api.py`
 
+### pyqual.bulk_init
+- **Functions**: 15
+- **Classes**: 1
+- **File**: `bulk_init.py`
+
 ### pyqual.report_generator
 - **Functions**: 14
 - **Classes**: 2
 - **File**: `report_generator.py`
-
-### pyqual.validation
-- **Functions**: 14
-- **Classes**: 6
-- **File**: `validation.py`
 
 ### pyqual.plugins.builtin
 - **Functions**: 14
@@ -139,7 +139,7 @@ Runs multiple scanners in order:
 
 Scans the project (language, available tools, test framework) and asks the
 LLM to prod
-- **Calls**: app.command, typer.Option, typer.Option, typer.Option, typer.Option, None.resolve, pyqual.api.validate_config, pyqual.validation.detect_project_facts
+- **Calls**: app.command, typer.Option, typer.Option, typer.Option, typer.Option, None.resolve, pyqual.api.validate_config, pyqual.validation.project.detect_project_facts
 
 ### pyqual.auto_closer.main
 - **Calls**: Path.cwd, gates_info.get, gates_info.get, print, PlanfileStore, store.list_tickets, print, pyqual.auto_closer.get_changed_files
@@ -178,13 +178,13 @@ Args:
     group_similar: If True, group similar issues for batc
 - **Calls**: time.monotonic, enumerate, len, log.info, sum, sum, sum, log.info
 
-### pyqual.cli.cmd_git.git_commit_cmd
-> Create a git commit.
-- **Calls**: git_app.command, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, pyqual.plugins.git.main.git_commit, result.get
-
 ### pyqual.cli_run_helpers.format_run_summary
 > Format run summary dict into human-readable string with ticket outcomes.
 - **Calls**: summary.get, summary.get, summary.get, summary.get, parts.append, summary.get, summary.get, summary.get
+
+### pyqual.cli.cmd_git.git_commit_cmd
+> Create a git commit.
+- **Calls**: git_app.command, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, pyqual.plugins.git.main.git_commit, result.get
 
 ### pyqual.cli.cmd_config.validate
 > Validate pyqual.yaml without running the pipeline.
@@ -415,11 +415,6 @@ Measures:
 - **Methods**: 4
 - **Key Methods**: pyqual.parallel.ParallelExecutor.__init__, pyqual.parallel.ParallelExecutor._run_tool_task, pyqual.parallel.ParallelExecutor._tool_worker, pyqual.parallel.ParallelExecutor.run
 
-### pyqual.validation.ValidationResult
-> Aggregated result of validating one pyqual.yaml.
-- **Methods**: 4
-- **Key Methods**: pyqual.validation.ValidationResult.errors, pyqual.validation.ValidationResult.warnings, pyqual.validation.ValidationResult.ok, pyqual.validation.ValidationResult.add
-
 ### pyqual.fix_tools.llx.LlxTool
 > LLX fix tool.
 - **Methods**: 4
@@ -430,6 +425,11 @@ Measures:
 > Registry for metric collector plugins.
 - **Methods**: 4
 - **Key Methods**: pyqual.plugins._base.PluginRegistry.register, pyqual.plugins._base.PluginRegistry.get, pyqual.plugins._base.PluginRegistry.list_plugins, pyqual.plugins._base.PluginRegistry.create_instance
+
+### pyqual.validation.schema.ValidationResult
+> Aggregated result of validating one pyqual.yaml.
+- **Methods**: 4
+- **Key Methods**: pyqual.validation.schema.ValidationResult.errors, pyqual.validation.schema.ValidationResult.warnings, pyqual.validation.schema.ValidationResult.ok, pyqual.validation.schema.ValidationResult.add
 
 ### pyqual.gates.CompositeGateSet
 > Weighted composite quality scoring from multiple gates.
@@ -453,16 +453,16 @@ Key functions that process and transform data:
 > Parse LLM suggestions and apply patches.
 - **Output to**: re.findall, Path, print, re.search, file_path.exists
 
-### pyqual.report_generator.parse_kwargs
-> Parse kwargs string that might have single quotes.
-- **Output to**: json.loads, ast.literal_eval
-
 ### pyqual.config.PyqualConfig._parse
 - **Output to**: raw.get, pyqual.tools.load_entry_point_presets, pyqual.tools.load_user_tools, pipeline.get, pipeline.get
 
 ### pyqual.config.PyqualConfig._validate_stages
 > Validate and construct StageConfig list from raw dicts.
 - **Output to**: StageConfig, stages.append, StageConfig.__dataclass_fields__.values, ValueError, ValueError
+
+### pyqual.report_generator.parse_kwargs
+> Parse kwargs string that might have single quotes.
+- **Output to**: json.loads, ast.literal_eval
 
 ### pyqual.parallel.parse_todo_items
 > Parse unchecked items from TODO.md.
@@ -485,31 +485,13 @@ Ret
 > Parse command line arguments.
 - **Output to**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.add_argument, parser.parse_args
 
-### pyqual.validation._validate_stage
-> Validate a single stage configuration.
-- **Output to**: s.get, s.get, s.get, s.get, result.add
-
-### pyqual.validation._validate_gate
-> Validate a single gate/metric configuration.
-- **Output to**: pyqual.validation._resolve_gate_metric, result.add, float, result.add, None.join
-
-### pyqual.validation._validate_loop_config
-> Validate loop configuration.
-- **Output to**: loop_raw.get, loop_raw.get, result.add, result.add, isinstance
-
-### pyqual.validation.validate_config
-> Validate a pyqual.yaml file and return structured issues.
-
-Does NOT run any stages — this is a stati
-- **Output to**: ValidationResult, pyqual.validation._load_yaml_config, raw.get, pipeline.get, pyqual.validation._load_tool_registry
+### pyqual.bulk_init._validate_yaml_content
+> Validate that YAML content is parseable and has required structure.
+- **Output to**: yaml.safe_load, ValueError, ValueError
 
 ### pyqual.bulk_run._parse_output_line
 > Parse a line of pyqual run output and update state.
 - **Output to**: line.strip, clean.startswith, clean.startswith, None.strip, None.strip
-
-### pyqual.bulk_init._validate_yaml_content
-> Validate that YAML content is parseable and has required structure.
-- **Output to**: yaml.safe_load, ValueError, ValueError
 
 ### pyqual.yaml_fixer._try_parse_yaml
 > Try to parse YAML and return success status and error message.
@@ -519,6 +501,10 @@ Does NOT run any stages — this is a stati
 > Parse PyYAML error message to extract line/column info.
 - **Output to**: YamlSyntaxIssue, re.search, error_str.lower, pyqual.yaml_fixer._get_context, error_str.lower
 
+### pyqual.cli_run_helpers.format_run_summary
+> Format run summary dict into human-readable string with ticket outcomes.
+- **Output to**: summary.get, summary.get, summary.get, summary.get, parts.append
+
 ### pyqual.cli_log_helpers.format_log_entry_row
 > Return (ts, event_name, name, status, details) for one log entry.
 - **Output to**: entry.get, entry.get, None.replace, entry.get, entry.get
@@ -526,10 +512,6 @@ Does NOT run any stages — this is a stati
 ### pyqual.report._parse_pyproject_fallback
 > Minimal regex parser for pyproject.toml when tomllib is unavailable.
 - **Output to**: path.read_text, re.search, re.search, m.group, m.group
-
-### pyqual.cli_run_helpers.format_run_summary
-> Format run summary dict into human-readable string with ticket outcomes.
-- **Output to**: summary.get, summary.get, summary.get, summary.get, parts.append
 
 ### pyqual.cli.cmd_config.validate
 > Validate pyqual.yaml without running the pipeline.
@@ -542,6 +524,10 @@ Checks for:
 > Validate that configured plugins in pyqual.yaml are available.
 - **Output to**: config_path.read_text, console.print, console.print, set, set
 
+### pyqual.plugins.documentation.main.DocumentationCollector._parse_pyproject_fallback
+> Minimal regex parser for pyproject.toml.
+- **Output to**: path.read_text, re.search, m.group
+
 ### pyqual.integrations.llx_mcp_service.build_parser
 > Build the CLI parser for the MCP service.
 - **Output to**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, os.getenv, int
@@ -550,9 +536,23 @@ Checks for:
 > Build the CLI parser for the llx MCP helper.
 - **Output to**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument
 
-### pyqual.plugins.documentation.main.DocumentationCollector._parse_pyproject_fallback
-> Minimal regex parser for pyproject.toml.
-- **Output to**: path.read_text, re.search, m.group
+### pyqual.validation.config_check._validate_stage
+> Validate a single stage configuration.
+- **Output to**: s.get, s.get, s.get, s.get, result.add
+
+### pyqual.validation.config_check._validate_gate
+> Validate a single gate/metric configuration.
+- **Output to**: pyqual.validation.schema._resolve_gate_metric, result.add, float, result.add, None.join
+
+### pyqual.validation.config_check._validate_loop_config
+> Validate loop configuration.
+- **Output to**: loop_raw.get, loop_raw.get, result.add, result.add, isinstance
+
+### pyqual.validation.config_check.validate_config
+> Validate a pyqual.yaml file and return structured issues.
+
+Does NOT run any stages — this is a stati
+- **Output to**: ValidationResult, pyqual.validation.config_check._load_yaml_config, raw.get, pipeline.get, pyqual.validation.config_check._load_tool_registry
 
 ## Behavioral Patterns
 
@@ -581,8 +581,8 @@ Functions exposed as public API (no underscore prefix):
 - `examples.custom_gates.metric_history.main` - 29 calls
 - `pyqual.bulk_init.classify_with_llm` - 26 calls
 - `pyqual.parallel.ParallelExecutor.run` - 25 calls
-- `pyqual.cli.cmd_git.git_commit_cmd` - 25 calls
 - `pyqual.cli_run_helpers.format_run_summary` - 25 calls
+- `pyqual.cli.cmd_git.git_commit_cmd` - 25 calls
 - `pyqual.cli.cmd_config.validate` - 25 calls
 - `pyqual.plugins.cli_helpers.plugin_search` - 25 calls
 - `pyqual.yaml_fixer.analyze_yaml_syntax` - 24 calls

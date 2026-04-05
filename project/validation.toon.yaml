@@ -1,7 +1,7 @@
-# vallm batch | 114f | 106✓ 16⚠ 0✗ | 2026-04-05
+# vallm batch | 116f | 108✓ 16⚠ 0✗ | 2026-04-05
 
 SUMMARY:
-  scanned: 114  passed: 106 (93.0%)  warnings: 16  errors: 0  unsupported: 8
+  scanned: 116  passed: 108 (93.1%)  warnings: 16  errors: 0  unsupported: 8
 
 WARNINGS[16]{path,score}:
   pyqual/bulk_run.py,0.90
@@ -27,19 +27,13 @@ WARNINGS[16]{path,score}:
       complexity.cyclomatic,warning,git_push_cmd has cyclomatic complexity 19 (max: 15),226
       complexity.lizard_cc,warning,git_scan_cmd: CC=16 exceeds limit 15,92
       complexity.lizard_cc,warning,git_push_cmd: CC=19 exceeds limit 15,226
-  pyqual/cli_observe.py,0.93
-    issues[4]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,_logs_impl has cyclomatic complexity 22 (max: 15),32
-      complexity.maintainability,warning,Low maintainability index: 19.5 (threshold: 20),
-      complexity.lizard_cc,warning,_logs_impl: CC=22 exceeds limit 15,32
-      complexity.lizard_cc,warning,register_observe_commands.history: CC=28 exceeds limit 15,345
   pyqual/pipeline.py,0.93
     issues[5]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,_execute_stage has cyclomatic complexity 17 (max: 15),247
-      complexity.cyclomatic,warning,_classify_error has cyclomatic complexity 17 (max: 15),611
+      complexity.cyclomatic,warning,_execute_stage has cyclomatic complexity 17 (max: 15),259
+      complexity.cyclomatic,warning,_classify_error has cyclomatic complexity 17 (max: 15),623
       complexity.maintainability,warning,Low maintainability index: 8.8 (threshold: 20),
-      complexity.lizard_cc,warning,_execute_stage: CC=17 exceeds limit 15,247
-      complexity.lizard_cc,warning,_classify_error: CC=17 exceeds limit 15,611
+      complexity.lizard_cc,warning,_execute_stage: CC=17 exceeds limit 15,259
+      complexity.lizard_cc,warning,_classify_error: CC=17 exceeds limit 15,623
   pyqual/_gate_collectors.py,0.96
     issues[3]{rule,severity,message,line}:
       complexity.cyclomatic,warning,_from_vulnerabilities has cyclomatic complexity 18 (max: 15),181
@@ -61,10 +55,10 @@ WARNINGS[16]{path,score}:
     issues[2]{rule,severity,message,line}:
       complexity.cyclomatic,warning,_bulk_run_impl has cyclomatic complexity 19 (max: 15),99
       complexity.lizard_cc,warning,_bulk_run_impl: CC=19 exceeds limit 15,99
-  pyqual/cli_run_helpers.py,0.97
+  pyqual/cli_observe.py,0.97
     issues[2]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,format_run_summary has cyclomatic complexity 19 (max: 15),322
-      complexity.lizard_cc,warning,format_run_summary: CC=18 exceeds limit 15,322
+      complexity.maintainability,warning,Low maintainability index: 19.1 (threshold: 20),
+      complexity.lizard_cc,warning,register_observe_commands.history: CC=28 exceeds limit 15,362
   pyqual/run_parallel_fix.py,0.97
     issues[2]{rule,severity,message,line}:
       complexity.cyclomatic,warning,main has cyclomatic complexity 18 (max: 15),306
@@ -73,6 +67,9 @@ WARNINGS[16]{path,score}:
     issues[2]{rule,severity,message,line}:
       complexity.cyclomatic,warning,_load_yaml_config has cyclomatic complexity 17 (max: 15),21
       complexity.lizard_cc,warning,_load_yaml_config: CC=17 exceeds limit 15,21
+  pyqual/cli_run_helpers.py,0.98
+    issues[1]{rule,severity,message,line}:
+      complexity.maintainability,warning,Low maintainability index: 19.7 (threshold: 20),
   tests/test_bulk_init.py,0.98
     issues[1]{rule,severity,message,line}:
       complexity.maintainability,warning,Low maintainability index: 19.2 (threshold: 20),

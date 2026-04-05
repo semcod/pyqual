@@ -39,6 +39,12 @@
     "command": "pip-audit --format=json --output=.pyqual/vulns.json",
     "output": ""
   },
+  "detect-secrets": {
+    "binary": "detect-secrets",
+    "command": "detect-secrets scan --all-files --force-use-all-plugins > .pyqual/secrets.json",
+    "output": ".pyqual/secrets.json",
+    "allow_failure": true
+  },
   "trufflehog": {
     "binary": "trufflehog",
     "command": "trufflehog git file://{workdir} --json",
@@ -66,11 +72,29 @@
     "output": "",
     "allow_failure": false
   },
+  "code2llm-filtered": {
+    "binary": "code2llm",
+    "command": "code2llm {workdir} -f toon -o ./project --no-chunk --exclude .git .venv .venv_test build dist __pycache__ .pytest_cache .code2llm_cache .benchmarks .mypy_cache .ruff_cache node_modules",
+    "output": "",
+    "allow_failure": true
+  },
   "vallm": {
     "binary": "vallm",
     "command": "vallm batch {workdir} --recursive --format toon --output ./project",
     "output": "",
     "allow_failure": false
+  },
+  "vallm-filtered": {
+    "binary": "vallm",
+    "command": "vallm batch {workdir} --recursive --format toon --output ./project --exclude .git,.venv,.venv_test,build,dist,__pycache__,.pytest_cache,.code2llm_cache,.benchmarks,.mypy_cache,.ruff_cache,node_modules",
+    "output": "",
+    "allow_failure": true
+  },
+  "vallm-verify": {
+    "binary": "vallm",
+    "command": "vallm batch {workdir} --recursive --no-complexity --format toon --output ./project/verify --exclude .git,.venv,.venv_test,build,dist,__pycache__,.pytest_cache,.code2llm_cache,.benchmarks,.mypy_cache,.ruff_cache,node_modules",
+    "output": "",
+    "allow_failure": true
   },
   "code2docs": {
     "binary": "code2docs",
@@ -112,44 +136,64 @@
     "command": "python3 -m pyqual.report --workdir {workdir}",
     "output": ""
   },
-  "py-lint": {
-    "binary": "pylint",
-    "command": "pylint {workdir} --output-format=json",
-    "output": ".pyqual/pylint.json"
+  "markdown-report": {
+    "binary": "python3",
+    "command": "python3 -m pyqual.report_generator",
+    "output": "",
+    "allow_failure": true
   },
-  "py-test": {
-    "binary": "pytest",
-    "command": "pytest {workdir} --json-report --json-report-file=.pyqual/pytest.json",
-    "output": ".pyqual/pytest.json"
+  "markdown_report": {
+    "binary": "python3",
+    "command": "python3 -m pyqual.report_generator",
+    "output": "",
+    "allow_failure": true
   },
-  "py-cov": {
-    "binary": "pytest",
-    "command": "pytest {workdir} --cov --cov-report=json:.pyqual/coverage.json",
-    "output": ".pyqual/coverage.json"
+  "git-push": {
+    "binary": "sh",
+    "command": "sh -c 'if [ -n \"$(git status --porcelain)\" ]; then git add -A && git commit -m \"chore: pyqual auto-commit [skip ci]\" 2>/dev/null || true && git push origin HEAD; else echo \"No changes to push\"; fi'",
+    "output": "",
+    "allow_failure": true
   },
-  "py-sec": {
-    "binary": "bandit",
-    "command": "bandit -r {workdir} -f json -o .pyqual/bandit.json",
-    "output": ".pyqual/bandit.json"
+  "git-commit": {
+    "binary": "sh",
+    "command": "sh -c 'if [ -n \"$(git status --porcelain)\" ]; then git add -A && git commit -m \"chore: pyqual auto-commit [skip ci]\" 2>/dev/null || true; else echo \"Nothing to commit\"; fi'",
+    "output": "",
+    "allow_failure": true
   },
-  "py-deps": {
-    "binary": "pip-audit",
-    "command": "pip-audit --format=json --output=.pyqual/pip-audit.json",
-    "output": ".pyqual/pip-audit.json"
+  "make-publish": {
+    "binary": "make",
+    "command": "make publish",
+    "output": "",
+    "allow_failure": true
   },
-  "py-docs": {
-    "binary": "pydocstyle",
-    "command": "pydocstyle {workdir} --json",
-    "output": ".pyqual/pydocstyle.json"
+  "twine-publish": {
+    "binary": "twine",
+    "command": "twine upload dist/* --skip-existing",
+    "output": "",
+    "allow_failure": true
   },
-  "py-types": {
-    "binary": "mypy",
-    "command": "mypy {workdir} --show-column-numbers --show-error-codes --no-error-summary --hide-error-context --json",
-    "output": ".pyqual/mypy.json"
+  "attack-merge": {
+    "binary": "python3",
+    "command": "python3 -m pyqual.plugins.attack",
+    "output": ".pyqual/attack_merge.json",
+    "allow_failure": true
   },
-  "py-style": {
-    "binary": "ruff",
-    "command": "ruff check {workdir} --format=json",
-    "output": ".pyqual/ruff.json"
+  "close-tasks": {
+    "binary": "python3",
+    "command": "python3 -m pyqual.auto_closer",
+    "output": "",
+    "allow_failure": true
+  },
+  "todo-fix": {
+    "binary": "python3",
+    "command": "python3 -m pyqual.run_parallel_fix",
+    "output": "",
+    "allow_failure": true
+  },
+  "setup-deps": {
+    "binary": "python3",
+    "command": "python3 -m pyqual.setup_deps",
+    "output": "",
+    "allow_failure": true
   }
 }

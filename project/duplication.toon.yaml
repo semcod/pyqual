@@ -1,36 +1,36 @@
-# redup/duplication | 8 groups | 72f 17881L | 2026-04-05
+# redup/duplication | 8 groups | 75f 17898L | 2026-04-05
 
 SUMMARY:
-  files_scanned: 72
-  total_lines:   17881
+  files_scanned: 75
+  total_lines:   17898
   dup_groups:    8
   dup_fragments: 27
-  saved_lines:   196
-  scan_ms:       6453
+  saved_lines:   191
+  scan_ms:       6443
 
 DUPLICATES[8] (ranked by impact):
   [14861325d045d048] ! STRU  collect  L=12 N=6 saved=60 sim=1.00
       pyqual/plugins/code_health/main.py:0-11  (collect)
-      pyqual/plugins/lint/main.py:0-11  (collect)
-      pyqual/plugins/security/main.py:0-18  (collect)
       pyqual/plugins/docs/main.py:0-18  (collect)
-      pyqual/plugins/deps/main.py:0-18  (collect)
+      pyqual/plugins/security/main.py:0-18  (collect)
+      pyqual/plugins/lint/main.py:0-11  (collect)
       pyqual/plugins/docker/main.py:0-18  (collect)
-  [07b7171277fd59f2] ! STRU  _display_comparison  L=43 N=2 saved=43 sim=1.00
-      pyqual/cli/cmd_tune.py:0-42  (_display_comparison)
+      pyqual/plugins/deps/main.py:0-18  (collect)
+  [07b7171277fd59f2] ! STRU  _display_comparison_for_tune  L=41 N=2 saved=41 sim=1.00
       pyqual/cli/main.py:0-40  (_display_comparison_for_tune)
+      pyqual/cli/cmd_tune.py:0-42  (_display_comparison)
   [96bfc15f5794cd81] ! EXAC  get_config_example  L=5 N=8 saved=35 sim=1.00
       pyqual/plugins/example_plugin/main.py:0-4  (get_config_example)
-      pyqual/plugins/attack/main.py:0-4  (get_config_example)
-      pyqual/plugins/security/main.py:0-4  (get_config_example)
-      pyqual/plugins/builtin.py:0-4  (get_config_example)
       pyqual/plugins/docs/main.py:0-4  (get_config_example)
-      pyqual/plugins/deps/main.py:0-4  (get_config_example)
+      pyqual/plugins/security/main.py:0-4  (get_config_example)
       pyqual/plugins/docker/main.py:0-4  (get_config_example)
+      pyqual/plugins/attack/main.py:0-4  (get_config_example)
+      pyqual/plugins/builtin.py:0-4  (get_config_example)
+      pyqual/plugins/deps/main.py:0-4  (get_config_example)
       pyqual/plugins/git/main.py:0-4  (get_config_example)
-  [19440a5d6eb75489]   STRU  _apply_thresholds  L=20 N=2 saved=20 sim=1.00
-      pyqual/cli/cmd_tune.py:0-19  (_apply_thresholds)
+  [19440a5d6eb75489]   STRU  _apply_thresholds_for_tune  L=17 N=2 saved=17 sim=1.00
       pyqual/cli/main.py:0-16  (_apply_thresholds_for_tune)
+      pyqual/cli/cmd_tune.py:0-19  (_apply_thresholds)
   [e8e1ba5d936993f1]   STRU  get_config_example  L=15 N=2 saved=15 sim=1.00
       examples/custom_plugins/performance_collector.py:0-14  (get_config_example)
       examples/custom_plugins/code_health_collector.py:0-19  (get_config_example)
@@ -49,14 +49,14 @@ REFACTOR[8] (ranked by priority):
   [1] ○ extract_function   → pyqual/plugins/utils/collect.py
       WHY: 6 occurrences of 12-line block across 6 files — saves 60 lines
       FILES: pyqual/plugins/code_health/main.py, pyqual/plugins/deps/main.py, pyqual/plugins/docker/main.py, pyqual/plugins/docs/main.py, pyqual/plugins/lint/main.py +1 more
-  [2] ◐ extract_function   → pyqual/cli/utils/_display_comparison.py
-      WHY: 2 occurrences of 43-line block across 2 files — saves 43 lines
+  [2] ◐ extract_function   → pyqual/cli/utils/_display_comparison_for_tune.py
+      WHY: 2 occurrences of 41-line block across 2 files — saves 41 lines
       FILES: pyqual/cli/cmd_tune.py, pyqual/cli/main.py
   [3] ○ extract_function   → pyqual/plugins/utils/get_config_example.py
       WHY: 8 occurrences of 5-line block across 8 files — saves 35 lines
       FILES: pyqual/plugins/attack/main.py, pyqual/plugins/builtin.py, pyqual/plugins/deps/main.py, pyqual/plugins/docker/main.py, pyqual/plugins/docs/main.py +3 more
-  [4] ○ extract_function   → pyqual/cli/utils/_apply_thresholds.py
-      WHY: 2 occurrences of 20-line block across 2 files — saves 20 lines
+  [4] ○ extract_function   → pyqual/cli/utils/_apply_thresholds_for_tune.py
+      WHY: 2 occurrences of 17-line block across 2 files — saves 17 lines
       FILES: pyqual/cli/cmd_tune.py, pyqual/cli/main.py
   [5] ○ extract_function   → examples/custom_plugins/utils/get_config_example.py
       WHY: 2 occurrences of 15-line block across 2 files — saves 15 lines
@@ -73,4 +73,4 @@ REFACTOR[8] (ranked by priority):
 
 METRICS-TARGET:
   dup_groups:  8 → 0
-  saved_lines: 196 lines recoverable
+  saved_lines: 191 lines recoverable

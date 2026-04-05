@@ -1,4 +1,4 @@
-# code2llm/evolution | 556 func | 71f | 2026-04-05
+# code2llm/evolution | 562 func | 74f | 2026-04-05
 
 NEXT[10] (ranked by impact):
   [1] !! SPLIT           pyqual/plugins/git/main.py
@@ -48,10 +48,10 @@ RISKS[3]:
   ⚠ Splitting pyqual/pipeline.py may break 23 import paths
 
 METRICS-TARGET:
-  CC̄:          5.6 → ≤3.9
+  CC̄:          5.5 → ≤3.8
   max-CC:      23 → ≤11
-  god-modules: 9 → 0
-  high-CC(≥15): 29 → ≤14
+  god-modules: 8 → 0
+  high-CC(≥15): 28 → ≤14
   hub-types:   0 → ≤0
 
 PATTERNS (language parser shared logic):
@@ -79,4 +79,4 @@ PATTERNS (language parser shared logic):
     - Standardized FunctionInfo/ClassInfo models
 
 HISTORY:
-  prev CC̄=5.5 → now CC̄=5.6
+  prev CC̄=5.6 → now CC̄=5.5

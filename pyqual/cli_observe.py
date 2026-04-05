@@ -29,6 +29,58 @@ _console = Console()
 _TIMESTAMP_COL_WIDTH = TIMESTAMP_COL_WIDTH
 
 
+def _output_sql_query(rows: list[dict], json_output: bool) -> None:
+    """Output SQL query results as JSON or table."""
+    if json_output:
+        for row in rows:
+            _console.print(json.dumps(row, default=str))
+    elif rows:
+        table = Table(title=f"SQL Query ({len(rows)} rows)")
+        for col in rows[0].keys():
+            table.add_column(col)
+        for row in rows:
+            table.add_row(*[str(v)[:80] for v in row.values()])
+        _console.print(table)
+    else:
+        _console.print("[dim]No results.[/dim]")
+
+
+def _output_json_entries(entries: list[dict]) -> None:
+    """Output log entries as JSON lines."""
+    for entry in entries:
+        clean = {k: v for k, v in entry.items() if not k.startswith("_")}
+        _console.print(json.dumps(clean, default=str))
+
+
+def _output_human_logs(entries: list[dict], show_output: bool) -> None:
+    """Output log entries in human-readable format."""
+    _lc = Console(force_terminal=True, width=BULK_LINE_TRUNCATE)
+    _lc.print(f"[bold]Pipeline Log[/bold] ({len(entries)} entries)\n")
+
+    for entry in entries:
+        ts, event_name, name, status_col, details = _format_log_entry_row(entry)
+        _lc.print(f"  {ts}  {event_name:<14} {name:<20} {status_col:<8} {details}")
+
+        if show_output and entry.get("_function_name") == "stage_done":
+            _print_stage_output(_lc, entry)
+
+    _lc.print(f"\n[dim]Log DB: {db_path}[/dim]")
+    _lc.print("[dim]Tip: pyqual logs --stage fix --output   # see llx prompts/output[/dim]")
+    _lc.print("[dim]Tip: pyqual history --prompts            # see full LLX fix prompts[/dim]")
+
+
+def _print_stage_output(console: Console, entry: dict) -> None:
+    """Print stdout/stderr for a stage entry."""
+    stdout = entry.get("stdout_tail", "")
+    stderr = entry.get("stderr_tail", "")
+    if stdout:
+        for line in str(stdout).splitlines()[-15:]:
+            console.print(f"    [dim][out][/dim] {line}")
+    if stderr:
+        for line in str(stderr).splitlines()[-10:]:
+            console.print(f"    [red][err][/red] {line}")
+
+
 def _logs_impl(
     workdir: Path,
     tail: int,
@@ -40,6 +92,7 @@ def _logs_impl(
     sql: str,
 ) -> None:
     """Implementation of logs command."""
+    global db_path  # For _output_human_logs tips
     db_path = Path(workdir) / PIPELINE_DB
     if not db_path.exists():
         _console.print("[yellow]No pipeline log found. Run 'pyqual run' first.[/yellow]")
@@ -47,23 +100,10 @@ def _logs_impl(
 
     if sql:
         rows = _query_nfo_db(db_path, sql=sql)
-        if json_output:
-            for row in rows:
-                _console.print(json.dumps(row, default=str))
-        else:
-            if not rows:
-                _console.print("[dim]No results.[/dim]")
-                return
-            table = Table(title=f"SQL Query ({len(rows)} rows)")
-            for col in rows[0].keys():
-                table.add_column(col)
-            for row in rows:
-                table.add_row(*[str(v)[:80] for v in row.values()])
-            _console.print(table)
+        _output_sql_query(rows, json_output)
         return
 
-    rows = _query_nfo_db(db_path, event=level, failed=failed, tail=tail,
-                         stage=stage)
+    rows = _query_nfo_db(db_path, event=level, failed=failed, tail=tail, stage=stage)
     entries = [_row_to_event_dict(r) for r in rows]
 
     if not entries:
@@ -71,32 +111,9 @@ def _logs_impl(
         return
 
     if json_output:
-        for entry in entries:
-            clean = {k: v for k, v in entry.items() if not k.startswith("_")}
-            _console.print(json.dumps(clean, default=str))
-        return
-
-    # Human-readable output (works in both TTY and non-TTY)
-    _lc = Console(force_terminal=True, width=BULK_LINE_TRUNCATE)
-    _lc.print(f"[bold]Pipeline Log[/bold] ({len(entries)} entries)\n")
-
-    for entry in entries:
-        ts, event_name, name, status_col, details = _format_log_entry_row(entry)
-        _lc.print(f"  {ts}  {event_name:<14} {name:<20} {status_col:<8} {details}")
-
-        if show_output and entry.get("_function_name") == "stage_done":
-            stdout = entry.get("stdout_tail", "")
-            stderr = entry.get("stderr_tail", "")
-            if stdout:
-                for line in str(stdout).splitlines()[-15:]:
-                    _lc.print(f"    [dim][out][/dim] {line}")
-            if stderr:
-                for line in str(stderr).splitlines()[-10:]:
-                    _lc.print(f"    [red][err][/red] {line}")
-
-    _lc.print(f"\n[dim]Log DB: {db_path}[/dim]")
-    _lc.print("[dim]Tip: pyqual logs --stage fix --output   # see llx prompts/output[/dim]")
-    _lc.print("[dim]Tip: pyqual history --prompts            # see full LLX fix prompts[/dim]")
+        _output_json_entries(entries)
+    else:
+        _output_human_logs(entries, show_output)
 
 
 def _watch_impl(
