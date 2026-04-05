@@ -111,5 +111,45 @@
     "binary": "python3",
     "command": "python3 -m pyqual.report --workdir {workdir}",
     "output": ""
+  },
+  "py-lint": {
+    "binary": "pylint",
+    "command": "pylint {workdir} --output-format=json",
+    "output": ".pyqual/pylint.json"
+  },
+  "py-test": {
+    "binary": "pytest",
+    "command": "pytest {workdir} --json-report --json-report-file=.pyqual/pytest.json",
+    "output": ".pyqual/pytest.json"
+  },
+  "py-cov": {
+    "binary": "pytest",
+    "command": "pytest {workdir} --cov --cov-report=json:.pyqual/coverage.json",
+    "output": ".pyqual/coverage.json"
+  },
+  "py-sec": {
+    "binary": "bandit",
+    "command": "bandit -r {workdir} -f json -o .pyqual/bandit.json",
+    "output": ".pyqual/bandit.json"
+  },
+  "py-deps": {
+    "binary": "pip-audit",
+    "command": "pip-audit --format=json --output=.pyqual/pip-audit.json",
+    "output": ".pyqual/pip-audit.json"
+  },
+  "py-docs": {
+    "binary": "pydocstyle",
+    "command": "pydocstyle {workdir} --json",
+    "output": ".pyqual/pydocstyle.json"
+  },
+  "py-types": {
+    "binary": "mypy",
+    "command": "mypy {workdir} --show-column-numbers --show-error-codes --no-error-summary --hide-error-context --json",
+    "output": ".pyqual/mypy.json"
+  },
+  "py-style": {
+    "binary": "ruff",
+    "command": "ruff check {workdir} --format=json",
+    "output": ".pyqual/ruff.json"
   }
 }
