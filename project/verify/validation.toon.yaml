@@ -1,7 +1,7 @@
-# vallm batch | 328f | 208✓ 2⚠ 2✗ | 2026-04-05
+# vallm batch | 328f | 170✓ 2⚠ 40✗ | 2026-04-05
 
 SUMMARY:
-  scanned: 328  passed: 208 (63.4%)  warnings: 2  errors: 2  unsupported: 117
+  scanned: 328  passed: 170 (51.8%)  warnings: 2  errors: 40  unsupported: 117
 
 WARNINGS[2]{path,score}:
   dashboard/vite.config.ts,0.79
@@ -11,10 +11,14 @@ WARNINGS[2]{path,score}:
     issues[1]{rule,severity,message,line}:
       js.import.resolvable,warning,Module 'vitest/config' not found,1
 
-ERRORS[2]{path,score}:
+ERRORS[40]{path,score}:
   .pyqual/attack_merge.json,0.00
     issues[1]{rule,severity,message,line}:
       syntax.tree_sitter,error,tree-sitter found 6 parse error(s) in json,
+  tests/test_profiles.py,0.83
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'yaml' not found,5
+      python.import.resolvable,error,Module 'pytest' not found,6
   dashboard/api/main.py,0.85
     issues[5]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'fastapi' not found,1
@@ -22,6 +26,128 @@ ERRORS[2]{path,score}:
       python.import.resolvable,error,Module 'fastapi.staticfiles' not found,3
       python.import.resolvable,error,Module 'fastapi.security' not found,4
       python.import.resolvable,error,Module 'dashboard.constants' not found,14
+  pyqual/integrations/llx_mcp.py,0.86
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'llx.mcp.client' not found,15
+      python.import.resolvable,error,Module 'llx.mcp.workflows' not found,16
+      python.import.resolvable,error,Module 'llx.utils.issues' not found,23
+  tests/test_profiles_module.py,0.86
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,5
+  pyqual/auto_closer.py,0.88
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'yaml' not found,17
+      python.import.resolvable,error,Module 'planfile.core.models' not found,157
+  tests/test_bulk_init.py,0.88
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,9
+      python.import.resolvable,error,Module 'yaml' not found,10
+  pyqual/integrations/llx_mcp_service.py,0.89
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'llx.mcp.service' not found,13
+  tests/test_cli_run_helpers.py,0.89
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,7
+  tests/test_secrets_collector.py,0.89
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,6
+  tests/test_validation.py,0.89
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,7
+  pyqual/plugins/deps/test.py,0.91
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,8
+  pyqual/plugins/docker/test.py,0.91
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,8
+  pyqual/plugins/docs/test.py,0.91
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,8
+  pyqual/plugins/documentation/test.py,0.91
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,8
+  tests/test_bulk_run.py,0.91
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,10
+      python.import.resolvable,error,Module 'yaml' not found,11
+  tests/test_llx_mcp.py,0.93
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'httpx' not found,7
+      python.import.resolvable,error,Module 'pytest' not found,8
+      python.import.resolvable,error,Module 'llx.mcp.workflows' not found,13
+  pyqual/llm.py,0.94
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'llx.llm' not found,12
+  pyqual/pipeline.py,0.94
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'nfo' not found,15
+      python.import.resolvable,error,Module 'nfo.models' not found,16
+      python.import.resolvable,error,Module 'nfo.sinks' not found,17
+  pyqual/plugins/example_plugin/test.py,0.94
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,12
+  pyqual/plugins/security/test.py,0.94
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,9
+  pyqual/yaml_fixer.py,0.94
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'yaml' not found,351
+  test_pyqual.py,0.94
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'yaml' not found,7
+      python.import.resolvable,error,Module 'yaml' not found,362
+      python.import.resolvable,error,Module 'yaml' not found,570
+  tests/test_github_actions.py,0.94
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,10
+  pyqual/plugins/attack/test.py,0.95
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,10
+  pyqual/plugins/git/test.py,0.95
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,14
+  pyqual/validation/config_check.py,0.95
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'yaml' not found,87
+  tests/test_pyqual.py,0.95
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,7
+  tests/test_report.py,0.95
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'yaml' not found,9
+  pyqual/__init__.py,0.96
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'llx.llm' not found,54
+  pyqual/bulk_init.py,0.96
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'yaml' not found,32
+  pyqual/cli/cmd_tune.py,0.96
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'yaml' not found,9
+  pyqual/config.py,0.96
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'yaml' not found,10
+  tests/test_runtime_errors.py,0.96
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,10
+  pyqual/bulk_run.py,0.97
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'yaml' not found,34
+  pyqual/cli/main.py,0.97
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'yaml' not found,12
+  tests/test_pipeline_stages.py,0.97
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,11
+  tests/test_tickets.py,0.97
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,7
+  pyqual/cli/cmd_run.py,0.98
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'yaml' not found,14
+  pyqual/report.py,0.98
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'yaml' not found,27
 
 UNSUPPORTED[5]{bucket,count}:
   *.md,63
