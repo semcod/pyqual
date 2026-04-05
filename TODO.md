@@ -46,7 +46,7 @@
 - [ ] examples/multi_gate_pipeline/run_pipeline.py:121 - module execution block
 - [ ] examples/ticket_workflow/sync_tickets.py:19 - Unused import: 'annotations'
 - [ ] examples/ticket_workflow/sync_tickets.py:90 - module execution block
-- [ ] pyproject.toml:24 - Outdated dependency: litellm 1.83.0 → 1.83.3 (wheel)
+- [x] pyproject.toml:24 - Outdated dependency: litellm 1.83.0 → 1.83.3 (wheel)
 - [x] pyqual/__init__.py:56 - Duplicate import: 'DEFAULT_MAX_TOKENS' (first at line 54)
 - [x] pyqual/__init__.py:56 - Duplicate import: 'LLM' (first at line 54)
 - [x] pyqual/__init__.py:56 - Duplicate import: 'LLMResponse' (first at line 54)
@@ -334,7 +334,7 @@
 - [ ] pyqual/stage_names.py:3 - Unused import: 'annotations'
 - [ ] pyqual/tickets.py:76 - LLM-style docstring in sync_from_gates
 - [ ] pyqual/validation.py:12 - Unused import: 'annotations'
-- [ ] pyqual/validation/__init__.py:32 - Unused import: 'annotations'
+- [x] pyqual/validation/__init__.py:32 - Unused import: 'annotations'
 - [ ] pyqual/validation/config_check.py:3 - Unused import: 'annotations'
 - [ ] pyqual/validation/config_check.py:8 - Unused import: 'CONFIG_READ_MAX_CHARS'
 - [ ] pyqual/validation/config_check.py:50 - LLM-style docstring in _load_yaml_config
