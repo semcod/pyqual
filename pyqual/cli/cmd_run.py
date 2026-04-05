@@ -52,6 +52,36 @@ def _emit_yaml_items(items: list[dict], indent: int = 0) -> None:
         _emit(f"{prefix}{line}\n")
 
 
+def _build_stage_dict(result: Any, workdir: Path) -> dict[str, Any]:
+    """Build a stage dict from a stage result."""
+    sd: dict[str, Any] = {"name": result.name}
+    if result.skipped:
+        sd["status"] = "skipped"
+    else:
+        sd["status"] = "passed" if result.passed else "failed"
+        sd["duration"] = round(result.duration, 1)
+        metrics = _extract_stage_summary(result.name, result.stdout, result.stderr)
+        sd.update(metrics)
+        if not result.passed:
+            sd["rc"] = result.returncode
+            err = _get_last_error_line(result.stderr or result.stdout or "")
+            if err:
+                sd["stderr"] = err
+    _enrich_from_artifacts(workdir, [sd])
+    return sd
+
+
+def _build_gate_dict(gate: Any, op_sym: dict[str, str]) -> dict[str, Any]:
+    """Build a gate dict from a gate result."""
+    return {
+        "metric": gate.metric,
+        "value": round(gate.value, 1) if gate.value is not None else None,
+        "threshold": gate.threshold,
+        "operator": op_sym.get(gate.operator, gate.operator),
+        "passed": gate.passed,
+    }
+
+
 def _handle_config_env_error(
     failure: Any,
     config_path: Path,
@@ -236,33 +266,12 @@ def run(
         pass  # YAML streaming is the progress indicator; use `pyqual watch` for live logs
 
     def _on_stage_done(result: Any) -> None:
-        sd: dict[str, Any] = {"name": result.name}
-        if result.skipped:
-            sd["status"] = "skipped"
-        else:
-            sd["status"] = "passed" if result.passed else "failed"
-            sd["duration"] = round(result.duration, 1)
-            metrics = _extract_stage_summary(result.name, result.stdout, result.stderr)
-            sd.update(metrics)
-            if not result.passed:
-                sd["rc"] = result.returncode
-                err = _get_last_error_line(result.stderr or result.stdout or "")
-                if err:
-                    sd["stderr"] = err
-        _enrich_from_artifacts(_workdir, [sd])
+        sd = _build_stage_dict(result, _workdir)
         _iter_stages.append(sd)
         _emit_yaml_items([sd], indent=2)
 
     def _on_iteration_done(iteration: Any) -> None:
-        gate_dicts: list[dict[str, Any]] = []
-        for gate in iteration.gates:
-            gate_dicts.append({
-                "metric": gate.metric,
-                "value": round(gate.value, 1) if gate.value is not None else None,
-                "threshold": gate.threshold,
-                "operator": op_sym.get(gate.operator, gate.operator),
-                "passed": gate.passed,
-            })
+        gate_dicts = [_build_gate_dict(g, op_sym) for g in iteration.gates]
         _emit("  gates:\n")
         _emit_yaml_items(gate_dicts, indent=2)
         _emit(f"  all_gates_passed: {'true' if iteration.all_gates_passed else 'false'}\n")
@@ -294,31 +303,10 @@ def run(
     # If callbacks weren't fired (e.g. no iterations), rebuild from result
     if not _all_iterations and result.iterations:
         for iteration in result.iterations:
-            iter_stages = []
-            for stage in iteration.stages:
-                sd: dict[str, Any] = {"name": stage.name}
-                if stage.skipped:
-                    sd["status"] = "skipped"
-                else:
-                    sd["status"] = "passed" if stage.passed else "failed"
-                    sd["duration"] = round(stage.duration, 1)
-                    metrics = _extract_stage_summary(stage.name, stage.stdout, stage.stderr)
-                    sd.update(metrics)
-                    if not stage.passed:
-                        sd["rc"] = stage.returncode
-                        err = _get_last_error_line(stage.stderr or stage.stdout or "")
-                        if err:
-                            sd["stderr"] = err
-                _enrich_from_artifacts(_workdir, [sd])
-                iter_stages.append(sd)
+            iter_stages = [_build_stage_dict(stage, _workdir) for stage in iteration.stages]
+            for sd in iter_stages:
                 _emit_yaml_items([sd], indent=2)
-            gate_dicts = [{
-                "metric": g.metric,
-                "value": round(g.value, 1) if g.value is not None else None,
-                "threshold": g.threshold,
-                "operator": op_sym.get(g.operator, g.operator),
-                "passed": g.passed,
-            } for g in iteration.gates]
+            gate_dicts = [_build_gate_dict(g, op_sym) for g in iteration.gates]
             if gate_dicts:
                 _emit("  gates:\n")
                 _emit_yaml_items(gate_dicts, indent=2)

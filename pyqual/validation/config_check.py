@@ -18,6 +18,35 @@ from pyqual.yaml_fixer import (
 )
 
 
+# Severity lookup for YAML error types
+_ERROR_SEVERITY_MAP = {
+    YamlErrorType.UNCLOSED_QUOTE: Severity.ERROR,
+    YamlErrorType.UNCLOSED_BRACKET: Severity.ERROR,
+    YamlErrorType.TAB_CHARACTER: Severity.INFO,
+    YamlErrorType.TRAILING_SPACE: Severity.INFO,
+    YamlErrorType.INDENTATION: Severity.INFO,
+}
+
+
+def _get_issue_severity(issue: Any, try_fix: bool) -> tuple[Severity, str]:
+    """Determine severity and suggestion for a YAML issue."""
+    # Check explicit mapping first
+    if issue.error_type in _ERROR_SEVERITY_MAP:
+        sev = _ERROR_SEVERITY_MAP[issue.error_type]
+        if issue.can_fix and try_fix:
+            return Severity.WARNING, f"Auto-fixed: {issue.error_type.value}"
+        if sev == Severity.ERROR:
+            return sev, issue.fixed if issue.can_fix else f"Fix at line {issue.line}, col {issue.column}"
+        return sev, f"Style: {issue.error_type.value} at line {issue.line}"
+
+    # Default handling
+    if issue.can_fix and try_fix:
+        return Severity.WARNING, f"Auto-fixed: {issue.error_type.value}"
+    if issue.can_fix:
+        return Severity.INFO, f"Style: {issue.error_type.value} at line {issue.line}"
+    return Severity.ERROR, f"Fix at line {issue.line}, col {issue.column}"
+
+
 def _load_yaml_config(
     config_path: Path,
     result: ValidationResult,
@@ -38,52 +67,17 @@ def _load_yaml_config(
 
     content = config_path.read_text()
 
-    # First, run detailed syntax analysis
+    # Run detailed syntax analysis
     syntax_result = analyze_yaml_syntax(content)
 
-    # If there are syntax issues, report them
-    if syntax_result.issues:
-        for issue in syntax_result.issues:
-            # Determine severity based on issue type
-            if issue.error_type in (YamlErrorType.UNCLOSED_QUOTE, YamlErrorType.UNCLOSED_BRACKET):
-                # These are actual syntax errors
-                severity = Severity.ERROR
-                suggestion = issue.fixed if issue.can_fix else f"Fix at line {issue.line}, col {issue.column}"
-            elif issue.error_type in (YamlErrorType.TAB_CHARACTER, YamlErrorType.TRAILING_SPACE):
-                # These are style issues that can be auto-fixed
-                if try_fix and issue.can_fix:
-                    severity = Severity.WARNING
-                    suggestion = f"Auto-fixed: {issue.error_type.value}"
-                else:
-                    severity = Severity.INFO  # Style issues are INFO, not ERROR
-                    suggestion = f"Style: {issue.error_type.value} at line {issue.line}"
-            elif issue.error_type == YamlErrorType.INDENTATION:
-                # Indentation warnings are INFO unless they cause parse failures
-                severity = Severity.INFO
-                suggestion = issue.message
-            else:
-                # Default: style issues are INFO, unfixable syntax errors are ERROR
-                if issue.can_fix and try_fix:
-                    severity = Severity.WARNING
-                    suggestion = f"Auto-fixed: {issue.error_type.value}"
-                elif issue.can_fix:
-                    severity = Severity.INFO
-                    suggestion = f"Style: {issue.error_type.value} at line {issue.line}"
-                else:
-                    severity = Severity.ERROR
-                    suggestion = f"Fix at line {issue.line}, col {issue.column}"
-
-            result.add(
-                severity,
-                EC.CONFIG_YAML_PARSE,
-                issue.message,
-                suggestion=suggestion,
-            )
+    # Report syntax issues
+    for issue in syntax_result.issues:
+        severity, suggestion = _get_issue_severity(issue, try_fix)
+        result.add(severity, EC.CONFIG_YAML_PARSE, issue.message, suggestion=suggestion)
 
     # If trying to fix, use fixed content
     if try_fix and syntax_result.was_fixed:
         content = syntax_result.fixed_content
-        # Backup original
         backup = config_path.with_suffix(".yaml.bak")
         config_path.rename(backup)
         config_path.write_text(content)

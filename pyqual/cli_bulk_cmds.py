@@ -96,92 +96,24 @@ def _bulk_init_impl(
                    f"errors: {len(result.errors)})")
 
 
-def _bulk_run_impl(
-    path: Path,
-    parallel: int,
-    dry_run: bool,
-    timeout: int,
-    filter_name: list[str],
-    no_live: bool,
-    verbose: bool,
-    json_output: bool,
-    log_dir: Path | None,
-    analyze: bool,
-) -> None:
-    """Implementation of bulk-run command."""
-    from rich.live import Live
-
-    from pyqual.bulk_run import (
-        BulkRunResult,
-        build_dashboard_table,
-        bulk_run,
-        discover_projects,
-    )
+def _discover_and_validate(path: Path) -> list:
+    """Discover projects and validate path. Returns states or raises Exit."""
+    from pyqual.bulk_run import discover_projects
 
     if not path.is_dir():
         _console.print(f"[red]Not a directory: {path}[/red]")
         raise typer.Exit(1)
 
-    # Discover projects
     all_states = discover_projects(path)
     if not all_states:
         _console.print(f"[yellow]No projects with pyqual.yaml found in {path}[/yellow]")
         raise typer.Exit(1)
 
-    _console.print(f"[bold]Bulk run[/bold]: {len(all_states)} projects in [cyan]{path}[/cyan]"
-                   f" (parallel={parallel})")
-    if dry_run:
-        _console.print("[yellow]DRY RUN mode[/yellow]")
-    _console.print()
+    return all_states
 
-    if log_dir:
-        _console.print(f"[dim]Logs → {log_dir}/[/dim]")
-    if analyze:
-        _console.print("[dim]LLX analysis enabled for failed projects.[/dim]")
 
-    if no_live:
-        # No live dashboard — just run and print summary
-        result = bulk_run(
-            root=path,
-            parallel=parallel,
-            dry_run=dry_run,
-            timeout=timeout,
-            filter_names=filter_name or None,
-            log_dir=log_dir,
-            analyze=analyze,
-        )
-    else:
-        # Live dashboard
-        _live_result: list[BulkRunResult] = []
-
-        def _run_with_live(live: Live, states_ref: list) -> BulkRunResult:
-            def _refresh(states):
-                states_ref.clear()
-                states_ref.extend(states)
-                live.update(build_dashboard_table(states, show_last_line=verbose,
-                                                  show_analysis=analyze))
-
-            return bulk_run(
-                root=path,
-                parallel=parallel,
-                dry_run=dry_run,
-                timeout=timeout,
-                filter_names=filter_name or None,
-                live_callback=_refresh,
-                log_dir=log_dir,
-                analyze=analyze,
-            )
-
-        states_ref: list = []
-        with Live(build_dashboard_table(all_states, show_last_line=verbose,
-                                        show_analysis=analyze),
-                  console=_console, refresh_per_second=2) as live:
-            result = _run_with_live(live, states_ref)
-            # Final update
-            if states_ref:
-                live.update(build_dashboard_table(states_ref, show_last_line=verbose,
-                                                  show_analysis=analyze))
-
+def _output_bulk_result(result, json_output: bool) -> None:
+    """Output bulk run result as JSON or summary."""
     if json_output:
         _console.print(json.dumps({
             "passed": result.passed,
@@ -209,8 +141,115 @@ def _bulk_run_impl(
 
     _console.print(f"\n[bold]Total time: {result.total_duration:.1f}s[/bold]")
 
+
+def _bulk_run_impl(
+    path: Path,
+    parallel: int,
+    dry_run: bool,
+    timeout: int,
+    filter_name: list[str],
+    no_live: bool,
+    verbose: bool,
+    json_output: bool,
+    log_dir: Path | None,
+    analyze: bool,
+) -> None:
+    """Implementation of bulk-run command."""
+    from rich.live import Live
+
+    from pyqual.bulk_run import (
+        BulkRunResult,
+        build_dashboard_table,
+        bulk_run,
+    )
+
+    all_states = _discover_and_validate(path)
+
+    _console.print(f"[bold]Bulk run[/bold]: {len(all_states)} projects in [cyan]{path}[/cyan]"
+                   f" (parallel={parallel})")
+    if dry_run:
+        _console.print("[yellow]DRY RUN mode[/yellow]")
+    _console.print()
+
+    if log_dir:
+        _console.print(f"[dim]Logs → {log_dir}/[/dim]")
+    if analyze:
+        _console.print("[dim]LLX analysis enabled for failed projects.[/dim]")
+
+    if no_live:
+        # No live dashboard — just run and print summary
+        result = bulk_run(
+            root=path,
+            parallel=parallel,
+            dry_run=dry_run,
+            timeout=timeout,
+            filter_names=filter_name or None,
+            log_dir=log_dir,
+            analyze=analyze,
+        )
+    else:
+        # Live dashboard
+        result = _run_with_live_dashboard(
+            path, parallel, dry_run, timeout, filter_name, log_dir, analyze, verbose, all_states
+        )
+
+    _output_bulk_result(result, json_output)
+
     if result.failed or result.errors:
         raise typer.Exit(1)
+
+
+def _run_with_live_dashboard(
+    path: Path,
+    parallel: int,
+    dry_run: bool,
+    timeout: int,
+    filter_name: list[str],
+    log_dir: Path | None,
+    analyze: bool,
+    verbose: bool,
+    all_states: list,
+):
+    """Run bulk with live dashboard display."""
+    from rich.live import Live
+
+    from pyqual.bulk_run import (
+        BulkRunResult,
+        build_dashboard_table,
+        bulk_run,
+    )
+
+    _live_result: list[BulkRunResult] = []
+
+    def _run_with_live(live: Live, states_ref: list) -> BulkRunResult:
+        def _refresh(states):
+            states_ref.clear()
+            states_ref.extend(states)
+            live.update(build_dashboard_table(states, show_last_line=verbose,
+                                              show_analysis=analyze))
+
+        return bulk_run(
+            root=path,
+            parallel=parallel,
+            dry_run=dry_run,
+            timeout=timeout,
+            filter_names=filter_name or None,
+            live_callback=_refresh,
+            log_dir=log_dir,
+            analyze=analyze,
+        )
+
+    states_ref: list = []
+    with Live(build_dashboard_table(all_states, show_last_line=verbose,
+                                    show_analysis=analyze),
+              console=_console, refresh_per_second=2) as live:
+        result = _run_with_live(live, states_ref)
+        # Final update
+        if states_ref:
+            live.update(build_dashboard_table(states_ref, show_last_line=verbose,
+                                              show_analysis=analyze))
+
+    return result
 
 
 def register_bulk_commands(app: typer.Typer) -> None:

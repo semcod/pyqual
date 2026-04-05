@@ -118,6 +118,47 @@ class ProjectRunState:
 # Output line parser (parses pyqual run --verbose stderr/stdout)
 # ---------------------------------------------------------------------------
 
+def _parse_stage_start(state: ProjectRunState, line: str) -> bool:
+    """Parse stage start marker. Returns True if handled."""
+    if line.startswith("▶ ") or line.startswith("► "):
+        state.current_stage = line[2:].strip()
+        return True
+    return False
+
+
+def _parse_iteration_header(state: ProjectRunState, line: str) -> None:
+    """Parse iteration header and update state."""
+    if "Iteration " not in line:
+        return
+    try:
+        num_str = line.split("Iteration ")[1].split()[0].strip("─ ")
+        state.iteration = int(num_str)
+        state.stages_done = 0
+        state.gates_passed = 0
+    except (ValueError, IndexError):
+        pass
+
+
+def _parse_gate_line(state: ProjectRunState, line: str) -> bool:
+    """Parse gate comparison line. Returns True if handled."""
+    if "≤" in line or "≥" in line:
+        if "✅" in line:
+            state.gates_passed += 1
+        return True
+    return False
+
+
+def _parse_stage_completion(state: ProjectRunState, line: str) -> None:
+    """Parse stage completion marker."""
+    for icon in ("✅", "❌", "⏭"):
+        if icon in line:
+            after_icon = line.split(icon, 1)[1].strip()
+            if "(" in after_icon:
+                state.stages_done += 1
+                state.current_stage = after_icon.split("(")[0].strip()
+            break
+
+
 def _parse_output_line(state: ProjectRunState, line: str) -> None:
     """Parse a line of pyqual run output and update state."""
     line = line.strip()
@@ -125,42 +166,22 @@ def _parse_output_line(state: ProjectRunState, line: str) -> None:
         return
 
     state.last_line = line[:BULK_LINE_TRUNCATE]
-    clean = line
 
-    # Detect stage START: "▶ lint" (emitted before stage executes)
-    if clean.startswith("▶ ") or clean.startswith("► "):
-        state.current_stage = clean[2:].strip()
+    # Try each parser in order
+    if _parse_stage_start(state, line):
         return
 
-    # Detect iteration header: "─── Iteration 2 ───"
-    if "Iteration " in clean:
-        try:
-            num_str = clean.split("Iteration ")[1].split()[0].strip("─ ")
-            state.iteration = int(num_str)
-            state.stages_done = 0
-            state.gates_passed = 0   # reset per-iteration gate counter
-        except (ValueError, IndexError):
-            pass
+    _parse_iteration_header(state, line)
 
-    # Gate lines: "  ✅ critical: 0.0 ≤ 0.0" — handle before stage detection
-    if "≤" in clean or "≥" in clean:
-        if "✅" in clean:
-            state.gates_passed += 1
+    if _parse_gate_line(state, line):
         return
 
-    # Stage completion: "  ✅ lint (1.2s)" or "  ❌ test (3.4s)" or "  ⏭ fix (skipped)"
-    # Stage lines always have "(Xs)" or "(skipped)" after the name
-    for icon in ("✅", "❌", "⏭"):
-        if icon in clean:
-            after_icon = clean.split(icon, 1)[1].strip()
-            if "(" in after_icon:
-                state.stages_done += 1
-                state.current_stage = after_icon.split("(")[0].strip()
-            break
+    _parse_stage_completion(state, line)
 
-    if "All gates passed" in clean:
+    # Final status detection
+    if "All gates passed" in line:
         state.status = RunStatus.PASSED
-    if "Gates not met after" in clean:
+    if "Gates not met after" in line:
         state.status = RunStatus.FAILED
 
 

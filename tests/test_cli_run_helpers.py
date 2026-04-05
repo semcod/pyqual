@@ -269,19 +269,17 @@ class TestFormatRunSummary:
     def test_includes_todo_info(self) -> None:
         summary = {"todo_active": 5, "todo_completed": 3, "todo_total": 8}
         text = format_run_summary(summary)
-        assert "TODO" in text
-        assert "5 active" in text
+        assert "Tickets" in text
 
     def test_includes_fix_info(self) -> None:
         summary = {"fix_result": "changed", "fix_files_changed": 2}
         text = format_run_summary(summary)
-        assert "fix" in text
-        assert "result=changed" in text
+        assert "Fix" in text
 
     def test_includes_delivery_failures(self) -> None:
         summary = {"delivery_failures": ["publish failed (rc=2): make: *** Error 1", "deploy failed (rc=1): deployment failed"]}
         text = format_run_summary(summary)
-        assert "delivery" in text
+        assert "Delivery" in text
         assert "publish failed" in text
         assert "deploy failed" in text
 

@@ -256,46 +256,46 @@ class Pipeline:
             return binary
         return None
 
+    def _make_skipped_result(self, stage: StageConfig, reason: str) -> StageResult:
+        """Create a skipped stage result."""
+        result = StageResult(
+            name=stage.name, returncode=0,
+            stdout=f"[skipped] {reason}",
+            stderr="", duration=0.0, skipped=True,
+            tool=stage.tool,
+        )
+        self._log_stage(stage, result)
+        return result
+
+    def _make_dry_run_result(self, stage: StageConfig, command: str) -> StageResult:
+        """Create a dry-run stage result."""
+        label = f"tool:{stage.tool}" if stage.tool else stage.run
+        result = StageResult(
+            name=stage.name, returncode=0,
+            stdout=f"[dry-run] Would execute: {label}",
+            stderr="", duration=0.0,
+            command=command, tool=stage.tool,
+        )
+        self._log_stage(stage, result)
+        return result
+
     def _execute_stage(self, stage: StageConfig, dry_run: bool) -> StageResult:
         """Execute a single stage command."""
         command = stage.run
-        # `optional` means best-effort discovery / binary skipping, not silent success.
-        # Command failures should still surface so publish/push errors are visible.
         allow_failure = False
 
         if stage.tool:
             resolved = self._resolve_tool_stage(stage)
             command, allow_failure = resolved
             if not command:
-                result = StageResult(
-                    name=stage.name, returncode=0,
-                    stdout=f"[skipped] Tool '{stage.tool}' not found (optional)",
-                    stderr="", duration=0.0, skipped=True,
-                    tool=stage.tool,
-                )
-                self._log_stage(stage, result)
-                return result
+                return self._make_skipped_result(stage, f"Tool '{stage.tool}' not found (optional)")
         elif stage.optional and command:
             missing = self._check_optional_binary(command)
             if missing:
-                result = StageResult(
-                    name=stage.name, returncode=0,
-                    stdout=f"[skipped] '{missing}' not found on PATH (optional)",
-                    stderr="", duration=0.0, skipped=True,
-                )
-                self._log_stage(stage, result)
-                return result
+                return self._make_skipped_result(stage, f"'{missing}' not found on PATH (optional)")
 
         if dry_run:
-            label = f"tool:{stage.tool}" if stage.tool else stage.run
-            result = StageResult(
-                name=stage.name, returncode=0,
-                stdout=f"[dry-run] Would execute: {label}",
-                stderr="", duration=0.0,
-                command=command, tool=stage.tool,
-            )
-            self._log_stage(stage, result)
-            return result
+            return self._make_dry_run_result(stage, command)
 
         log.info("stage=%s tool=%s command=%r status=started", stage.name, stage.tool or "-", command)
         if self.on_stage_start:
@@ -318,19 +318,23 @@ class Pipeline:
             self._capture_runtime_error(stage, result)
 
         if not result.passed and not result.skipped and self.on_stage_error:
-            from pyqual.validation import StageFailure
-            failure = StageFailure(
-                stage_name=stage.name,
-                returncode=result.returncode,
-                stderr=result.stderr,
-                stdout=result.stdout,
-                duration=result.duration,
-                is_fix_stage=is_fix_stage,
-                timed_out=(result.returncode == TIMEOUT_EXIT_CODE),
-            )
-            self.on_stage_error(failure)
+            self._notify_stage_error(stage, result, is_fix_stage)
 
         return result
+
+    def _notify_stage_error(self, stage: StageConfig, result: StageResult, is_fix_stage: bool) -> None:
+        """Notify callback of stage error."""
+        from pyqual.validation import StageFailure
+        failure = StageFailure(
+            stage_name=stage.name,
+            returncode=result.returncode,
+            stderr=result.stderr,
+            stdout=result.stdout,
+            duration=result.duration,
+            is_fix_stage=is_fix_stage,
+            timed_out=(result.returncode == TIMEOUT_EXIT_CODE),
+        )
+        self.on_stage_error(failure)
 
     def _execute_captured(self, stage: StageConfig, command: str,
                           allow_failure: bool, env: dict, start: float) -> StageResult:
@@ -625,30 +629,35 @@ class Pipeline:
         rc = result.original_returncode
         stderr = (result.stderr or "").lower()
         
-        if rc == TIMEOUT_EXIT_CODE:
-            return "timeout"
-        elif rc == 124:  # timeout command
-            return "timeout"
-        elif rc == 125:  # timeout command error
-            return "timeout"
-        elif rc >= 128 and rc <= 129:
+        # Return code classification
+        rc_error_map = {
+            TIMEOUT_EXIT_CODE: "timeout",
+            124: "timeout",  # timeout command
+            125: "timeout",  # timeout command error
+            127: "command_not_found",
+            126: "permission_denied",
+        }
+        if rc in rc_error_map:
+            return rc_error_map[rc]
+        if 128 <= rc <= 129:
             return "signal"
-        elif rc == 127:
-            return "command_not_found"
-        elif rc == 126:
-            return "permission_denied"
-        elif "importerror" in stderr or "modulenotfounderror" in stderr:
-            return "import_error"
-        elif "syntaxerror" in stderr:
-            return "syntax_error"
-        elif "keyerror" in stderr or "attributeerror" in stderr:
-            return "runtime_exception"
-        elif "assertionerror" in stderr:
-            return "assertion_failed"
-        elif "test failed" in stderr or "failed tests" in stderr:
-            return "test_failed"
-        else:
-            return "unknown"
+        
+        # Stderr pattern classification
+        stderr_patterns = [
+            ("importerror", "import_error"),
+            ("modulenotfounderror", "import_error"),
+            ("syntaxerror", "syntax_error"),
+            ("keyerror", "runtime_exception"),
+            ("attributeerror", "runtime_exception"),
+            ("assertionerror", "assertion_failed"),
+            ("test failed", "test_failed"),
+            ("failed tests", "test_failed"),
+        ]
+        for pattern, error_type in stderr_patterns:
+            if pattern in stderr:
+                return error_type
+        
+        return "unknown"
     
     def _extract_error_message(self, result: StageResult) -> str:
         """Extract the most relevant error message from stderr/stdout."""

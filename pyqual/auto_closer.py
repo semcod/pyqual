@@ -91,10 +91,78 @@ Format your response as a GitHub-style markdown block."""
         return f"⚠️ LLM Evaluation failed: {e}"
 
 
+def _should_close_ticket(ticket, changed_files: set[str]) -> bool:
+    """Determine if a ticket should be closed."""
+    current_status = str(ticket.status).lower()
+    if "done" in current_status:
+        return False
+
+    ticket_files = ticket.sync.get("files", [])
+    if any(f in changed_files for f in ticket_files):
+        return True
+    if "in_progress" in current_status:
+        return True
+    return False
+
+
+def _close_github_issue(reporter, issue_num: int) -> bool:
+    """Close a GitHub issue. Returns True on success."""
+    if not reporter.repo:
+        print(f"    ⚠️ GITHUB_REPOSITORY not set, cannot close issue #{issue_num}")
+        return False
+
+    env = os.environ.copy()
+    if reporter.token:
+        env["GH_TOKEN"] = reporter.token
+    close_result = subprocess.run(
+        ["gh", "issue", "close", str(issue_num),
+         "--repo", reporter.repo,
+         "--comment", "Auto-closed: All quality gates passed"],
+        capture_output=True, text=True, timeout=30,
+        env=env
+    )
+    if close_result.returncode == 0:
+        print(f"    ✅ Closed issue #{issue_num}")
+        return True
+    print(f"    ⚠️ Failed to close issue #{issue_num}: {close_result.stderr[:100]}")
+    return False
+
+
+def _process_ticket(ticket, store, reporter, diff_content: str, completion_rate: float) -> bool:
+    """Process a single ticket for closure. Returns True if closed."""
+    print(f"  ✓ Evaluating {ticket.id}: {ticket.title}")
+
+    # Generate local LLM evaluation
+    evaluation = evaluate_with_llm(ticket.title, ticket.description, diff_content)
+
+    # Try to find GitHub Issue number
+    external_id = ticket.sync.get("id")
+    if external_id and external_id.isdigit():
+        issue_num = int(external_id)
+        print(f"    📢 Posting evaluation comment to issue #{issue_num}...")
+
+        comment_body = f"""### 📊 Pyqual Task Evaluation for {ticket.id}
+**Status:** ✅ Quality Gates Passed ({completion_rate:.1f}%)
+
+{evaluation}
+
+---
+*Automatically evaluated and closed by pyqual.*"""
+
+        reporter.post_issue_comment(comment_body, issue_num)
+        print(f"    🔒 Closing issue #{issue_num}...")
+        _close_github_issue(reporter, issue_num)
+
+    # Mark as done locally
+    from planfile.core.models import TicketStatus
+    store.update_ticket(ticket.id, status=TicketStatus.done)
+    return True
+
+
 def main():
     workdir = Path.cwd()
     report_path = workdir / REPORT_FILE
-    
+
     if not report_path.exists():
         print(f"ℹ️ {REPORT_FILE} not found. Skipping auto-closure.")
         return
@@ -107,21 +175,20 @@ def main():
     except Exception as e:
         print(f"✗ Failed to parse {REPORT_FILE}: {e}")
         return
-    
+
     # Calculate simple pass rate metric
     passed = gates_info.get("passed", 0)
     total = gates_info.get("total", 1)
     completion_rate = (passed / total) * 100 if total > 0 else 0
-    
+
     if status != "pass":
         print(f"❌ Quality gates status: {status} ({completion_rate:.1f}% passed). Skipping task closure.")
         return
 
     print(f"✅ Quality gates passed ({completion_rate:.1f}%)! Processing tickets...")
-    
+
     try:
         from planfile.core.store import PlanfileStore
-        from planfile.core.models import TicketStatus
         from pyqual.github_actions import GitHubActionsReporter
     except ImportError as e:
         print(f"✗ Library missing: {e}")
@@ -133,70 +200,12 @@ def main():
     changed_files = get_changed_files()
     diff_content = get_diff_content()
     reporter = GitHubActionsReporter()
-    
+
     closed_count = 0
     for ticket in tickets:
-        current_status = str(ticket.status).lower()
-        if ticket.id == "PLF-002":
-            print(f"DEBUG: Checking PLF-002: status='{current_status}'")
-            
-        if "done" in current_status:
-            continue
-            
-        should_close = False
-        ticket_files = ticket.sync.get("files", [])
-        if any(f in changed_files for f in ticket_files):
-            should_close = True
-            
-        if "in_progress" in current_status:
-            should_close = True
-
-        if should_close:
-            print(f"  ✓ Evaluating {ticket.id}: {ticket.title}")
-            
-            # 1. Generate local LLM evaluation
-            evaluation = evaluate_with_llm(ticket.title, ticket.description, diff_content)
-            
-            # 2. Try to find GitHub Issue number
-            # planfile stores external IDs in sync metadata
-            external_id = ticket.sync.get("id")
-            if external_id and external_id.isdigit():
-                issue_num = int(external_id)
-                print(f"    📢 Posting evaluation comment to issue #{issue_num}...")
-                
-                comment_body = f"""### 📊 Pyqual Task Evaluation for {ticket.id}
-**Status:** ✅ Quality Gates Passed ({completion_rate:.1f}%)
-
-{evaluation}
-
----
-*Automatically evaluated and closed by pyqual.*"""
-                
-                reporter.post_issue_comment(comment_body, issue_num)
-                
-                # Close the GitHub issue
-                print(f"    🔒 Closing issue #{issue_num}...")
-                if not reporter.repo:
-                    print(f"    ⚠️ GITHUB_REPOSITORY not set, cannot close issue #{issue_num}")
-                else:
-                    env = os.environ.copy()
-                    if reporter.token:
-                        env["GH_TOKEN"] = reporter.token
-                    close_result = subprocess.run(
-                        ["gh", "issue", "close", str(issue_num), 
-                         "--repo", reporter.repo,
-                         "--comment", "Auto-closed: All quality gates passed"],
-                        capture_output=True, text=True, timeout=30,
-                        env=env
-                    )
-                    if close_result.returncode == 0:
-                        print(f"    ✅ Closed issue #{issue_num}")
-                    else:
-                        print(f"    ⚠️ Failed to close issue #{issue_num}: {close_result.stderr[:100]}")
-            
-            # 3. Mark as done locally
-            store.update_ticket(ticket.id, status=TicketStatus.done)
-            closed_count += 1
+        if _should_close_ticket(ticket, changed_files):
+            if _process_ticket(ticket, store, reporter, diff_content, completion_rate):
+                closed_count += 1
 
     if closed_count > 0:
         print(f"\n🎉 Successfully evaluated and marked {closed_count} tickets as DONE.")

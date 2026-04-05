@@ -9,6 +9,105 @@ interface RepositoryDetailProps {
   repositories: Repository[];
 }
 
+// Helper component for status badge
+const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
+  const isPassed = status === 'passed';
+  const bgClass = isPassed ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+  const Icon = isPassed ? CheckCircleIcon : XCircleIcon;
+
+  return (
+    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${bgClass}`}>
+      <Icon className="h-4 w-4 mr-1" />
+      {status}
+    </span>
+  );
+};
+
+// Helper component for metric card
+const MetricCard: React.FC<{
+  name: string;
+  value: number | string;
+  passed: boolean;
+  threshold?: number;
+}> = ({ name, value, passed, threshold }) => {
+  const Icon = passed ? CheckCircleIcon : XCircleIcon;
+  const iconColor = passed ? 'text-green-500' : 'text-red-500';
+
+  return (
+    <div className="border rounded-lg p-4">
+      <div className="flex justify-between items-start">
+        <div>
+          <p className="text-sm font-medium text-gray-500 capitalize">
+            {name.replace(/_/g, ' ')}
+          </p>
+          <p className="text-2xl font-semibold text-gray-900">
+            {typeof value === 'number' ? value.toFixed(1) : value}
+            {name.includes('coverage') && '%'}
+          </p>
+        </div>
+        <Icon className={`h-5 w-5 ${iconColor}`} />
+      </div>
+      {threshold !== undefined && (
+        <p className="text-xs text-gray-500 mt-1">Threshold: {threshold}</p>
+      )}
+    </div>
+  );
+};
+
+// Helper component for run details grid
+const RunDetails: React.FC<{ run: PyqualSummary }> = ({ run }) => (
+  <div className="bg-white rounded-lg shadow p-6">
+    <h2 className="text-lg font-medium text-gray-900 mb-4">Latest Run Details</h2>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div>
+        <p className="text-sm font-medium text-gray-500">Commit</p>
+        <p className="text-sm text-gray-900 font-mono">{run.commit.slice(0, 8)}</p>
+      </div>
+      <div>
+        <p className="text-sm font-medium text-gray-500">Branch</p>
+        <p className="text-sm text-gray-900">{run.branch}</p>
+      </div>
+      <div>
+        <p className="text-sm font-medium text-gray-500">Timestamp</p>
+        <p className="text-sm text-gray-900">{new Date(run.timestamp).toLocaleString()}</p>
+      </div>
+      <div>
+        <p className="text-sm font-medium text-gray-500">Duration</p>
+        <p className="text-sm text-gray-900">{run.duration_s?.toFixed(2)}s</p>
+      </div>
+      <div>
+        <p className="text-sm font-medium text-gray-500">Iterations</p>
+        <p className="text-sm text-gray-900">{run.iterations}</p>
+      </div>
+      <div>
+        <p className="text-sm font-medium text-gray-500">Python Version</p>
+        <p className="text-sm text-gray-900">{run.python_version || 'N/A'}</p>
+      </div>
+    </div>
+  </div>
+);
+
+// Helper component for metrics section
+const MetricsSection: React.FC<{ run: PyqualSummary }> = ({ run }) => (
+  <div className="bg-white rounded-lg shadow p-6">
+    <h2 className="text-lg font-medium text-gray-900 mb-4">Quality Metrics</h2>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {Object.entries(run.metrics).map(([key, value]) => {
+        const gate = run.gates.find(g => g.metric === key);
+        return (
+          <MetricCard
+            key={key}
+            name={key}
+            value={value}
+            passed={gate?.passed ?? true}
+            threshold={gate?.threshold}
+          />
+        );
+      })}
+    </div>
+  </div>
+);
+
 const RepositoryDetail: React.FC<RepositoryDetailProps> = ({ repositories }) => {
   const { repoId } = useParams<{ repoId: string }>();
   const navigate = useNavigate();
@@ -20,7 +119,6 @@ const RepositoryDetail: React.FC<RepositoryDetailProps> = ({ repositories }) => 
     const repo = repositories.find(r => r.id === repoId);
     if (repo) {
       setRepository(repo);
-      // In a real implementation, fetch historical runs
       setRuns(repo.runs || [repo.lastRun].filter(Boolean) as PyqualSummary[]);
     }
     setLoading(false);
@@ -61,18 +159,7 @@ const RepositoryDetail: React.FC<RepositoryDetailProps> = ({ repositories }) => 
         </div>
         {latestRun && (
           <div className="flex items-center space-x-4">
-            <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-              latestRun.status === 'passed' 
-                ? 'bg-green-100 text-green-800' 
-                : 'bg-red-100 text-red-800'
-            }`}>
-              {latestRun.status === 'passed' ? (
-                <CheckCircleIcon className="h-4 w-4 mr-1" />
-              ) : (
-                <XCircleIcon className="h-4 w-4 mr-1" />
-              )}
-              {latestRun.status}
-            </span>
+            <StatusBadge status={latestRun.status} />
             <a
               href={repository.ciUrl}
               target="_blank"
@@ -86,77 +173,10 @@ const RepositoryDetail: React.FC<RepositoryDetailProps> = ({ repositories }) => 
       </div>
 
       {/* Latest Run Summary */}
-      {latestRun && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Latest Run Details</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <p className="text-sm font-medium text-gray-500">Commit</p>
-              <p className="text-sm text-gray-900 font-mono">{latestRun.commit.slice(0, 8)}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Branch</p>
-              <p className="text-sm text-gray-900">{latestRun.branch}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Timestamp</p>
-              <p className="text-sm text-gray-900">
-                {new Date(latestRun.timestamp).toLocaleString()}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Duration</p>
-              <p className="text-sm text-gray-900">{latestRun.duration_s?.toFixed(2)}s</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Iterations</p>
-              <p className="text-sm text-gray-900">{latestRun.iterations}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Python Version</p>
-              <p className="text-sm text-gray-900">{latestRun.python_version || 'N/A'}</p>
-            </div>
-          </div>
-        </div>
-      )}
+      {latestRun && <RunDetails run={latestRun} />}
 
       {/* Metrics */}
-      {latestRun && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Quality Metrics</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {Object.entries(latestRun.metrics).map(([key, value]) => {
-              const gate = latestRun.gates.find(g => g.metric === key);
-              const passed = gate?.passed ?? true;
-              return (
-                <div key={key} className="border rounded-lg p-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="text-sm font-medium text-gray-500 capitalize">
-                        {key.replace(/_/g, ' ')}
-                      </p>
-                      <p className="text-2xl font-semibold text-gray-900">
-                        {typeof value === 'number' ? value.toFixed(1) : value}
-                        {key.includes('coverage') && '%'}
-                      </p>
-                    </div>
-                    {passed ? (
-                      <CheckCircleIcon className="h-5 w-5 text-green-500" />
-                    ) : (
-                      <XCircleIcon className="h-5 w-5 text-red-500" />
-                    )}
-                  </div>
-                  {gate?.threshold && (
-                    <p className="text-xs text-gray-500 mt-1">
-                      Threshold: {gate.threshold}
-                    </p>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
+      {latestRun && <MetricsSection run={latestRun} />}
 
       {/* Stages */}
       {latestRun && (

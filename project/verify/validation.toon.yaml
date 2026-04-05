@@ -1,0 +1,28 @@
+# vallm batch | 327f | 208✓ 2⚠ 1✗ | 2026-04-05
+
+SUMMARY:
+  scanned: 327  passed: 208 (63.6%)  warnings: 2  errors: 1  unsupported: 117
+
+WARNINGS[2]{path,score}:
+  dashboard/vite.config.ts,0.79
+    issues[1]{rule,severity,message,line}:
+      js.import.resolvable,warning,Module 'vite' not found,1
+  dashboard/vitest.config.ts,0.86
+    issues[1]{rule,severity,message,line}:
+      js.import.resolvable,warning,Module 'vitest/config' not found,1
+
+ERRORS[1]{path,score}:
+  dashboard/api/main.py,0.85
+    issues[5]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'fastapi' not found,1
+      python.import.resolvable,error,Module 'fastapi.middleware.cors' not found,2
+      python.import.resolvable,error,Module 'fastapi.staticfiles' not found,3
+      python.import.resolvable,error,Module 'fastapi.security' not found,4
+      python.import.resolvable,error,Module 'dashboard.constants' not found,14
+
+UNSUPPORTED[5]{bucket,count}:
+  *.md,63
+  Dockerfile*,2
+  *.txt,13
+  *.yml,3
+  other,36

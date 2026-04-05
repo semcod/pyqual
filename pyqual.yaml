@@ -16,36 +16,10 @@ pipeline:
     secrets_found_max: 0     # detect-secrets findings
     mypy_errors_max: 100      # mypy type errors (realistic for gradual typing)
 
-  # Pipeline stages — use 'tool:' for built-in presets or 'run:' for custom
+  # Pipeline stages using new built-in tools
   stages:
-    # Verify/install all tool dependencies before pipeline starts
     - name: setup
-      run: |
-        set -e
-        echo "=== pyqual dependency check ==="
-        # Python tools (pip)
-        for pkg in code2llm vallm prefact llx pytest-cov goal; do
-          if python -m pip show "$pkg" >/dev/null 2>&1; then
-            echo "  ✓ $pkg"
-          else
-            echo "  ✗ $pkg — installing…"
-            pip install -q "$pkg" || echo "  ⚠ $pkg install failed (optional)"
-          fi
-        done
-        # Node tools (claude)
-        if command -v claude >/dev/null 2>&1; then
-          echo "  ✓ claude $(claude --version 2>/dev/null)"
-        else
-          echo "  ✗ claude — installing…"
-          npm install -g --prefix="$HOME/.local" @anthropic-ai/claude-code 2>/dev/null \
-            && echo "  ✓ claude installed" \
-            || echo "  ⚠ claude install failed (fix stage will use llx fallback)"
-        fi
-        # Claude Code auth can be either:
-        # - local OAuth session via `claude auth login`
-        # - ANTHROPIC_API_KEY in CI/GitHub Actions
-        # We only verify the CLI is available here.
-        echo "=== setup done ==="
+      tool: setup-deps
       when: first_iteration
       timeout: 300
 
@@ -56,43 +30,25 @@ pipeline:
       when: first_iteration
       optional: true
 
-    # - name: analyze
-    #   tool: code2llm
-    #   when: first_iteration
-
-    # - name: validate
-    #   run: vallm batch pyqual tests --recursive --format toon --output ./project
-    #   when: always
-
-    # Security scans (enabled):
     - name: pip-audit
-      run: pip-audit --format=json --output=.pyqual/audit.json 2>/dev/null || pip-audit --format=json > .pyqual/audit.json 2>&1 || echo "[]" > .pyqual/audit.json
+      tool: pip-audit
       when: always
       optional: true
-      timeout: 120
 
     - name: ruff-lint
-      run: ruff check pyqual tests --output-format=json > .pyqual/ruff.json 2>&1 || echo "[]" > .pyqual/ruff.json
+      tool: ruff
       when: always
       optional: true
-      timeout: 60
 
     - name: detect-secrets
-      run: |
-        if command -v detect-secrets >/dev/null 2>&1; then
-          detect-secrets scan --all-files --force-use-all-plugins --baseline .pyqual/secrets-baseline.json 2>/dev/null > .pyqual/secrets.json || detect-secrets scan --all-files 2>/dev/null > .pyqual/secrets.json || echo '{"results":{}}' > .pyqual/secrets.json
-        else
-          echo '{"results":{}}' > .pyqual/secrets.json
-        fi
+      tool: detect-secrets
       when: always
       optional: true
-      timeout: 60
 
     - name: mypy-types
-      run: mypy pyqual --ignore-missing-imports --show-error-codes --output=json > .pyqual/mypy.json 2>&1 || mypy pyqual --ignore-missing-imports --show-error-codes > .pyqual/mypy.txt 2>&1 || echo "[]" > .pyqual/mypy.json
+      tool: mypy
       when: always
       optional: true
-      timeout: 120
 
     - name: prefact
       tool: prefact
@@ -100,147 +56,60 @@ pipeline:
       when: metrics_fail
       timeout: 900
 
-    # Custom fix - uses explicit LLM_MODEL (openrouter/openai/gpt-5-mini)
-    # NOTE: Requires llx to be installed (pip install llx) or will gracefully skip
+    # Custom fix - uses explicit LLM_MODEL
     - name: fix
       run: |
         export PATH="$HOME/.local/bin:$PATH"
-        echo "Using model: ${LLM_MODEL:-openrouter/openai/gpt-5-mini}"
-        python3 pyqual/custom_fix.py 2>&1 | tee .pyqual/fix_output.log || echo "Fix stage skipped (llx not available)"
+        python3 pyqual/custom_fix.py 2>&1 | tee .pyqual/fix_output.log || echo "Fix stage skipped"
       when: metrics_fail
       optional: true
       timeout: 1800
 
     - name: verify
-      run: vallm batch pyqual tests --recursive --format toon --output ./project
+      tool: vallm-verify
       optional: true
       when: after_fix
-      timeout: 300
 
-    # Generate metrics report (YAML) and update README.md badges
     - name: report
       tool: report
       when: always
       optional: true
 
-    # Continuous improvement: process TODO.md items when all gates pass
-    # Uses parallel execution with multiple tools (Claude Code + llx)
     - name: todo_fix
-      run: python3 -m pyqual.run_parallel_fix
+      tool: todo-fix
       when: metrics_pass
       optional: true
       timeout: 1800
 
-    # Auto-merge attack mode - pull remote changes first
-    - name: automerge
-      run: |
-        export PYTHONPATH=$PYTHONPATH:.
-        python3 - <<'PY'
-        from pyqual.plugins.attack import attack_check, attack_merge
-        import json
-        import sys
-
-        check = attack_check()
-        with open('.pyqual/attack_check.json', 'w') as f:
-            json.dump(check, f)
-
-        if not check['success']:
-            print('Attack check failed:', check.get('error'))
-            sys.exit(0)
-
-        print(f"Conflicts: {check['conflicts_detected']}, Behind: {check['branches_behind']}")
-
-        if check['branches_behind'] > 0 or check['conflicts_detected'] > 0:
-            merge = attack_merge(strategy='theirs', dry_run=False)
-            with open('.pyqual/attack_merge.json', 'w') as f:
-                json.dump(merge, f)
-            print(f"Merge result: success={merge.get('success')}")
-        else:
-            print('Already up to date')
-        PY
-      when: always
-      optional: true
-      timeout: 120
-
     - name: close_tasks
-      run: |
-        export PYTHONPATH=$PYTHONPATH:.
-        python3 pyqual/auto_closer.py
-        planfile sync all
+      tool: close-tasks
       when: always
       optional: true
 
-    # Push must be after close_tasks to include VERSION changes
     - name: push
-      run: |
-        if [ -n "$(git status --porcelain)" ]; then
-          git add -A
-          git commit -m "chore: pyqual auto-commit [skip ci]" 2>/dev/null || true
-          git push origin HEAD
-        else
-          echo "No changes to push"
-        fi
+      tool: git-push
       when: always
       optional: true
-      timeout: 120
 
     - name: publish
-      run: make publish
+      tool: make-publish
       when: metrics_pass
       optional: true
-      timeout: 300
 
-    # Auto-merge attack mode - aggressive conflict resolution (runs before push to pull changes)
     - name: automerge
-      run: |
-        export PYTHONPATH=$PYTHONPATH:.
-        python3 - <<'PY'
-        from pyqual.plugins.attack import attack_check, attack_merge
-        import json
-        import sys
-
-        # First check if merge is possible
-        check = attack_check()
-        with open('.pyqual/attack_check.json', 'w') as f:
-            json.dump(check, f)
-
-        if not check['success']:
-            print('Attack check failed:', check.get('error'))
-            sys.exit(0)  # Don't fail pipeline, just skip
-
-        print(f"Conflicts detected: {check['conflicts_detected']}")
-        print(f"Can fast-forward: {check['can_fast_forward']}")
-
-        # Perform attack merge if needed
-        if check['branches_behind'] > 0 or check['conflicts_detected'] > 0:
-            merge = attack_merge(strategy='theirs', dry_run=False)
-            with open('.pyqual/attack_merge.json', 'w') as f:
-                json.dump(merge, f)
-
-            if merge['success']:
-                print(f"Merge successful! Resolved {merge['conflicts_resolved']} conflicts")
-            else:
-                print('Merge failed:', merge.get('error'))
-        else:
-            print('Already up to date, no merge needed')
-        PY
+      tool: attack-merge
       when: always
       optional: true
-      timeout: 120
 
-    # Generate comprehensive markdown report with Mermaid diagram and ASCII flow
     - name: markdown_report
-      run: python3 -m pyqual.report_generator
+      tool: markdown-report
       when: always
       optional: true
-      timeout: 30
 
-  # Loop behavior
   loop:
     max_iterations: 3
-    on_fail: report      # report | create_ticket | block
+    on_fail: report
 
-  # Environment (optional)
   env:
     LLM_MODEL: openrouter/openai/gpt-5-mini
     LLX_DEFAULT_TIER: balanced
