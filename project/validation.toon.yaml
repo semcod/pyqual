@@ -4,14 +4,6 @@ SUMMARY:
   scanned: 116  passed: 108 (93.1%)  warnings: 16  errors: 0  unsupported: 8
 
 WARNINGS[16]{path,score}:
-  pyqual/bulk_run.py,0.90
-    issues[6]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,_run_single_project has cyclomatic complexity 19 (max: 15),231
-      complexity.cyclomatic,warning,_build_project_row has cyclomatic complexity 19 (max: 15),340
-      complexity.cyclomatic,warning,bulk_run has cyclomatic complexity 17 (max: 15),469
-      complexity.lizard_cc,warning,_run_single_project: CC=19 exceeds limit 15,231
-      complexity.lizard_cc,warning,_build_project_row: CC=19 exceeds limit 15,340
-      complexity.lizard_cc,warning,bulk_run: CC=17 exceeds limit 15,469
   pyqual/plugins/git/main.py,0.90
     issues[7]{rule,severity,message,line}:
       complexity.cyclomatic,warning,git_status has cyclomatic complexity 18 (max: 15),232
@@ -21,6 +13,12 @@ WARNINGS[16]{path,score}:
       complexity.lizard_cc,warning,git_status: CC=18 exceeds limit 15,232
       complexity.lizard_cc,warning,git_push: CC=17 exceeds limit 15,409
       complexity.lizard_cc,warning,scan_for_secrets: CC=17 exceeds limit 15,608
+  pyqual/bulk_run.py,0.93
+    issues[4]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,_run_single_project has cyclomatic complexity 17 (max: 15),260
+      complexity.cyclomatic,warning,bulk_run has cyclomatic complexity 17 (max: 15),493
+      complexity.lizard_cc,warning,_run_single_project: CC=17 exceeds limit 15,260
+      complexity.lizard_cc,warning,bulk_run: CC=17 exceeds limit 15,493
   pyqual/cli/cmd_git.py,0.93
     issues[4]{rule,severity,message,line}:
       complexity.cyclomatic,warning,git_scan_cmd has cyclomatic complexity 17 (max: 15),92

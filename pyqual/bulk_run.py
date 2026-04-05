@@ -228,6 +228,35 @@ def _analyze_project(state: ProjectRunState, log_dir: Path | None = None) -> Non
 # Single project runner (runs in a thread)
 # ---------------------------------------------------------------------------
 
+def _preflight_validate(state: ProjectRunState, config_path: Path) -> bool:
+    """Run pre-flight validation. Returns True if config is valid."""
+    try:
+        from pyqual.validation import validate_config
+        preflight = validate_config(config_path)
+        if not preflight.ok:
+            state.status = RunStatus.ERROR
+            first_err = preflight.errors[0]
+            state.error_msg = f"[config] {first_err.code}: {first_err.message[:120]}"
+            state.duration = time.monotonic() - state.start_time
+            return False
+    except Exception:
+        pass  # validation module import failed — let subprocess report the error
+    return True
+
+
+def _parse_config_counts(state: ProjectRunState, config_path: Path) -> None:
+    """Parse config to get stage/iteration/gate counts."""
+    try:
+        data = yaml.safe_load(config_path.read_text())
+        pipe = data.get("pipeline", data)
+        state.stages_total = len(pipe.get("stages", []))
+        state.max_iterations = pipe.get("loop", {}).get("max_iterations", 3)
+        state.gates_total = len(pipe.get("metrics", {}))
+    except Exception:
+        state.stages_total = 0
+        state.max_iterations = 3
+
+
 def _run_single_project(
     state: ProjectRunState,
     dry_run: bool = False,
@@ -249,28 +278,11 @@ def _run_single_project(
         return
 
     # --- Pre-flight validation (fast, local, no subprocess) ---
-    try:
-        from pyqual.validation import validate_config
-        preflight = validate_config(config_path)
-        if not preflight.ok:
-            state.status = RunStatus.ERROR
-            first_err = preflight.errors[0]
-            state.error_msg = f"[config] {first_err.code}: {first_err.message[:120]}"
-            state.duration = time.monotonic() - state.start_time
-            return
-    except Exception:
-        pass  # validation module import failed — let subprocess report the error
+    if not _preflight_validate(state, config_path):
+        return
 
     # Parse config to get stage/iteration counts
-    try:
-        data = yaml.safe_load(config_path.read_text())
-        pipe = data.get("pipeline", data)
-        state.stages_total = len(pipe.get("stages", []))
-        state.max_iterations = pipe.get("loop", {}).get("max_iterations", 3)
-        state.gates_total = len(pipe.get("metrics", {}))
-    except Exception:
-        state.stages_total = 0
-        state.max_iterations = 3
+    _parse_config_counts(state, config_path)
 
     cmd = [pyqual_cmd, "run", "--config", str(config_path), "--workdir", str(state.path)]
     if dry_run:
