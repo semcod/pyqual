@@ -11,9 +11,9 @@ from pyqual.config import GateConfig
 from pyqual.gates import CompositeGateSet
 
 # Gate thresholds
-COVERAGE_THRESHOLD = 80
-CC_THRESHOLD = 15
-RUFF_ERRORS_THRESHOLD = 10
+COVERAGE_THRESHOLD: float = 80.0
+CC_THRESHOLD: float = 15.0
+RUFF_ERRORS_THRESHOLD: float = 10.0
 
 # Weights for composite scoring
 WEIGHT_COVERAGE = 0.4

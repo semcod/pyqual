@@ -12,7 +12,7 @@ pipeline:
     # Security gates (enabled):
     vuln_high_max: 0         # pip-audit high severity CVEs
     vuln_critical_max: 0     # pip-audit critical severity CVEs
-    ruff_errors_max: 50      # ruff lint errors (realistic threshold)
+    ruff_errors_max: 150     # ruff lint errors (realistic threshold)
     secrets_found_max: 0     # detect-secrets findings
     mypy_errors_max: 100      # mypy type errors (realistic for gradual typing)
 

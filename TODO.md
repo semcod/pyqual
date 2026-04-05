@@ -15,9 +15,9 @@
 - [ ] examples/custom_gates/composite_gates.py:34 - Magic number: 80.0 - use named constant
 - [ ] examples/custom_gates/composite_gates.py:35 - Magic number: 15.0 - use named constant
 - [ ] examples/custom_gates/composite_gates.py:157 - module execution block
-- [ ] examples/custom_gates/composite_simple.py:14 - Magic number: 80 - use named constant
-- [ ] examples/custom_gates/composite_simple.py:15 - Magic number: 15 - use named constant
-- [ ] examples/custom_gates/composite_simple.py:24 - Magic number: 75.0 - use named constant
+- [x] examples/custom_gates/composite_simple.py:14 - Magic number: 80 - use named constant
+- [x] examples/custom_gates/composite_simple.py:15 - Magic number: 15 - use named constant
+- [x] examples/custom_gates/composite_simple.py:24 - Magic number: 75.0 - use named constant
 - [ ] examples/custom_gates/dynamic_thresholds.py:8 - Magic number: 80.0 - use named constant
 - [ ] examples/custom_gates/dynamic_thresholds.py:11 - Magic number: 75.0 - use named constant
 - [ ] examples/custom_gates/dynamic_thresholds.py:53 - module execution block
