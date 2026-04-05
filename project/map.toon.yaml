@@ -1,10 +1,10 @@
-# pyqual | 96f 18175L | shell:4,typescript:11,javascript:2,python:79 | 2026-04-04
-# stats: 534 func | 0 cls | 96 mod | CC̄=5.5 | critical:27 | cycles:0
+# pyqual | 98f 18848L | shell:4,javascript:2,typescript:11,python:81 | 2026-04-05
+# stats: 556 func | 0 cls | 98 mod | CC̄=5.6 | critical:29 | cycles:0
 # alerts[5]: fan-out run=31; fan-out register_observe_commands=29; fan-out main=27; fan-out get_last_run=26; fan-out main=26
-# hotspots[5]: run fan=31; register_observe_commands fan=29; main fan=27; main fan=26; get_last_run fan=26
-# evolution: CC̄ 5.5→5.5 (flat 0.0)
+# hotspots[5]: run fan=31; register_observe_commands fan=29; main fan=27; get_last_run fan=26; main fan=26
+# evolution: CC̄ 5.5→5.6 (regressed +0.1)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[96]:
+M[98]:
   SUGGESTED_COMMANDS.sh,4
   dashboard/api/main.py,340
   dashboard/constants.py,57
@@ -26,7 +26,7 @@ M[96]:
   project.sh,35
   pyqual/__init__.py,154
   pyqual/__main__.py,6
-  pyqual/_gate_collectors.py,658
+  pyqual/_gate_collectors.py,700
   pyqual/api.py,519
   pyqual/auto_closer.py,208
   pyqual/bulk_init.py,564
@@ -42,13 +42,14 @@ M[96]:
   pyqual/cli/cmd_plugin.py,44
   pyqual/cli/cmd_run.py,349
   pyqual/cli/cmd_tickets.py,169
-  pyqual/cli/main.py,45
+  pyqual/cli/cmd_tune.py,240
+  pyqual/cli/main.py,231
   pyqual/cli_bulk_cmds.py,246
   pyqual/cli_log_helpers.py,117
   pyqual/cli_observe.py,446
-  pyqual/cli_run_helpers.py,345
-  pyqual/config.py,273
-  pyqual/constants.py,106
+  pyqual/cli_run_helpers.py,397
+  pyqual/config.py,257
+  pyqual/constants.py,107
   pyqual/custom_fix.py,218
   pyqual/fix_tools/__init__.py,47
   pyqual/fix_tools/aider.py,49
@@ -63,7 +64,7 @@ M[96]:
   pyqual/integrations/llx_mcp_service.py,68
   pyqual/llm.py,126
   pyqual/parallel.py,328
-  pyqual/pipeline.py,562
+  pyqual/pipeline.py,669
   pyqual/pipeline_protocols.py,44
   pyqual/pipeline_results.py,52
   pyqual/plugins/__init__.py,84
@@ -96,6 +97,7 @@ M[96]:
   pyqual/report.py,565
   pyqual/report_generator.py,423
   pyqual/run_parallel_fix.py,403
+  pyqual/stage_names.py,61
   pyqual/tickets.py,123
   pyqual/tools.py,323
   pyqual/validation.py,600
@@ -178,6 +180,29 @@ D:
     git_scan_cmd(paths;workdir;use_trufflehog;use_gitleaks;use_patterns;json_output;fail_on_findings)
     git_commit_cmd(message;workdir;add_all;if_changed;json_output)
     git_push_cmd(workdir;remote;branch;force;force_with_lease;detect_protection;dry_run;scan_secrets;json_output)
+  pyqual/cli_run_helpers.py:
+    e: count_todo_items,extract_pytest_stage_summary,extract_lint_stage_summary,extract_prefact_stage_summary,extract_code2llm_stage_summary,extract_validation_stage_summary,extract_fix_stage_summary,extract_mypy_stage_summary,extract_bandit_stage_summary,extract_stage_summary,_enrich_analysis,_enrich_validation,_enrich_todo,enrich_from_artifacts,infer_fix_result,_extract_todo_summary,_extract_fix_summary,_extract_delivery_summary,build_run_summary,format_run_summary,get_last_error_line
+    count_todo_items(todo_path)
+    extract_pytest_stage_summary(name;text)
+    extract_lint_stage_summary(text)
+    extract_prefact_stage_summary(name;text)
+    extract_code2llm_stage_summary(name;text)
+    extract_validation_stage_summary(name;text)
+    extract_fix_stage_summary(name;text)
+    extract_mypy_stage_summary(name;text)
+    extract_bandit_stage_summary(text)
+    extract_stage_summary(name;stdout;stderr)
+    _enrich_analysis(workdir;stages)
+    _enrich_validation(workdir;stages)
+    _enrich_todo(workdir;stages)
+    enrich_from_artifacts(workdir;stages)
+    infer_fix_result(stage)
+    _extract_todo_summary(stages)
+    _extract_fix_summary(stages)
+    _extract_delivery_summary(stages)
+    build_run_summary(report)
+    format_run_summary(summary)
+    get_last_error_line(text)
   pyqual/cli/cmd_config.py:
     e: gates,validate,fix_config,status,report
     gates(config;workdir)
@@ -198,7 +223,7 @@ D:
     _print_cycle_completion(remaining;max_items)
     main()
   pyqual/_gate_collectors.py:
-    e: _read_artifact_text,_from_toon,_from_vallm,_from_coverage,_from_bandit,_from_secrets,_from_vulnerabilities,_from_security,_from_sbom,_from_vulture,_from_pyroma,_from_code_health,_from_git_health,_from_llm_quality,_from_ai_cost,_from_benchmark,_from_memory_profile,_from_radon,_from_mypy,_from_lint,_from_ruff,_count_pylint_by_type,_from_pylint,_from_flake8,_from_interrogate
+    e: _read_artifact_text,_from_toon,_from_vallm,_from_coverage,_from_bandit,_from_secrets,_from_vulnerabilities,_from_security,_from_sbom,_from_vulture,_from_pyroma,_from_code_health,_from_git_health,_from_llm_quality,_from_ai_cost,_from_benchmark,_from_memory_profile,_from_radon,_from_mypy,_from_lint,_from_ruff,_count_pylint_by_type,_from_pylint,_from_flake8,_from_runtime_errors,_from_interrogate
     _read_artifact_text(workdir;filenames)
     _from_toon(workdir)
     _from_vallm(workdir)
@@ -223,10 +248,8 @@ D:
     _count_pylint_by_type(messages;type_name;symbol_prefix)
     _from_pylint(workdir)
     _from_flake8(workdir)
+    _from_runtime_errors(workdir)
     _from_interrogate(workdir)
-  pyqual/pipeline.py:
-    e: Pipeline
-    Pipeline: __init__(9),run(1),check_gates(0),_run_iteration(2),_iteration_stagnated(0),_should_run_stage(4),_resolve_tool_stage(1),_resolve_env(0),_check_optional_binary(0),_execute_stage(2),_execute_captured(5),_execute_streaming(5),_init_nfo(0),_nfo_emit(4),_is_fix_stage(1),_log_stage(2),_archive_llx_report(2),_log_gates(2),_log_event(1),_ensure_pyqual_dir(0)  # Execute pipeline stages in a loop until quality gates pass...
   pyqual/plugins/git/main.py:
     e: GitCollector,_count_by_severity,run_git_command,git_status,git_commit,git_push,git_add,scan_for_secrets,_scan_with_trufflehog,_scan_with_gitleaks,_scan_with_patterns,_is_likely_false_positive,_get_provider_for_pattern,_get_severity_for_pattern,preflight_push_check
     GitCollector(MetricCollector): collect(1),_collect_scan_metrics(2),_collect_preflight_metrics(2),_collect_status_metrics(2),_collect_push_metrics(2),_collect_commit_metrics(2),get_config_example(0)  # Git repository operations collector — status, commit, push w...
@@ -265,6 +288,9 @@ D:
     validate_config(config_path;try_fix)
     _detect_language(file_names)
     detect_project_facts(workdir)
+  pyqual/pipeline.py:
+    e: Pipeline
+    Pipeline: __init__(9),run(1),check_gates(0),_run_iteration(2),_iteration_stagnated(0),_should_run_stage(4),_resolve_tool_stage(1),_resolve_env(0),_check_optional_binary(0),_execute_stage(2),_execute_captured(5),_execute_streaming(5),_init_nfo(0),_nfo_emit(4),_is_fix_stage(1),_log_stage(2),_archive_llx_report(2),_log_gates(2),_log_event(1),_ensure_pyqual_dir(0),_capture_runtime_error(2),_classify_error(1),_extract_error_message(1)  # Execute pipeline stages in a loop until quality gates pass...
   pyqual/report_generator.py:
     e: StageResult,PipelineRun,parse_kwargs,_should_skip_stage,_get_stage_status,_extract_metrics_from_kwargs,_read_coverage_from_file,_build_gate,_build_gates_from_metrics,get_last_run,generate_mermaid_diagram,generate_ascii_diagram,generate_metrics_table,generate_stage_details,generate_report,main
     StageResult:
@@ -312,28 +338,6 @@ D:
 
 Measures:
 -...
-  pyqual/cli_run_helpers.py:
-    e: count_todo_items,extract_pytest_stage_summary,extract_lint_stage_summary,extract_prefact_stage_summary,extract_code2llm_stage_summary,extract_validation_stage_summary,extract_fix_stage_summary,extract_mypy_stage_summary,extract_bandit_stage_summary,extract_stage_summary,_enrich_analysis,_enrich_validation,_enrich_todo,enrich_from_artifacts,infer_fix_result,_extract_todo_summary,_extract_fix_summary,build_run_summary,format_run_summary,get_last_error_line
-    count_todo_items(todo_path)
-    extract_pytest_stage_summary(name;text)
-    extract_lint_stage_summary(text)
-    extract_prefact_stage_summary(name;text)
-    extract_code2llm_stage_summary(name;text)
-    extract_validation_stage_summary(name;text)
-    extract_fix_stage_summary(name;text)
-    extract_mypy_stage_summary(name;text)
-    extract_bandit_stage_summary(text)
-    extract_stage_summary(name;stdout;stderr)
-    _enrich_analysis(workdir;stages)
-    _enrich_validation(workdir;stages)
-    _enrich_todo(workdir;stages)
-    enrich_from_artifacts(workdir;stages)
-    infer_fix_result(stage)
-    _extract_todo_summary(stages)
-    _extract_fix_summary(stages)
-    build_run_summary(report)
-    format_run_summary(summary)
-    get_last_error_line(text)
   pyqual/cli_log_helpers.py:
     e: query_nfo_db,row_to_event_dict,format_log_entry_row
     query_nfo_db(db_path;event;failed;tail;sql;stage)
@@ -411,6 +415,15 @@ Measures:
     mcp_fix(workdir;project_path;issues;output;endpoint;model;file;use_docker;docker_arg;task;json_output)
     mcp_refactor(workdir;project_path;issues;output;endpoint;model;file;use_docker;docker_arg;json_output)
     mcp_service(host;port)
+  pyqual/cli/cmd_tune.py:
+    e: tune_thresholds,_load_latest_metrics,_calculate_thresholds,_display_comparison,_confirm_apply,_apply_thresholds,tune_show
+    tune_thresholds(aggressive;conservative;dry_run;config_path)
+    _load_latest_metrics()
+    _calculate_thresholds(metrics;aggressive;conservative)
+    _display_comparison(current;suggested;actual)
+    _confirm_apply()
+    _apply_thresholds(config_path;thresholds)
+    tune_show()
   dashboard/src/App.tsx:
     i: ./api,./components/Overview,./components/RepositoryDetail,./components/Settings,./types,react,react-router-dom
     e: App,loadRepositories,repos,handleRepositorySelect,runs,RepositoryCard,lastRun,statusColor,statusIcon
@@ -492,6 +505,18 @@ Measures:
     format_result_summary(result)
     export_results_json(result;output_path)
     shell_check(command)
+  pyqual/bulk_init_fingerprint.py:
+    e: ProjectFingerprint,_collect_top_level_entries,_collect_manifests,_collect_file_extensions,_load_json_object,_collect_json_scripts,_collect_makefile_targets,_collect_pyproject_metadata,_collect_readme_excerpt,collect_fingerprint
+    ProjectFingerprint:  # Lightweight summary of a project directory sent to LLM for c...
+    _collect_top_level_entries(project_dir;fp)
+    _collect_manifests(project_dir;fp)
+    _collect_file_extensions(project_dir)
+    _load_json_object(path)
+    _collect_json_scripts(project_dir;filename)
+    _collect_makefile_targets(project_dir)
+    _collect_pyproject_metadata(project_dir;fp)
+    _collect_readme_excerpt(project_dir)
+    collect_fingerprint(project_dir)
   pyqual/yaml_fixer.py:
     e: YamlErrorType,YamlSyntaxIssue,YamlFixResult,_detect_indentation_issues,_detect_quote_issues,_is_multiline_quote,_detect_bracket_issues,_detect_colon_issues,_detect_trailing_spaces,_detect_bom,_get_context,analyze_yaml_syntax,_try_parse_yaml,_parse_pyyaml_error,fix_yaml_file
     YamlErrorType(str,Enum):  # Types of YAML syntax errors we can detect and fix...
@@ -509,18 +534,6 @@ Measures:
     _try_parse_yaml(content)
     _parse_pyyaml_error(error_str;lines)
     fix_yaml_file(config_path;dry_run)
-  pyqual/bulk_init_fingerprint.py:
-    e: ProjectFingerprint,_collect_top_level_entries,_collect_manifests,_collect_file_extensions,_load_json_object,_collect_json_scripts,_collect_makefile_targets,_collect_pyproject_metadata,_collect_readme_excerpt,collect_fingerprint
-    ProjectFingerprint:  # Lightweight summary of a project directory sent to LLM for c...
-    _collect_top_level_entries(project_dir;fp)
-    _collect_manifests(project_dir;fp)
-    _collect_file_extensions(project_dir)
-    _load_json_object(path)
-    _collect_json_scripts(project_dir;filename)
-    _collect_makefile_targets(project_dir)
-    _collect_pyproject_metadata(project_dir;fp)
-    _collect_readme_excerpt(project_dir)
-    collect_fingerprint(project_dir)
   pyqual/gates.py:
     e: GateResult,Gate,GateSet,CompositeGateSet
     GateResult: __str__(0)  # Result of a single gate check...
@@ -542,10 +555,6 @@ Exa...
     e: GitHubTask,GitHubActionsReporter
     GitHubTask: to_todo_item(0),__str__(0)  # Represents a task from GitHub (issue or PR)...
     GitHubActionsReporter: __init__(2),create_issue(3),ensure_issue_exists(3),is_running_in_github_actions(0),get_pr_number(0),fetch_issues(2),fetch_pull_requests(1),post_pr_comment(2),post_issue_comment(2),close_issue(2),close_pull_request(2),generate_failure_report(4),set_output(2),set_failed(1)  # Reports pyqual results to GitHub Actions and PRs...
-  pyqual/bulk_init_classify.py:
-    e: ProjectConfig,check_skip_conditions
-    ProjectConfig:  # Parsed LLM response — project-specific config decisions...
-    check_skip_conditions(fp)
   pyqual/tools.py:
     e: ToolPreset,_preset_from_dict,_load_json_presets,_load_default_presets,get_preset,list_presets,is_builtin,register_preset,load_user_tools,preset_to_dict,dump_presets_json,register_custom_tools_from_yaml,load_entry_point_presets,resolve_stage_command
     ToolPreset: is_available(0),shell_command(1)  # Definition of a built-in tool invocation preset...
@@ -562,6 +571,18 @@ Exa...
     register_custom_tools_from_yaml(custom_tools)
     load_entry_point_presets()
     resolve_stage_command(tool_name;workdir)
+  pyqual/bulk_init_classify.py:
+    e: ProjectConfig,check_skip_conditions
+    ProjectConfig:  # Parsed LLM response — project-specific config decisions...
+    check_skip_conditions(fp)
+  pyqual/cli/main.py:
+    e: tune_thresholds_cmd,_load_latest_metrics_for_tune,_calculate_thresholds_for_tune,_display_comparison_for_tune,_apply_thresholds_for_tune,setup_logging
+    tune_thresholds_cmd(aggressive;conservative;dry_run;config_path)
+    _load_latest_metrics_for_tune()
+    _calculate_thresholds_for_tune(metrics;aggressive;conservative)
+    _display_comparison_for_tune(current;suggested;actual)
+    _apply_thresholds_for_tune(config_path;thresholds)
+    setup_logging(verbose;workdir)
   pyqual/cli/cmd_plugin.py:
     e: plugin
     plugin(action;name;workdir;tag)
@@ -569,6 +590,13 @@ Exa...
     e: CoverageCollector,coverage_summary
     CoverageCollector(MetricCollector): collect(1)  # Coverage metrics collector — extracts test coverage data...
     coverage_summary(workdir)
+  pyqual/stage_names.py:
+    e: normalize_stage_name,is_fix_stage_name,is_verify_stage_name,is_delivery_stage_name,get_stage_when_default
+    normalize_stage_name(name)
+    is_fix_stage_name(name)
+    is_verify_stage_name(name)
+    is_delivery_stage_name(name)
+    get_stage_when_default(name)
   pyqual/cli/cmd_init.py:
     e: init,profiles
     init(path;profile)
@@ -665,17 +693,6 @@ This demonstrat...
   pyqual/fix_tools/llx.py:
     e: LlxTool
     LlxTool(FixTool): __init__(3),is_available(0),get_command(0),get_timeout(0)  # LLX fix tool...
-  pyqual/cli/main.py:
-    e: setup_logging
-    setup_logging(verbose;workdir)
-  pyqual/profiles.py:
-    e: PipelineProfile,get_profile,list_profiles
-    PipelineProfile:  # A reusable pipeline template with default stages and metrics...
-    get_profile(name)
-    list_profiles()
-  pyqual/fix_tools/claude.py:
-    e: ClaudeTool
-    ClaudeTool(FixTool): is_available(0),get_command(0),get_timeout(0)  # Claude Code CLI tool...
   pyqual/pipeline_protocols.py:
     e: OnStageStart,OnIterationStart,OnStageError,OnStageDone,OnStageOutput,OnIterationDone
     OnStageStart(Protocol): __call__(1)
@@ -684,6 +701,14 @@ This demonstrat...
     OnStageDone(Protocol): __call__(1)  # Called after each stage completes. Receives the full StageRe...
     OnStageOutput(Protocol): __call__(3)  # Called with each line of streaming output from a stage...
     OnIterationDone(Protocol): __call__(1)  # Called after each iteration completes. Receives the full Ite...
+  pyqual/profiles.py:
+    e: PipelineProfile,get_profile,list_profiles
+    PipelineProfile:  # A reusable pipeline template with default stages and metrics...
+    get_profile(name)
+    list_profiles()
+  pyqual/fix_tools/claude.py:
+    e: ClaudeTool
+    ClaudeTool(FixTool): is_available(0),get_command(0),get_timeout(0)  # Claude Code CLI tool...
   pyqual/integrations/llx_mcp_service.py:
     e: create_app,run_server,build_parser,main
     create_app(state;llx_server)
@@ -692,12 +717,12 @@ This demonstrat...
     main(argv)
   SUGGESTED_COMMANDS.sh:
   project.sh:
+  dashboard/tailwind.config.js:
+  dashboard/postcss.config.js:
   dashboard/vite.config.ts:
     i: @vitejs/plugin-react,vite
-  dashboard/tailwind.config.js:
   dashboard/src/main.tsx:
     i: ./App,react,react-dom/client
-  dashboard/postcss.config.js:
   dashboard/src/types/index.ts:
     e: PyqualMetric,PyqualStage,PyqualSummary,Repository,DashboardConfig,MetricHistory,MetricTrend
     PyqualMetric:

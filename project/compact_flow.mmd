@@ -7,17 +7,19 @@ flowchart TD
     pyqual__bulk_init_classify["pyqual.bulk_init_classify<br/>1 funcs"]
     pyqual__bulk_init_fingerprint["pyqual.bulk_init_fingerprint<br/>9 funcs"]
     pyqual__bulk_run["pyqual.bulk_run<br/>7 funcs"]
-    pyqual__cli["pyqual.cli<br/>35 funcs"]
+    pyqual__cli["pyqual.cli<br/>47 funcs"]
     pyqual__cli_bulk_cmds["pyqual.cli_bulk_cmds<br/>3 funcs"]
+    pyqual__cli_run_helpers["pyqual.cli_run_helpers<br/>21 funcs"]
     pyqual__config["pyqual.config<br/>8 funcs"]
     pyqual__fix_tools["pyqual.fix_tools<br/>16 funcs"]
     pyqual__gates["pyqual.gates<br/>11 funcs"]
     pyqual__github_tasks["pyqual.github_tasks<br/>3 funcs"]
-    pyqual__pipeline["pyqual.pipeline<br/>20 funcs"]
+    pyqual__pipeline["pyqual.pipeline<br/>23 funcs"]
     pyqual__plugins["pyqual.plugins<br/>135 funcs"]
     pyqual__profiles["pyqual.profiles<br/>2 funcs"]
     pyqual__report["pyqual.report<br/>18 funcs"]
     pyqual__run_parallel_fix["pyqual.run_parallel_fix<br/>10 funcs"]
+    pyqual__stage_names["pyqual.stage_names<br/>5 funcs"]
     pyqual__tickets["pyqual.tickets<br/>7 funcs"]
     pyqual__tools["pyqual.tools<br/>15 funcs"]
     pyqual__validation["pyqual.validation<br/>14 funcs"]
@@ -26,29 +28,32 @@ flowchart TD
     pyqual__cli ==>|14| pyqual__plugins
     examples__integration_example ==>|13| pyqual__api
     pyqual__cli_bulk_cmds ==>|6| pyqual__bulk_run
+    pyqual__cli ==>|6| pyqual__config
     pyqual__cli ==>|6| pyqual__tickets
     pyqual__config ==>|5| pyqual__tools
     examples__ticket_workflow ==>|4| pyqual__tickets
     pyqual__validation ==>|4| pyqual__tools
-    pyqual__cli ==>|4| pyqual__config
     pyqual__cli ==>|4| pyqual__api
+    pyqual__cli_run_helpers -->|3| pyqual__stage_names
     pyqual__cli -->|3| pyqual__github_tasks
     pyqual__config -->|2| pyqual__profiles
     pyqual__api -->|2| pyqual__tools
+    pyqual__pipeline -->|2| pyqual__stage_names
     pyqual__pipeline -->|2| pyqual__tools
     pyqual__cli -->|2| pyqual__profiles
     pyqual__cli -->|2| pyqual__validation
     run_analysis -->|1| pyqual__config
     examples__multi_gate_pipeline -->|1| pyqual__config
     examples__ticket_workflow -->|1| pyqual__config
+    pyqual__config -->|1| pyqual__stage_names
     pyqual__gates -->|1| pyqual__plugins
     pyqual__tickets -->|1| pyqual__config
     pyqual__cli_bulk_cmds -->|1| pyqual__bulk_init
     pyqual__api -->|1| pyqual__config
     pyqual__api -->|1| pyqual__profiles
     pyqual__run_parallel_fix -->|1| pyqual__fix_tools
-    pyqual__bulk_run -->|1| pyqual__api
     pyqual__validation -->|1| pyqual__yaml_fixer
+    pyqual__bulk_run -->|1| pyqual__api
     pyqual__bulk_init -->|1| pyqual__bulk_init_classify
     pyqual__bulk_init -->|1| pyqual__bulk_init_fingerprint
     pyqual__report -->|1| pyqual__plugins

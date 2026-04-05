@@ -1,64 +1,76 @@
-# redup/duplication | 6 groups | 70f 17188L | 2026-04-04
+# redup/duplication | 8 groups | 72f 17881L | 2026-04-05
 
 SUMMARY:
-  files_scanned: 70
-  total_lines:   17188
-  dup_groups:    6
-  dup_fragments: 23
-  saved_lines:   173
-  scan_ms:       9999
+  files_scanned: 72
+  total_lines:   17881
+  dup_groups:    8
+  dup_fragments: 27
+  saved_lines:   196
+  scan_ms:       6453
 
-DUPLICATES[6] (ranked by impact):
-  [14861325d045d048] ! STRU  collect  L=19 N=6 saved=95 sim=1.00
-      pyqual/plugins/docs/main.py:0-18  (collect)
-      pyqual/plugins/security/main.py:0-18  (collect)
+DUPLICATES[8] (ranked by impact):
+  [14861325d045d048] ! STRU  collect  L=12 N=6 saved=60 sim=1.00
       pyqual/plugins/code_health/main.py:0-11  (collect)
       pyqual/plugins/lint/main.py:0-11  (collect)
-      pyqual/plugins/docker/main.py:0-18  (collect)
+      pyqual/plugins/security/main.py:0-18  (collect)
+      pyqual/plugins/docs/main.py:0-18  (collect)
       pyqual/plugins/deps/main.py:0-18  (collect)
+      pyqual/plugins/docker/main.py:0-18  (collect)
+  [07b7171277fd59f2] ! STRU  _display_comparison  L=43 N=2 saved=43 sim=1.00
+      pyqual/cli/cmd_tune.py:0-42  (_display_comparison)
+      pyqual/cli/main.py:0-40  (_display_comparison_for_tune)
   [96bfc15f5794cd81] ! EXAC  get_config_example  L=5 N=8 saved=35 sim=1.00
-      pyqual/plugins/docs/main.py:0-4  (get_config_example)
-      pyqual/plugins/security/main.py:0-4  (get_config_example)
       pyqual/plugins/example_plugin/main.py:0-4  (get_config_example)
       pyqual/plugins/attack/main.py:0-4  (get_config_example)
+      pyqual/plugins/security/main.py:0-4  (get_config_example)
       pyqual/plugins/builtin.py:0-4  (get_config_example)
-      pyqual/plugins/docker/main.py:0-4  (get_config_example)
+      pyqual/plugins/docs/main.py:0-4  (get_config_example)
       pyqual/plugins/deps/main.py:0-4  (get_config_example)
+      pyqual/plugins/docker/main.py:0-4  (get_config_example)
       pyqual/plugins/git/main.py:0-4  (get_config_example)
-  [e8e1ba5d936993f1]   STRU  get_config_example  L=20 N=2 saved=20 sim=1.00
-      examples/custom_plugins/code_health_collector.py:0-19  (get_config_example)
+  [19440a5d6eb75489]   STRU  _apply_thresholds  L=20 N=2 saved=20 sim=1.00
+      pyqual/cli/cmd_tune.py:0-19  (_apply_thresholds)
+      pyqual/cli/main.py:0-16  (_apply_thresholds_for_tune)
+  [e8e1ba5d936993f1]   STRU  get_config_example  L=15 N=2 saved=15 sim=1.00
       examples/custom_plugins/performance_collector.py:0-14  (get_config_example)
+      examples/custom_plugins/code_health_collector.py:0-19  (get_config_example)
   [019f5be5db247f2d]   STRU  get_timeout  L=5 N=3 saved=10 sim=1.00
       pyqual/fix_tools/claude.py:0-4  (get_timeout)
-      pyqual/fix_tools/llx.py:0-4  (get_timeout)
       pyqual/fix_tools/aider.py:0-4  (get_timeout)
+      pyqual/fix_tools/llx.py:0-4  (get_timeout)
   [cade98fabc7ef6c2]   STRU  _ensure_dotenv_loaded  L=7 N=2 saved=7 sim=1.00
       pyqual/llm.py:0-6  (_ensure_dotenv_loaded)
       pyqual/config.py:0-7  (_load_env_file)
-  [24e9e104c399dae7]   STRU  list_profiles  L=6 N=2 saved=6 sim=1.00
-      pyqual/profiles.py:0-5  (list_profiles)
+  [24e9e104c399dae7]   STRU  list_presets  L=6 N=2 saved=6 sim=1.00
       pyqual/tools.py:0-5  (list_presets)
+      pyqual/profiles.py:0-5  (list_profiles)
 
-REFACTOR[6] (ranked by priority):
+REFACTOR[8] (ranked by priority):
   [1] ○ extract_function   → pyqual/plugins/utils/collect.py
-      WHY: 6 occurrences of 19-line block across 6 files — saves 95 lines
+      WHY: 6 occurrences of 12-line block across 6 files — saves 60 lines
       FILES: pyqual/plugins/code_health/main.py, pyqual/plugins/deps/main.py, pyqual/plugins/docker/main.py, pyqual/plugins/docs/main.py, pyqual/plugins/lint/main.py +1 more
-  [2] ○ extract_function   → pyqual/plugins/utils/get_config_example.py
+  [2] ◐ extract_function   → pyqual/cli/utils/_display_comparison.py
+      WHY: 2 occurrences of 43-line block across 2 files — saves 43 lines
+      FILES: pyqual/cli/cmd_tune.py, pyqual/cli/main.py
+  [3] ○ extract_function   → pyqual/plugins/utils/get_config_example.py
       WHY: 8 occurrences of 5-line block across 8 files — saves 35 lines
       FILES: pyqual/plugins/attack/main.py, pyqual/plugins/builtin.py, pyqual/plugins/deps/main.py, pyqual/plugins/docker/main.py, pyqual/plugins/docs/main.py +3 more
-  [3] ○ extract_function   → examples/custom_plugins/utils/get_config_example.py
+  [4] ○ extract_function   → pyqual/cli/utils/_apply_thresholds.py
       WHY: 2 occurrences of 20-line block across 2 files — saves 20 lines
+      FILES: pyqual/cli/cmd_tune.py, pyqual/cli/main.py
+  [5] ○ extract_function   → examples/custom_plugins/utils/get_config_example.py
+      WHY: 2 occurrences of 15-line block across 2 files — saves 15 lines
       FILES: examples/custom_plugins/code_health_collector.py, examples/custom_plugins/performance_collector.py
-  [4] ○ extract_function   → pyqual/fix_tools/utils/get_timeout.py
+  [6] ○ extract_function   → pyqual/fix_tools/utils/get_timeout.py
       WHY: 3 occurrences of 5-line block across 3 files — saves 10 lines
       FILES: pyqual/fix_tools/aider.py, pyqual/fix_tools/claude.py, pyqual/fix_tools/llx.py
-  [5] ○ extract_function   → pyqual/utils/_ensure_dotenv_loaded.py
+  [7] ○ extract_function   → pyqual/utils/_ensure_dotenv_loaded.py
       WHY: 2 occurrences of 7-line block across 2 files — saves 7 lines
       FILES: pyqual/config.py, pyqual/llm.py
-  [6] ○ extract_function   → pyqual/utils/list_profiles.py
+  [8] ○ extract_function   → pyqual/utils/list_presets.py
       WHY: 2 occurrences of 6-line block across 2 files — saves 6 lines
       FILES: pyqual/profiles.py, pyqual/tools.py
 
 METRICS-TARGET:
-  dup_groups:  6 → 0
-  saved_lines: 173 lines recoverable
+  dup_groups:  8 → 0
+  saved_lines: 196 lines recoverable

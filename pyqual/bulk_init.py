@@ -220,6 +220,81 @@ def classify_with_llm(fp: ProjectFingerprint, model: str | None = None) -> Proje
 # Heuristic fallback (no LLM)
 # ---------------------------------------------------------------------------
 
+# Manifest → project type classifier mapping (checked in priority order)
+_MANIFEST_CLASSIFIERS = [
+    ("pyproject.toml", "_classify_python"),
+    ("setup.py", "_classify_python"),
+    ("package.json", "_classify_node"),
+    ("composer.json", "_classify_php"),
+    ("Cargo.toml", "_classify_rust"),
+    ("go.mod", "_classify_go"),
+    ("Makefile", "_classify_makefile"),
+]
+
+
+def _classify_python(fp: ProjectFingerprint) -> ProjectConfig:
+    """Classify Python project."""
+    test_cmd = "python3 -m pytest -q" if fp.has_tests_dir else "python3 -m pytest -q --co 2>/dev/null || true"
+    return ProjectConfig(
+        project_type="python",
+        has_tests=fp.has_tests_dir,
+        test_command=test_cmd,
+        lint_tool_preset="ruff",
+    )
+
+
+def _classify_node(fp: ProjectFingerprint) -> ProjectConfig:
+    """Classify Node.js/TypeScript project."""
+    ptype = "typescript" if ".ts" in fp.file_extensions or ".tsx" in fp.file_extensions else "node"
+    return ProjectConfig(
+        project_type=ptype,
+        has_tests="test" in fp.node_scripts,
+        test_command="npm test" if "test" in fp.node_scripts else None,
+        lint_command="npm run lint" if "lint" in fp.node_scripts else None,
+        build_command="npm run build" if "build" in fp.node_scripts else None,
+    )
+
+
+def _classify_php(fp: ProjectFingerprint) -> ProjectConfig:
+    """Classify PHP project."""
+    return ProjectConfig(
+        project_type="php",
+        has_tests="test" in fp.composer_scripts,
+        test_command="composer test" if "test" in fp.composer_scripts else None,
+        lint_command="find . -name '*.php' -exec php -l {} \\;",
+    )
+
+
+def _classify_rust(fp: ProjectFingerprint) -> ProjectConfig:
+    """Classify Rust project."""
+    return ProjectConfig(
+        project_type="rust",
+        has_tests=True,
+        test_command="cargo test",
+        lint_command="cargo clippy",
+        build_command="cargo build",
+    )
+
+
+def _classify_go(fp: ProjectFingerprint) -> ProjectConfig:
+    """Classify Go project."""
+    return ProjectConfig(
+        project_type="go",
+        has_tests=True,
+        test_command="go test ./...",
+        lint_command="golangci-lint run",
+    )
+
+
+def _classify_makefile(fp: ProjectFingerprint) -> ProjectConfig:
+    """Classify Makefile-based project."""
+    return ProjectConfig(
+        project_type="mixed",
+        has_tests="test" in fp.makefile_targets,
+        test_command="make test" if "test" in fp.makefile_targets else None,
+        lint_command="make lint" if "lint" in fp.makefile_targets else None,
+    )
+
 
 def _classify_heuristic(fp: ProjectFingerprint) -> ProjectConfig:
     """Rule-based classification when LLM is unavailable."""
@@ -228,86 +303,14 @@ def _classify_heuristic(fp: ProjectFingerprint) -> ProjectConfig:
     if skip_result:
         return skip_result
 
-    has_python = "pyproject.toml" in fp.manifests or "setup.py" in fp.manifests
-    has_node = "package.json" in fp.manifests
-    has_composer = "composer.json" in fp.manifests
-    has_makefile = "Makefile" in fp.manifests
-    has_cargo = "Cargo.toml" in fp.manifests
-    has_go = "go.mod" in fp.manifests
-
-    # Python
-    if has_python:
-        test_cmd = "python3 -m pytest -q" if fp.has_tests_dir else "python3 -m pytest -q --co 2>/dev/null || true"
-        return ProjectConfig(
-            project_type="python",
-            has_tests=fp.has_tests_dir,
-            test_command=test_cmd,
-            lint_tool_preset="ruff",
-        )
-
-    # Node.js / TypeScript
-    if has_node:
-        ptype = "typescript" if ".ts" in fp.file_extensions or ".tsx" in fp.file_extensions else "node"
-        test_cmd = None
-        lint_cmd = None
-        build_cmd = None
-        if "test" in fp.node_scripts:
-            test_cmd = "npm test"
-        if "lint" in fp.node_scripts:
-            lint_cmd = "npm run lint"
-        if "build" in fp.node_scripts:
-            build_cmd = "npm run build"
-        return ProjectConfig(
-            project_type=ptype,
-            has_tests="test" in fp.node_scripts,
-            test_command=test_cmd,
-            lint_command=lint_cmd,
-            build_command=build_cmd,
-        )
-
-    # PHP
-    if has_composer:
-        test_cmd = "composer test" if "test" in fp.composer_scripts else None
-        return ProjectConfig(
-            project_type="php",
-            has_tests="test" in fp.composer_scripts,
-            test_command=test_cmd,
-            lint_command="find . -name '*.php' -exec php -l {} \\;",
-        )
-
-    # Rust
-    if has_cargo:
-        return ProjectConfig(
-            project_type="rust",
-            has_tests=True,
-            test_command="cargo test",
-            lint_command="cargo clippy",
-            build_command="cargo build",
-        )
-
-    # Go
-    if has_go:
-        return ProjectConfig(
-            project_type="go",
-            has_tests=True,
-            test_command="go test ./...",
-            lint_command="golangci-lint run",
-        )
-
-    # Makefile-only
-    if has_makefile:
-        test_cmd = "make test" if "test" in fp.makefile_targets else None
-        lint_cmd = "make lint" if "lint" in fp.makefile_targets else None
-        return ProjectConfig(
-            project_type="mixed",
-            has_tests="test" in fp.makefile_targets,
-            test_command=test_cmd,
-            lint_command=lint_cmd,
-        )
+    # Check manifests in priority order using dispatch table
+    for manifest, classifier_name in _MANIFEST_CLASSIFIERS:
+        if manifest in fp.manifests:
+            classifier = globals()[classifier_name]
+            return classifier(fp)
 
     # Check for loose Python files
-    py_exts = {".py"}
-    if py_exts & set(fp.file_extensions):
+    if ".py" in fp.file_extensions:
         return ProjectConfig(
             project_type="python",
             has_tests=fp.has_tests_dir,
