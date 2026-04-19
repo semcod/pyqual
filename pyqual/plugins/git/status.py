@@ -7,6 +7,43 @@ from typing import Any
 from .git_command import run_git_command
 
 
+def _parse_branch_line(line: str, result: dict[str, Any]) -> None:
+    """Parse a '## branch...remote [ahead N, behind N]' porcelain line into result."""
+    branch_info = line[3:].strip()
+    if "..." not in branch_info:
+        result["branch"] = branch_info
+        return
+    result["branch"] = branch_info.split("...")[0]
+    if "[" not in branch_info:
+        return
+    ahead_behind = branch_info[branch_info.find("[") + 1: branch_info.find("]")] 
+    ahead_match = re.search(r"ahead\s+(\d+)", ahead_behind)
+    if ahead_match:
+        result["ahead"] = int(ahead_match.group(1))
+    behind_match = re.search(r"behind\s+(\d+)", ahead_behind)
+    if behind_match:
+        result["behind"] = int(behind_match.group(1))
+
+
+def _parse_file_status(
+    line: str,
+    staged: list[str],
+    unstaged: list[str],
+    untracked: list[str],
+) -> None:
+    """Classify one porcelain file-status line into staged/unstaged/untracked lists."""
+    if len(line) < 3:
+        return
+    status_code = line[:2]
+    filename = line[3:]
+    if status_code[0] not in " ?!":
+        staged.append(filename)
+    elif status_code == "??":
+        untracked.append(filename)
+    elif status_code[1] != " ":
+        unstaged.append(filename)
+
+
 def git_status(cwd: Path | None = None) -> dict[str, Any]:
     """Get git repository status.
 
@@ -43,44 +80,17 @@ def git_status(cwd: Path | None = None) -> dict[str, Any]:
         result["error"] = status_result.stderr.strip()
         return result
 
-    lines = status_result.stdout.strip().split("\n")
     staged: list[str] = []
     unstaged: list[str] = []
     untracked: list[str] = []
 
-    for line in lines:
+    for line in status_result.stdout.strip().split("\n"):
         if not line:
             continue
         if line.startswith("##"):
-            branch_info = line[3:].strip()
-            if "..." in branch_info:
-                branch_part = branch_info.split("...")[0]
-                result["branch"] = branch_part
-                if "[" in branch_info:
-                    ahead_behind = branch_info[
-                        branch_info.find("[") + 1 : branch_info.find("]")
-                    ]
-                    if "ahead" in ahead_behind:
-                        ahead_match = re.search(r"ahead\s+(\d+)", ahead_behind)
-                        if ahead_match:
-                            result["ahead"] = int(ahead_match.group(1))
-                    if "behind" in ahead_behind:
-                        behind_match = re.search(r"behind\s+(\d+)", ahead_behind)
-                        if behind_match:
-                            result["behind"] = int(behind_match.group(1))
-            else:
-                result["branch"] = branch_info
-            continue
-
-        if len(line) >= 3:
-            status_code = line[:2]
-            filename = line[3:]
-            if status_code[0] not in " ?!":
-                staged.append(filename)
-            elif status_code[1] != " ":
-                unstaged.append(filename)
-            elif status_code == "??":
-                untracked.append(filename)
+            _parse_branch_line(line, result)
+        else:
+            _parse_file_status(line, staged, unstaged, untracked)
 
     result["staged_files"] = staged
     result["unstaged_files"] = unstaged

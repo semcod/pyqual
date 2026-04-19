@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import typer
 from rich.table import Table
@@ -50,6 +50,33 @@ def gates(
         raise typer.Exit(1)
 
 
+_SEV_STYLE = {
+    Severity.ERROR:   ("[bold red]ERROR  [/]", "red"),
+    Severity.WARNING: ("[yellow]WARNING[/]", "yellow"),
+    Severity.INFO:    ("[dim]INFO   [/]", "dim"),
+}
+
+
+def _print_issues(result: Any, cfg_path: Path, fix: bool) -> None:
+    """Print all validation issues to the console."""
+    for issue in result.issues:
+        badge, style = _SEV_STYLE[issue.severity]
+        location = f" [dim][{issue.stage}][/dim]" if issue.stage else ""
+        fixed_indicator = ""
+        if fix and issue.suggestion and "Auto-fixed:" in issue.suggestion:
+            fixed_indicator = " [green][fixed][/green]"
+        console.print(f"  {badge}{location}{fixed_indicator}  [{style}]{issue.message}[/{style}]")
+        if issue.suggestion and not issue.suggestion.startswith("Auto-fixed:"):
+            console.print(f"          [dim]→ {issue.suggestion}[/dim]")
+
+
+def _print_fix_summary(result: Any, cfg_path: Path) -> None:
+    """Print count of auto-fixed issues when --fix is active."""
+    fixed_count = sum(1 for i in result.issues if "Auto-fixed:" in (i.suggestion or ""))
+    if fixed_count:
+        console.print(f"\n[green]✓ Auto-fixed {fixed_count} syntax issue(s)[/green] (backup: {cfg_path.name}.bak)")
+
+
 @app.command()
 def validate(
     config: Path = typer.Option("pyqual.yaml", "--config", "-c"),
@@ -76,12 +103,6 @@ def validate(
     cfg_path = Path(workdir) / config if not Path(config).is_absolute() else Path(config)
     result = validate_config(cfg_path, try_fix=fix)
 
-    SEV_STYLE = {
-        Severity.ERROR:   ("[bold red]ERROR  [/]", "red"),
-        Severity.WARNING: ("[yellow]WARNING[/]", "yellow"),
-        Severity.INFO:    ("[dim]INFO   [/]", "dim"),
-    }
-
     if not result.issues:
         console.print(f"[bold green]✅ {cfg_path.name} is valid.[/bold green]"
                       f" ({result.stages_checked} stages, {result.gates_checked} gates)")
@@ -90,24 +111,10 @@ def validate(
     console.print(f"[bold]Validating {cfg_path.name}[/bold]"
                   f" — {result.stages_checked} stages, {result.gates_checked} gates\n")
 
-    for issue in result.issues:
-        badge, style = SEV_STYLE[issue.severity]
-        location = f" [dim][{issue.stage}][/dim]" if issue.stage else ""
+    _print_issues(result, cfg_path, fix)
 
-        # Check if this is an auto-fixed issue
-        fixed_indicator = ""
-        if fix and issue.suggestion and "Auto-fixed:" in issue.suggestion:
-            fixed_indicator = " [green][fixed][/green]"
-
-        console.print(f"  {badge}{location}{fixed_indicator}  [{style}]{issue.message}[/{style}]")
-        if issue.suggestion and not issue.suggestion.startswith("Auto-fixed:"):
-            console.print(f"          [dim]→ {issue.suggestion}[/dim]")
-
-    # Show summary of fixes if any were applied
     if fix:
-        fixed_count = sum(1 for i in result.issues if "Auto-fixed:" in (i.suggestion or ""))
-        if fixed_count:
-            console.print(f"\n[green]✓ Auto-fixed {fixed_count} syntax issue(s)[/green] (backup: {cfg_path.name}.bak)")
+        _print_fix_summary(result, cfg_path)
 
     console.print()
     nerr = len(result.errors)

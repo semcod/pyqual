@@ -148,23 +148,8 @@ def _check_pypi_version(package_name: str, version: str) -> tuple[bool, Optional
         return False, str(exc)
 
 
-def validate_release_state(
-    workdir: Path,
-    registry: str = "pypi",
-    bump_patch: bool = True,
-) -> ValidationResult:
-    """Validate whether the current package state is safe to publish.
-
-    Args:
-        workdir: Project root to inspect.
-        registry: Package registry name. Currently only ``pypi`` is supported.
-        bump_patch: When True, validate the version that will be produced by
-            the current ``make publish`` workflow (patch bump first).
-    """
-    workdir = Path(workdir).resolve()
-    result = ValidationResult(config_name=workdir.name)
-
-    git = git_status(cwd=workdir)
+def _check_git_state(git: dict, result: ValidationResult) -> None:
+    """Add git-state issues to *result* from a git_status dict."""
     if not git.get("success", False):
         result.add(
             Severity.ERROR,
@@ -173,38 +158,43 @@ def validate_release_state(
             stage="release-check",
             suggestion="Run the release check from inside a git repository.",
         )
-    else:
-        if not git.get("is_clean", False):
-            dirty_parts: list[str] = []
-            for key, label in (
-                ("staged_files", "staged"),
-                ("unstaged_files", "unstaged"),
-                ("untracked_files", "untracked"),
-            ):
-                files = git.get(key, [])
-                if isinstance(files, list) and files:
-                    dirty_parts.append(f"{len(files)} {label}")
+        return
 
-            detail = ", ".join(dirty_parts) if dirty_parts else "working tree contains changes"
-            result.add(
-                Severity.ERROR,
-                EC.RELEASE_GIT_DIRTY,
-                f"Working tree is not clean ({detail}).",
-                stage="release-check",
-                suggestion="Commit or stash changes before publishing.",
-            )
+    if not git.get("is_clean", False):
+        dirty_parts: list[str] = []
+        for key, label in (
+            ("staged_files", "staged"),
+            ("unstaged_files", "unstaged"),
+            ("untracked_files", "untracked"),
+        ):
+            files = git.get(key, [])
+            if isinstance(files, list) and files:
+                dirty_parts.append(f"{len(files)} {label}")
+        detail = ", ".join(dirty_parts) if dirty_parts else "working tree contains changes"
+        result.add(
+            Severity.ERROR,
+            EC.RELEASE_GIT_DIRTY,
+            f"Working tree is not clean ({detail}).",
+            stage="release-check",
+            suggestion="Commit or stash changes before publishing.",
+        )
 
-        behind = int(git.get("behind", 0) or 0)
-        if behind > 0:
-            result.add(
-                Severity.WARNING,
-                EC.RELEASE_GIT_BEHIND,
-                f"Branch is behind remote by {behind} commit(s).",
-                stage="release-check",
-                suggestion="Pull or rebase before publishing to avoid releasing stale code.",
-            )
+    behind = int(git.get("behind", 0) or 0)
+    if behind > 0:
+        result.add(
+            Severity.WARNING,
+            EC.RELEASE_GIT_BEHIND,
+            f"Branch is behind remote by {behind} commit(s).",
+            stage="release-check",
+            suggestion="Pull or rebase before publishing to avoid releasing stale code.",
+        )
 
-    metadata = _read_project_metadata(workdir)
+
+def _check_version_metadata(
+    metadata: dict,
+    result: ValidationResult,
+) -> tuple[Optional[str], Optional[str]]:
+    """Validate version metadata; return (package_name, base_version) or (None, None) on fatal error."""
     package_name = metadata.get("package_name")
     pyproject_version = metadata.get("pyproject_version")
     version_file = metadata.get("version_file")
@@ -218,7 +208,7 @@ def validate_release_state(
             stage="release-check",
             suggestion="Add [project].name to pyproject.toml.",
         )
-        return result
+        return None, None
 
     base_version = version_file or pyproject_version
     if not base_version:
@@ -229,7 +219,7 @@ def validate_release_state(
             stage="release-check",
             suggestion="Add a VERSION file or set [project].version in pyproject.toml.",
         )
-        return result
+        return package_name, None
 
     if version_file and pyproject_version and version_file != pyproject_version:
         result.add(
@@ -249,17 +239,16 @@ def validate_release_state(
             suggestion="Update pyqual/__init__.py so __version__ matches VERSION and pyproject.toml.",
         )
 
-    release_version = _resolve_release_version(base_version, bump_patch=bump_patch)
-    if not release_version:
-        result.add(
-            Severity.ERROR,
-            EC.RELEASE_INVALID_VERSION,
-            f"Version '{base_version}' is not a supported semantic version.",
-            stage="release-check",
-            suggestion="Use MAJOR.MINOR.PATCH versioning so the release validator can check PyPI.",
-        )
-        return result
+    return package_name, base_version
 
+
+def _check_registry(
+    package_name: str,
+    release_version: str,
+    registry: str,
+    result: ValidationResult,
+) -> None:
+    """Check registry availability and add findings to *result*."""
     if registry.lower() != "pypi":
         result.add(
             Severity.WARNING,
@@ -268,7 +257,7 @@ def validate_release_state(
             stage="release-check",
             suggestion="Use registry='pypi' or extend the validator for another registry.",
         )
-        return result
+        return
 
     exists, registry_error = _check_pypi_version(package_name, release_version)
     if registry_error:
@@ -288,4 +277,41 @@ def validate_release_state(
             suggestion="Bump the version before publishing or publish a different release.",
         )
 
+
+def validate_release_state(
+    workdir: Path,
+    registry: str = "pypi",
+    bump_patch: bool = True,
+) -> ValidationResult:
+    """Validate whether the current package state is safe to publish.
+
+    Args:
+        workdir: Project root to inspect.
+        registry: Package registry name. Currently only ``pypi`` is supported.
+        bump_patch: When True, validate the version that will be produced by
+            the current ``make publish`` workflow (patch bump first).
+    """
+    workdir = Path(workdir).resolve()
+    result = ValidationResult(config_name=workdir.name)
+
+    _check_git_state(git_status(cwd=workdir), result)
+
+    package_name, base_version = _check_version_metadata(
+        _read_project_metadata(workdir), result
+    )
+    if not package_name or not base_version:
+        return result
+
+    release_version = _resolve_release_version(base_version, bump_patch=bump_patch)
+    if not release_version:
+        result.add(
+            Severity.ERROR,
+            EC.RELEASE_INVALID_VERSION,
+            f"Version '{base_version}' is not a supported semantic version.",
+            stage="release-check",
+            suggestion="Use MAJOR.MINOR.PATCH versioning so the release validator can check PyPI.",
+        )
+        return result
+
+    _check_registry(package_name, release_version, registry, result)
     return result
