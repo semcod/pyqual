@@ -1,0 +1,40 @@
+"""Tests for README badge updates in pyqual.report."""
+
+from __future__ import annotations
+
+import tempfile
+from pathlib import Path
+
+from pyqual.report import BADGE_END, BADGE_START, update_readme_badges
+
+from tests.report_helpers import make_project
+
+
+def test_update_readme_badges_inserts_block() -> None:
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        make_project(root)
+        readme = root / "README.md"
+        readme.write_text(f"hello\n{BADGE_START}\nold\n{BADGE_END}\nworld\n")
+
+        update_readme_badges(root, "![x](y)")
+
+        text = readme.read_text()
+        assert BADGE_START in text
+        assert BADGE_END in text
+        assert "![x](y)" in text
+
+
+def test_update_readme_badges_creates_block_when_missing() -> None:
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        make_project(root)
+        readme = root / "README.md"
+        readme.write_text("hello\nworld\n")
+
+        update_readme_badges(root, "![x](y)")
+
+        text = readme.read_text()
+        assert BADGE_START in text
+        assert BADGE_END in text
+        assert "![x](y)" in text

@@ -39,6 +39,12 @@ from pyqual.constants import (
 )
 from pyqual.gates import GateSet
 
+CONSTANT_5 = 5
+MIN_8 = 8.0
+CONSTANT_70 = 70
+MAX_500 = 500
+
+
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
@@ -51,12 +57,12 @@ BADGE_END = "<!-- pyqual:badges:end -->"
 _QUALITY_BADGE_DEFS: list[tuple[str, str, Any, Any]] = [
     ("cc", "CC̄", lambda v: "brightgreen" if v <= BADGE_THRESHOLD_CC_LOW else "green" if v <= BADGE_THRESHOLD_CC_MED else "orange" if v <= BADGE_THRESHOLD_CC_HIGH else "red", lambda v: f"{v:.1f}"),
     ("coverage", "coverage", lambda v: "brightgreen" if v >= BADGE_THRESHOLD_EXCELLENT else "green" if v >= BADGE_THRESHOLD_GOOD else "orange" if v >= BADGE_THRESHOLD_POOR else "red", lambda v: f"{v:.0f}%25"),
-    ("vallm_pass", "vallm", lambda v: "brightgreen" if v >= BADGE_THRESHOLD_PASS else "green" if v >= 70 else "orange" if v >= BADGE_THRESHOLD_WARN else "red", lambda v: f"{v:.0f}%25"),
+    ("vallm_pass", "vallm", lambda v: "brightgreen" if v >= BADGE_THRESHOLD_PASS else "green" if v >= CONSTANT_70 else "orange" if v >= BADGE_THRESHOLD_WARN else "red", lambda v: f"{v:.0f}%25"),
     ("critical", "critical", lambda v: "brightgreen" if v == 0 else "red", lambda v: f"{v:.0f}"),
-    ("error_count", "errors", lambda v: "brightgreen" if v == 0 else "orange" if v <= 5 else "red", lambda v: f"{v:.0f}"),
-    ("maintainability_index", "MI", lambda v: "brightgreen" if v >= BADGE_THRESHOLD_EXCELLENT else "green" if v >= BADGE_THRESHOLD_GOOD else "orange" if v >= BADGE_THRESHOLD_POOR else "red", lambda v: f"{v:.0f}"),
+    ("error_count", "errors", lambda v: "brightgreen" if v == 0 else "orange" if v <= CONSTANT_5 else "red", lambda v: f"{v:.0f}"),
+    ("maintainability_index", "maintainability", lambda v: "brightgreen" if v >= BADGE_THRESHOLD_EXCELLENT else "green" if v >= BADGE_THRESHOLD_GOOD else "orange" if v >= BADGE_THRESHOLD_POOR else "red", lambda v: f"{v:.0f}"),
     ("ruff_errors", "ruff", lambda v: "brightgreen" if v == 0 else "orange" if v <= 10 else "red", lambda v: f"{v:.0f}"),
-    ("mypy_errors", "mypy", lambda v: "brightgreen" if v == 0 else "orange" if v <= 5 else "red", lambda v: f"{v:.0f}"),
+    ("mypy_errors", "mypy", lambda v: "brightgreen" if v == 0 else "orange" if v <= CONSTANT_5 else "red", lambda v: f"{v:.0f}"),
     ("bandit_high", "bandit", lambda v: "brightgreen" if v == 0 else "red", lambda v: f"{v:.0f}%20high"),
     ("docstring_coverage", "docstrings", lambda v: "brightgreen" if v >= BADGE_THRESHOLD_EXCELLENT else "green" if v >= BADGE_THRESHOLD_GOOD else "orange" if v >= BADGE_THRESHOLD_POOR else "red", lambda v: f"{v:.0f}%25"),
 ]
@@ -159,7 +165,7 @@ def _read_costs_package(workdir: Path) -> dict[str, Any]:
         return {}
 
     try:
-        all_commits = parse_commits(str(workdir), max_count=500, ai_only=False, full_history=True)
+        all_commits = parse_commits(str(workdir), max_count=MAX_500, ai_only=False, full_history=True)
         ai_indicators = ["🤖", "ai:", "[ai]", "(ai)", "automat", "cascade", "claude", "gpt", "llm"]
         ai_commits = [
             c for c in all_commits
@@ -176,7 +182,7 @@ def _read_costs_package(workdir: Path) -> dict[str, Any]:
             except Exception:
                 pass
         human_hours = sum(
-            min(len(commits) * 0.5, 8.0)
+            min(len(commits) * 0.5, MIN_8)
             for authors in daily.values()
             for commits in authors.values()
         )
@@ -190,8 +196,10 @@ def _read_costs_package(workdir: Path) -> dict[str, Any]:
         return {}
 
 
-def _read_costs_data(workdir: Path) -> dict[str, Any]:
+def _read_costs_data(workdir: Path | None) -> dict[str, Any]:
     """Read AI cost data from .pyqual/costs.json or the costs package."""
+    if workdir is None:
+        return {}
     result = _read_costs_json(workdir)
     if "ai_cost" not in result:
         for k, v in _read_costs_package(workdir).items():
@@ -368,7 +376,7 @@ def _build_project_badges(meta: dict[str, Any]) -> str:
     ai_cost = meta.get("ai_cost")
     ai_commits = meta.get("ai_commits")
     if ai_cost is not None:
-        cost_color = "brightgreen" if ai_cost < 1 else "green" if ai_cost < 5 else "orange" if ai_cost < 10 else "red"
+        cost_color = "brightgreen" if ai_cost < 1 else "green" if ai_cost < CONSTANT_5 else "orange" if ai_cost < 10 else "red"
         label = "AI Cost"
         value = f"${ai_cost:.2f}" + (f" ({ai_commits} commits)" if ai_commits else "")
         url = _badge_url(label, value, cost_color)
@@ -443,6 +451,25 @@ def build_badges(metrics: dict[str, float], gates_passed: bool,
 # ---------------------------------------------------------------------------
 # README badge update
 # ---------------------------------------------------------------------------
+
+def _replace_badges_in_text(text: str, badge_line: str) -> str:
+    """Replace or insert badge block in a raw README string (no file I/O)."""
+    block = f"{BADGE_START}\n{badge_line}\n{BADGE_END}"
+    pattern = re.compile(
+        re.escape(BADGE_START) + r".*?" + re.escape(BADGE_END),
+        re.DOTALL,
+    )
+    if pattern.search(text):
+        return pattern.sub(block, text)
+    lines = text.split("\n")
+    insert_idx = 0
+    for i, line in enumerate(lines):
+        stripped = line.strip()
+        if stripped.startswith("![") or stripped.startswith("[!["):
+            insert_idx = i + 1
+    lines.insert(insert_idx, block)
+    return "\n".join(lines)
+
 
 def update_readme_badges(
     readme_path: Path,

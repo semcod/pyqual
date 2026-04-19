@@ -123,6 +123,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.140] - 2026-04-19
+
+### Docs
+- Update README.md
+- Update TODO.md
+- Update docs/README.md
+- Update docs/ai-fix-tools.md
+- Update docs/api.md
+- Update docs/ci-dashboard-integration.md
+- Update docs/configuration.md
+- Update docs/index.md
+- Update docs/logs-and-data.md
+- Update docs/runtime-errors.md
+- ... and 4 more files
+
+### Test
+- Update test_pyqual.py
+- Update tests/__init__.py
+- Update tests/__init__.py.bak
+- Update tests/config_test.py
+- Update tests/pipeline_test.py
+- Update tests/report_helpers.py
+- Update tests/test_bulk_init_pkg/__init__.py
+- Update tests/test_bulk_init_pkg/conftest.py
+- Update tests/test_bulk_init_pkg/test_fingerprint.py
+- Update tests/test_bulk_init_pkg/test_fixtures.py
+- ... and 20 more files
+
+### Other
+- Update In the class/method where the magic number appears (around line 15):
+- Update PATCH_REQUEST/REQUEST_FILES.txt
+- Update Taskfile.yml
+- Update app.doql.css
+- Update project/analysis.toon.yaml
+- Update project/calls.mmd
+- Update project/calls.png
+- Update project/calls.toon.yaml
+- Update project/compact_flow.mmd
+- Update project/compact_flow.png
+- ... and 18 more files
+
 ## [0.1.125] - 2026-04-04
 
 ### Docs

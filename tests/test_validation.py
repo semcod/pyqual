@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
 
 from pyqual.validation import (
     EC,
@@ -12,7 +11,6 @@ from pyqual.validation import (
     Severity,
     StageFailure,
     ValidationResult,
-    _classify_failure,
     detect_project_facts,
     error_domain,
     validate_config,

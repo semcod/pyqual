@@ -1,0 +1,114 @@
+"""Tests for badge construction in pyqual.report."""
+
+from __future__ import annotations
+
+from pyqual.report import (
+    _build_project_badges,
+    _build_quality_badges,
+    build_badges,
+)
+
+
+def test_build_badges_pass() -> None:
+    metrics = {"cc": 3.6, "coverage": 85.0, "vallm_pass": 92.0}
+    line = build_badges(metrics, gates_passed=True, gates_passed_count=3, gates_total=3)
+    assert "pyqual-pass-brightgreen" in line
+    assert "CC" in line
+    assert "coverage" in line
+    assert "vallm" in line
+
+
+def test_build_badges_fail() -> None:
+    metrics = {"cc": 25.0, "coverage": 30.0}
+    line = build_badges(metrics, gates_passed=False, gates_passed_count=0, gates_total=2)
+    assert "pyqual-fail-red" in line
+
+
+def test_build_badges_empty_metrics_no_project_meta() -> None:
+    line = build_badges({}, gates_passed=True)
+    assert "pyqual-pass" in line
+    assert line.count("![") == 1
+
+
+def test_build_badges_with_project_meta() -> None:
+    metrics = {"cc": 5.0, "coverage": 80.0}
+    meta = {
+        "version": "1.2.3",
+        "python": ">=3.9",
+        "license": "MIT",
+        "ai_cost": 3.50,
+        "ai_commits": 42,
+        "human_hours": 10.5,
+        "model": "openrouter/qwen/qwen3-coder-next",
+    }
+    block = build_badges(metrics, gates_passed=True, project_meta=meta, gates_passed_count=2, gates_total=2)
+    lines = block.split("\n")
+    assert len(lines) == 2
+    assert "version" in lines[0].lower() or "Version" in lines[0]
+    assert "AI Cost" in lines[0] or "AI%20Cost" in lines[0]
+    assert "Human Time" in lines[0] or "Human%20Time" in lines[0]
+    assert "Model" in lines[0]
+    assert "license" in lines[0].lower() or "License" in lines[0]
+    assert "pyqual-pass" in lines[1]
+    assert "gates" in lines[1]
+    assert "CC" in lines[1]
+
+
+def test_build_badges_gates_ratio() -> None:
+    metrics = {"cc": 5.0}
+    block = build_badges(metrics, gates_passed=False, gates_passed_count=1, gates_total=3)
+    assert "1%2F3" in block or "1/3" in block
+
+
+def test_project_badges_all_fields() -> None:
+    meta = {
+        "version": "0.1.0",
+        "python": ">=3.10",
+        "license": "Apache-2.0",
+        "ai_cost": 7.50,
+        "ai_commits": 61,
+        "human_hours": 20.3,
+        "model": "openrouter/qwen/qwen3-coder-next",
+    }
+    line = _build_project_badges(meta)
+    assert "0.1.0" in line
+    assert "3.10" in line
+    assert "Apache" in line
+    assert "$7.50" in line or "%247.50" in line
+    assert "20.3h" in line
+    assert "Model" in line
+
+
+def test_project_badges_empty_meta() -> None:
+    line = _build_project_badges({})
+    assert line == ""
+
+
+def test_project_badges_ai_cost_colors() -> None:
+    line = _build_project_badges({"ai_cost": 0.50})
+    assert "brightgreen" in line
+    line = _build_project_badges({"ai_cost": 3.0})
+    assert "green" in line
+    line = _build_project_badges({"ai_cost": 8.0})
+    assert "orange" in line
+    line = _build_project_badges({"ai_cost": 15.0})
+    assert "red" in line
+
+
+def test_quality_badges_with_extra_metrics() -> None:
+    metrics = {
+        "cc": 5.0,
+        "coverage": 85.0,
+        "maintainability_index": 72.0,
+        "ruff_errors": 0.0,
+        "mypy_errors": 3.0,
+        "docstring_cov": 90.0,
+    }
+    line = _build_quality_badges(metrics, gates_passed=True, gates_passed_count=6, gates_total=6)
+    assert "pyqual-pass" in line
+    assert "CC" in line
+    assert "coverage" in line
+    assert "maintainability" in line.lower() or "maintainability%20index" in line
+    assert "ruff" in line.lower()
+    assert "mypy" in line.lower()
+    assert "docstring" in line.lower()

@@ -1,5 +1,3 @@
-# Pyqual CI/CD Integration & Dashboard Guide
-
 ## Overview
 
 This guide explains how to integrate Pyqual into your CI/CD pipelines and set up a dashboard for visualizing quality metrics across multiple repositories.
@@ -16,8 +14,6 @@ This guide explains how to integrate Pyqual into your CI/CD pipelines and set up
    - [Deployment](#deployment)
 3. [Data Sources](#data-sources)
 4. [Troubleshooting](#troubleshooting)
-
-## CI/CD Integration
 
 ### GitHub Actions
 
@@ -67,8 +63,6 @@ This guide explains how to integrate Pyqual into your CI/CD pipelines and set up
    - Review apps for merge requests
    - Scheduled nightly runs
 
-## Dashboard Setup
-
 ### Prerequisites
 
 - Node.js 18+ and npm
@@ -104,8 +98,6 @@ This guide explains how to integrate Pyqual into your CI/CD pipelines and set up
    }
    ```
 
-### Configuration Options
-
 #### Repository Configuration
 
 Each repository requires:
@@ -119,8 +111,6 @@ Each repository requires:
 
 - `VITE_API_URL`: Backend API URL (default: http://localhost:8000)
 - `VITE_GITHUB_TOKEN`: GitHub token for higher rate limits
-
-### Running the Dashboard
 
 #### Development
 
@@ -137,8 +127,6 @@ Each repository requires:
    ```
 
 3. Open http://localhost:3000
-
-#### Production Deployment
 
 ##### GitHub Pages
 
@@ -203,8 +191,6 @@ For on-premises or development:
 - API reads from local `.pyqual/` directories
 - Supports ingestion endpoint for CI uploads
 
-## Data Format
-
 ### Summary JSON Structure
 
 ```json
@@ -239,8 +225,6 @@ For on-premises or development:
 }
 ```
 
-## Troubleshooting
-
 ### Charts Not Displaying
 
 1. **Check browser console** for JavaScript errors
@@ -264,8 +248,6 @@ For on-premises or development:
 3. **Verify repository URLs** are correct
 4. **Check CI artifacts** are being uploaded
 
-### Common Issues
-
 #### Issue: "No runs" displayed
 - Solution: Ensure CI is running and uploading artifacts
 - Check if `summary.json` exists in artifacts
@@ -277,8 +259,6 @@ For on-premises or development:
 #### Issue: Dashboard not updating
 - Solution: Verify refresh interval settings
 - Check if data source is accessible
-
-## Advanced Configuration
 
 ### Custom Metrics
 

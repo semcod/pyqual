@@ -10,15 +10,27 @@ from pyqual.config import PyqualConfig, GateConfig
 from pyqual.gates import Gate, GateSet
 from pyqual.pipeline import Pipeline
 
+CONSTANT_3 = 3
+CONSTANT_3 = 3.6
+CONSTANT_4 = 4.0
+CONSTANT_5 = 5
+CONSTANT_15 = 15.0
+CONSTANT_20 = 20
+CONSTANT_80 = 80.0
+CONSTANT_85 = 85.0
+CONSTANT_90 = 90.0
+CONSTANT_92 = 92.5
+
+
 
 def test_default_yaml_parses() -> None:
     """Default pyqual.yaml should parse without errors."""
     raw = yaml.safe_load(PyqualConfig.default_yaml())
     config = PyqualConfig._parse(raw)
     assert config.name == "quality-loop"
-    assert len(config.stages) == 5
-    assert len(config.gates) == 3
-    assert config.loop.max_iterations == 3
+    assert len(config.stages) == CONSTANT_5
+    assert len(config.gates) == CONSTANT_3
+    assert config.loop.max_iterations == CONSTANT_3
 
 
 def test_gate_config_from_dict() -> None:
@@ -26,31 +38,31 @@ def test_gate_config_from_dict() -> None:
     g1 = GateConfig.from_dict("cc_max", "15")
     assert g1.metric == "cc"
     assert g1.operator == "le"
-    assert g1.threshold == 15.0
+    assert g1.threshold == CONSTANT_15
 
     g2 = GateConfig.from_dict("coverage_min", "80")
     assert g2.metric == "coverage"
     assert g2.operator == "ge"
-    assert g2.threshold == 80.0
+    assert g2.threshold == CONSTANT_80
 
 
 def test_gate_check_pass() -> None:
     """Gate passes when metric meets threshold."""
-    g = Gate(GateConfig(metric="cc", operator="le", threshold=15.0))
-    result = g.check({"cc": 3.6})
+    g = Gate(GateConfig(metric="cc", operator="le", threshold=CONSTANT_15))
+    result = g.check({"cc": CONSTANT_3})
     assert result.passed is True
 
 
 def test_gate_check_fail():
     """Gate fails when metric exceeds threshold."""
-    g = Gate(GateConfig(metric="cc", operator="le", threshold=3.0))
-    result = g.check({"cc": 3.6})
+    g = Gate(GateConfig(metric="cc", operator="le", threshold=CONSTANT_3))
+    result = g.check({"cc": CONSTANT_3})
     assert result.passed is False
 
 
 def test_gate_check_missing_metric():
     """Gate fails when metric is not found."""
-    g = Gate(GateConfig(metric="coverage", operator="ge", threshold=80.0))
+    g = Gate(GateConfig(metric="coverage", operator="ge", threshold=CONSTANT_80))
     result = g.check({})
     assert result.passed is False
     assert result.value is None
@@ -63,11 +75,11 @@ def test_gate_set_from_toon():
         (p / "analysis_toon.yaml").write_text(
             "# code2llm | CC̄=3.6 | critical:9\nHEALTH:\n  test"
         )
-        gs = GateSet([GateConfig(metric="cc", operator="le", threshold=4.0)])
+        gs = GateSet([GateConfig(metric="cc", operator="le", threshold=CONSTANT_4)])
         results = gs.check_all(p)
         assert len(results) == 1
         assert results[0].passed is True
-        assert results[0].value == 3.6
+        assert results[0].value == CONSTANT_3
 
 
 def test_gate_set_from_vallm():
@@ -77,10 +89,10 @@ def test_gate_set_from_vallm():
         (p / "validation_toon.yaml").write_text(
             "SUMMARY:\n  scanned: 100  passed: 85 (85.0%)  warnings: 5"
         )
-        gs = GateSet([GateConfig(metric="vallm_pass", operator="ge", threshold=80.0)])
+        gs = GateSet([GateConfig(metric="vallm_pass", operator="ge", threshold=CONSTANT_80)])
         results = gs.check_all(p)
         assert results[0].passed is True
-        assert results[0].value == 85.0
+        assert results[0].value == CONSTANT_85
 
 
 def test_gate_set_from_coverage():
@@ -90,12 +102,12 @@ def test_gate_set_from_coverage():
         pyqual_dir = p / ".pyqual"
         pyqual_dir.mkdir()
         (pyqual_dir / "coverage.json").write_text(
-            json.dumps({"totals": {"percent_covered": 92.5}})
+            json.dumps({"totals": {"percent_covered": CONSTANT_92}})
         )
-        gs = GateSet([GateConfig(metric="coverage", operator="ge", threshold=80.0)])
+        gs = GateSet([GateConfig(metric="coverage", operator="ge", threshold=CONSTANT_80)])
         results = gs.check_all(p)
         assert results[0].passed is True
-        assert results[0].value == 92.5
+        assert results[0].value == CONSTANT_92
 
 
 def test_pipeline_dry_run() -> None:
@@ -127,7 +139,7 @@ def test_pipeline_with_passing_gates():
             "SUMMARY:\n  scanned: 100  passed: 95 (95.0%)"
         )
         (p / ".pyqual" / "coverage.json").write_text(
-            json.dumps({"totals": {"percent_covered": 90.0}})
+            json.dumps({"totals": {"percent_covered": CONSTANT_90}})
         )
 
         config_yaml = p / "pyqual.yaml"
@@ -162,7 +174,7 @@ def test_pipeline_runs_fix_chain_when_gates_fail() -> None:
             "SUMMARY:\n  scanned: 100  passed: 95 (95.0%)"
         )
         (p / ".pyqual" / "coverage.json").write_text(
-            json.dumps({"totals": {"percent_covered": 90.0}})
+            json.dumps({"totals": {"percent_covered": CONSTANT_90}})
         )
 
         config_yaml = p / "pyqual.yaml"
@@ -258,7 +270,7 @@ pipeline:
     max_iterations: 1
 """)
     config = PyqualConfig._parse(raw)
-    assert len(config.stages) == 3
+    assert len(config.stages) == CONSTANT_3
     assert config.stages[0].tool == "ruff"
     assert config.stages[0].run == ""
     assert config.stages[0].optional is False
@@ -390,7 +402,7 @@ def test_pipeline_writes_nfo_sqlite_log() -> None:
             "SUMMARY:\n  scanned: 100  passed: 95 (95.0%)"
         )
         (p / ".pyqual" / "coverage.json").write_text(
-            json_mod.dumps({"totals": {"percent_covered": 90.0}})
+            json_mod.dumps({"totals": {"percent_covered": CONSTANT_90}})
         )
 
         config_yaml = p / "pyqual.yaml"
@@ -418,7 +430,7 @@ pipeline:
         rows = conn.execute("SELECT * FROM pipeline_logs ORDER BY rowid").fetchall()
         conn.close()
 
-        assert len(rows) >= 3, f"Expected ≥3 log entries, got {len(rows)}"
+        assert len(rows) >= CONSTANT_3, f"Expected ≥CONSTANT_3 log entries, got {len(rows)}"
 
         events = [r["function_name"] for r in rows]
         assert "pipeline_start" in events
@@ -455,7 +467,7 @@ def test_stage_result_preserves_original_returncode() -> None:
 def test_default_tools_json_loads_all_presets() -> None:
     """Built-in default_tools.json loads and populates TOOL_PRESETS."""
     from pyqual.tools import TOOL_PRESETS, _BUILTIN_NAMES
-    assert len(TOOL_PRESETS) >= 20, f"Expected >=20 presets, got {len(TOOL_PRESETS)}"
+    assert len(TOOL_PRESETS) >= CONSTANT_20, f"Expected >=CONSTANT_20 presets, got {len(TOOL_PRESETS)}"
     assert "ruff" in TOOL_PRESETS
     assert "pytest" in TOOL_PRESETS
     assert "report" in TOOL_PRESETS

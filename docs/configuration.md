@@ -440,12 +440,6 @@ conn = sqlite3.connect(".pyqual/pipeline.db")
 rows = conn.execute("SELECT * FROM pipeline_logs WHERE level='WARNING'").fetchall()
 ```
 
-### LLM auto-diagnosis workflow
-
-```bash
-# 1. Run pipeline
-pyqual run
-
 # 2. Extract failures as JSON for LLM
 pyqual logs --json --failed > .pyqual/failures.json
 

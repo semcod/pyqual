@@ -1,82 +1,174 @@
-# vallm batch | 116f | 108✓ 16⚠ 0✗ | 2026-04-05
+# vallm batch | 375f | 216✓ 17⚠ 29✗ | 2026-04-15
 
 SUMMARY:
-  scanned: 116  passed: 108 (93.1%)  warnings: 16  errors: 0  unsupported: 8
+  scanned: 375  passed: 216 (57.6%)  warnings: 17  errors: 29  unsupported: 130
 
-WARNINGS[16]{path,score}:
+WARNINGS[17]{path,score}:
+  dashboard/vite.config.ts,0.83
+    issues[1]{rule,severity,message,line}:
+      js.import.resolvable,warning,Module 'vite' not found,1
+  dashboard/vitest.config.ts,0.89
+    issues[1]{rule,severity,message,line}:
+      js.import.resolvable,warning,Module 'vitest/config' not found,1
   pyqual/plugins/git/main.py,0.90
     issues[7]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,git_status has cyclomatic complexity 18 (max: 15),232
-      complexity.cyclomatic,warning,git_push has cyclomatic complexity 17 (max: 15),409
-      complexity.cyclomatic,warning,scan_for_secrets has cyclomatic complexity 17 (max: 15),608
-      complexity.maintainability,warning,Low maintainability index: 17.7 (threshold: 20),
-      complexity.lizard_cc,warning,git_status: CC=18 exceeds limit 15,232
-      complexity.lizard_cc,warning,git_push: CC=17 exceeds limit 15,409
-      complexity.lizard_cc,warning,scan_for_secrets: CC=17 exceeds limit 15,608
-  pyqual/bulk_run.py,0.93
-    issues[4]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,_run_single_project has cyclomatic complexity 17 (max: 15),260
-      complexity.cyclomatic,warning,bulk_run has cyclomatic complexity 17 (max: 15),493
-      complexity.lizard_cc,warning,_run_single_project: CC=17 exceeds limit 15,260
-      complexity.lizard_cc,warning,bulk_run: CC=17 exceeds limit 15,493
-  pyqual/cli/cmd_git.py,0.93
-    issues[4]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,git_scan_cmd has cyclomatic complexity 17 (max: 15),92
-      complexity.cyclomatic,warning,git_push_cmd has cyclomatic complexity 19 (max: 15),226
-      complexity.lizard_cc,warning,git_scan_cmd: CC=16 exceeds limit 15,92
-      complexity.lizard_cc,warning,git_push_cmd: CC=19 exceeds limit 15,226
-  pyqual/pipeline.py,0.93
-    issues[5]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,_execute_stage has cyclomatic complexity 17 (max: 15),259
-      complexity.cyclomatic,warning,_classify_error has cyclomatic complexity 17 (max: 15),623
-      complexity.maintainability,warning,Low maintainability index: 8.8 (threshold: 20),
-      complexity.lizard_cc,warning,_execute_stage: CC=17 exceeds limit 15,259
-      complexity.lizard_cc,warning,_classify_error: CC=17 exceeds limit 15,623
-  pyqual/_gate_collectors.py,0.96
-    issues[3]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,_from_vulnerabilities has cyclomatic complexity 18 (max: 15),181
-      complexity.maintainability,warning,Low maintainability index: 2.7 (threshold: 20),
-      complexity.lizard_cc,warning,_from_vulnerabilities: CC=18 exceeds limit 15,181
-  pyqual/auto_closer.py,0.97
+      complexity.cyclomatic,warning,git_status has cyclomatic complexity 18 (max: 15),238
+      complexity.cyclomatic,warning,git_push has cyclomatic complexity 17 (max: 15),415
+      complexity.cyclomatic,warning,scan_for_secrets has cyclomatic complexity 17 (max: 15),614
+      complexity.maintainability,warning,Low maintainability index: 17.5 (threshold: 20),
+      complexity.lizard_cc,warning,git_status: CC=18 exceeds limit 15,238
+      complexity.lizard_cc,warning,git_push: CC=17 exceeds limit 15,415
+      complexity.lizard_cc,warning,scan_for_secrets: CC=17 exceeds limit 15,614
+  dashboard/src/components/Overview.tsx,0.93
     issues[2]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,main has cyclomatic complexity 20 (max: 15),94
-      complexity.lizard_cc,warning,main: CC=19 exceeds limit 15,94
+      complexity.lizard_cc,warning,Overview: CC=23 exceeds limit 15,16
+      complexity.lizard_length,warning,Overview: 132 lines exceeds limit 100,16
+  pyqual/validation/release.py,0.93
+    issues[3]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,validate_release_state has cyclomatic complexity 22 (max: 15),151
+      complexity.lizard_cc,warning,validate_release_state: CC=21 exceeds limit 15,151
+      complexity.lizard_length,warning,validate_release_state: 121 lines exceeds limit 100,151
+  pyqual/pipeline.py,0.96
+    issues[3]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,_execute_stage has cyclomatic complexity 16 (max: 15),292
+      complexity.maintainability,warning,Low maintainability index: 10.3 (threshold: 20),
+      complexity.lizard_cc,warning,_execute_stage: CC=16 exceeds limit 15,292
+  test_pyqual.py,0.96
+    issues[2]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,test_pipeline_writes_nfo_sqlite_log has cyclomatic complexity 17 (max: 15),392
+      complexity.maintainability,warning,Low maintainability index: 14.1 (threshold: 20),
+  dashboard/src/App.tsx,0.97
+    issues[1]{rule,severity,message,line}:
+      complexity.lizard_length,warning,App: 114 lines exceeds limit 100,16
+  dashboard/src/components/Settings.tsx,0.97
+    issues[1]{rule,severity,message,line}:
+      complexity.lizard_length,warning,Settings: 110 lines exceeds limit 100,4
+  integration/run_matrix.sh,0.97
+    issues[1]{rule,severity,message,line}:
+      complexity.lizard_length,warning,run_case: 170 lines exceeds limit 100,11
   pyqual/cli/cmd_config.py,0.97
     issues[2]{rule,severity,message,line}:
       complexity.cyclomatic,warning,validate has cyclomatic complexity 19 (max: 15),54
       complexity.lizard_cc,warning,validate: CC=19 exceeds limit 15,54
-  pyqual/cli/cmd_run.py,0.97
+  pyqual/plugins/git/status.py,0.97
     issues[2]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,run has cyclomatic complexity 23 (max: 15),194
-      complexity.lizard_cc,warning,run: CC=21 exceeds limit 15,194
-  pyqual/cli_bulk_cmds.py,0.97
-    issues[2]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,_bulk_run_impl has cyclomatic complexity 19 (max: 15),99
-      complexity.lizard_cc,warning,_bulk_run_impl: CC=19 exceeds limit 15,99
-  pyqual/cli_observe.py,0.97
-    issues[2]{rule,severity,message,line}:
-      complexity.maintainability,warning,Low maintainability index: 19.1 (threshold: 20),
-      complexity.lizard_cc,warning,register_observe_commands.history: CC=28 exceeds limit 15,362
-  pyqual/run_parallel_fix.py,0.97
-    issues[2]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,main has cyclomatic complexity 18 (max: 15),306
-      complexity.lizard_cc,warning,main: CC=17 exceeds limit 15,306
-  pyqual/validation/config_check.py,0.97
-    issues[2]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,_load_yaml_config has cyclomatic complexity 17 (max: 15),21
-      complexity.lizard_cc,warning,_load_yaml_config: CC=17 exceeds limit 15,21
+      complexity.cyclomatic,warning,git_status has cyclomatic complexity 18 (max: 15),10
+      complexity.lizard_cc,warning,git_status: CC=18 exceeds limit 15,10
+  pyqual/_gate_collectors.py,0.98
+    issues[1]{rule,severity,message,line}:
+      complexity.maintainability,warning,Low maintainability index: 4.2 (threshold: 20),
+  pyqual/cli/cmd_run.py,0.98
+    issues[1]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,run has cyclomatic complexity 17 (max: 15),224
   pyqual/cli_run_helpers.py,0.98
     issues[1]{rule,severity,message,line}:
       complexity.maintainability,warning,Low maintainability index: 19.7 (threshold: 20),
-  tests/test_bulk_init.py,0.98
+  tests/pipeline_test.py,0.98
     issues[1]{rule,severity,message,line}:
-      complexity.maintainability,warning,Low maintainability index: 19.2 (threshold: 20),
-  tests/test_cli_run_helpers.py,0.98
+      complexity.cyclomatic,warning,test_pipeline_writes_nfo_sqlite_log has cyclomatic complexity 17 (max: 15),6
+  tests/test_pipeline.py,0.98
     issues[1]{rule,severity,message,line}:
-      complexity.maintainability,warning,Low maintainability index: 19.0 (threshold: 20),
-  tests/test_pipeline_stages.py,0.98
-    issues[1]{rule,severity,message,line}:
-      complexity.maintainability,warning,Low maintainability index: 0.0 (threshold: 20),
+      complexity.cyclomatic,warning,test_pipeline_writes_nfo_sqlite_log has cyclomatic complexity 17 (max: 15),9
 
-UNSUPPORTED[1]{bucket,count}:
-  *.md,8
+ERRORS[29]{path,score}:
+  .pyqual/attack_merge.json,0.00
+    issues[1]{rule,severity,message,line}:
+      syntax.tree_sitter,error,tree-sitter found 6 parse error(s) in json,
+  dashboard/api/main.py,0.85
+    issues[5]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'fastapi' not found,1
+      python.import.resolvable,error,Module 'fastapi.middleware.cors' not found,2
+      python.import.resolvable,error,Module 'fastapi.staticfiles' not found,3
+      python.import.resolvable,error,Module 'fastapi.security' not found,4
+      python.import.resolvable,error,Module 'dashboard.constants' not found,14
+  pyqual/integrations/llx_mcp.py,0.86
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'llx.mcp.client' not found,15
+      python.import.resolvable,error,Module 'llx.mcp.workflows' not found,16
+      python.import.resolvable,error,Module 'llx.utils.issues' not found,23
+  tests/test_profiles_module.py,0.86
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,5
+  pyqual/integrations/llx_mcp_service.py,0.89
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'llx.mcp.service' not found,13
+  tests/test_bulk_init_pkg/test_fixtures.py,0.89
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,6
+  tests/test_cli_run_helpers.py,0.89
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,7
+  tests/test_secrets_collector.py,0.89
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,6
+  pyqual/plugins/deps/test.py,0.91
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,8
+  pyqual/plugins/docker/test.py,0.91
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,8
+  pyqual/plugins/docs/test.py,0.91
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,8
+  pyqual/plugins/documentation/test.py,0.91
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,8
+  tests/test_profiles.py,0.91
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,6
+  pyqual/auto_closer.py,0.94
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'planfile.core.models' not found,157
+  pyqual/llm.py,0.94
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'llx.llm' not found,12
+  pyqual/plugins/example_plugin/test.py,0.94
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,12
+  pyqual/plugins/security/test.py,0.94
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,9
+  tests/test_bulk_init.py,0.94
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,9
+  tests/test_github_actions.py,0.94
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,10
+  pyqual/plugins/attack/test.py,0.95
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,10
+  pyqual/plugins/git/test.py,0.95
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,14
+  tests/test_bulk_run.py,0.95
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,8
+  tests/test_llx_mcp.py,0.95
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,8
+      python.import.resolvable,error,Module 'llx.mcp.workflows' not found,13
+  tests/test_pyqual.py,0.95
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,7
+  pyqual/__init__.py,0.96
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'llx.llm' not found,54
+  tests/test_pipeline_stages.py,0.96
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,10
+  tests/test_release_validation.py,0.96
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,12
+  tests/test_runtime_errors.py,0.96
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,10
+  tests/test_tickets.py,0.97
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,7
+
+UNSUPPORTED[5]{bucket,count}:
+  *.md,63
+  Dockerfile*,2
+  *.txt,13
+  *.yml,3
+  other,49

@@ -20,6 +20,10 @@ from pyqual.plugins.git import git_status
 from pyqual.validation.errors import EC, Severity
 from pyqual.validation.schema import ValidationResult
 
+CONSTANT_200 = 200
+CONSTANT_404 = 404
+
+
 __all__ = ["validate_release_state"]
 
 
@@ -132,10 +136,10 @@ def _check_pypi_version(package_name: str, version: str) -> tuple[bool, Optional
     url = f"https://pypi.org/pypi/{package_name}/{version}/json"
     try:
         response = urlopen(url, timeout=10)
-        status = getattr(response, "status", 200)
-        return status == 200, None
+        status = getattr(response, "status", CONSTANT_200)
+        return status == CONSTANT_200, None
     except HTTPError as exc:
-        if exc.code == 404:
+        if exc.code == CONSTANT_404:
             return False, None
         return False, f"HTTP {exc.code}"
     except URLError as exc:

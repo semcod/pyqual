@@ -1,57 +1,57 @@
-# code2llm/evolution | 562 func | 74f | 2026-04-05
+# code2llm/evolution | 729 func | 95f | 2026-04-19
 
 NEXT[10] (ranked by impact):
   [1] !! SPLIT           pyqual/plugins/git/main.py
-      WHY: 961L, 1 classes, max CC=18
-      EFFORT: ~4h  IMPACT: 17298
+      WHY: 967L, 1 classes, max CC=18
+      EFFORT: ~4h  IMPACT: 17406
 
-  [2] !! SPLIT           pyqual/_gate_collectors.py
-      WHY: 700L, 0 classes, max CC=18
-      EFFORT: ~4h  IMPACT: 12600
+  [2] !! SPLIT           pyqual/pipeline.py
+      WHY: 700L, 1 classes, max CC=16
+      EFFORT: ~4h  IMPACT: 11200
 
-  [3] !! SPLIT           pyqual/pipeline.py
-      WHY: 669L, 1 classes, max CC=17
-      EFFORT: ~4h  IMPACT: 11373
+  [3] !! SPLIT           pyqual/_gate_collectors.py
+      WHY: 705L, 0 classes, max CC=15
+      EFFORT: ~4h  IMPACT: 10575
 
-  [4] !  SPLIT-FUNC      run  CC=23  fan=31
-      WHY: CC=23 exceeds 15
-      EFFORT: ~1h  IMPACT: 713
+  [4] !  SPLIT-FUNC      run  CC=17  fan=26
+      WHY: CC=17 exceeds 15
+      EFFORT: ~1h  IMPACT: 442
 
-  [5] !  SPLIT-FUNC      main  CC=20  fan=26
-      WHY: CC=20 exceeds 15
-      EFFORT: ~1h  IMPACT: 520
-
-  [6] !  SPLIT-FUNC      main  CC=18  fan=27
-      WHY: CC=18 exceeds 15
-      EFFORT: ~1h  IMPACT: 486
-
-  [7] !  SPLIT-FUNC      _logs_impl  CC=22  fan=21
-      WHY: CC=22 exceeds 15
-      EFFORT: ~1h  IMPACT: 462
-
-  [8] !  SPLIT-FUNC      _run_single_project  CC=19  fan=21
-      WHY: CC=19 exceeds 15
-      EFFORT: ~1h  IMPACT: 399
-
-  [9] !  SPLIT-FUNC      get_last_run  CC=15  fan=26
+  [5] !  SPLIT-FUNC      get_last_run  CC=15  fan=26
       WHY: CC=15 exceeds 15
       EFFORT: ~1h  IMPACT: 390
 
-  [10] !  SPLIT-FUNC      RepositoryDetail  CC=20  fan=17
-      WHY: CC=20 exceeds 15
-      EFFORT: ~1h  IMPACT: 340
+  [6] !  SPLIT-FUNC      validate_release_state  CC=22  fan=16
+      WHY: CC=22 exceeds 15
+      EFFORT: ~1h  IMPACT: 352
+
+  [7] !  SPLIT-FUNC      git_status  CC=18  fan=16
+      WHY: CC=18 exceeds 15
+      EFFORT: ~1h  IMPACT: 288
+
+  [8] !  SPLIT-FUNC      git_status  CC=18  fan=16
+      WHY: CC=18 exceeds 15
+      EFFORT: ~1h  IMPACT: 288
+
+  [9] !  SPLIT-FUNC      ParallelExecutor.run  CC=15  fan=17
+      WHY: CC=15 exceeds 15
+      EFFORT: ~1h  IMPACT: 255
+
+  [10] !  SPLIT-FUNC      Pipeline._execute_stage  CC=16  fan=14
+      WHY: CC=16 exceeds 15
+      EFFORT: ~1h  IMPACT: 224
 
 
 RISKS[3]:
   ⚠ Splitting pyqual/plugins/git/main.py may break 21 import paths
-  ⚠ Splitting pyqual/_gate_collectors.py may break 26 import paths
-  ⚠ Splitting pyqual/pipeline.py may break 23 import paths
+  ⚠ Splitting pyqual/_gate_collectors.py may break 27 import paths
+  ⚠ Splitting pyqual/pipeline.py may break 26 import paths
 
 METRICS-TARGET:
-  CC̄:          5.5 → ≤3.8
-  max-CC:      23 → ≤11
-  god-modules: 8 → 0
-  high-CC(≥15): 28 → ≤14
+  CC̄:          4.9 → ≤3.4
+  max-CC:      22 → ≤11
+  god-modules: 7 → 0
+  high-CC(≥15): 16 → ≤8
   hub-types:   0 → ≤0
 
 PATTERNS (language parser shared logic):
@@ -79,4 +79,4 @@ PATTERNS (language parser shared logic):
     - Standardized FunctionInfo/ClassInfo models
 
 HISTORY:
-  prev CC̄=5.6 → now CC̄=5.5
+  prev CC̄=5.1 → now CC̄=4.9

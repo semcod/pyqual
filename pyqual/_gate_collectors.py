@@ -14,6 +14,11 @@ import re
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+CONSTANT_3 = 3
+CONSTANT_4 = 4
+CONSTANT_6 = 6
+
+
 if TYPE_CHECKING:
     from pyqual.plugins import MetricCollector
 
@@ -157,7 +162,7 @@ def _from_secrets(workdir: Path) -> dict[str, float]:
     try:
         data = json.loads(sec_path.read_text())
         if isinstance(data, list):
-            severities = {"critical": 4, "high": 3, "medium": 2, "low": 1}
+            severities = {"critical": CONSTANT_4, "high": CONSTANT_3, "medium": 2, "low": 1}
             max_sev = 0
             for finding in data:
                 sev = finding.get("severity", "").lower()
@@ -172,7 +177,7 @@ def _from_secrets(workdir: Path) -> dict[str, float]:
                 count = sum(len(v) for v in findings.values() if isinstance(v, list))
                 result["secrets_count"] = float(count)
                 result["secrets_found"] = float(count)
-                result["secrets_severity"] = 3.0  # High severity for secrets
+                result["secrets_severity"] = CONSTANT_3  # High severity for secrets
     except (json.JSONDecodeError, TypeError):
         pass
     return result
@@ -296,7 +301,7 @@ def _from_pyroma(workdir: Path) -> dict[str, float]:
             if isinstance(score, (int, float)):
                 result["pyroma_score"] = float(score)
             elif isinstance(score, str) and score.upper() in "ABCDEF":
-                result["pyroma_score"] = float(6 - ord(score.upper()[0]) + ord("A"))
+                result["pyroma_score"] = float(CONSTANT_6 - ord(score.upper()[0]) + ord("A"))
         except (json.JSONDecodeError, TypeError):
             pass
     return result

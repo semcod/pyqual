@@ -244,7 +244,7 @@ def test_quality_badges_with_extra_metrics() -> None:
         "docstring_coverage": 65.0,
     }
     line = _build_quality_badges(metrics, True, 3, 3)
-    assert "MI" in line
+    assert "maintainability" in line.lower()
     assert "ruff" in line
     assert "mypy" in line
     assert "docstrings" in line

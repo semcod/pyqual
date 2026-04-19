@@ -28,8 +28,6 @@ else:
                 print(f"  Error: {stage.stderr}")
 ```
 
-## Configuration API
-
 ### Create config programmatically
 
 ```python
@@ -104,9 +102,6 @@ for iteration in result.iterations:
             print(f"    Error: {stage.stderr}")
 ```
 
-## Dry Run Mode
-
-```python
 # Preview without executing
 result = pipeline.run(dry_run=True)
 
@@ -145,8 +140,6 @@ sync_all_tickets(
     direction="both"
 )
 ```
-
-## API Reference
 
 ### Classes
 
@@ -230,9 +223,6 @@ from llx.llm import LLM, get_llm_model, DEFAULT_MAX_TOKENS
 
 # Also works — pyqual re-export
 from pyqual.llm import LLM, get_llm_model, DEFAULT_MAX_TOKENS
-
-# Create LLM instance (reads .env for model/key)
-llm = LLM()
 
 # Complete a prompt
 response = llm.complete(

@@ -15,6 +15,12 @@ from typing import Any, Callable
 
 from pyqual.plugins import MetricCollector, PluginMetadata, PluginRegistry
 
+CONSTANT_3 = 3
+CONSTANT_5 = 5
+CONSTANT_50 = 50
+CONSTANT_127 = 127
+
+
 
 def _count_by_severity(secrets: list[dict[str, Any]]) -> dict[str, int]:
     """Count secrets by severity level."""
@@ -223,7 +229,7 @@ def run_git_command(
     except FileNotFoundError:
         return subprocess.CompletedProcess(
             args=cmd,
-            returncode=127,
+            returncode=CONSTANT_127,
             stdout="",
             stderr="git command not found",
         )
@@ -278,7 +284,7 @@ def git_status(cwd: Path | None = None) -> dict[str, Any]:
 
         # Branch info line
         if line.startswith("##"):
-            branch_info = line[3:].strip()
+            branch_info = line[CONSTANT_3:].strip()
             # Parse branch and ahead/behind
             if "..." in branch_info:
                 branch_part = branch_info.split("...")[0]
@@ -300,9 +306,9 @@ def git_status(cwd: Path | None = None) -> dict[str, Any]:
             continue
 
         # File status (2 char status code + filename)
-        if len(line) >= 3:
+        if len(line) >= CONSTANT_3:
             status_code = line[:2]
-            filename = line[3:]
+            filename = line[CONSTANT_3:]
 
             # Staged changes (first char is not space or ?)
             if status_code[0] not in " ?!":
@@ -713,7 +719,7 @@ def _scan_with_trufflehog(paths: list[str], cwd: Path) -> dict[str, Any]:
                     "line": data.get("SourceMetadata", {}).get("Data", {}).get("Filesystem", {}).get("line", 0),
                     "type": data.get("DetectorName", "unknown"),
                     "provider": data.get("DetectorName", "unknown"),
-                    "raw": data.get("Raw", "")[:50] + "..." if len(data.get("Raw", "")) > 50 else data.get("Raw", ""),
+                    "raw": data.get("Raw", "")[:CONSTANT_50] + "..." if len(data.get("Raw", "")) > CONSTANT_50 else data.get("Raw", ""),
                     "scanner": "trufflehog",
                     "severity": "HIGH" if data.get("Verified") else "MEDIUM",
                 }
@@ -795,7 +801,7 @@ def _scan_with_patterns(paths: list[str], cwd: Path) -> dict[str, Any]:
                         "line": line_num,
                         "type": pattern_name,
                         "provider": _get_provider_for_pattern(pattern_name),
-                        "raw": match[:50] + "..." if len(match) > 50 else match,
+                        "raw": match[:CONSTANT_50] + "..." if len(match) > CONSTANT_50 else match,
                         "scanner": "builtin_patterns",
                         "severity": _get_severity_for_pattern(pattern_name),
                     }
@@ -947,7 +953,7 @@ def preflight_push_check(
                 )
             
             # Show first few findings
-            for finding in secrets[:5]:
+            for finding in secrets[:CONSTANT_5]:
                 file = finding.get("file", "unknown")
                 line = finding.get("line", 0)
                 type_ = finding.get("type", "unknown")

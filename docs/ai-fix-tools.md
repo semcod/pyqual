@@ -34,9 +34,6 @@ All examples below follow the same pattern — only the `run:` command changes.
 ```bash
 npm install -g @anthropic-ai/claude-code
 claude auth login
-# or set ANTHROPIC_API_KEY in .env
-```
-
 ### pyqual.yaml
 
 ```yaml
@@ -127,9 +124,6 @@ pipeline still attempts an automated repair instead of failing immediately.
 
 ```bash
 npm install -g @openai/codex
-# Set OPENAI_API_KEY in .env
-```
-
 ### pyqual.yaml
 
 ```yaml
@@ -193,52 +187,6 @@ pipeline:
 
 ```bash
 npm install -g @anthropic-ai/gemini-cli
-# or: go install github.com/google-gemini/gemini-cli@latest
-# Set GEMINI_API_KEY in .env
-```
-
-### pyqual.yaml
-
-```yaml
-pipeline:
-  name: gemini-fix
-  metrics:
-    cc_max: 15
-    coverage_min: 80
-
-  stages:
-    - name: validate
-      tool: vallm
-
-    - name: test
-      tool: pytest
-
-    - name: prefact
-      tool: prefact
-      when: metrics_fail
-      optional: true
-
-    - name: fix
-      run: |
-        PROMPT="Fix all quality gate failures."
-        [ -f .pyqual/errors.json ] && PROMPT="$PROMPT\n\nErrors:\n$(cat .pyqual/errors.json)"
-        [ -f TODO.md ] && PROMPT="$PROMPT\n\nTODO:\n$(cat TODO.md)"
-        echo "$PROMPT" | gemini -y \
-          --model gemini-2.5-pro
-      when: metrics_fail
-      timeout: 1800
-
-    - name: verify
-      tool: pytest
-      when: after_fix
-
-  loop:
-    max_iterations: 3
-
-  env:
-    GEMINI_API_KEY: ${GEMINI_API_KEY}
-```
-
 ### Key Flags
 
 | Flag | Purpose |
@@ -257,9 +205,6 @@ pipeline:
 
 ```bash
 pip install aider-chat
-# Set OPENAI_API_KEY, ANTHROPIC_API_KEY, or OPENROUTER_API_KEY in .env
-```
-
 ### pyqual.yaml (built-in preset)
 
 ```yaml
@@ -501,8 +446,6 @@ If your AI tool has a CLI that can edit files, it works with pyqual. The pattern
 
 ---
 
-## Tips
-
 ### Cost Control
 
 ```yaml
@@ -588,9 +531,6 @@ Every AI fix tool requires an API key. pyqual reads keys from **environment vari
 | **aider** | Any of the above, or `OPENROUTER_API_KEY` | Depends on model backend |
 | **llx fix** | `OPENROUTER_API_KEY` (default) | [openrouter.ai](https://openrouter.ai/keys) |
 
-### Local Setup (.env)
-
-```bash
 # Create .env in project root (gitignored!)
 cat >> .env << 'EOF'
 ANTHROPIC_API_KEY=sk-ant-api03-...
@@ -611,7 +551,6 @@ Claude Code supports **two auth methods**:
 **1. OAuth login (interactive, local dev):**
 ```bash
 claude auth login
-# Opens browser, stores session in ~/.claude/
 # No API key needed — uses your Anthropic account/subscription
 ```
 

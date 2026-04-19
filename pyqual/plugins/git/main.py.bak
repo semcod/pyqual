@@ -1,0 +1,12 @@
+"""Public entrypoints for the git plugin.
+
+This module preserves the existing API by re-exporting the concrete
+implementations from the internal submodules.
+"""
+
+from __future__ import annotations
+
+from .git_command import run_git_command
+from .status import git_status
+
+__all__ = ["run_git_command", "git_status"]

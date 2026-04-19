@@ -377,3 +377,9 @@
 ---
 
 *To execute all tasks, run: `prefact -a --execute-todos`*
+## Quality Gate Violations (auto-detected)
+
+- [ ] New function git_status has CC=18 (limit: 12)
+- [ ] New function test_pipeline_writes_nfo_sqlite_log has CC=16 (limit: 12)
+- [ ] New function test_pipeline_writes_nfo_sqlite_log has CC=16 (limit: 12)
+- [ ] New function test_build_badges_with_project_meta has CC=14 (limit: 12)

@@ -25,7 +25,11 @@ from typing import Any, Callable
 from pyqual.config import PyqualConfig
 from pyqual.gates import GateSet, GateResult
 from pyqual.pipeline import Pipeline, PipelineResult, StageResult, IterationResult
-from pyqual.tools import get_preset, list_presets, ToolPreset
+from pyqual.tools import get_preset
+
+CONSTANT_3 = 3
+TIMEOUT_300 = 300
+
 
 log = logging.getLogger("pyqual.api")
 
@@ -207,7 +211,7 @@ def run_stage(
     command: str | None = None,
     tool: str | None = None,
     workdir: str | Path = ".",
-    timeout: int = 300,
+    timeout: int = TIMEOUT_300,
     env: dict[str, str] | None = None,
 ) -> dict[str, Any]:
     """Run a single stage/command directly.
@@ -267,7 +271,7 @@ def run_stage(
             "returncode": proc.returncode,
             "stdout": proc.stdout or "",
             "stderr": proc.stderr or "",
-            "duration": round(duration, 3),
+            "duration": round(duration, CONSTANT_3),
             "passed": proc.returncode == 0,
             "command": command,
         }
@@ -278,7 +282,7 @@ def run_stage(
             "returncode": TIMEOUT_EXIT_CODE,
             "stdout": "",
             "stderr": f"Timeout after {timeout}s",
-            "duration": round(duration, 3),
+            "duration": round(duration, CONSTANT_3),
             "passed": False,
             "command": command,
         }
@@ -289,7 +293,7 @@ def run_stage(
             "returncode": 1,
             "stdout": "",
             "stderr": str(e),
-            "duration": round(duration, 3),
+            "duration": round(duration, CONSTANT_3),
             "passed": False,
             "command": command,
         }

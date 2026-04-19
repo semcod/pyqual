@@ -150,8 +150,6 @@ cat .pyqual/runtime_errors.json | \
 4. **Clear errors periodically** in CI to prevent stale errors from affecting builds
 5. **Integrate with fix workflows** to enable automatic remediation
 
-## Troubleshooting
-
 ### No runtime errors file
 The file is only created when errors occur. If you expect errors but don't see the file:
 - Check if stages are actually failing (non-zero exit codes)

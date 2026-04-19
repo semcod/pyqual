@@ -40,6 +40,16 @@ from pyqual.pipeline_protocols import (
 from pyqual.pipeline_results import IterationResult, PipelineResult, StageResult
 from pyqual.tools import get_preset
 
+CONSTANT_3 = 3
+TIMEOUT_124 = 124
+TIMEOUT_125 = 125
+CONSTANT_126 = 126
+CONSTANT_127 = 127
+CONSTANT_128 = 128
+CONSTANT_129 = 129
+CONSTANT_500 = 500
+
+
 if TYPE_CHECKING:
     from pyqual.gates import GateResult
 
@@ -101,7 +111,7 @@ class Pipeline:
         self._log_event("pipeline_end",
                         final_ok=result.final_passed,
                         iterations=result.iteration_count,
-                        total_duration_s=round(result.total_duration, 3))
+                        total_duration_s=round(result.total_duration, CONSTANT_3))
         log.info("pipeline=%s result=%s iterations=%d duration=%.1fs",
                  self.config.name,
                  "PASS" if result.final_passed else "FAIL",
@@ -493,7 +503,7 @@ class Pipeline:
             "original_returncode": result.original_returncode,
             "ok": result.passed,
             "skipped": result.skipped,
-            "duration_s": round(result.duration, 3),
+            "duration_s": round(result.duration, CONSTANT_3),
             "optional": stage.optional,
             "allow_failure": bool(preset and preset.allow_failure),
         }
@@ -528,7 +538,7 @@ class Pipeline:
             "stage": stage.name,
             "command": result.command or stage.run,
             "returncode": result.returncode,
-            "duration_s": round(result.duration, 3),
+            "duration_s": round(result.duration, CONSTANT_3),
             "ok": result.passed,
         }
 
@@ -605,11 +615,11 @@ class Pipeline:
             "command": result.command or stage.run,
             "tool": stage.tool,
             "returncode": result.original_returncode,
-            "duration_s": round(result.duration, 3),
+            "duration_s": round(result.duration, CONSTANT_3),
             "error_type": self._classify_error(result),
             "message": self._extract_error_message(result),
-            "stdout_tail": result.stdout[-500:] if result.stdout else "",
-            "stderr_tail": result.stderr[-500:] if result.stderr else "",
+            "stdout_tail": result.stdout[-CONSTANT_500:] if result.stdout else "",
+            "stderr_tail": result.stderr[-CONSTANT_500:] if result.stderr else "",
         }
         
         errors_list.append(error_entry)
@@ -632,14 +642,14 @@ class Pipeline:
         # Return code classification
         rc_error_map = {
             TIMEOUT_EXIT_CODE: "timeout",
-            124: "timeout",  # timeout command
-            125: "timeout",  # timeout command error
-            127: "command_not_found",
-            126: "permission_denied",
+            TIMEOUT_124: "timeout",  # timeout command
+            TIMEOUT_125: "timeout",  # timeout command error
+            CONSTANT_127: "command_not_found",
+            CONSTANT_126: "permission_denied",
         }
         if rc in rc_error_map:
             return rc_error_map[rc]
-        if 128 <= rc <= 129:
+        if CONSTANT_128 <= rc <= CONSTANT_129:
             return "signal"
         
         # Stderr pattern classification

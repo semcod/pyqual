@@ -7,8 +7,6 @@ Pyqual records all pipeline activity to two storage backends:
 | **Pipeline DB** | `.pyqual/pipeline.db` | SQLite (nfo) | Stage results, gate checks, pipeline events |
 | **LLX History** | `.pyqual/llx_history.jsonl` | JSON Lines | LLM fix prompts, model selection, issue details |
 
-## Pipeline Database (`.pyqual/pipeline.db`)
-
 ### Schema
 
 Single table `pipeline_logs` with columns:
@@ -25,8 +23,6 @@ Single table `pipeline_logs` with columns:
 | `version` | TEXT | Pipeline name from `pyqual.yaml` |
 
 Other columns (`args`, `arg_types`, `kwarg_types`, `return_value`, `return_type`, `exception`, `exception_type`, `traceback`, `environment`, `trace_id`, `llm_analysis`) exist in the schema but are typically NULL.
-
-### Event Types
 
 #### `pipeline_start`
 
@@ -102,14 +98,6 @@ kwargs = {
 }
 ```
 
-## CLI Commands for Reading Data
-
-### `pyqual logs` — Query pipeline.db
-
-```bash
-# All entries (table view)
-pyqual logs
-
 # Last N entries
 pyqual logs --tail 10
 
@@ -131,12 +119,6 @@ pyqual logs --json --failed
 pyqual logs --sql "SELECT * FROM pipeline_logs WHERE function_name='gate_check' AND kwargs LIKE '%ok%: False%'"
 ```
 
-### `pyqual history` — Query LLX fix history
-
-```bash
-# Summary table
-pyqual history
-
 # Last 5 runs
 pyqual history --tail 5
 
@@ -155,9 +137,6 @@ pyqual history --json
 Run in a **second terminal** while `pyqual run` executes:
 
 ```bash
-# Live tail of new pipeline.db entries
-pyqual watch
-
 # Include stage stdout/stderr as they appear
 pyqual watch --output
 
@@ -167,8 +146,6 @@ pyqual watch --prompts
 # Faster polling
 pyqual watch --interval 0.5
 ```
-
-## Direct SQL Access
 
 ### From Python
 
@@ -231,9 +208,6 @@ WHERE function_name = 'pipeline_start'
 GROUP BY day ORDER BY day;
 ```
 
-### From CLI (via `pyqual logs --sql`)
-
-```bash
 # Coverage trend
 pyqual logs --sql "SELECT timestamp, kwargs FROM pipeline_logs WHERE function_name='gate_check' AND kwargs LIKE '%coverage%' ORDER BY id"
 
