@@ -23,7 +23,7 @@ Declarative quality gate loops for AI-assisted development
 ## Metadata
 
 - **name**: `pyqual`
-- **version**: `0.1.141`
+- **version**: `0.1.142`
 - **python_requires**: `>=3.9`
 - **license**: Apache-2.0
 - **ai_model**: `openrouter/x-ai/grok-code-fast-1`
@@ -493,7 +493,7 @@ pipeline:
 ```yaml
 project:
   name: pyqual
-  version: 0.1.141
+  version: 0.1.142
   env: local
 ```
 

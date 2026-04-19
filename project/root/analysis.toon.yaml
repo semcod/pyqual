@@ -1,28 +1,15 @@
-# code2llm | 127f 21304L | python:109,typescript:12,shell:4,javascript:2 | 2026-04-19
-# CC̄=4.9 | critical:16/754 | dups:0 | cycles:0
+# code2llm | 127f 21324L | python:109,typescript:12,shell:4,javascript:2 | 2026-04-19
+# CC̄=4.8 | critical:3/774 | dups:0 | cycles:0
 
-HEALTH[16]:
-  🟡 CC    get_last_run CC=15 (limit:15)
+HEALTH[3]:
   🟡 CC    run CC=15 (limit:15)
-  🟡 CC    _from_radon CC=15 (limit:15)
   🟡 CC    _execute_stage CC=16 (limit:15)
-  🟡 CC    run CC=17 (limit:15)
-  🟡 CC    validate CC=19 (limit:15)
-  🟡 CC    attack_merge CC=15 (limit:15)
-  🟡 CC    git_status CC=18 (limit:15)
-  🟡 CC    check_requirements CC=15 (limit:15)
-  🟡 CC    _check_docs_folder CC=15 (limit:15)
-  🟡 CC    git_status CC=18 (limit:15)
-  🟡 CC    git_push CC=17 (limit:15)
-  🟡 CC    scan_for_secrets CC=17 (limit:15)
-  🟡 CC    preflight_push_check CC=15 (limit:15)
-  🟡 CC    validate_release_state CC=22 (limit:15)
   🟡 CC    build_dashboard_table CC=15 (limit:15)
 
 REFACTOR[1]:
-  1. split 16 high-CC methods  (CC>15)
+  1. split 3 high-CC methods  (CC>15)
 
-PIPELINES[400]:
+PIPELINES[402]:
   [1] Src [MetricsTrendChart]: MetricsTrendChart
       PURITY: 100% pure
   [2] Src [data]: data
@@ -40,35 +27,35 @@ LAYERS:
   │ project.sh                  35L  0C    0m  CC=0.0    ←0
   │ SUGGESTED_COMMANDS.sh        4L  0C    0m  CC=0.0    ←0
   │
-  pyqual/                         CC̄=5.1    ←in:37  →out:10  !! split
-  │ !! main                       967L  1C   21m  CC=18     ←2
-  │ !! _gate_collectors           705L  0C   27m  CC=15     ←2
+  pyqual/                         CC̄=5.0    ←in:37  →out:10  !! split
+  │ !! main                       968L  1C   27m  CC=12     ←2
+  │ !! _gate_collectors           710L  0C   28m  CC=14     ←2
   │ !! pipeline                   700L  1C   26m  CC=16     ←0
-  │ !! report                     592L  0C   18m  CC=12     ←0
+  │ !! report                     592L  0C   19m  CC=12     ←0
   │ !! bulk_init                  567L  1C   15m  CC=14     ←1
   │ !! api                        523L  1C   15m  CC=10     ←3
   │ main                       485L  1C   12m  CC=11     ←1
-  │ !! main                       464L  1C   10m  CC=15     ←1
+  │ main                       465L  1C   11m  CC=13     ←1
   │ main                       427L  1C   13m  CC=14     ←1
-  │ !! report_generator           423L  2C   14m  CC=15     ←0
   │ yaml_fixer                 419L  3C   12m  CC=10     ←1
   │ cli_run_helpers            418L  0C   24m  CC=11     ←0
   │ main                       410L  1C   11m  CC=11     ←1
   │ test                       408L  6C   24m  CC=6      ←0
+  │ report_generator           401L  2C   15m  CC=11     ←0
   │ run_parallel_fix           401L  0C   12m  CC=13     ←0
   │ builtin                    399L  7C   14m  CC=13     ←0
-  │ !! main                       388L  1C   11m  CC=15     ←0
   │ cli_observe                381L  0C   15m  CC=11     ←0
+  │ main                       381L  1C   12m  CC=13     ←0
   │ github_actions             357L  2C   16m  CC=9      ←0
-  │ !! main                       354L  1C    9m  CC=15     ←3
-  │ !! cmd_run                    337L  0C   11m  CC=17     ←0
+  │ cmd_run                    347L  0C   12m  CC=11     ←0
+  │ main                       343L  1C   10m  CC=9      ←3
   │ !! parallel                   328L  4C    7m  CC=15     ←1
   │ tools                      323L  1C   15m  CC=8      ←4
+  │ release                    317L  0C   12m  CC=10     ←1
   │ cmd_git                    309L  0C    8m  CC=11     ←0
-  │ !! release                    291L  0C    9m  CC=22     ←1
   │ cli_bulk_cmds              285L  0C    6m  CC=14     ←0
   │ config                     273L  4C    8m  CC=13     ←11
-  │ !! cmd_config                 266L  0C    5m  CC=19     ←0
+  │ cmd_config                 273L  0C    7m  CC=13     ←0
   │ config_check               259L  0C    7m  CC=10     ←0
   │ cmd_tune                   240L  0C    7m  CC=12     ←0
   │ main                       231L  0C    6m  CC=8      ←1
@@ -98,10 +85,10 @@ LAYERS:
   │ constants                  107L  0C    0m  CC=0.0    ←0
   │ test                       102L  2C    7m  CC=4      ←0
   │ release_check              101L  0C    2m  CC=14     ←0
+  │ status                     101L  0C    3m  CC=8      ←3
   │ llx_mcp                    101L  0C    2m  CC=6      ←0
   │ __main__                    92L  0C    4m  CC=5      ←0
   │ cmd_info                    91L  0C    2m  CC=5      ←0
-  │ !! status                      91L  0C    1m  CC=18     ←3
   │ schema                      91L  2C    2m  CC=3      ←1
   │ cmd_init                    90L  0C    2m  CC=7      ←0
   │ _base                       87L  3C    7m  CC=5      ←6
@@ -181,9 +168,9 @@ COUPLING:
   pyqual.gate_collectors                       2                                                                                                                      ──                        
             run_analysis                       1                                                                                                                                              ──
   CYCLES: none
-  HUB: pyqual/ (fan-in=37)
   HUB: pyqual.bulk/ (fan-in=6)
   HUB: pyqual.plugins/ (fan-in=17)
+  HUB: pyqual/ (fan-in=37)
   SMELL: pyqual.cli/ fan-out=37 → split needed
   SMELL: pyqual/ fan-out=10 → split needed
 

@@ -1,57 +1,37 @@
-# code2llm/evolution | 729 func | 95f | 2026-04-19
+# code2llm/evolution | 748 func | 95f | 2026-04-19
 
-NEXT[10] (ranked by impact):
+NEXT[5] (ranked by impact):
   [1] !! SPLIT           pyqual/plugins/git/main.py
-      WHY: 967L, 1 classes, max CC=18
-      EFFORT: ~4h  IMPACT: 17406
+      WHY: 968L, 1 classes, max CC=12
+      EFFORT: ~4h  IMPACT: 11616
 
   [2] !! SPLIT           pyqual/pipeline.py
       WHY: 700L, 1 classes, max CC=16
       EFFORT: ~4h  IMPACT: 11200
 
   [3] !! SPLIT           pyqual/_gate_collectors.py
-      WHY: 705L, 0 classes, max CC=15
-      EFFORT: ~4h  IMPACT: 10575
+      WHY: 710L, 0 classes, max CC=14
+      EFFORT: ~4h  IMPACT: 9940
 
-  [4] !  SPLIT-FUNC      run  CC=17  fan=26
-      WHY: CC=17 exceeds 15
-      EFFORT: ~1h  IMPACT: 442
-
-  [5] !  SPLIT-FUNC      get_last_run  CC=15  fan=26
-      WHY: CC=15 exceeds 15
-      EFFORT: ~1h  IMPACT: 390
-
-  [6] !  SPLIT-FUNC      validate_release_state  CC=22  fan=16
-      WHY: CC=22 exceeds 15
-      EFFORT: ~1h  IMPACT: 352
-
-  [7] !  SPLIT-FUNC      git_status  CC=18  fan=16
-      WHY: CC=18 exceeds 15
-      EFFORT: ~1h  IMPACT: 288
-
-  [8] !  SPLIT-FUNC      git_status  CC=18  fan=16
-      WHY: CC=18 exceeds 15
-      EFFORT: ~1h  IMPACT: 288
-
-  [9] !  SPLIT-FUNC      ParallelExecutor.run  CC=15  fan=17
+  [4] !  SPLIT-FUNC      ParallelExecutor.run  CC=15  fan=17
       WHY: CC=15 exceeds 15
       EFFORT: ~1h  IMPACT: 255
 
-  [10] !  SPLIT-FUNC      Pipeline._execute_stage  CC=16  fan=14
+  [5] !  SPLIT-FUNC      Pipeline._execute_stage  CC=16  fan=14
       WHY: CC=16 exceeds 15
       EFFORT: ~1h  IMPACT: 224
 
 
 RISKS[3]:
-  ⚠ Splitting pyqual/plugins/git/main.py may break 21 import paths
-  ⚠ Splitting pyqual/_gate_collectors.py may break 27 import paths
+  ⚠ Splitting pyqual/plugins/git/main.py may break 27 import paths
+  ⚠ Splitting pyqual/_gate_collectors.py may break 28 import paths
   ⚠ Splitting pyqual/pipeline.py may break 26 import paths
 
 METRICS-TARGET:
-  CC̄:          4.9 → ≤3.4
-  max-CC:      22 → ≤11
+  CC̄:          4.8 → ≤3.4
+  max-CC:      16 → ≤8
   god-modules: 7 → 0
-  high-CC(≥15): 16 → ≤8
+  high-CC(≥15): 3 → ≤1
   hub-types:   0 → ≤0
 
 PATTERNS (language parser shared logic):
@@ -79,4 +59,4 @@ PATTERNS (language parser shared logic):
     - Standardized FunctionInfo/ClassInfo models
 
 HISTORY:
-  (first run — no previous data)
+  prev CC̄=4.8 → now CC̄=4.8
