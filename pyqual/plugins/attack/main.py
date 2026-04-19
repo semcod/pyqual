@@ -233,58 +233,47 @@ def attack_merge(
         return result
 
     if dry_run:
-        # Check what would happen
         merge_check = run_git_command(
             ["merge-tree", "$(git merge-base HEAD origin/main)", "HEAD", "origin/main"],
             cwd=cwd,
         )
         if merge_check.returncode == 0:
-            conflicts = merge_check.stdout.count("<<<<<<<")
-            result["conflicts_resolved"] = conflicts
+            result["conflicts_resolved"] = merge_check.stdout.count("<<<<<<<")
             result["files_changed"] = len([l for l in merge_check.stdout.split("\n") if l.startswith("changed")])
             result["success"] = True
         return result
 
-    # Perform actual merge with strategy
     if strategy == "theirs":
-        # Stash any changes
-        run_git_command(["stash", "push", "-m", "attack_merge_stash"], cwd=cwd)
-
-        # Try to merge
-        merge_result = run_git_command(
-            ["merge", "origin/main", "--no-commit", "--no-ff"],
-            cwd=cwd,
-        )
-
-        if merge_result.returncode != 0:
-            # Resolve conflicts by taking theirs
-            run_git_command(["checkout", "--theirs", "."], cwd=cwd)
-            run_git_command(["add", "."], cwd=cwd)
-
-        # Get list of conflicted files
-        status_result = run_git_command(["status", "--porcelain"], cwd=cwd)
-        conflicts = [l[3:] for l in status_result.stdout.split("\n") if l.startswith("UU")]
-        result["conflicts_resolved"] = len(conflicts)
-
-        # Commit the merge
-        commit_result = run_git_command(
-            ["commit", "-m", f"chore: attack merge with {strategy} strategy [automated]"],
-            cwd=cwd,
-        )
-
-        # Pop stash
-        run_git_command(["stash", "pop"], cwd=cwd)
-
-        if commit_result.returncode == 0:
-            result["success"] = True
-            # Count files changed
-            diff_result = run_git_command(
-                ["diff", "HEAD~1", "--name-only"],
-                cwd=cwd,
-            )
-            result["files_changed"] = len([l for l in diff_result.stdout.split("\n") if l.strip()])
-
+        _merge_theirs(result, cwd=cwd)
     return result
+
+
+def _merge_theirs(result: dict, cwd: "Path | None") -> None:
+    """Perform an attack merge using the 'theirs' strategy, updating result in-place."""
+    strategy = result["strategy"]
+    run_git_command(["stash", "push", "-m", "attack_merge_stash"], cwd=cwd)
+
+    merge_result = run_git_command(
+        ["merge", "origin/main", "--no-commit", "--no-ff"], cwd=cwd,
+    )
+    if merge_result.returncode != 0:
+        run_git_command(["checkout", "--theirs", "."], cwd=cwd)
+        run_git_command(["add", "."], cwd=cwd)
+
+    status_result = run_git_command(["status", "--porcelain"], cwd=cwd)
+    conflicts = [l[3:] for l in status_result.stdout.split("\n") if l.startswith("UU")]
+    result["conflicts_resolved"] = len(conflicts)
+
+    commit_result = run_git_command(
+        ["commit", "-m", f"chore: attack merge with {strategy} strategy [automated]"],
+        cwd=cwd,
+    )
+    run_git_command(["stash", "pop"], cwd=cwd)
+
+    if commit_result.returncode == 0:
+        result["success"] = True
+        diff_result = run_git_command(["diff", "HEAD~1", "--name-only"], cwd=cwd)
+        result["files_changed"] = len([l for l in diff_result.stdout.split("\n") if l.strip()])
 
 
 def auto_merge_pr(

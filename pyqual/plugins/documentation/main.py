@@ -217,40 +217,33 @@ stages:
 
     def _check_docs_folder(self, workdir: Path) -> dict[str, float]:
         """Check docs/ folder presence and content."""
-        result: dict[str, float] = {}
-
-        docs_paths = [
-            workdir / "docs",
-            workdir / "doc",
-            workdir / "documentation",
-        ]
-
+        docs_paths = [workdir / "docs", workdir / "doc", workdir / "documentation"]
         docs_exists = any(p.exists() and p.is_dir() for p in docs_paths)
-        result["docs_folder_exists"] = 1.0 if docs_exists else 0.0
-
+        result: dict[str, float] = {"docs_folder_exists": 1.0 if docs_exists else 0.0}
         if docs_exists:
             docs_path = next(p for p in docs_paths if p.exists())
-            # Count documentation files
-            doc_files = list(docs_path.rglob("*.md")) + list(docs_path.rglob("*.rst")) + list(docs_path.rglob("*.txt"))
-            result["docs_files_count"] = float(len(doc_files))
-            result["docs_has_index"] = 1.0 if any(
-                f.name.lower().startswith(("index", "readme", "home")) for f in doc_files
-            ) else 0.0
-
-            # Check for API docs
-            api_files = [f for f in doc_files if "api" in f.name.lower() or "reference" in f.name.lower()]
-            result["docs_has_api"] = 1.0 if api_files else 0.0
-
-            # Check for configuration files
-            has_conf = any((docs_path / f).exists() for f in ["conf.py", "mkdocs.yml", "mkdocs.yaml"])
-            result["docs_has_config"] = 1.0 if has_conf else 0.0
+            result.update(self._read_docs_details(docs_path))
         else:
-            result["docs_files_count"] = 0.0
-            result["docs_has_index"] = 0.0
-            result["docs_has_api"] = 0.0
-            result["docs_has_config"] = 0.0
-
+            result.update({"docs_files_count": 0.0, "docs_has_index": 0.0,
+                           "docs_has_api": 0.0, "docs_has_config": 0.0})
         return result
+
+    def _read_docs_details(self, docs_path: Path) -> dict[str, float]:
+        """Return content metrics for an existing docs folder."""
+        doc_files = (
+            list(docs_path.rglob("*.md"))
+            + list(docs_path.rglob("*.rst"))
+            + list(docs_path.rglob("*.txt"))
+        )
+        has_index = any(f.name.lower().startswith(("index", "readme", "home")) for f in doc_files)
+        has_api = any("api" in f.name.lower() or "reference" in f.name.lower() for f in doc_files)
+        has_conf = any((docs_path / f).exists() for f in ["conf.py", "mkdocs.yml", "mkdocs.yaml"])
+        return {
+            "docs_files_count": float(len(doc_files)),
+            "docs_has_index": 1.0 if has_index else 0.0,
+            "docs_has_api": 1.0 if has_api else 0.0,
+            "docs_has_config": 1.0 if has_conf else 0.0,
+        }
 
     def _check_required_files(self, workdir: Path) -> dict[str, float]:
         """Check presence of required documentation files."""

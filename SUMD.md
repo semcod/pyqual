@@ -23,7 +23,7 @@ Declarative quality gate loops for AI-assisted development
 ## Metadata
 
 - **name**: `pyqual`
-- **version**: `0.1.140`
+- **version**: `0.1.141`
 - **python_requires**: `>=3.9`
 - **license**: Apache-2.0
 - **ai_model**: `openrouter/x-ai/grok-code-fast-1`
@@ -493,7 +493,7 @@ pipeline:
 ```yaml
 project:
   name: pyqual
-  version: 0.1.140
+  version: 0.1.141
   env: local
 ```
 
@@ -1480,28 +1480,29 @@ def _read_artifact_text(workdir, filenames)  # CC=5, fan=2
 def _from_toon(workdir)  # CC=4, fan=4
 def _from_vallm(workdir)  # CC=6, fan=9
 def _from_coverage(workdir)  # CC=9, fan=6
-def _from_bandit(workdir)  # CC=10, fan=7 ⚠
-def _from_secrets(workdir)  # CC=9, fan=11
-def _count_by_severity(items, severity)  # CC=3, fan=3
+def _from_bandit(workdir)  # CC=4, fan=7
+def _from_secrets(workdir)  # CC=7, fan=11
+def _count_by_severity(items, severity)  # CC=1, fan=3
 def _from_vulnerabilities(workdir)  # CC=6, fan=9
 def _from_security(workdir)  # CC=2, fan=6
-def _from_sbom(workdir)  # CC=11, fan=10 ⚠
+def _from_sbom(workdir)  # CC=5, fan=10
 def _from_vulture(workdir)  # CC=5, fan=8
 def _from_pyroma(workdir)  # CC=8, fan=9
 def _from_code_health(workdir)  # CC=2, fan=6
 def _from_git_health(workdir)  # CC=5, fan=5
 def _from_llm_quality(workdir)  # CC=12, fan=5 ⚠
 def _from_ai_cost(workdir)  # CC=5, fan=5
-def _from_benchmark(workdir)  # CC=14, fan=8 ⚠
+def _from_benchmark(workdir)  # CC=12, fan=8 ⚠
 def _from_memory_profile(workdir)  # CC=7, fan=5
-def _from_radon(workdir)  # CC=15, fan=11 ⚠
+def _parse_radon_json(data)  # CC=4, fan=6
+def _from_radon(workdir)  # CC=6, fan=7
 def _from_mypy(workdir)  # CC=6, fan=8
 def _from_lint(workdir)  # CC=2, fan=6
-def _from_ruff(workdir)  # CC=12, fan=11 ⚠
-def _count_pylint_by_type(messages, type_name, symbol_prefix)  # CC=4, fan=5
+def _from_ruff(workdir)  # CC=8, fan=11
+def _count_pylint_by_type(messages, type_name, symbol_prefix)  # CC=2, fan=5
 def _from_pylint(workdir)  # CC=8, fan=9
-def _from_flake8(workdir)  # CC=12, fan=11 ⚠
-def _from_runtime_errors(workdir)  # CC=8, fan=13
+def _from_flake8(workdir)  # CC=6, fan=11
+def _from_runtime_errors(workdir)  # CC=6, fan=13
 def _from_interrogate(workdir)  # CC=10, fan=6 ⚠
 ```
 
@@ -1510,38 +1511,38 @@ def _from_interrogate(workdir)  # CC=10, fan=6 ⚠
 ```python
 class Pipeline:  # Execute pipeline stages in a loop until quality gates pass.
     def __init__(config, workdir, on_stage_start, on_iteration_start, on_stage_error, on_stage_done, on_stage_output, stream, on_iteration_done)  # CC=1
-    def run(dry_run)  # CC=6
+    def run(dry_run)  # CC=5
     def check_gates()  # CC=1
-    def _run_iteration(num, dry_run)  # CC=8
+    def _run_iteration(num, dry_run)  # CC=7
     def _iteration_stagnated(iteration)  # CC=8
-    def _should_run_stage(stage, gates_pass, stages_so_far, iteration)  # CC=4
+    def _should_run_stage(stage, gates_pass, stages_so_far, iteration)  # CC=5
     def _resolve_tool_stage(stage)  # CC=5
     def _resolve_env()  # CC=6
-    def _check_optional_binary(command)  # CC=8
+    def _check_optional_binary(command)  # CC=7
     def _make_skipped_result(stage, reason)  # CC=1
-    def _make_dry_run_result(stage, command)  # CC=2
+    def _make_dry_run_result(stage, command)  # CC=1
     def _execute_stage(stage, dry_run)  # CC=16 ⚠
     def _notify_stage_error(stage, result, is_fix_stage)  # CC=1
-    def _execute_captured(stage, command, allow_failure, env, start)  # CC=8
-    def _execute_streaming(stage, command, allow_failure, env, start)  # CC=13 ⚠
+    def _execute_captured(stage, command, allow_failure, env, start)  # CC=6
+    def _execute_streaming(stage, command, allow_failure, env, start)  # CC=10 ⚠
     def _init_nfo()  # CC=1
     def _nfo_emit(event, level, kwargs, duration_ms)  # CC=2
-    def _is_fix_stage(stage)  # CC=6
-    def _log_stage(stage, result)  # CC=12 ⚠
-    def _archive_llx_report(stage, result)  # CC=6
-    def _log_gates(iteration, gates)  # CC=5
+    def _is_fix_stage(stage)  # CC=5
+    def _log_stage(stage, result)  # CC=9
+    def _archive_llx_report(stage, result)  # CC=7
+    def _log_gates(iteration, gates)  # CC=2
     def _log_event(event)  # CC=1
     def _ensure_pyqual_dir()  # CC=1
-    def _capture_runtime_error(stage, result)  # CC=9
+    def _capture_runtime_error(stage, result)  # CC=7
     def _classify_error(result)  # CC=6
-    def _extract_error_message(result)  # CC=12 ⚠
+    def _extract_error_message(result)  # CC=11 ⚠
 ```
 
 ### `pyqual.cli_run_helpers` (`pyqual/cli_run_helpers.py`)
 
 ```python
 def count_todo_items(todo_path)  # CC=2, fan=3
-def extract_pytest_stage_summary(name, text)  # CC=6, fan=5
+def extract_pytest_stage_summary(name, text)  # CC=5, fan=5
 def extract_lint_stage_summary(text)  # CC=3, fan=3
 def extract_prefact_stage_summary(name, text)  # CC=4, fan=5
 def extract_code2llm_stage_summary(name, text)  # CC=5, fan=5
@@ -1554,16 +1555,16 @@ def _enrich_analysis(workdir, stages)  # CC=8, fan=10
 def _enrich_validation(workdir, stages)  # CC=7, fan=10
 def _enrich_todo(workdir, stages)  # CC=7, fan=7
 def enrich_from_artifacts(workdir, stages)  # CC=1, fan=3
-def infer_fix_result(stage)  # CC=8, fan=7
-def _extract_todo_summary(stages)  # CC=9, fan=4
-def _extract_fix_summary(stages)  # CC=8, fan=7
+def infer_fix_result(stage)  # CC=6, fan=7
+def _extract_todo_summary(stages)  # CC=7, fan=4
+def _extract_fix_summary(stages)  # CC=6, fan=7
 def _extract_delivery_summary(stages)  # CC=7, fan=9
-def build_run_summary(report)  # CC=5, fan=6
+def build_run_summary(report)  # CC=1, fan=6
 def _format_ticket_summary(summary)  # CC=6, fan=3
 def _format_fix_summary(summary)  # CC=7, fan=3
-def _format_delivery_summary(summary)  # CC=5, fan=3
-def format_run_summary(summary)  # CC=6, fan=5
-def get_last_error_line(text)  # CC=11, fan=5 ⚠
+def _format_delivery_summary(summary)  # CC=4, fan=3
+def format_run_summary(summary)  # CC=5, fan=5
+def get_last_error_line(text)  # CC=4, fan=5
 ```
 
 ### `pyqual.report` (`pyqual/report.py`)
@@ -1574,19 +1575,19 @@ def _parse_pyproject_fallback(path)  # CC=4, fan=3
 def _read_version(workdir, pyproject)  # CC=3, fan=4
 def _read_git_commit_count(workdir)  # CC=3, fan=4
 def _read_costs_json(workdir)  # CC=6, fan=5
-def _read_costs_package(workdir)  # CC=12, fan=12 ⚠
+def _read_costs_package(workdir)  # CC=6, fan=12
 def _read_costs_data(workdir)  # CC=4, fan=4
 def collect_project_metadata(workdir, config)  # CC=10, fan=11 ⚠
 def collect_all_metrics(workdir)  # CC=5, fan=5
-def evaluate_gates(config, workdir)  # CC=3, fan=3
-def generate_report(config, workdir, output)  # CC=9, fan=14
+def evaluate_gates(config, workdir)  # CC=1, fan=3
+def generate_report(config, workdir, output)  # CC=2, fan=14
 def _badge_url(label, value, color)  # CC=1, fan=1
-def _build_project_badges(meta)  # CC=11, fan=4 ⚠
-def _build_quality_badges(metrics, gates_passed, gates_passed_count, gates_total)  # CC=8, fan=6
+def _build_project_badges(meta)  # CC=7, fan=4
+def _build_quality_badges(metrics, gates_passed, gates_passed_count, gates_total)  # CC=5, fan=6
 def build_badges(metrics, gates_passed, project_meta, gates_passed_count, gates_total)  # CC=4, fan=4
 def _replace_badges_in_text(text, badge_line)  # CC=5, fan=10
 def update_readme_badges(readme_path, metrics, gates_passed, project_meta, gates_passed_count, gates_total)  # CC=7, fan=14
-def run(workdir, config_path, readme_path)  # CC=9, fan=12
+def run(workdir, config_path, readme_path)  # CC=6, fan=12
 def main()  # CC=1, fan=6
 ```
 
@@ -1595,19 +1596,19 @@ def main()  # CC=1, fan=6
 ```python
 def _build_llm_prompt(fp)  # CC=3, fan=4
 def classify_with_llm(fp, model)  # CC=9, fan=14
-def _classify_python(fp)  # CC=2, fan=1
-def _classify_node(fp)  # CC=6, fan=1
-def _classify_php(fp)  # CC=2, fan=1
+def _classify_python(fp)  # CC=1, fan=1
+def _classify_node(fp)  # CC=2, fan=1
+def _classify_php(fp)  # CC=1, fan=1
 def _classify_rust(fp)  # CC=1, fan=1
 def _classify_go(fp)  # CC=1, fan=1
-def _classify_makefile(fp)  # CC=3, fan=1
+def _classify_makefile(fp)  # CC=1, fan=1
 def _classify_heuristic(fp)  # CC=6, fan=5
 def _safe_name(name)  # CC=1, fan=3
 def generate_pyqual_yaml(project_name, cfg)  # CC=7, fan=6
 def _validate_yaml_content(yaml_content, project_name)  # CC=4, fan=2
 def _write_pyqual_yaml(project_dir, yaml_content)  # CC=1, fan=2
 def _classify_project(fp, use_llm, model, project_name)  # CC=3, fan=3
-def bulk_init(root)  # CC=14, fan=12 ⚠
+def bulk_init(root)  # CC=12, fan=12 ⚠
 class BulkInitResult:  # Summary of a bulk-init run.
     def total()  # CC=1
 ```

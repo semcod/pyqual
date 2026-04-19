@@ -159,74 +159,52 @@ def get_last_run(db_path: Path) -> PipelineRun | None:
     if not rows:
         conn.close()
         return None
-    
-    # Get the most recent run (first row timestamp)
+
     latest_timestamp = rows[0]['timestamp']
-    
-    # Parse stages from recent entries (within last 10 minutes of latest)
+    conn.close()
+    return _build_run_from_rows(rows, latest_timestamp, db_path)
+
+
+def _build_run_from_rows(rows: list, latest_timestamp: str, db_path: "Path") -> "PipelineRun":
+    """Parse stage rows into a PipelineRun (most-recent-first ordering expected)."""
     stages = []
     total_duration = 0.0
-    gates = []
-    metrics = {}
+    metrics: dict = {}
     seen_names: set[str] = set()
 
-    for row in rows[:20]:  # Last 20 stages max
+    for row in rows[:20]:
         kwargs = parse_kwargs(row['kwargs'])
         stage_name = kwargs.get('stage', '')
-
-        if _should_skip_stage(stage_name):
-            continue
-
-        # Skip duplicate stages (keep most recent)
-        if stage_name in seen_names:
+        if _should_skip_stage(stage_name) or stage_name in seen_names:
             continue
         seen_names.add(stage_name)
-
-        status = _get_stage_status(kwargs)
-
         stages.append(StageResult(
             name=stage_name,
-            status=status,
+            status=_get_stage_status(kwargs),
             duration=kwargs.get('duration_s', 0.0),
             returncode=kwargs.get('returncode'),
-            details=kwargs
+            details=kwargs,
         ))
         total_duration += kwargs.get('duration_s', 0.0)
+        metrics.update(_extract_metrics_from_kwargs(kwargs))
 
-        # Extract metrics from stage kwargs
-        stage_metrics = _extract_metrics_from_kwargs(kwargs)
-        metrics.update(stage_metrics)
-
-    # Build gates from metrics with proper thresholds
     gates = _build_gates_from_metrics(metrics)
-    
-    # Calculate all_gates_passed based on actual gates, not stages
-    all_gates_passed = all(gate.get('passed', False) for gate in gates) if gates else True
-    
-    conn.close()
-    
-    # Reverse stages to show in execution order
-    stages.reverse()
-    
-    # Read coverage from file if available and not already extracted
     if 'coverage' not in metrics:
         coverage = _read_coverage_from_file(db_path)
         if coverage is not None:
             metrics['coverage'] = coverage
-
-    # Rebuild gates with coverage if now available
     if 'coverage' in metrics and not any(g.get('metric') == 'coverage' for g in gates):
         gates.append(_build_gate('coverage', metrics['coverage'], 55.0, '>='))
-        # Recalculate all_gates_passed
-        all_gates_passed = all(gate.get('passed', False) for gate in gates) if gates else True
-    
+
+    all_gates_passed = all(gate.get('passed', False) for gate in gates) if gates else True
+    stages.reverse()
     return PipelineRun(
         timestamp=latest_timestamp,
         total_time=total_duration,
         all_gates_passed=all_gates_passed,
         stages=stages,
         gates=gates,
-        metrics=metrics
+        metrics=metrics,
     )
 
 

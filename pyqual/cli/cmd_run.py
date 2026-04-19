@@ -220,6 +220,30 @@ def _create_tickets_if_needed(
         raise typer.Exit(1)
 
 
+def _rebuild_iterations_from_result(
+    result: Any,
+    all_iterations: list[dict[str, Any]],
+    workdir: Any,
+    op_sym: dict[str, str],
+) -> None:
+    """Emit YAML for each iteration and populate all_iterations when callbacks were not fired."""
+    for iteration in result.iterations:
+        iter_stages = [_build_stage_dict(stage, workdir) for stage in iteration.stages]
+        for sd in iter_stages:
+            _emit_yaml_items([sd], indent=2)
+        gate_dicts = [_build_gate_dict(g, op_sym) for g in iteration.gates]
+        if gate_dicts:
+            _emit("  gates:\n")
+            _emit_yaml_items(gate_dicts, indent=2)
+        _emit(f"  all_gates_passed: {'true' if iteration.all_gates_passed else 'false'}\n")
+        all_iterations.append({
+            "iteration": iteration.iteration,
+            "stages": iter_stages,
+            "gates": gate_dicts,
+            "all_gates_passed": iteration.all_gates_passed,
+        })
+
+
 @app.command()
 def run(
     config: Path = typer.Option("pyqual.yaml", "--config", "-c"),
@@ -302,21 +326,7 @@ def run(
     # ── Emit final YAML fields ──
     # If callbacks weren't fired (e.g. no iterations), rebuild from result
     if not _all_iterations and result.iterations:
-        for iteration in result.iterations:
-            iter_stages = [_build_stage_dict(stage, _workdir) for stage in iteration.stages]
-            for sd in iter_stages:
-                _emit_yaml_items([sd], indent=2)
-            gate_dicts = [_build_gate_dict(g, op_sym) for g in iteration.gates]
-            if gate_dicts:
-                _emit("  gates:\n")
-                _emit_yaml_items(gate_dicts, indent=2)
-            _emit(f"  all_gates_passed: {'true' if iteration.all_gates_passed else 'false'}\n")
-            _all_iterations.append({
-                "iteration": iteration.iteration,
-                "stages": iter_stages,
-                "gates": gate_dicts,
-                "all_gates_passed": iteration.all_gates_passed,
-            })
+        _rebuild_iterations_from_result(result, _all_iterations, _workdir, op_sym)
 
     _emit(f"result: {'all_gates_passed' if result.final_passed else 'gates_not_met'}\n")
     _emit(f"total_time: {round(result.total_duration, 1)}\n")

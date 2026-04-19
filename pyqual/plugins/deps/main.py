@@ -357,6 +357,11 @@ def get_dependency_tree(cwd: Path | None = None) -> dict[str, Any]:
         }
 
 
+def _is_pinned_req(line: str) -> bool:
+    """Return True if a requirements line specifies a version constraint."""
+    return any(op in line for op in ("==", ">=", "<=", "~="))
+
+
 def check_requirements(
     req_file: str = "requirements.txt",
     cwd: Path | None = None,
@@ -384,16 +389,12 @@ def check_requirements(
     try:
         content = req_path.read_text()
         lines = [l.strip() for l in content.split("\n") if l.strip() and not l.startswith("#")]
-        
-        # Check for unpinned packages
+
         unpinned = []
         for line in lines:
-            # Skip comments, options, and git URLs
             if line.startswith("-") or "git+" in line or "@" in line:
                 continue
-            
-            # Check if version is pinned
-            if "==" not in line and ">=" not in line and "<=" not in line and "~=" not in line:
+            if not _is_pinned_req(line):
                 unpinned.append(line.split("#")[0].split(";")[0].strip())
         
         return {

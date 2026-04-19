@@ -123,6 +123,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.142] - 2026-04-19
+
+### Docs
+- Update README.md
+- Update SUMD.md
+- Update SUMR.md
+
+### Other
+- Update sumd.json
+
 ## [0.1.141] - 2026-04-19
 
 ### Docs

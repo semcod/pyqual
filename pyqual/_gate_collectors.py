@@ -437,12 +437,28 @@ def _from_memory_profile(workdir: Path) -> dict[str, float]:
     return result
 
 
+def _parse_radon_json(data: dict) -> float | None:
+    """Return average maintainability index from parsed radon.json data, or None."""
+    scores = [
+        float(v["mi"]) for v in data.values()
+        if isinstance(v, dict) and "mi" in v
+    ]
+    if not scores:
+        scores = [
+            float(entry["mi"])
+            for entries in data.values()
+            if isinstance(entries, list)
+            for entry in entries
+            if isinstance(entry, dict) and "mi" in entry
+        ]
+    return round(sum(scores) / len(scores), 2) if scores else None
+
+
 def _from_radon(workdir: Path) -> dict[str, float]:
     """Extract maintainability using plugin if available."""
     if _code_health_collector:
         metrics = _code_health_collector.collect(workdir)
         return {"maintainability_index": metrics.get("maintainability_index", 0.0)}
-    # Legacy fallback""
     result: dict[str, float] = {}
     p = workdir / ".pyqual" / "radon.json"
     if not p.exists():
@@ -450,20 +466,9 @@ def _from_radon(workdir: Path) -> dict[str, float]:
     try:
         data = json.loads(p.read_text())
         if isinstance(data, dict):
-            scores = [
-                float(v["mi"]) for v in data.values()
-                if isinstance(v, dict) and "mi" in v
-            ]
-            if not scores:
-                scores = [
-                    float(entry["mi"])
-                    for entries in data.values()
-                    if isinstance(entries, list)
-                    for entry in entries
-                    if isinstance(entry, dict) and "mi" in entry
-                ]
-            if scores:
-                result["maintainability_index"] = round(sum(scores) / len(scores), 2)
+            mi = _parse_radon_json(data)
+            if mi is not None:
+                result["maintainability_index"] = mi
     except (json.JSONDecodeError, TypeError, KeyError, ValueError):
         pass
     return result

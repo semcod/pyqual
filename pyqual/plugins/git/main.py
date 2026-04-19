@@ -467,30 +467,38 @@ def git_push(
     push_result = run_git_command(push_args, cwd=cwd, check=False)
 
     result["output"] = push_result.stdout + push_result.stderr
+    _parse_push_errors(push_result, result)
+    _count_pushed_commits(push_result, result, remote=remote, branch=branch, cwd=cwd)
+    return result
 
-    # Detect push protection
+
+def _parse_push_errors(push_result: Any, result: dict[str, Any]) -> None:
+    """Detect push-protection violation and extract error lines from push output."""
     output_lower = result["output"].lower()
     if "push protection" in output_lower or "gh013" in output_lower:
         result["push_protection_violation"] = True
         result["errors"].append("GitHub Push Protection violation detected")
-
-    # Check for other errors
     if push_result.returncode != 0:
-        # Extract error messages
-        stderr_lines = push_result.stderr.strip().split("\n")
-        for line in stderr_lines:
+        for line in push_result.stderr.strip().split("\n"):
             line = line.strip()
             if line and not line.startswith("remote: "):
                 result["errors"].append(line)
             elif "error:" in line.lower():
                 result["errors"].append(line.replace("remote: ", ""))
 
-    # Count commits pushed (check if already up to date)
+
+def _count_pushed_commits(
+    push_result: Any,
+    result: dict[str, Any],
+    remote: str,
+    branch: str,
+    cwd: Any,
+) -> None:
+    """Set result['commits_pushed'] and result['success'] after a push."""
     if "everything up-to-date" in result["output"].lower():
         result["commits_pushed"] = 0
         result["success"] = True
     elif push_result.returncode == 0:
-        # Try to count commits
         count_result = run_git_command(
             ["rev-list", "--count", f"{remote}/{branch}..{branch}"],
             cwd=cwd,
@@ -501,8 +509,6 @@ def git_push(
             except ValueError:
                 pass
         result["success"] = True
-
-    return result
 
 
 def git_add(paths: list[str] | str, cwd: Path | None = None) -> dict[str, Any]:
@@ -654,38 +660,41 @@ def scan_for_secrets(
 
     result["total_files_scanned"] = len(paths)
     workdir = cwd or Path(".")
+    _run_enabled_scanners(
+        paths, workdir, result,
+        use_trufflehog=use_trufflehog,
+        use_gitleaks=use_gitleaks,
+        use_patterns=use_patterns,
+    )
+    result["success"] = len(result["secrets_found"]) == 0
+    return result
 
-    # Build scanner dispatch table: (name, check_func, scan_func)
-    scanners: list[tuple[str, Callable[[], bool], Callable[[list[str], Path], dict[str, Any]]]] = [
-        ("trufflehog", lambda: shutil.which("trufflehog") is not None, _scan_with_trufflehog),
-        ("gitleaks", lambda: shutil.which("gitleaks") is not None, _scan_with_gitleaks),
+
+def _run_enabled_scanners(
+    paths: list[str],
+    workdir: Path,
+    result: dict[str, Any],
+    use_trufflehog: bool,
+    use_gitleaks: bool,
+    use_patterns: bool,
+) -> None:
+    """Run each enabled scanner and accumulate findings into result."""
+    scanner_flags = [
+        ("trufflehog", use_trufflehog, _scan_with_trufflehog),
+        ("gitleaks", use_gitleaks, _scan_with_gitleaks),
     ]
-    
-    # Run enabled external scanners
-    for name, check_fn, scan_fn in scanners:
-        if use_trufflehog and name == "trufflehog" and check_fn():
+    for name, enabled, scan_fn in scanner_flags:
+        if enabled and shutil.which(name) is not None:
             result["scanners_used"].append(name)
-            scan_result = scan_fn(paths, workdir)
-            result["secrets_found"].extend(scan_result.get("findings", []))
-        elif use_gitleaks and name == "gitleaks" and check_fn():
-            result["scanners_used"].append(name)
-            scan_result = scan_fn(paths, workdir)
-            result["secrets_found"].extend(scan_result.get("findings", []))
+            result["secrets_found"].extend(scan_fn(paths, workdir).get("findings", []))
 
-    # Fallback or supplemental pattern scan
     if use_patterns:
         if not result["scanners_used"]:
             result["scanners_used"].append("builtin_patterns")
-        pattern_result = _scan_with_patterns(paths, workdir)
-        # Add only unique findings (not already detected by other scanners)
         existing = {(s["file"], s["line"]) for s in result["secrets_found"]}
-        for finding in pattern_result.get("findings", []):
-            key = (finding["file"], finding["line"])
-            if key not in existing:
+        for finding in _scan_with_patterns(paths, workdir).get("findings", []):
+            if (finding["file"], finding["line"]) not in existing:
                 result["secrets_found"].append(finding)
-
-    result["success"] = len(result["secrets_found"]) == 0
-    return result
 
 
 def _scan_with_trufflehog(paths: list[str], cwd: Path) -> dict[str, Any]:
@@ -935,32 +944,25 @@ def preflight_push_check(
     if scan_secrets:
         scan_result = scan_for_secrets(cwd=workdir)
         result["secrets_scan"] = scan_result
-        
         if not scan_result["success"]:
             result["can_push"] = False
-            secrets = scan_result.get("secrets_found", [])
-            critical = [s for s in secrets if s.get("severity") == "CRITICAL"]
-            high = [s for s in secrets if s.get("severity") == "HIGH"]
-            
-            if critical:
-                result["blockers"].append(
-                    f"Found {len(critical)} CRITICAL secret(s) - push blocked"
-                )
-            if high:
-                result["warnings"].append(
-                    f"Found {len(high)} HIGH severity potential secret(s)"
-                )
-            
-            # Show first few findings
-            for finding in secrets[:CONSTANT_5]:
-                file = finding.get("file", "unknown")
-                line = finding.get("line", 0)
-                type_ = finding.get("type", "unknown")
-                severity = finding.get("severity", "MEDIUM")
-                msg = f"  [{severity}] {type_} in {file}:{line}"
-                if severity == "CRITICAL":
-                    result["blockers"].append(msg)
-                else:
-                    result["warnings"].append(msg)
+            _classify_secret_findings(scan_result.get("secrets_found", []), result)
 
     return result
+
+
+def _classify_secret_findings(secrets: list[dict[str, Any]], result: dict[str, Any]) -> None:
+    """Add blocker/warning messages to result based on secret severity."""
+    critical = [s for s in secrets if s.get("severity") == "CRITICAL"]
+    high = [s for s in secrets if s.get("severity") == "HIGH"]
+    if critical:
+        result["blockers"].append(f"Found {len(critical)} CRITICAL secret(s) - push blocked")
+    if high:
+        result["warnings"].append(f"Found {len(high)} HIGH severity potential secret(s)")
+    for finding in secrets[:CONSTANT_5]:
+        sev = finding.get("severity", "MEDIUM")
+        msg = f"  [{sev}] {finding.get('type', 'unknown')} in {finding.get('file', 'unknown')}:{finding.get('line', 0)}"
+        if sev == "CRITICAL":
+            result["blockers"].append(msg)
+        else:
+            result["warnings"].append(msg)
