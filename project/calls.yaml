@@ -1,0 +1,5418 @@
+project: /home/tom/github/semcod/pyqual
+generated_from: code2llm call graph analysis
+stats:
+  total_nodes: 403
+  total_edges: 394
+  modules_count: 77
+nodes:
+  pyqual._gate_collectors._from_secrets:
+    name: _from_secrets
+    module: pyqual._gate_collectors
+    line: 153
+    cyclomatic_complexity: 9
+    calls_out: 20
+    calls_in: 1
+  pyqual.bulk_init_fingerprint._collect_json_scripts:
+    name: _collect_json_scripts
+    module: pyqual.bulk_init_fingerprint
+    line: 90
+    cyclomatic_complexity: 4
+    calls_out: 4
+    calls_in: 2
+  pyqual.bulk_init_fingerprint._load_json_object:
+    name: _load_json_object
+    module: pyqual.bulk_init_fingerprint
+    line: 81
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 1
+  pyqual.run_parallel_fix._print_cycle_completion:
+    name: _print_cycle_completion
+    module: pyqual.run_parallel_fix
+    line: 297
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 1
+  pyqual.api.load_config:
+    name: load_config
+    module: pyqual.api
+    line: 53
+    cyclomatic_complexity: 2
+    calls_out: 7
+    calls_in: 1
+  pyqual.report.build_badges:
+    name: build_badges
+    module: pyqual.report
+    line: 431
+    cyclomatic_complexity: 4
+    calls_out: 5
+    calls_in: 1
+  pyqual.plugins.security.test.TestPipAudit.test_pip_audit_not_found:
+    name: test_pip_audit_not_found
+    module: pyqual.plugins.security.test
+    line: 155
+    cyclomatic_complexity: 4
+    calls_out: 5
+    calls_in: 0
+  pyqual._gate_collectors._from_bandit:
+    name: _from_bandit
+    module: pyqual._gate_collectors
+    line: 125
+    cyclomatic_complexity: 10
+    calls_out: 17
+    calls_in: 1
+  pyqual.github_actions.GitHubActionsReporter.set_output:
+    name: set_output
+    module: pyqual.github_actions
+    line: 344
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 0
+  pyqual.bulk_init_classify.check_skip_conditions:
+    name: check_skip_conditions
+    module: pyqual.bulk_init_classify
+    line: 48
+    cyclomatic_complexity: 8
+    calls_out: 6
+    calls_in: 1
+  pyqual.report.main:
+    name: main
+    module: pyqual.report
+    line: 579
+    cyclomatic_complexity: 1
+    calls_out: 8
+    calls_in: 0
+  pyqual.validation.release._read_project_metadata:
+    name: _read_project_metadata
+    module: pyqual.validation.release
+    line: 92
+    cyclomatic_complexity: 8
+    calls_out: 8
+    calls_in: 1
+  pyqual.plugins.git.test.TestSecretScanning.test_scan_finds_github_token:
+    name: test_scan_finds_github_token
+    module: pyqual.plugins.git.test
+    line: 208
+    cyclomatic_complexity: 6
+    calls_out: 4
+    calls_in: 0
+  pyqual.cli.cmd_run._run_auto_fix_config:
+    name: _run_auto_fix_config
+    module: pyqual.cli.cmd_run
+    line: 143
+    cyclomatic_complexity: 7
+    calls_out: 21
+    calls_in: 1
+  pyqual.integrations.llx_mcp.build_parser:
+    name: build_parser
+    module: pyqual.integrations.llx_mcp
+    line: 47
+    cyclomatic_complexity: 1
+    calls_out: 16
+    calls_in: 1
+  pyqual.plugins.git.main._parse_file_status:
+    name: _parse_file_status
+    module: pyqual.plugins.git.main
+    line: 256
+    cyclomatic_complexity: 5
+    calls_out: 4
+    calls_in: 1
+  dashboard.src.api.config:
+    name: config
+    module: dashboard.src.api
+    line: 26
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 0
+  pyqual.auto_closer.get_changed_files:
+    name: get_changed_files
+    module: pyqual.auto_closer
+    line: 23
+    cyclomatic_complexity: 4
+    calls_out: 9
+    calls_in: 1
+  pyqual.plugins.docker.main.get_image_info:
+    name: get_image_info
+    module: pyqual.plugins.docker.main
+    line: 331
+    cyclomatic_complexity: 6
+    calls_out: 10
+    calls_in: 1
+  pyqual.plugins.attack.main._merge_theirs:
+    name: _merge_theirs
+    module: pyqual.plugins.attack.main
+    line: 251
+    cyclomatic_complexity: 7
+    calls_out: 14
+    calls_in: 1
+  pyqual.report_generator.generate_stage_details:
+    name: generate_stage_details
+    module: pyqual.report_generator
+    line: 306
+    cyclomatic_complexity: 11
+    calls_out: 16
+    calls_in: 1
+  pyqual._gate_collectors._parse_radon_json:
+    name: _parse_radon_json
+    module: pyqual._gate_collectors
+    line: 440
+    cyclomatic_complexity: 11
+    calls_out: 10
+    calls_in: 1
+  pyqual.plugins.security.main.security_summary:
+    name: security_summary
+    module: pyqual.plugins.security.main
+    line: 387
+    cyclomatic_complexity: 2
+    calls_out: 8
+    calls_in: 2
+  pyqual.plugins.git.main._classify_secret_findings:
+    name: _classify_secret_findings
+    module: pyqual.plugins.git.main
+    line: 954
+    cyclomatic_complexity: 9
+    calls_out: 12
+    calls_in: 1
+  pyqual.cli.cmd_tune._load_latest_metrics:
+    name: _load_latest_metrics
+    module: pyqual.cli.cmd_tune
+    line: 70
+    cyclomatic_complexity: 5
+    calls_out: 11
+    calls_in: 2
+  pyqual.github_actions.GitHubActionsReporter.ensure_issue_exists:
+    name: ensure_issue_exists
+    module: pyqual.github_actions
+    line: 99
+    cyclomatic_complexity: 8
+    calls_out: 8
+    calls_in: 0
+  pyqual.cli.cmd_git._print_file_list:
+    name: _print_file_list
+    module: pyqual.cli.cmd_git
+    line: 18
+    cyclomatic_complexity: 4
+    calls_out: 6
+    calls_in: 3
+  pyqual.plugins.docker.main.run_hadolint:
+    name: run_hadolint
+    module: pyqual.plugins.docker.main
+    line: 192
+    cyclomatic_complexity: 9
+    calls_out: 6
+    calls_in: 2
+  pyqual.plugins.deps.test.TestGetOutdatedPackages.test_pip_not_available:
+    name: test_pip_not_available
+    module: pyqual.plugins.deps.test
+    line: 125
+    cyclomatic_complexity: 2
+    calls_out: 1
+    calls_in: 0
+  pyqual.plugins.git.main._is_likely_false_positive:
+    name: _is_likely_false_positive
+    module: pyqual.plugins.git.main
+    line: 821
+    cyclomatic_complexity: 9
+    calls_out: 6
+    calls_in: 3
+  pyqual.plugins.deps.test.TestGetDependencyTree.test_pipdeptree_not_available:
+    name: test_pipdeptree_not_available
+    module: pyqual.plugins.deps.test
+    line: 136
+    cyclomatic_complexity: 4
+    calls_out: 5
+    calls_in: 0
+  pyqual.plugins.git.test.TestSecretScanning.test_false_positive_detection:
+    name: test_false_positive_detection
+    module: pyqual.plugins.git.test
+    line: 260
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 0
+  pyqual.bulk_init._build_llm_prompt:
+    name: _build_llm_prompt
+    module: pyqual.bulk_init
+    line: 147
+    cyclomatic_complexity: 3
+    calls_out: 7
+    calls_in: 1
+  pyqual.parallel.parse_todo_items:
+    name: parse_todo_items
+    module: pyqual.parallel
+    line: 54
+    cyclomatic_complexity: 4
+    calls_out: 7
+    calls_in: 1
+  pyqual.plugins.attack.__main__._ensure_dir:
+    name: _ensure_dir
+    module: pyqual.plugins.attack.__main__
+    line: 26
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 2
+  pyqual.bulk.orchestrator.discover_projects:
+    name: discover_projects
+    module: pyqual.bulk.orchestrator
+    line: 40
+    cyclomatic_complexity: 5
+    calls_out: 7
+    calls_in: 2
+  pyqual.report_generator.generate_metrics_table:
+    name: generate_metrics_table
+    module: pyqual.report_generator
+    line: 274
+    cyclomatic_complexity: 5
+    calls_out: 11
+    calls_in: 1
+  pyqual.run_parallel_fix.main:
+    name: main
+    module: pyqual.run_parallel_fix
+    line: 333
+    cyclomatic_complexity: 13
+    calls_out: 37
+    calls_in: 0
+  pyqual.cli_observe._print_history_summary:
+    name: _print_history_summary
+    module: pyqual.cli_observe
+    line: 323
+    cyclomatic_complexity: 10
+    calls_out: 14
+    calls_in: 1
+  pyqual.plugins.deps.test.TestDepsHealthCheck.test_health_check_structure:
+    name: test_health_check_structure
+    module: pyqual.plugins.deps.test
+    line: 190
+    cyclomatic_complexity: 5
+    calls_out: 1
+    calls_in: 0
+  dashboard.src.api.fetchLatestRun:
+    name: fetchLatestRun
+    module: dashboard.src.api
+    line: 45
+    cyclomatic_complexity: 11
+    calls_out: 6
+    calls_in: 3
+  pyqual.setup_deps.check_all:
+    name: check_all
+    module: pyqual.setup_deps
+    line: 93
+    cyclomatic_complexity: 5
+    calls_out: 5
+    calls_in: 1
+  pyqual.auto_closer.main:
+    name: main
+    module: pyqual.auto_closer
+    line: 162
+    cyclomatic_complexity: 11
+    calls_out: 27
+    calls_in: 0
+  pyqual.plugins.attack.test.TestAttackCheck.test_successful_check:
+    name: test_successful_check
+    module: pyqual.plugins.attack.test
+    line: 90
+    cyclomatic_complexity: 4
+    calls_out: 6
+    calls_in: 0
+  pyqual.cli.cmd_config._print_issues:
+    name: _print_issues
+    module: pyqual.cli.cmd_config
+    line: 60
+    cyclomatic_complexity: 8
+    calls_out: 3
+    calls_in: 1
+  pyqual.bulk_init_fingerprint._collect_manifests:
+    name: _collect_manifests
+    module: pyqual.bulk_init_fingerprint
+    line: 56
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 1
+  pyqual.auto_closer.evaluate_with_llm:
+    name: evaluate_with_llm
+    module: pyqual.auto_closer
+    line: 66
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 1
+  pyqual.plugins.docs.test.TestCheckReadme.test_readme_quality_check:
+    name: test_readme_quality_check
+    module: pyqual.plugins.docs.test
+    line: 119
+    cyclomatic_complexity: 7
+    calls_out: 2
+    calls_in: 0
+  examples.integration_example.check_prerequisites:
+    name: check_prerequisites
+    module: examples.integration_example
+    line: 45
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 0
+  pyqual.cli.cmd_tune.tune_show:
+    name: tune_show
+    module: pyqual.cli.cmd_tune
+    line: 225
+    cyclomatic_complexity: 4
+    calls_out: 13
+    calls_in: 0
+  pyqual._gate_collectors._read_artifact_text:
+    name: _read_artifact_text
+    module: pyqual._gate_collectors
+    line: 51
+    cyclomatic_complexity: 5
+    calls_out: 2
+    calls_in: 4
+  pyqual.cli.main.setup_logging:
+    name: setup_logging
+    module: pyqual.cli.main
+    line: 215
+    cyclomatic_complexity: 2
+    calls_out: 11
+    calls_in: 1
+  pyqual.validation.release._read_version_file:
+    name: _read_version_file
+    module: pyqual.validation.release
+    line: 74
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 1
+  pyqual.plugins.deps.main.deps_health_check:
+    name: deps_health_check
+    module: pyqual.plugins.deps.main
+    line: 418
+    cyclomatic_complexity: 8
+    calls_out: 21
+    calls_in: 1
+  pyqual.cli_observe._output_sql_query:
+    name: _output_sql_query
+    module: pyqual.cli_observe
+    line: 32
+    cyclomatic_complexity: 7
+    calls_out: 11
+    calls_in: 1
+  pyqual.plugins.deps.test.TestCheckRequirements.test_requirements_not_found:
+    name: test_requirements_not_found
+    module: pyqual.plugins.deps.test
+    line: 148
+    cyclomatic_complexity: 3
+    calls_out: 1
+    calls_in: 0
+  pyqual._gate_collectors._from_pyroma:
+    name: _from_pyroma
+    module: pyqual._gate_collectors
+    line: 287
+    cyclomatic_complexity: 8
+    calls_out: 15
+    calls_in: 1
+  examples.integration_example.run_quality_check:
+    name: run_quality_check
+    module: examples.integration_example
+    line: 10
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 0
+  pyqual.cli_run_helpers._format_ticket_summary:
+    name: _format_ticket_summary
+    module: pyqual.cli_run_helpers
+    line: 322
+    cyclomatic_complexity: 6
+    calls_out: 9
+    calls_in: 1
+  pyqual.plugins.git.main.run_git_command:
+    name: run_git_command
+    module: pyqual.plugins.git.main
+    line: 205
+    cyclomatic_complexity: 5
+    calls_out: 3
+    calls_in: 14
+  pyqual.setup_deps._check_cli:
+    name: _check_cli
+    module: pyqual.setup_deps
+    line: 75
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 1
+  examples.integration_example.quick_gate_check:
+    name: quick_gate_check
+    module: examples.integration_example
+    line: 113
+    cyclomatic_complexity: 4
+    calls_out: 3
+    calls_in: 0
+  pyqual.output._parse_output_line:
+    name: _parse_output_line
+    module: pyqual.output
+    line: 3
+    cyclomatic_complexity: 1
+    calls_out: 0
+    calls_in: 1
+  pyqual.report_generator._build_gate:
+    name: _build_gate
+    module: pyqual.report_generator
+    line: 108
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 2
+  pyqual.tools.get_preset:
+    name: get_preset
+    module: pyqual.tools
+    line: 139
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 7
+  pyqual.validation.release._check_registry:
+    name: _check_registry
+    module: pyqual.validation.release
+    line: 245
+    cyclomatic_complexity: 4
+    calls_out: 5
+    calls_in: 1
+  pyqual.validation.errors._classify_failure:
+    name: _classify_failure
+    module: pyqual.validation.errors
+    line: 177
+    cyclomatic_complexity: 11
+    calls_out: 5
+    calls_in: 0
+  pyqual.run_parallel_fix.get_todo_batch:
+    name: get_todo_batch
+    module: pyqual.run_parallel_fix
+    line: 22
+    cyclomatic_complexity: 5
+    calls_out: 8
+    calls_in: 1
+  pyqual.plugins.git.status.git_status:
+    name: git_status
+    module: pyqual.plugins.git.status
+    line: 47
+    cyclomatic_complexity: 8
+    calls_out: 8
+    calls_in: 5
+  pyqual.cli_run_helpers.extract_pytest_stage_summary:
+    name: extract_pytest_stage_summary
+    module: pyqual.cli_run_helpers
+    line: 27
+    cyclomatic_complexity: 6
+    calls_out: 11
+    calls_in: 1
+  examples.integration_example.run_with_callbacks:
+    name: run_with_callbacks
+    module: examples.integration_example
+    line: 19
+    cyclomatic_complexity: 1
+    calls_out: 5
+    calls_in: 0
+  pyqual.plugins.docs.test.TestInterrogate.test_interrogate_not_found:
+    name: test_interrogate_not_found
+    module: pyqual.plugins.docs.test
+    line: 147
+    cyclomatic_complexity: 4
+    calls_out: 6
+    calls_in: 0
+  pyqual.plugins.git.main.git_push:
+    name: git_push
+    module: pyqual.plugins.git.main
+    line: 414
+    cyclomatic_complexity: 6
+    calls_out: 10
+    calls_in: 1
+  pyqual.plugins.git.git_command.run_git_command:
+    name: run_git_command
+    module: pyqual.plugins.git.git_command
+    line: 8
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 0
+  examples.custom_gates.dynamic_thresholds.main:
+    name: main
+    module: examples.custom_gates.dynamic_thresholds
+    line: 15
+    cyclomatic_complexity: 11
+    calls_out: 11
+    calls_in: 0
+  pyqual.tickets.sync_all_tickets:
+    name: sync_all_tickets
+    module: pyqual.tickets
+    line: 67
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 4
+  pyqual.plugins.deps.main._is_pinned_req:
+    name: _is_pinned_req
+    module: pyqual.plugins.deps.main
+    line: 360
+    cyclomatic_complexity: 2
+    calls_out: 1
+    calls_in: 1
+  pyqual.plugins.git.main.GitCollector._collect_scan_metrics:
+    name: _collect_scan_metrics
+    module: pyqual.plugins.git.main
+    line: 121
+    cyclomatic_complexity: 4
+    calls_out: 16
+    calls_in: 0
+  pyqual.pipeline.Pipeline._log_stage:
+    name: _log_stage
+    module: pyqual.pipeline
+    line: 492
+    cyclomatic_complexity: 12
+    calls_out: 8
+    calls_in: 0
+  pyqual.plugins.git.test.TestGitStatus.test_status_in_empty_repo:
+    name: test_status_in_empty_repo
+    module: pyqual.plugins.git.test
+    line: 95
+    cyclomatic_complexity: 6
+    calls_out: 1
+    calls_in: 0
+  pyqual.custom_fix.apply_patch:
+    name: apply_patch
+    module: pyqual.custom_fix
+    line: 27
+    cyclomatic_complexity: 3
+    calls_out: 9
+    calls_in: 0
+  pyqual.plugins.git.test.TestGitStatus.test_status_with_untracked_file:
+    name: test_status_with_untracked_file
+    module: pyqual.plugins.git.test
+    line: 105
+    cyclomatic_complexity: 4
+    calls_out: 2
+    calls_in: 0
+  pyqual.cli.cmd_git._run_preflight_checks:
+    name: _run_preflight_checks
+    module: pyqual.cli.cmd_git
+    line: 230
+    cyclomatic_complexity: 9
+    calls_out: 17
+    calls_in: 1
+  pyqual.pipeline.Pipeline._resolve_tool_stage:
+    name: _resolve_tool_stage
+    module: pyqual.pipeline
+    line: 194
+    cyclomatic_complexity: 5
+    calls_out: 8
+    calls_in: 0
+  pyqual.profiles.get_profile:
+    name: get_profile
+    module: pyqual.profiles
+    line: 200
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 3
+  pyqual.pipeline.Pipeline._iteration_stagnated:
+    name: _iteration_stagnated
+    module: pyqual.pipeline
+    line: 159
+    cyclomatic_complexity: 8
+    calls_out: 1
+    calls_in: 0
+  pyqual.tickets.sync_github_tickets:
+    name: sync_github_tickets
+    module: pyqual.tickets
+    line: 58
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 2
+  pyqual.github_actions.GitHubActionsReporter.set_failed:
+    name: set_failed
+    module: pyqual.github_actions
+    line: 355
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 0
+  pyqual.report._build_project_badges:
+    name: _build_project_badges
+    module: pyqual.report
+    line: 353
+    cyclomatic_complexity: 11
+    calls_out: 20
+    calls_in: 1
+  pyqual.cli_observe._output_human_logs:
+    name: _output_human_logs
+    module: pyqual.cli_observe
+    line: 55
+    cyclomatic_complexity: 4
+    calls_out: 10
+    calls_in: 1
+  pyqual.setup_deps._check_pip:
+    name: _check_pip
+    module: pyqual.setup_deps
+    line: 56
+    cyclomatic_complexity: 5
+    calls_out: 7
+    calls_in: 1
+  pyqual.plugins.attack.test.TestAttackMerge.test_not_git_repo:
+    name: test_not_git_repo
+    module: pyqual.plugins.attack.test
+    line: 110
+    cyclomatic_complexity: 3
+    calls_out: 1
+    calls_in: 0
+  pyqual.plugins.git.main.git_commit:
+    name: git_commit
+    module: pyqual.plugins.git.main
+    line: 332
+    cyclomatic_complexity: 12
+    calls_out: 9
+    calls_in: 3
+  dashboard.src.api.getRepoPath:
+    name: getRepoPath
+    module: dashboard.src.api
+    line: 121
+    cyclomatic_complexity: 2
+    calls_out: 1
+    calls_in: 1
+  pyqual._gate_collectors._from_toon:
+    name: _from_toon
+    module: pyqual._gate_collectors
+    line: 64
+    cyclomatic_complexity: 4
+    calls_out: 7
+    calls_in: 0
+  pyqual.run_parallel_fix.git_commit_and_push:
+    name: git_commit_and_push
+    module: pyqual.run_parallel_fix
+    line: 143
+    cyclomatic_complexity: 4
+    calls_out: 9
+    calls_in: 1
+  pyqual.plugins.git.test.TestPreFlightCheck.test_preflight_clean_repo:
+    name: test_preflight_clean_repo
+    module: pyqual.plugins.git.test
+    line: 345
+    cyclomatic_complexity: 3
+    calls_out: 1
+    calls_in: 0
+  dashboard.api.main.read_summary_json:
+    name: read_summary_json
+    module: dashboard.api.main
+    line: 63
+    cyclomatic_complexity: 3
+    calls_out: 5
+    calls_in: 2
+  pyqual.cli_run_helpers.extract_fix_stage_summary:
+    name: extract_fix_stage_summary
+    module: pyqual.cli_run_helpers
+    line: 91
+    cyclomatic_complexity: 9
+    calls_out: 20
+    calls_in: 1
+  pyqual.tools.register_custom_tools_from_yaml:
+    name: register_custom_tools_from_yaml
+    module: pyqual.tools
+    line: 235
+    cyclomatic_complexity: 5
+    calls_out: 10
+    calls_in: 2
+  examples.custom_gates.composite_gates.run_composite_check:
+    name: run_composite_check
+    module: examples.custom_gates.composite_gates
+    line: 82
+    cyclomatic_complexity: 8
+    calls_out: 17
+    calls_in: 1
+  dashboard.api.main.get_stage_performance:
+    name: get_stage_performance
+    module: dashboard.api.main
+    line: 193
+    cyclomatic_complexity: 3
+    calls_out: 12
+    calls_in: 0
+  pyqual.stage_names.normalize_stage_name:
+    name: normalize_stage_name
+    module: pyqual.stage_names
+    line: 29
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 4
+  pyqual.stage_names.is_delivery_stage_name:
+    name: is_delivery_stage_name
+    module: pyqual.stage_names
+    line: 54
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 1
+  pyqual.validation.errors._match_env_subtype:
+    name: _match_env_subtype
+    module: pyqual.validation.errors
+    line: 149
+    cyclomatic_complexity: 3
+    calls_out: 1
+    calls_in: 1
+  pyqual.cli_run_helpers._extract_delivery_summary:
+    name: _extract_delivery_summary
+    module: pyqual.cli_run_helpers
+    line: 283
+    cyclomatic_complexity: 7
+    calls_out: 15
+    calls_in: 1
+  pyqual.cli.cmd_run._create_tickets_if_needed:
+    name: _create_tickets_if_needed
+    module: pyqual.cli.cmd_run
+    line: 197
+    cyclomatic_complexity: 7
+    calls_out: 6
+    calls_in: 1
+  pyqual.report._parse_pyproject_fallback:
+    name: _parse_pyproject_fallback
+    module: pyqual.report
+    line: 92
+    cyclomatic_complexity: 4
+    calls_out: 5
+    calls_in: 1
+  pyqual.cli_bulk_cmds._discover_and_validate:
+    name: _discover_and_validate
+    module: pyqual.cli_bulk_cmds
+    line: 99
+    cyclomatic_complexity: 3
+    calls_out: 6
+    calls_in: 1
+  examples.custom_gates.metric_history.main:
+    name: main
+    module: examples.custom_gates.metric_history
+    line: 140
+    cyclomatic_complexity: 9
+    calls_out: 29
+    calls_in: 0
+  pyqual.api.run_stage:
+    name: run_stage
+    module: pyqual.api
+    line: 209
+    cyclomatic_complexity: 10
+    calls_out: 18
+    calls_in: 0
+  pyqual.plugins.attack.__main__.cmd_merge:
+    name: cmd_merge
+    module: pyqual.plugins.attack.__main__
+    line: 49
+    cyclomatic_complexity: 5
+    calls_out: 19
+    calls_in: 1
+  pyqual.bulk.parser._parse_output_line:
+    name: _parse_output_line
+    module: pyqual.bulk.parser
+    line: 30
+    cyclomatic_complexity: 7
+    calls_out: 7
+    calls_in: 0
+  pyqual.bulk_init_fingerprint._collect_readme_excerpt:
+    name: _collect_readme_excerpt
+    module: pyqual.bulk_init_fingerprint
+    line: 143
+    cyclomatic_complexity: 4
+    calls_out: 2
+    calls_in: 1
+  pyqual.custom_fix.add_docstring:
+    name: add_docstring
+    module: pyqual.custom_fix
+    line: 43
+    cyclomatic_complexity: 6
+    calls_out: 11
+    calls_in: 2
+  pyqual.cli.cmd_run._handle_config_env_error:
+    name: _handle_config_env_error
+    module: pyqual.cli.cmd_run
+    line: 85
+    cyclomatic_complexity: 8
+    calls_out: 10
+    calls_in: 1
+  pyqual.cli.cmd_git.git_status_cmd:
+    name: git_status_cmd
+    module: pyqual.cli.cmd_git
+    line: 30
+    cyclomatic_complexity: 6
+    calls_out: 23
+    calls_in: 0
+  pyqual.cli.cmd_tune._calculate_thresholds:
+    name: _calculate_thresholds
+    module: pyqual.cli.cmd_tune
+    line: 101
+    cyclomatic_complexity: 12
+    calls_out: 15
+    calls_in: 1
+  pyqual.validation.release._check_version_metadata:
+    name: _check_version_metadata
+    module: pyqual.validation.release
+    line: 193
+    cyclomatic_complexity: 9
+    calls_out: 8
+    calls_in: 1
+  dashboard.api.main.query_pipeline_db:
+    name: query_pipeline_db
+    module: dashboard.api.main
+    line: 74
+    cyclomatic_complexity: 4
+    calls_out: 7
+    calls_in: 6
+  pyqual.validation.release._read_pyproject:
+    name: _read_pyproject
+    module: pyqual.validation.release
+    line: 30
+    cyclomatic_complexity: 5
+    calls_out: 5
+    calls_in: 1
+  pyqual.bulk_init_fingerprint._collect_pyproject_metadata:
+    name: _collect_pyproject_metadata
+    module: pyqual.bulk_init_fingerprint
+    line: 118
+    cyclomatic_complexity: 10
+    calls_out: 11
+    calls_in: 1
+  pyqual.plugins.security.test.TestSecuritySummary.test_security_summary_empty:
+    name: test_security_summary_empty
+    module: pyqual.plugins.security.test
+    line: 179
+    cyclomatic_complexity: 5
+    calls_out: 1
+    calls_in: 0
+  pyqual.report._read_costs_data:
+    name: _read_costs_data
+    module: pyqual.report
+    line: 199
+    cyclomatic_complexity: 4
+    calls_out: 4
+    calls_in: 1
+  pyqual.setup_deps._install_pip:
+    name: _install_pip
+    module: pyqual.setup_deps
+    line: 81
+    cyclomatic_complexity: 2
+    calls_out: 1
+    calls_in: 1
+  pyqual.cli.cmd_plugin.plugin:
+    name: plugin
+    module: pyqual.cli.cmd_plugin
+    line: 19
+    cyclomatic_complexity: 8
+    calls_out: 14
+    calls_in: 0
+  pyqual.plugins.git.main._parse_branch_line:
+    name: _parse_branch_line
+    module: pyqual.plugins.git.main
+    line: 238
+    cyclomatic_complexity: 5
+    calls_out: 10
+    calls_in: 1
+  pyqual.validation.config_check._validate_stage:
+    name: _validate_stage
+    module: pyqual.validation.config_check
+    line: 122
+    cyclomatic_complexity: 10
+    calls_out: 12
+    calls_in: 1
+  pyqual._gate_collectors._count_pylint_by_type:
+    name: _count_pylint_by_type
+    module: pyqual._gate_collectors
+    line: 544
+    cyclomatic_complexity: 4
+    calls_out: 6
+    calls_in: 3
+  pyqual.plugins.security.test.TestBanditCheck.test_bandit_not_found:
+    name: test_bandit_not_found
+    module: pyqual.plugins.security.test
+    line: 142
+    cyclomatic_complexity: 4
+    calls_out: 6
+    calls_in: 0
+  pyqual.report.evaluate_gates:
+    name: evaluate_gates
+    module: pyqual.report
+    line: 286
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 2
+  pyqual.plugins.git.test.TestPreFlightCheck.test_preflight_with_secrets_blocks_push:
+    name: test_preflight_with_secrets_blocks_push
+    module: pyqual.plugins.git.test
+    line: 330
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 0
+  pyqual.plugins.git.test.TestSecretScanning.test_provider_mapping:
+    name: test_provider_mapping
+    module: pyqual.plugins.git.test
+    line: 276
+    cyclomatic_complexity: 5
+    calls_out: 4
+    calls_in: 0
+  pyqual.plugins.deps.main.get_dependency_tree:
+    name: get_dependency_tree
+    module: pyqual.plugins.deps.main
+    line: 300
+    cyclomatic_complexity: 10
+    calls_out: 7
+    calls_in: 2
+  pyqual.report.collect_all_metrics:
+    name: collect_all_metrics
+    module: pyqual.report
+    line: 262
+    cyclomatic_complexity: 5
+    calls_out: 6
+    calls_in: 2
+  pyqual.validation.errors._match_fix_env_subtype:
+    name: _match_fix_env_subtype
+    module: pyqual.validation.errors
+    line: 157
+    cyclomatic_complexity: 5
+    calls_out: 2
+    calls_in: 1
+  pyqual.plugins.git.test.TestGitCommit.test_commit_only_if_changed_no_changes:
+    name: test_commit_only_if_changed_no_changes
+    module: pyqual.plugins.git.test
+    line: 170
+    cyclomatic_complexity: 3
+    calls_out: 1
+    calls_in: 0
+  pyqual.cli.cmd_run._emit_yaml_items:
+    name: _emit_yaml_items
+    module: pyqual.cli.cmd_run
+    line: 46
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 4
+  pyqual.plugins.security.test.TestSecuritySummary.test_security_summary_with_issues:
+    name: test_security_summary_with_issues
+    module: pyqual.plugins.security.test
+    line: 188
+    cyclomatic_complexity: 4
+    calls_out: 4
+    calls_in: 0
+  examples.custom_gates.metric_history.save_snapshot:
+    name: save_snapshot
+    module: examples.custom_gates.metric_history
+    line: 52
+    cyclomatic_complexity: 1
+    calls_out: 7
+    calls_in: 2
+  examples.integration_example.preview_pipeline:
+    name: preview_pipeline
+    module: examples.integration_example
+    line: 99
+    cyclomatic_complexity: 4
+    calls_out: 5
+    calls_in: 0
+  pyqual._gate_collectors._from_security:
+    name: _from_security
+    module: pyqual._gate_collectors
+    line: 223
+    cyclomatic_complexity: 2
+    calls_out: 15
+    calls_in: 0
+  examples.ticket_workflow.sync_tickets.tickets_from_gate_failures:
+    name: tickets_from_gate_failures
+    module: examples.ticket_workflow.sync_tickets
+    line: 48
+    cyclomatic_complexity: 7
+    calls_out: 12
+    calls_in: 1
+  pyqual.validation.release._resolve_release_version:
+    name: _resolve_release_version
+    module: pyqual.validation.release
+    line: 128
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 1
+  examples.custom_gates.metric_history.print_trend_report:
+    name: print_trend_report
+    module: examples.custom_gates.metric_history
+    line: 114
+    cyclomatic_complexity: 8
+    calls_out: 4
+    calls_in: 1
+  pyqual.release_check._print_result:
+    name: _print_result
+    module: pyqual.release_check
+    line: 20
+    cyclomatic_complexity: 14
+    calls_out: 10
+    calls_in: 1
+  pyqual.plugins.deps.main.check_requirements:
+    name: check_requirements
+    module: pyqual.plugins.deps.main
+    line: 365
+    cyclomatic_complexity: 12
+    calls_out: 17
+    calls_in: 4
+  pyqual.api.run:
+    name: run
+    module: pyqual.api
+    line: 119
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 1
+  pyqual.cli.cmd_run._rebuild_iterations_from_result:
+    name: _rebuild_iterations_from_result
+    module: pyqual.cli.cmd_run
+    line: 223
+    cyclomatic_complexity: 7
+    calls_out: 7
+    calls_in: 1
+  pyqual.plugins.security.main.run_detect_secrets:
+    name: run_detect_secrets
+    module: pyqual.plugins.security.main
+    line: 313
+    cyclomatic_complexity: 10
+    calls_out: 11
+    calls_in: 1
+  pyqual.cli_observe._print_history_table:
+    name: _print_history_table
+    module: pyqual.cli_observe
+    line: 270
+    cyclomatic_complexity: 6
+    calls_out: 21
+    calls_in: 1
+  pyqual.cli.cmd_run.run:
+    name: run
+    module: pyqual.cli.cmd_run
+    line: 248
+    cyclomatic_complexity: 11
+    calls_out: 47
+    calls_in: 0
+  pyqual.plugins.git.main._parse_push_errors:
+    name: _parse_push_errors
+    module: pyqual.plugins.git.main
+    line: 475
+    cyclomatic_complexity: 8
+    calls_out: 10
+    calls_in: 1
+  pyqual.cli.cmd_tickets.tickets_all:
+    name: tickets_all
+    module: pyqual.cli.cmd_tickets
+    line: 92
+    cyclomatic_complexity: 2
+    calls_out: 8
+    calls_in: 0
+  pyqual.plugins.docker.test.TestHadolint.test_hadolint_not_found:
+    name: test_hadolint_not_found
+    module: pyqual.plugins.docker.test
+    line: 119
+    cyclomatic_complexity: 4
+    calls_out: 5
+    calls_in: 0
+  pyqual.cli_bulk_cmds._output_bulk_result:
+    name: _output_bulk_result
+    module: pyqual.cli_bulk_cmds
+    line: 115
+    cyclomatic_complexity: 9
+    calls_out: 21
+    calls_in: 1
+  pyqual.integrations.llx_mcp_service.main:
+    name: main
+    module: pyqual.integrations.llx_mcp_service
+    line: 59
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 0
+  pyqual.auto_closer._close_github_issue:
+    name: _close_github_issue
+    module: pyqual.auto_closer
+    line: 108
+    cyclomatic_complexity: 4
+    calls_out: 6
+    calls_in: 1
+  pyqual.plugins.install_plugin_config:
+    name: install_plugin_config
+    module: pyqual.plugins
+    line: 77
+    cyclomatic_complexity: 2
+    calls_out: 5
+    calls_in: 2
+  pyqual.api.validate_config:
+    name: validate_config
+    module: pyqual.api
+    line: 72
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 4
+  pyqual.cli_observe._print_stage_output:
+    name: _print_stage_output
+    module: pyqual.cli_observe
+    line: 72
+    cyclomatic_complexity: 5
+    calls_out: 8
+    calls_in: 1
+  pyqual.cli_run_helpers.build_run_summary:
+    name: build_run_summary
+    module: pyqual.cli_run_helpers
+    line: 307
+    cyclomatic_complexity: 5
+    calls_out: 10
+    calls_in: 0
+  pyqual.gate_collectors.legacy._from_toon:
+    name: _from_toon
+    module: pyqual.gate_collectors.legacy
+    line: 6
+    cyclomatic_complexity: 4
+    calls_out: 7
+    calls_in: 0
+  pyqual._gate_collectors._count_by_severity:
+    name: _count_by_severity
+    module: pyqual._gate_collectors
+    line: 186
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 7
+  pyqual.bulk_init_fingerprint._collect_top_level_entries:
+    name: _collect_top_level_entries
+    module: pyqual.bulk_init_fingerprint
+    line: 42
+    cyclomatic_complexity: 7
+    calls_out: 6
+    calls_in: 1
+  dashboard.src.api.fetchRepositoriesWithFallback:
+    name: fetchRepositoriesWithFallback
+    module: dashboard.src.api
+    line: 195
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 0
+  pyqual.tools.register_preset:
+    name: register_preset
+    module: pyqual.tools
+    line: 154
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 3
+  pyqual.report_generator.generate_mermaid_diagram:
+    name: generate_mermaid_diagram
+    module: pyqual.report_generator
+    line: 211
+    cyclomatic_complexity: 7
+    calls_out: 11
+    calls_in: 1
+  pyqual._gate_collectors._from_pylint:
+    name: _from_pylint
+    module: pyqual._gate_collectors
+    line: 552
+    cyclomatic_complexity: 8
+    calls_out: 21
+    calls_in: 1
+  pyqual.plugins.git.test.TestSecretScanning.test_severity_mapping:
+    name: test_severity_mapping
+    module: pyqual.plugins.git.test
+    line: 283
+    cyclomatic_complexity: 6
+    calls_out: 5
+    calls_in: 0
+  pyqual.yaml_fixer._detect_bracket_issues:
+    name: _detect_bracket_issues
+    module: pyqual.yaml_fixer
+    line: 172
+    cyclomatic_complexity: 9
+    calls_out: 14
+    calls_in: 1
+  pyqual.cli_run_helpers.enrich_from_artifacts:
+    name: enrich_from_artifacts
+    module: pyqual.cli_run_helpers
+    line: 215
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 0
+  pyqual.validation.config_check._validate_gate:
+    name: _validate_gate
+    module: pyqual.validation.config_check
+    line: 168
+    cyclomatic_complexity: 3
+    calls_out: 6
+    calls_in: 1
+  pyqual.plugins.security.main.run_pip_audit:
+    name: run_pip_audit
+    module: pyqual.plugins.security.main
+    line: 249
+    cyclomatic_complexity: 11
+    calls_out: 7
+    calls_in: 1
+  pyqual.tools.list_presets:
+    name: list_presets
+    module: pyqual.tools
+    line: 144
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 3
+  pyqual.cli.cmd_tickets.tickets_fetch:
+    name: tickets_fetch
+    module: pyqual.cli.cmd_tickets
+    line: 106
+    cyclomatic_complexity: 6
+    calls_out: 15
+    calls_in: 0
+  pyqual.cli.cmd_run._emit:
+    name: _emit
+    module: pyqual.cli.cmd_run
+    line: 40
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 14
+  pyqual.cli.cmd_tune._display_comparison:
+    name: _display_comparison
+    module: pyqual.cli.cmd_tune
+    line: 158
+    cyclomatic_complexity: 7
+    calls_out: 21
+    calls_in: 1
+  pyqual.validation.schema._resolve_gate_metric:
+    name: _resolve_gate_metric
+    module: pyqual.validation.schema
+    line: 44
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 1
+  pyqual.cli_run_helpers._enrich_todo:
+    name: _enrich_todo
+    module: pyqual.cli_run_helpers
+    line: 199
+    cyclomatic_complexity: 7
+    calls_out: 11
+    calls_in: 1
+  pyqual.plugins.docs.test.TestCheckReadme.test_readme_not_found:
+    name: test_readme_not_found
+    module: pyqual.plugins.docs.test
+    line: 112
+    cyclomatic_complexity: 3
+    calls_out: 1
+    calls_in: 0
+  pyqual.tools.dump_presets_json:
+    name: dump_presets_json
+    module: pyqual.tools
+    line: 219
+    cyclomatic_complexity: 5
+    calls_out: 5
+    calls_in: 0
+  pyqual._gate_collectors._from_radon:
+    name: _from_radon
+    module: pyqual._gate_collectors
+    line: 457
+    cyclomatic_complexity: 6
+    calls_out: 7
+    calls_in: 1
+  pyqual.cli_observe._history_impl:
+    name: _history_impl
+    module: pyqual.cli_observe
+    line: 218
+    cyclomatic_complexity: 8
+    calls_out: 14
+    calls_in: 1
+  pyqual.plugins.cli_helpers.plugin_info:
+    name: plugin_info
+    module: pyqual.plugins.cli_helpers
+    line: 78
+    cyclomatic_complexity: 5
+    calls_out: 16
+    calls_in: 1
+  pyqual.plugins.git.main._scan_with_patterns:
+    name: _scan_with_patterns
+    module: pyqual.plugins.git.main
+    line: 782
+    cyclomatic_complexity: 9
+    calls_out: 11
+    calls_in: 1
+  dashboard.src.api.match:
+    name: match
+    module: dashboard.src.api
+    line: 122
+    cyclomatic_complexity: 1
+    calls_out: 0
+    calls_in: 1
+  pyqual.tools.load_user_tools:
+    name: load_user_tools
+    module: pyqual.tools
+    line: 185
+    cyclomatic_complexity: 6
+    calls_out: 6
+    calls_in: 1
+  pyqual.config._load_env_file:
+    name: _load_env_file
+    module: pyqual.config
+    line: 24
+    cyclomatic_complexity: 2
+    calls_out: 3
+    calls_in: 1
+  pyqual.plugins.get_available_plugins:
+    name: get_available_plugins
+    module: pyqual.plugins
+    line: 69
+    cyclomatic_complexity: 2
+    calls_out: 1
+    calls_in: 3
+  pyqual.plugins.deps.main.get_outdated_packages:
+    name: get_outdated_packages
+    module: pyqual.plugins.deps.main
+    line: 219
+    cyclomatic_complexity: 9
+    calls_out: 15
+    calls_in: 2
+  dashboard.api.main.get_latest_run:
+    name: get_latest_run
+    module: dashboard.api.main
+    line: 128
+    cyclomatic_complexity: 2
+    calls_out: 3
+    calls_in: 0
+  pyqual.cli_run_helpers._format_delivery_summary:
+    name: _format_delivery_summary
+    module: pyqual.cli_run_helpers
+    line: 369
+    cyclomatic_complexity: 5
+    calls_out: 3
+    calls_in: 1
+  pyqual.plugins.cli_helpers.plugin_search:
+    name: plugin_search
+    module: pyqual.plugins.cli_helpers
+    line: 44
+    cyclomatic_complexity: 11
+    calls_out: 25
+    calls_in: 1
+  pyqual.run_parallel_fix._print_yaml_results:
+    name: _print_yaml_results
+    module: pyqual.run_parallel_fix
+    line: 245
+    cyclomatic_complexity: 10
+    calls_out: 33
+    calls_in: 1
+  pyqual.release_check.main:
+    name: main
+    module: pyqual.release_check
+    line: 49
+    cyclomatic_complexity: 4
+    calls_out: 15
+    calls_in: 0
+  pyqual.bulk.orchestrator.bulk_run:
+    name: bulk_run
+    module: pyqual.bulk.orchestrator
+    line: 91
+    cyclomatic_complexity: 11
+    calls_out: 16
+    calls_in: 2
+  pyqual.plugins.example_plugin.test.TestHelperFunctions.test_example_helper_function:
+    name: test_example_helper_function
+    module: pyqual.plugins.example_plugin.test
+    line: 93
+    cyclomatic_complexity: 3
+    calls_out: 1
+    calls_in: 0
+  pyqual.cli.cmd_run._build_stage_dict:
+    name: _build_stage_dict
+    module: pyqual.cli.cmd_run
+    line: 55
+    cyclomatic_complexity: 7
+    calls_out: 5
+    calls_in: 2
+  pyqual.cli_run_helpers._extract_fix_summary:
+    name: _extract_fix_summary
+    module: pyqual.cli_run_helpers
+    line: 258
+    cyclomatic_complexity: 8
+    calls_out: 15
+    calls_in: 1
+  dashboard.api.main.safe_parse:
+    name: safe_parse
+    module: dashboard.api.main
+    line: 90
+    cyclomatic_complexity: 4
+    calls_out: 2
+    calls_in: 6
+  pyqual.validation.release._bump_patch_version:
+    name: _bump_patch_version
+    module: pyqual.validation.release
+    line: 119
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 1
+  pyqual.fix_tools.get_available_tools:
+    name: get_available_tools
+    module: pyqual.fix_tools
+    line: 17
+    cyclomatic_complexity: 5
+    calls_out: 9
+    calls_in: 1
+  pyqual.cli.cmd_run._handle_llm_error:
+    name: _handle_llm_error
+    module: pyqual.cli.cmd_run
+    line: 113
+    cyclomatic_complexity: 5
+    calls_out: 7
+    calls_in: 1
+  pyqual.cli.cmd_run._build_gate_dict:
+    name: _build_gate_dict
+    module: pyqual.cli.cmd_run
+    line: 74
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 2
+  pyqual.report._build_quality_badges:
+    name: _build_quality_badges
+    module: pyqual.report
+    line: 401
+    cyclomatic_complexity: 8
+    calls_out: 10
+    calls_in: 1
+  pyqual.plugins.git.test.TestGitStatus.test_status_not_a_git_repo:
+    name: test_status_not_a_git_repo
+    module: pyqual.plugins.git.test
+    line: 116
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 0
+  dashboard.api.main.get_gate_status:
+    name: get_gate_status
+    module: dashboard.api.main
+    line: 225
+    cyclomatic_complexity: 2
+    calls_out: 12
+    calls_in: 0
+  pyqual.tools._preset_from_dict:
+    name: _preset_from_dict
+    module: pyqual.tools
+    line: 87
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 1
+  pyqual._gate_collectors._from_flake8:
+    name: _from_flake8
+    module: pyqual._gate_collectors
+    line: 587
+    cyclomatic_complexity: 12
+    calls_out: 30
+    calls_in: 1
+  pyqual.cli.cmd_git.git_scan_cmd:
+    name: git_scan_cmd
+    module: pyqual.cli.cmd_git
+    line: 86
+    cyclomatic_complexity: 11
+    calls_out: 42
+    calls_in: 0
+  pyqual.tools.load_entry_point_presets:
+    name: load_entry_point_presets
+    module: pyqual.tools
+    line: 269
+    cyclomatic_complexity: 8
+    calls_out: 15
+    calls_in: 2
+  pyqual.cli.main._calculate_thresholds_for_tune:
+    name: _calculate_thresholds_for_tune
+    module: pyqual.cli.main
+    line: 117
+    cyclomatic_complexity: 7
+    calls_out: 7
+    calls_in: 1
+  pyqual.plugins.attack.test.TestAutoMergePR.test_pr_merge_with_gh_cli:
+    name: test_pr_merge_with_gh_cli
+    module: pyqual.plugins.attack.test
+    line: 136
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 0
+  pyqual.plugins.docs.test.TestCheckLinks.test_lychee_not_found:
+    name: test_lychee_not_found
+    module: pyqual.plugins.docs.test
+    line: 159
+    cyclomatic_complexity: 2
+    calls_out: 1
+    calls_in: 0
+  pyqual.plugins.attack.__main__.main:
+    name: main
+    module: pyqual.plugins.attack.__main__
+    line: 80
+    cyclomatic_complexity: 4
+    calls_out: 4
+    calls_in: 0
+  pyqual.plugins.docs.main.check_links:
+    name: check_links
+    module: pyqual.plugins.docs.main
+    line: 360
+    cyclomatic_complexity: 8
+    calls_out: 7
+    calls_in: 2
+  pyqual.cli_run_helpers._format_fix_summary:
+    name: _format_fix_summary
+    module: pyqual.cli_run_helpers
+    line: 346
+    cyclomatic_complexity: 7
+    calls_out: 8
+    calls_in: 1
+  pyqual.report._read_version:
+    name: _read_version
+    module: pyqual.report
+    line: 106
+    cyclomatic_complexity: 3
+    calls_out: 5
+    calls_in: 1
+  pyqual.plugins.example_plugin.main.example_helper_function:
+    name: example_helper_function
+    module: pyqual.plugins.example_plugin.main
+    line: 60
+    cyclomatic_complexity: 1
+    calls_out: 0
+    calls_in: 1
+  pyqual.stage_names.get_stage_when_default:
+    name: get_stage_when_default
+    module: pyqual.stage_names
+    line: 59
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 1
+  pyqual.cli.cmd_tune.tune_thresholds:
+    name: tune_thresholds
+    module: pyqual.cli.cmd_tune
+    line: 18
+    cyclomatic_complexity: 7
+    calls_out: 19
+    calls_in: 0
+  pyqual.parallel.run_parallel_fix:
+    name: run_parallel_fix
+    module: pyqual.parallel
+    line: 271
+    cyclomatic_complexity: 7
+    calls_out: 16
+    calls_in: 0
+  pyqual.plugins.git.test.TestGitCommit.test_commit_with_changes:
+    name: test_commit_with_changes
+    module: pyqual.plugins.git.test
+    line: 155
+    cyclomatic_complexity: 4
+    calls_out: 3
+    calls_in: 0
+  pyqual.plugins.git.status._parse_branch_line:
+    name: _parse_branch_line
+    module: pyqual.plugins.git.status
+    line: 10
+    cyclomatic_complexity: 5
+    calls_out: 10
+    calls_in: 1
+  pyqual.plugins.attack.test.TestAttackCheck.test_not_git_repo:
+    name: test_not_git_repo
+    module: pyqual.plugins.attack.test
+    line: 83
+    cyclomatic_complexity: 3
+    calls_out: 1
+    calls_in: 0
+  pyqual.tools.preset_to_dict:
+    name: preset_to_dict
+    module: pyqual.tools
+    line: 207
+    cyclomatic_complexity: 2
+    calls_out: 0
+    calls_in: 1
+  pyqual.bulk.orchestrator.build_dashboard_table:
+    name: build_dashboard_table
+    module: pyqual.bulk.orchestrator
+    line: 50
+    cyclomatic_complexity: 15
+    calls_out: 16
+    calls_in: 3
+  pyqual.report_generator.generate_ascii_diagram:
+    name: generate_ascii_diagram
+    module: pyqual.report_generator
+    line: 249
+    cyclomatic_complexity: 7
+    calls_out: 10
+    calls_in: 1
+  pyqual.cli_bulk_cmds._bulk_run_impl:
+    name: _bulk_run_impl
+    module: pyqual.cli_bulk_cmds
+    line: 145
+    cyclomatic_complexity: 8
+    calls_out: 11
+    calls_in: 1
+  pyqual.cli.cmd_config.validate:
+    name: validate
+    module: pyqual.cli.cmd_config
+    line: 81
+    cyclomatic_complexity: 8
+    calls_out: 22
+    calls_in: 0
+  pyqual.yaml_fixer.analyze_yaml_syntax:
+    name: analyze_yaml_syntax
+    module: pyqual.yaml_fixer
+    line: 305
+    cyclomatic_complexity: 10
+    calls_out: 24
+    calls_in: 2
+  examples.multi_gate_pipeline.run_pipeline.main:
+    name: main
+    module: examples.multi_gate_pipeline.run_pipeline
+    line: 60
+    cyclomatic_complexity: 13
+    calls_out: 30
+    calls_in: 0
+  pyqual.yaml_fixer._detect_quote_issues:
+    name: _detect_quote_issues
+    module: pyqual.yaml_fixer
+    line: 110
+    cyclomatic_complexity: 8
+    calls_out: 18
+    calls_in: 1
+  pyqual.gate_collectors.legacy._from_vallm:
+    name: _from_vallm
+    module: pyqual.gate_collectors.legacy
+    line: 16
+    cyclomatic_complexity: 6
+    calls_out: 10
+    calls_in: 0
+  pyqual.plugins.git.main.scan_for_secrets:
+    name: scan_for_secrets
+    module: pyqual.plugins.git.main
+    line: 619
+    cyclomatic_complexity: 5
+    calls_out: 8
+    calls_in: 5
+  pyqual.cli.cmd_init.init:
+    name: init
+    module: pyqual.cli.cmd_init
+    line: 16
+    cyclomatic_complexity: 7
+    calls_out: 22
+    calls_in: 0
+  pyqual.tickets._load_sync_integration:
+    name: _load_sync_integration
+    module: pyqual.tickets
+    line: 10
+    cyclomatic_complexity: 2
+    calls_out: 1
+    calls_in: 1
+  pyqual.report.collect_project_metadata:
+    name: collect_project_metadata
+    module: pyqual.report
+    line: 210
+    cyclomatic_complexity: 10
+    calls_out: 17
+    calls_in: 2
+  pyqual.setup_deps.main:
+    name: main
+    module: pyqual.setup_deps
+    line: 111
+    cyclomatic_complexity: 10
+    calls_out: 8
+    calls_in: 0
+  pyqual.custom_fix.parse_and_apply_suggestions:
+    name: parse_and_apply_suggestions
+    module: pyqual.custom_fix
+    line: 66
+    cyclomatic_complexity: 13
+    calls_out: 21
+    calls_in: 0
+  pyqual.report._badge_url:
+    name: _badge_url
+    module: pyqual.report
+    line: 346
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 8
+  dashboard.src.components.RepositoryDetail.RepositoryDetail:
+    name: RepositoryDetail
+    module: dashboard.src.components.RepositoryDetail
+    line: 111
+    cyclomatic_complexity: 9
+    calls_out: 9
+    calls_in: 0
+  pyqual.validation.project.detect_project_facts:
+    name: detect_project_facts
+    module: pyqual.validation.project
+    line: 33
+    cyclomatic_complexity: 8
+    calls_out: 11
+    calls_in: 2
+  dashboard.api.main.get_db_path:
+    name: get_db_path
+    module: dashboard.api.main
+    line: 59
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 5
+  pyqual.cli_run_helpers.infer_fix_result:
+    name: infer_fix_result
+    module: pyqual.cli_run_helpers
+    line: 226
+    cyclomatic_complexity: 8
+    calls_out: 8
+    calls_in: 1
+  pyqual.plugins.git.test.TestSecretScanning.test_scan_finds_aws_key:
+    name: test_scan_finds_aws_key
+    module: pyqual.plugins.git.test
+    line: 228
+    cyclomatic_complexity: 5
+    calls_out: 3
+    calls_in: 0
+  pyqual.bulk_init._classify_project:
+    name: _classify_project
+    module: pyqual.bulk_init
+    line: 478
+    cyclomatic_complexity: 3
+    calls_out: 4
+    calls_in: 1
+  pyqual.stage_names.is_fix_stage_name:
+    name: is_fix_stage_name
+    module: pyqual.stage_names
+    line: 34
+    cyclomatic_complexity: 7
+    calls_out: 6
+    calls_in: 4
+  pyqual.plugins.docker.main.docker_security_check:
+    name: docker_security_check
+    module: pyqual.plugins.docker.main
+    line: 390
+    cyclomatic_complexity: 8
+    calls_out: 7
+    calls_in: 2
+  pyqual.bulk_init.classify_with_llm:
+    name: classify_with_llm
+    module: pyqual.bulk_init
+    line: 166
+    cyclomatic_complexity: 9
+    calls_out: 26
+    calls_in: 1
+  pyqual.pipeline.Pipeline._is_fix_stage:
+    name: _is_fix_stage
+    module: pyqual.pipeline
+    line: 483
+    cyclomatic_complexity: 6
+    calls_out: 2
+    calls_in: 0
+  pyqual.plugins.docs.main.run_interrogate:
+    name: run_interrogate
+    module: pyqual.plugins.docs.main
+    line: 298
+    cyclomatic_complexity: 5
+    calls_out: 5
+    calls_in: 2
+  dashboard.api.main.get_metric_history:
+    name: get_metric_history
+    module: dashboard.api.main
+    line: 163
+    cyclomatic_complexity: 3
+    calls_out: 10
+    calls_in: 0
+  pyqual.report._read_pyproject:
+    name: _read_pyproject
+    module: pyqual.report
+    line: 75
+    cyclomatic_complexity: 5
+    calls_out: 4
+    calls_in: 1
+  pyqual.report._read_git_commit_count:
+    name: _read_git_commit_count
+    module: pyqual.report
+    line: 116
+    cyclomatic_complexity: 3
+    calls_out: 4
+    calls_in: 1
+  pyqual.bulk.parser._parse_iteration_header:
+    name: _parse_iteration_header
+    module: pyqual.bulk.parser
+    line: 18
+    cyclomatic_complexity: 3
+    calls_out: 4
+    calls_in: 1
+  pyqual.auto_closer.get_diff_content:
+    name: get_diff_content
+    module: pyqual.auto_closer
+    line: 46
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 1
+  pyqual.api.get_tool_command:
+    name: get_tool_command
+    module: pyqual.api
+    line: 302
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 0
+  pyqual.yaml_fixer._try_parse_yaml:
+    name: _try_parse_yaml
+    module: pyqual.yaml_fixer
+    line: 348
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 1
+  pyqual.plugins.docker.test.TestTrivyScan.test_trivy_not_found:
+    name: test_trivy_not_found
+    module: pyqual.plugins.docker.test
+    line: 131
+    cyclomatic_complexity: 4
+    calls_out: 5
+    calls_in: 0
+  pyqual.cli_run_helpers._extract_todo_summary:
+    name: _extract_todo_summary
+    module: pyqual.cli_run_helpers
+    line: 241
+    cyclomatic_complexity: 9
+    calls_out: 13
+    calls_in: 1
+  examples.custom_gates.composite_gates.compute_composite_score:
+    name: compute_composite_score
+    module: examples.custom_gates.composite_gates
+    line: 44
+    cyclomatic_complexity: 9
+    calls_out: 12
+    calls_in: 1
+  dashboard.api.main.get_project_summary:
+    name: get_project_summary
+    module: dashboard.api.main
+    line: 253
+    cyclomatic_complexity: 6
+    calls_out: 12
+    calls_in: 0
+  examples.integration_example.run_shell_command_example:
+    name: run_shell_command_example
+    module: examples.integration_example
+    line: 55
+    cyclomatic_complexity: 3
+    calls_out: 8
+    calls_in: 0
+  pyqual.plugins.git.main._run_enabled_scanners:
+    name: _run_enabled_scanners
+    module: pyqual.plugins.git.main
+    line: 673
+    cyclomatic_complexity: 9
+    calls_out: 9
+    calls_in: 1
+  pyqual.cli.cmd_run._handle_pipeline_error:
+    name: _handle_pipeline_error
+    module: pyqual.cli.cmd_run
+    line: 130
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 1
+  pyqual.tools.resolve_stage_command:
+    name: resolve_stage_command
+    module: pyqual.tools
+    line: 307
+    cyclomatic_complexity: 2
+    calls_out: 5
+    calls_in: 0
+  pyqual.tickets._normalize_sources:
+    name: _normalize_sources
+    module: pyqual.tickets
+    line: 20
+    cyclomatic_complexity: 4
+    calls_out: 2
+    calls_in: 1
+  pyqual._gate_collectors._from_vulture:
+    name: _from_vulture
+    module: pyqual._gate_collectors
+    line: 269
+    cyclomatic_complexity: 5
+    calls_out: 8
+    calls_in: 1
+  pyqual.plugins.attack.test.TestAttackMerge.test_dry_run_merge:
+    name: test_dry_run_merge
+    module: pyqual.plugins.attack.test
+    line: 117
+    cyclomatic_complexity: 3
+    calls_out: 6
+    calls_in: 0
+  pyqual.bulk_init._safe_name:
+    name: _safe_name
+    module: pyqual.bulk_init
+    line: 332
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 1
+  pyqual.cli_observe._load_history_entries:
+    name: _load_history_entries
+    module: pyqual.cli_observe
+    line: 256
+    cyclomatic_complexity: 4
+    calls_out: 5
+    calls_in: 1
+  dashboard.src.components.RepositoryDetail.navigate:
+    name: navigate
+    module: dashboard.src.components.RepositoryDetail
+    line: 113
+    cyclomatic_complexity: 3
+    calls_out: 6
+    calls_in: 1
+  pyqual.validation.project._detect_language:
+    name: _detect_language
+    module: pyqual.validation.project
+    line: 25
+    cyclomatic_complexity: 4
+    calls_out: 2
+    calls_in: 1
+  pyqual._gate_collectors._from_ruff:
+    name: _from_ruff
+    module: pyqual._gate_collectors
+    line: 514
+    cyclomatic_complexity: 12
+    calls_out: 27
+    calls_in: 1
+  pyqual.tickets.sync_planfile_tickets:
+    name: sync_planfile_tickets
+    module: pyqual.tickets
+    line: 31
+    cyclomatic_complexity: 2
+    calls_out: 6
+    calls_in: 5
+  pyqual.cli.cmd_config.fix_config:
+    name: fix_config
+    module: pyqual.cli.cmd_config
+    line: 133
+    cyclomatic_complexity: 13
+    calls_out: 46
+    calls_in: 0
+  pyqual.report_generator.generate_report:
+    name: generate_report
+    module: pyqual.report_generator
+    line: 336
+    cyclomatic_complexity: 4
+    calls_out: 12
+    calls_in: 1
+  pyqual.validation.config_check._get_issue_severity:
+    name: _get_issue_severity
+    module: pyqual.validation.config_check
+    line: 31
+    cyclomatic_complexity: 9
+    calls_out: 0
+    calls_in: 1
+  pyqual.plugins.docker.main.run_trivy_scan:
+    name: run_trivy_scan
+    module: pyqual.plugins.docker.main
+    line: 252
+    cyclomatic_complexity: 14
+    calls_out: 13
+    calls_in: 2
+  pyqual.cli_observe._output_json_entries:
+    name: _output_json_entries
+    module: pyqual.cli_observe
+    line: 48
+    cyclomatic_complexity: 4
+    calls_out: 4
+    calls_in: 1
+  pyqual.cli.main._display_comparison_for_tune:
+    name: _display_comparison_for_tune
+    module: pyqual.cli.main
+    line: 151
+    cyclomatic_complexity: 7
+    calls_out: 21
+    calls_in: 1
+  pyqual.cli.cmd_tickets.tickets_todo:
+    name: tickets_todo
+    module: pyqual.cli.cmd_tickets
+    line: 64
+    cyclomatic_complexity: 2
+    calls_out: 8
+    calls_in: 0
+  pyqual.github_tasks.fetch_github_tasks:
+    name: fetch_github_tasks
+    module: pyqual.github_tasks
+    line: 13
+    cyclomatic_complexity: 3
+    calls_out: 5
+    calls_in: 1
+  pyqual.plugins.docker.test.TestDockerSecurityCheck.test_security_check_without_image:
+    name: test_security_check_without_image
+    module: pyqual.plugins.docker.test
+    line: 143
+    cyclomatic_complexity: 4
+    calls_out: 2
+    calls_in: 0
+  pyqual.bulk_init.bulk_init:
+    name: bulk_init
+    module: pyqual.bulk_init
+    line: 490
+    cyclomatic_complexity: 14
+    calls_out: 18
+    calls_in: 1
+  examples.ticket_workflow.sync_tickets.main:
+    name: main
+    module: examples.ticket_workflow.sync_tickets
+    line: 80
+    cyclomatic_complexity: 2
+    calls_out: 3
+    calls_in: 0
+  pyqual.api.run_pipeline:
+    name: run_pipeline
+    module: pyqual.api
+    line: 156
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 2
+  pyqual._gate_collectors._from_vulnerabilities:
+    name: _from_vulnerabilities
+    module: pyqual._gate_collectors
+    line: 191
+    cyclomatic_complexity: 6
+    calls_out: 26
+    calls_in: 1
+  pyqual.parallel.ParallelExecutor.run:
+    name: run
+    module: pyqual.parallel
+    line: 202
+    cyclomatic_complexity: 15
+    calls_out: 25
+    calls_in: 1
+  pyqual.integrations.llx_mcp_service.build_parser:
+    name: build_parser
+    module: pyqual.integrations.llx_mcp_service
+    line: 42
+    cyclomatic_complexity: 1
+    calls_out: 7
+    calls_in: 1
+  pyqual.report.run:
+    name: run
+    module: pyqual.report
+    line: 530
+    cyclomatic_complexity: 9
+    calls_out: 17
+    calls_in: 1
+  pyqual.plugins.git.main.git_status:
+    name: git_status
+    module: pyqual.plugins.git.main
+    line: 275
+    cyclomatic_complexity: 8
+    calls_out: 8
+    calls_in: 5
+  pyqual.cli_run_helpers.extract_stage_summary:
+    name: extract_stage_summary
+    module: pyqual.cli_run_helpers
+    line: 142
+    cyclomatic_complexity: 3
+    calls_out: 16
+    calls_in: 0
+  pyqual.plugins.attack.main.attack_merge:
+    name: attack_merge
+    module: pyqual.plugins.attack.main
+    line: 188
+    cyclomatic_complexity: 9
+    calls_out: 11
+    calls_in: 4
+  dashboard.api.main.get_project_runs:
+    name: get_project_runs
+    module: dashboard.api.main
+    line: 136
+    cyclomatic_complexity: 3
+    calls_out: 8
+    calls_in: 0
+  examples.ticket_workflow.sync_tickets.sync_from_cli:
+    name: sync_from_cli
+    module: examples.ticket_workflow.sync_tickets
+    line: 29
+    cyclomatic_complexity: 3
+    calls_out: 10
+    calls_in: 1
+  pyqual.integrations.llx_mcp.main:
+    name: main
+    module: pyqual.integrations.llx_mcp
+    line: 63
+    cyclomatic_complexity: 6
+    calls_out: 18
+    calls_in: 0
+  dashboard.src.App.App:
+    name: App
+    module: dashboard.src.App
+    line: 16
+    cyclomatic_complexity: 8
+    calls_out: 11
+    calls_in: 0
+  pyqual.run_parallel_fix._setup_batch:
+    name: _setup_batch
+    module: pyqual.run_parallel_fix
+    line: 306
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 1
+  pyqual.cli.cmd_tickets.tickets_github:
+    name: tickets_github
+    module: pyqual.cli.cmd_tickets
+    line: 78
+    cyclomatic_complexity: 2
+    calls_out: 8
+    calls_in: 0
+  pyqual.plugins.git.main._count_pushed_commits:
+    name: _count_pushed_commits
+    module: pyqual.plugins.git.main
+    line: 490
+    cyclomatic_complexity: 5
+    calls_out: 4
+    calls_in: 1
+  pyqual.plugins.cli_helpers.plugin_add:
+    name: plugin_add
+    module: pyqual.plugins.cli_helpers
+    line: 101
+    cyclomatic_complexity: 5
+    calls_out: 19
+    calls_in: 1
+  pyqual.plugins.attack.main.auto_merge_pr:
+    name: auto_merge_pr
+    module: pyqual.plugins.attack.main
+    line: 279
+    cyclomatic_complexity: 6
+    calls_out: 7
+    calls_in: 3
+  pyqual.cli_run_helpers.extract_lint_stage_summary:
+    name: extract_lint_stage_summary
+    module: pyqual.cli_run_helpers
+    line: 44
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 1
+  pyqual.plugins.attack.main.attack_check:
+    name: attack_check
+    module: pyqual.plugins.attack.main
+    line: 128
+    cyclomatic_complexity: 7
+    calls_out: 9
+    calls_in: 4
+  pyqual.report.generate_report:
+    name: generate_report
+    module: pyqual.report
+    line: 306
+    cyclomatic_complexity: 9
+    calls_out: 15
+    calls_in: 1
+  dashboard.src.api.loadConfig:
+    name: loadConfig
+    module: dashboard.src.api
+    line: 7
+    cyclomatic_complexity: 7
+    calls_out: 5
+    calls_in: 1
+  pyqual.api.create_default_config:
+    name: create_default_config
+    module: pyqual.api
+    line: 79
+    cyclomatic_complexity: 3
+    calls_out: 6
+    calls_in: 0
+  pyqual.plugins.git.main._get_provider_for_pattern:
+    name: _get_provider_for_pattern
+    module: pyqual.plugins.git.main
+    line: 847
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 5
+  pyqual.plugins.git.status._parse_file_status:
+    name: _parse_file_status
+    module: pyqual.plugins.git.status
+    line: 28
+    cyclomatic_complexity: 5
+    calls_out: 4
+    calls_in: 1
+  pyqual.bulk_init._classify_heuristic:
+    name: _classify_heuristic
+    module: pyqual.bulk_init
+    line: 299
+    cyclomatic_complexity: 6
+    calls_out: 7
+    calls_in: 3
+  pyqual.plugins.git.main._get_severity_for_pattern:
+    name: _get_severity_for_pattern
+    module: pyqual.plugins.git.main
+    line: 871
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 6
+  pyqual.plugins.cli_helpers.plugin_list:
+    name: plugin_list
+    module: pyqual.plugins.cli_helpers
+    line: 17
+    cyclomatic_complexity: 9
+    calls_out: 19
+    calls_in: 1
+  pyqual.report_generator._build_gates_from_metrics:
+    name: _build_gates_from_metrics
+    module: pyqual.report_generator
+    line: 127
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 1
+  pyqual.api.shell_check:
+    name: shell_check
+    module: pyqual.api
+    line: 507
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 4
+  pyqual.cli.main.tune_thresholds_cmd:
+    name: tune_thresholds_cmd
+    module: pyqual.cli.main
+    line: 27
+    cyclomatic_complexity: 8
+    calls_out: 22
+    calls_in: 0
+  pyqual._gate_collectors._from_interrogate:
+    name: _from_interrogate
+    module: pyqual._gate_collectors
+    line: 652
+    cyclomatic_complexity: 10
+    calls_out: 16
+    calls_in: 1
+  pyqual.plugins.attack.test.TestAutoMergePR.test_no_pr_or_branch:
+    name: test_no_pr_or_branch
+    module: pyqual.plugins.attack.test
+    line: 158
+    cyclomatic_complexity: 3
+    calls_out: 1
+    calls_in: 0
+  pyqual.plugins.security.main.run_bandit_check:
+    name: run_bandit_check
+    module: pyqual.plugins.security.main
+    line: 182
+    cyclomatic_complexity: 10
+    calls_out: 4
+    calls_in: 1
+  pyqual.cli_bulk_cmds.register_bulk_commands:
+    name: register_bulk_commands
+    module: pyqual.cli_bulk_cmds
+    line: 255
+    cyclomatic_complexity: 1
+    calls_out: 21
+    calls_in: 0
+  pyqual.bulk_init_fingerprint._collect_makefile_targets:
+    name: _collect_makefile_targets
+    module: pyqual.bulk_init_fingerprint
+    line: 102
+    cyclomatic_complexity: 6
+    calls_out: 8
+    calls_in: 1
+  pyqual.plugins.docs.main.docs_quality_summary:
+    name: docs_quality_summary
+    module: pyqual.plugins.docs.main
+    line: 423
+    cyclomatic_complexity: 5
+    calls_out: 12
+    calls_in: 1
+  pyqual.plugins.attack.main.run_git_command:
+    name: run_git_command
+    module: pyqual.plugins.attack.main
+    line: 96
+    cyclomatic_complexity: 5
+    calls_out: 3
+    calls_in: 20
+  pyqual.plugins.git.main._scan_with_gitleaks:
+    name: _scan_with_gitleaks
+    module: pyqual.plugins.git.main
+    line: 741
+    cyclomatic_complexity: 7
+    calls_out: 9
+    calls_in: 0
+  pyqual.report.update_readme_badges:
+    name: update_readme_badges
+    module: pyqual.report
+    line: 474
+    cyclomatic_complexity: 7
+    calls_out: 17
+    calls_in: 1
+  pyqual.tickets.sync_from_gates:
+    name: sync_from_gates
+    module: pyqual.tickets
+    line: 76
+    cyclomatic_complexity: 9
+    calls_out: 8
+    calls_in: 1
+  pyqual.tickets.sync_todo_tickets:
+    name: sync_todo_tickets
+    module: pyqual.tickets
+    line: 49
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 3
+  pyqual.bulk_init.generate_pyqual_yaml:
+    name: generate_pyqual_yaml
+    module: pyqual.bulk_init
+    line: 337
+    cyclomatic_complexity: 7
+    calls_out: 77
+    calls_in: 1
+  dashboard.api.main.get_projects:
+    name: get_projects
+    module: dashboard.api.main
+    line: 105
+    cyclomatic_complexity: 5
+    calls_out: 10
+    calls_in: 0
+  pyqual.report._read_costs_json:
+    name: _read_costs_json
+    module: pyqual.report
+    line: 141
+    cyclomatic_complexity: 6
+    calls_out: 5
+    calls_in: 1
+  pyqual.validation.config_check.validate_config:
+    name: validate_config
+    module: pyqual.validation.config_check
+    line: 210
+    cyclomatic_complexity: 9
+    calls_out: 14
+    calls_in: 0
+  pyqual.bulk_init_fingerprint.collect_fingerprint:
+    name: collect_fingerprint
+    module: pyqual.bulk_init_fingerprint
+    line: 155
+    cyclomatic_complexity: 2
+    calls_out: 13
+    calls_in: 1
+  pyqual.cli.cmd_git.git_add_cmd:
+    name: git_add_cmd
+    module: pyqual.cli.cmd_git
+    line: 69
+    cyclomatic_complexity: 2
+    calls_out: 10
+    calls_in: 0
+  pyqual.report_generator.get_last_run:
+    name: get_last_run
+    module: pyqual.report_generator
+    line: 141
+    cyclomatic_complexity: 3
+    calls_out: 8
+    calls_in: 1
+  examples.custom_gates.metric_history.load_history:
+    name: load_history
+    module: examples.custom_gates.metric_history
+    line: 40
+    cyclomatic_complexity: 4
+    calls_out: 4
+    calls_in: 1
+  run_analysis.main:
+    name: main
+    module: run_analysis
+    line: 70
+    cyclomatic_complexity: 4
+    calls_out: 9
+    calls_in: 0
+  pyqual.report._read_costs_package:
+    name: _read_costs_package
+    module: pyqual.report
+    line: 160
+    cyclomatic_complexity: 12
+    calls_out: 17
+    calls_in: 1
+  pyqual.yaml_fixer._is_multiline_quote:
+    name: _is_multiline_quote
+    module: pyqual.yaml_fixer
+    line: 154
+    cyclomatic_complexity: 8
+    calls_out: 10
+    calls_in: 2
+  pyqual.report_generator._build_run_from_rows:
+    name: _build_run_from_rows
+    module: pyqual.report_generator
+    line: 168
+    cyclomatic_complexity: 11
+    calls_out: 23
+    calls_in: 1
+  examples.custom_gates.composite_gates.main:
+    name: main
+    module: examples.custom_gates.composite_gates
+    line: 124
+    cyclomatic_complexity: 2
+    calls_out: 13
+    calls_in: 0
+  dashboard.src.api.fetchRepositories:
+    name: fetchRepositories
+    module: dashboard.src.api
+    line: 25
+    cyclomatic_complexity: 4
+    calls_out: 5
+    calls_in: 1
+  pyqual.config.PyqualConfig.load:
+    name: load
+    module: pyqual.config
+    line: 104
+    cyclomatic_complexity: 2
+    calls_out: 7
+    calls_in: 0
+  pyqual.stage_names.is_verify_stage_name:
+    name: is_verify_stage_name
+    module: pyqual.stage_names
+    line: 49
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 0
+  pyqual.github_actions.GitHubActionsReporter.create_issue:
+    name: create_issue
+    module: pyqual.github_actions
+    line: 55
+    cyclomatic_complexity: 7
+    calls_out: 8
+    calls_in: 0
+  pyqual.cli_observe._logs_impl:
+    name: _logs_impl
+    module: pyqual.cli_observe
+    line: 84
+    cyclomatic_complexity: 6
+    calls_out: 11
+    calls_in: 1
+  Taskfile.print:
+    name: print
+    module: Taskfile
+    line: 240
+    cyclomatic_complexity: 0
+    calls_out: 0
+    calls_in: 189
+  pyqual.cli.cmd_git.git_commit_cmd:
+    name: git_commit_cmd
+    module: pyqual.cli.cmd_git
+    line: 159
+    cyclomatic_complexity: 5
+    calls_out: 25
+    calls_in: 0
+  pyqual.report_generator.main:
+    name: main
+    module: pyqual.report_generator
+    line: 385
+    cyclomatic_complexity: 1
+    calls_out: 6
+    calls_in: 0
+  pyqual.auto_closer._process_ticket:
+    name: _process_ticket
+    module: pyqual.auto_closer
+    line: 131
+    cyclomatic_complexity: 3
+    calls_out: 10
+    calls_in: 1
+  pyqual.plugins.docs.test.TestDocsQualitySummary.test_summary_structure:
+    name: test_summary_structure
+    module: pyqual.plugins.docs.test
+    line: 170
+    cyclomatic_complexity: 5
+    calls_out: 2
+    calls_in: 0
+  pyqual.tools._load_json_presets:
+    name: _load_json_presets
+    module: pyqual.tools
+    line: 97
+    cyclomatic_complexity: 6
+    calls_out: 10
+    calls_in: 2
+  pyqual.config.PyqualConfig._validate_stages:
+    name: _validate_stages
+    module: pyqual.config
+    line: 181
+    cyclomatic_complexity: 11
+    calls_out: 10
+    calls_in: 0
+  pyqual.yaml_fixer._get_context:
+    name: _get_context
+    module: pyqual.yaml_fixer
+    line: 294
+    cyclomatic_complexity: 3
+    calls_out: 6
+    calls_in: 7
+  pyqual.api.dry_run:
+    name: dry_run
+    module: pyqual.api
+    line: 196
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 0
+  pyqual.run_parallel_fix.mark_completed_todos:
+    name: mark_completed_todos
+    module: pyqual.run_parallel_fix
+    line: 48
+    cyclomatic_complexity: 11
+    calls_out: 19
+    calls_in: 1
+  pyqual.cli.cmd_run._on_stage_error_impl:
+    name: _on_stage_error_impl
+    module: pyqual.cli.cmd_run
+    line: 178
+    cyclomatic_complexity: 6
+    calls_out: 3
+    calls_in: 1
+  pyqual.cli_run_helpers._enrich_analysis:
+    name: _enrich_analysis
+    module: pyqual.cli_run_helpers
+    line: 161
+    cyclomatic_complexity: 8
+    calls_out: 20
+    calls_in: 1
+  dashboard.src.api.repositories:
+    name: repositories
+    module: dashboard.src.api
+    line: 29
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 0
+  pyqual.cli_bulk_cmds._bulk_init_impl:
+    name: _bulk_init_impl
+    module: pyqual.cli_bulk_cmds
+    line: 21
+    cyclomatic_complexity: 14
+    calls_out: 27
+    calls_in: 1
+  pyqual.plugins.docs.main.check_readme:
+    name: check_readme
+    module: pyqual.plugins.docs.main
+    line: 221
+    cyclomatic_complexity: 9
+    calls_out: 15
+    calls_in: 3
+  pyqual.run_parallel_fix.run_tool:
+    name: run_tool
+    module: pyqual.run_parallel_fix
+    line: 91
+    cyclomatic_complexity: 6
+    calls_out: 13
+    calls_in: 0
+  pyqual._gate_collectors._from_vallm:
+    name: _from_vallm
+    module: pyqual._gate_collectors
+    line: 82
+    cyclomatic_complexity: 6
+    calls_out: 10
+    calls_in: 0
+  pyqual.plugins.git.main.git_add:
+    name: git_add
+    module: pyqual.plugins.git.main
+    line: 514
+    cyclomatic_complexity: 4
+    calls_out: 6
+    calls_in: 1
+  pyqual.validation.release.validate_release_state:
+    name: validate_release_state
+    module: pyqual.validation.release
+    line: 281
+    cyclomatic_complexity: 4
+    calls_out: 10
+    calls_in: 1
+  pyqual.yaml_fixer.fix_yaml_file:
+    name: fix_yaml_file
+    module: pyqual.yaml_fixer
+    line: 401
+    cyclomatic_complexity: 3
+    calls_out: 5
+    calls_in: 0
+  examples.integration_example.run_single_stage:
+    name: run_single_stage
+    module: examples.integration_example
+    line: 79
+    cyclomatic_complexity: 2
+    calls_out: 5
+    calls_in: 0
+  pyqual.yaml_fixer._parse_pyyaml_error:
+    name: _parse_pyyaml_error
+    module: pyqual.yaml_fixer
+    line: 358
+    cyclomatic_complexity: 8
+    calls_out: 13
+    calls_in: 1
+  pyqual.report_generator.parse_kwargs:
+    name: parse_kwargs
+    module: pyqual.report_generator
+    line: 23
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 1
+  run_analysis.run_project:
+    name: run_project
+    module: run_analysis
+    line: 22
+    cyclomatic_complexity: 11
+    calls_out: 38
+    calls_in: 1
+  pyqual._gate_collectors._from_lint:
+    name: _from_lint
+    module: pyqual._gate_collectors
+    line: 500
+    cyclomatic_complexity: 2
+    calls_out: 9
+    calls_in: 0
+  pyqual.plugins.security.test.TestDetectSecrets.test_detect_secrets_not_found:
+    name: test_detect_secrets_not_found
+    module: pyqual.plugins.security.test
+    line: 167
+    cyclomatic_complexity: 4
+    calls_out: 5
+    calls_in: 0
+  pyqual.config.StageConfig.__post_init__:
+    name: __post_init__
+    module: pyqual.config
+    line: 63
+    cyclomatic_complexity: 2
+    calls_out: 1
+    calls_in: 0
+  pyqual.config.PyqualConfig._parse:
+    name: _parse
+    module: pyqual.config
+    line: 119
+    cyclomatic_complexity: 13
+    calls_out: 28
+    calls_in: 0
+  pyqual.plugins.attack.test.TestAutoMergePR.test_pr_merge_failure:
+    name: test_pr_merge_failure
+    module: pyqual.plugins.attack.test
+    line: 146
+    cyclomatic_complexity: 3
+    calls_out: 4
+    calls_in: 0
+  pyqual.integrations.llx_mcp_service.run_server:
+    name: run_server
+    module: pyqual.integrations.llx_mcp_service
+    line: 37
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 1
+  pyqual.bulk_init._validate_yaml_content:
+    name: _validate_yaml_content
+    module: pyqual.bulk_init
+    line: 461
+    cyclomatic_complexity: 4
+    calls_out: 3
+    calls_in: 1
+  pyqual.validation.release._check_pypi_version:
+    name: _check_pypi_version
+    module: pyqual.validation.release
+    line: 134
+    cyclomatic_complexity: 6
+    calls_out: 4
+    calls_in: 1
+  pyqual.validation.release._parse_pyproject_fallback:
+    name: _parse_pyproject_fallback
+    module: pyqual.validation.release
+    line: 53
+    cyclomatic_complexity: 7
+    calls_out: 9
+    calls_in: 2
+  pyqual._gate_collectors._from_mypy:
+    name: _from_mypy
+    module: pyqual._gate_collectors
+    line: 477
+    cyclomatic_complexity: 6
+    calls_out: 12
+    calls_in: 1
+  pyqual._gate_collectors._from_code_health:
+    name: _from_code_health
+    module: pyqual._gate_collectors
+    line: 310
+    cyclomatic_complexity: 2
+    calls_out: 9
+    calls_in: 0
+  pyqual.validation.config_check._load_tool_registry:
+    name: _load_tool_registry
+    module: pyqual.validation.config_check
+    line: 104
+    cyclomatic_complexity: 3
+    calls_out: 4
+    calls_in: 1
+  pyqual.validation.release._check_git_state:
+    name: _check_git_state
+    module: pyqual.validation.release
+    line: 151
+    cyclomatic_complexity: 10
+    calls_out: 13
+    calls_in: 1
+  pyqual.cli_run_helpers._enrich_validation:
+    name: _enrich_validation
+    module: pyqual.cli_run_helpers
+    line: 181
+    cyclomatic_complexity: 7
+    calls_out: 19
+    calls_in: 1
+  pyqual.plugins.deps.test.TestCheckRequirements.test_fully_pinned_requirements:
+    name: test_fully_pinned_requirements
+    module: pyqual.plugins.deps.test
+    line: 173
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 0
+  pyqual.cli_bulk_cmds._run_with_live_dashboard:
+    name: _run_with_live_dashboard
+    module: pyqual.cli_bulk_cmds
+    line: 202
+    cyclomatic_complexity: 2
+    calls_out: 10
+    calls_in: 1
+  pyqual.plugins.git.main.preflight_push_check:
+    name: preflight_push_check
+    module: pyqual.plugins.git.main
+    line: 891
+    cyclomatic_complexity: 7
+    calls_out: 10
+    calls_in: 3
+  pyqual.run_parallel_fix.parse_args:
+    name: parse_args
+    module: pyqual.run_parallel_fix
+    line: 176
+    cyclomatic_complexity: 1
+    calls_out: 7
+    calls_in: 1
+  pyqual.cli.main._load_latest_metrics_for_tune:
+    name: _load_latest_metrics_for_tune
+    module: pyqual.cli.main
+    line: 79
+    cyclomatic_complexity: 7
+    calls_out: 13
+    calls_in: 1
+  pyqual.plugins.git.main._scan_with_trufflehog:
+    name: _scan_with_trufflehog
+    module: pyqual.plugins.git.main
+    line: 700
+    cyclomatic_complexity: 10
+    calls_out: 18
+    calls_in: 0
+  pyqual.bulk.runner._run_single_project:
+    name: _run_single_project
+    module: pyqual.bulk.runner
+    line: 8
+    cyclomatic_complexity: 11
+    calls_out: 14
+    calls_in: 1
+  pyqual.plugins.attack.__main__.cmd_check:
+    name: cmd_check
+    module: pyqual.plugins.attack.__main__
+    line: 30
+    cyclomatic_complexity: 2
+    calls_out: 10
+    calls_in: 1
+  pyqual.validation.release._read_package_init_version:
+    name: _read_package_init_version
+    module: pyqual.validation.release
+    line: 82
+    cyclomatic_complexity: 3
+    calls_out: 5
+    calls_in: 1
+  pyqual.bulk_init._write_pyqual_yaml:
+    name: _write_pyqual_yaml
+    module: pyqual.bulk_init
+    line: 471
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 1
+  pyqual.plugins.git.test.TestSecretScanning.test_scan_skips_placeholders:
+    name: test_scan_skips_placeholders
+    module: pyqual.plugins.git.test
+    line: 246
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 0
+  pyqual.validation.config_check._load_yaml_config:
+    name: _load_yaml_config
+    module: pyqual.validation.config_check
+    line: 50
+    cyclomatic_complexity: 7
+    calls_out: 13
+    calls_in: 1
+  pyqual.plugins.deps.test.TestCheckRequirements.test_requirements_parsing:
+    name: test_requirements_parsing
+    module: pyqual.plugins.deps.test
+    line: 155
+    cyclomatic_complexity: 6
+    calls_out: 2
+    calls_in: 0
+  pyqual.tools._load_default_presets:
+    name: _load_default_presets
+    module: pyqual.tools
+    line: 118
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 0
+  pyqual.bulk_init_fingerprint._collect_file_extensions:
+    name: _collect_file_extensions
+    module: pyqual.bulk_init_fingerprint
+    line: 69
+    cyclomatic_complexity: 7
+    calls_out: 10
+    calls_in: 1
+  pyqual.cli_run_helpers.format_run_summary:
+    name: format_run_summary
+    module: pyqual.cli_run_helpers
+    line: 380
+    cyclomatic_complexity: 6
+    calls_out: 7
+    calls_in: 0
+  dashboard.src.App.loadRepositories:
+    name: loadRepositories
+    module: dashboard.src.App
+    line: 25
+    cyclomatic_complexity: 3
+    calls_out: 5
+    calls_in: 1
+  pyqual.plugins.docker.test.TestDockerSecurityCheck.test_security_check_structure:
+    name: test_security_check_structure
+    module: pyqual.plugins.docker.test
+    line: 154
+    cyclomatic_complexity: 3
+    calls_out: 1
+    calls_in: 0
+edges:
+- caller: run_analysis.run_project
+  callee: Taskfile.print
+  call_type: resolved
+- caller: run_analysis.main
+  callee: Taskfile.print
+  call_type: resolved
+- caller: run_analysis.main
+  callee: run_analysis.run_project
+  call_type: resolved
+- caller: dashboard.src.App.App
+  callee: dashboard.src.App.loadRepositories
+  call_type: resolved
+- caller: dashboard.src.components.RepositoryDetail.RepositoryDetail
+  callee: dashboard.src.components.RepositoryDetail.navigate
+  call_type: resolved
+- caller: dashboard.src.api.fetchRepositories
+  callee: dashboard.src.api.loadConfig
+  call_type: resolved
+- caller: dashboard.src.api.fetchRepositories
+  callee: dashboard.src.api.fetchLatestRun
+  call_type: resolved
+- caller: dashboard.src.api.config
+  callee: dashboard.src.api.fetchLatestRun
+  call_type: resolved
+- caller: dashboard.src.api.repositories
+  callee: dashboard.src.api.fetchLatestRun
+  call_type: resolved
+- caller: dashboard.src.api.fetchLatestRun
+  callee: dashboard.src.api.getRepoPath
+  call_type: resolved
+- caller: dashboard.src.api.getRepoPath
+  callee: dashboard.src.api.match
+  call_type: resolved
+- caller: dashboard.src.api.fetchRepositoriesWithFallback
+  callee: dashboard.src.api.fetchRepositories
+  call_type: resolved
+- caller: dashboard.api.main.get_projects
+  callee: dashboard.api.main.read_summary_json
+  call_type: resolved
+- caller: dashboard.api.main.get_latest_run
+  callee: dashboard.api.main.read_summary_json
+  call_type: resolved
+- caller: dashboard.api.main.get_project_runs
+  callee: dashboard.api.main.get_db_path
+  call_type: resolved
+- caller: dashboard.api.main.get_project_runs
+  callee: dashboard.api.main.query_pipeline_db
+  call_type: resolved
+- caller: dashboard.api.main.get_project_runs
+  callee: dashboard.api.main.safe_parse
+  call_type: resolved
+- caller: dashboard.api.main.get_metric_history
+  callee: dashboard.api.main.get_db_path
+  call_type: resolved
+- caller: dashboard.api.main.get_metric_history
+  callee: dashboard.api.main.query_pipeline_db
+  call_type: resolved
+- caller: dashboard.api.main.get_metric_history
+  callee: dashboard.api.main.safe_parse
+  call_type: resolved
+- caller: dashboard.api.main.get_stage_performance
+  callee: dashboard.api.main.get_db_path
+  call_type: resolved
+- caller: dashboard.api.main.get_stage_performance
+  callee: dashboard.api.main.query_pipeline_db
+  call_type: resolved
+- caller: dashboard.api.main.get_stage_performance
+  callee: dashboard.api.main.safe_parse
+  call_type: resolved
+- caller: dashboard.api.main.get_gate_status
+  callee: dashboard.api.main.get_db_path
+  call_type: resolved
+- caller: dashboard.api.main.get_gate_status
+  callee: dashboard.api.main.query_pipeline_db
+  call_type: resolved
+- caller: dashboard.api.main.get_gate_status
+  callee: dashboard.api.main.safe_parse
+  call_type: resolved
+- caller: dashboard.api.main.get_project_summary
+  callee: dashboard.api.main.get_db_path
+  call_type: resolved
+- caller: dashboard.api.main.get_project_summary
+  callee: dashboard.api.main.query_pipeline_db
+  call_type: resolved
+- caller: dashboard.api.main.get_project_summary
+  callee: dashboard.api.main.safe_parse
+  call_type: resolved
+- caller: examples.integration_example.run_quality_check
+  callee: pyqual.api.run_pipeline
+  call_type: resolved
+- caller: examples.integration_example.run_with_callbacks
+  callee: Taskfile.print
+  call_type: resolved
+- caller: examples.integration_example.check_prerequisites
+  callee: pyqual.api.shell_check
+  call_type: resolved
+- caller: examples.integration_example.run_shell_command_example
+  callee: pyqual.api.shell_check
+  call_type: resolved
+- caller: examples.integration_example.run_shell_command_example
+  callee: Taskfile.print
+  call_type: resolved
+- caller: examples.integration_example.run_single_stage
+  callee: Taskfile.print
+  call_type: resolved
+- caller: examples.integration_example.preview_pipeline
+  callee: Taskfile.print
+  call_type: resolved
+- caller: examples.integration_example.quick_gate_check
+  callee: Taskfile.print
+  call_type: resolved
+- caller: examples.custom_gates.metric_history.save_snapshot
+  callee: examples.custom_gates.metric_history.load_history
+  call_type: resolved
+- caller: examples.custom_gates.metric_history.print_trend_report
+  callee: Taskfile.print
+  call_type: resolved
+- caller: examples.custom_gates.metric_history.main
+  callee: Taskfile.print
+  call_type: resolved
+- caller: examples.custom_gates.metric_history.main
+  callee: examples.custom_gates.metric_history.save_snapshot
+  call_type: resolved
+- caller: examples.custom_gates.composite_gates.run_composite_check
+  callee: examples.custom_gates.composite_gates.compute_composite_score
+  call_type: resolved
+- caller: examples.custom_gates.composite_gates.run_composite_check
+  callee: Taskfile.print
+  call_type: resolved
+- caller: examples.custom_gates.composite_gates.main
+  callee: Taskfile.print
+  call_type: resolved
+- caller: examples.custom_gates.composite_gates.main
+  callee: examples.custom_gates.composite_gates.run_composite_check
+  call_type: resolved
+- caller: examples.custom_gates.dynamic_thresholds.main
+  callee: Taskfile.print
+  call_type: resolved
+- caller: examples.multi_gate_pipeline.run_pipeline.main
+  callee: Taskfile.print
+  call_type: resolved
+- caller: examples.ticket_workflow.sync_tickets.sync_from_cli
+  callee: Taskfile.print
+  call_type: resolved
+- caller: examples.ticket_workflow.sync_tickets.sync_from_cli
+  callee: pyqual.tickets.sync_github_tickets
+  call_type: resolved
+- caller: examples.ticket_workflow.sync_tickets.sync_from_cli
+  callee: pyqual.tickets.sync_all_tickets
+  call_type: resolved
+- caller: examples.ticket_workflow.sync_tickets.sync_from_cli
+  callee: pyqual.tickets.sync_todo_tickets
+  call_type: resolved
+- caller: examples.ticket_workflow.sync_tickets.tickets_from_gate_failures
+  callee: Taskfile.print
+  call_type: resolved
+- caller: examples.ticket_workflow.sync_tickets.tickets_from_gate_failures
+  callee: pyqual.tickets.sync_todo_tickets
+  call_type: resolved
+- caller: examples.ticket_workflow.sync_tickets.main
+  callee: examples.ticket_workflow.sync_tickets.sync_from_cli
+  call_type: resolved
+- caller: examples.ticket_workflow.sync_tickets.main
+  callee: examples.ticket_workflow.sync_tickets.tickets_from_gate_failures
+  call_type: resolved
+- caller: pyqual.custom_fix.apply_patch
+  callee: Taskfile.print
+  call_type: resolved
+- caller: pyqual.custom_fix.add_docstring
+  callee: Taskfile.print
+  call_type: resolved
+- caller: pyqual.custom_fix.parse_and_apply_suggestions
+  callee: Taskfile.print
+  call_type: resolved
+- caller: pyqual.custom_fix.parse_and_apply_suggestions
+  callee: pyqual.custom_fix.add_docstring
+  call_type: resolved
+- caller: pyqual.config.StageConfig.__post_init__
+  callee: pyqual.stage_names.get_stage_when_default
+  call_type: resolved
+- caller: pyqual.config.PyqualConfig.load
+  callee: pyqual.config._load_env_file
+  call_type: resolved
+- caller: pyqual.config.PyqualConfig._parse
+  callee: pyqual.tools.load_entry_point_presets
+  call_type: resolved
+- caller: pyqual.config.PyqualConfig._parse
+  callee: pyqual.tools.load_user_tools
+  call_type: resolved
+- caller: pyqual.config.PyqualConfig._parse
+  callee: pyqual.tools.register_custom_tools_from_yaml
+  call_type: resolved
+- caller: pyqual.config.PyqualConfig._parse
+  callee: pyqual.profiles.get_profile
+  call_type: resolved
+- caller: pyqual.config.PyqualConfig._validate_stages
+  callee: pyqual.tools.get_preset
+  call_type: resolved
+- caller: pyqual.config.PyqualConfig._validate_stages
+  callee: pyqual.tools.list_presets
+  call_type: resolved
+- caller: pyqual.report_generator._build_gates_from_metrics
+  callee: pyqual.report_generator._build_gate
+  call_type: resolved
+- caller: pyqual.report_generator.get_last_run
+  callee: pyqual.report_generator._build_run_from_rows
+  call_type: resolved
+- caller: pyqual.report_generator._build_run_from_rows
+  callee: pyqual.report_generator._build_gates_from_metrics
+  call_type: resolved
+- caller: pyqual.report_generator._build_run_from_rows
+  callee: pyqual.report_generator.parse_kwargs
+  call_type: resolved
+- caller: pyqual.report_generator.generate_report
+  callee: pyqual.report_generator.get_last_run
+  call_type: resolved
+- caller: pyqual.report_generator.generate_report
+  callee: pyqual.report_generator.generate_mermaid_diagram
+  call_type: resolved
+- caller: pyqual.report_generator.generate_report
+  callee: pyqual.report_generator.generate_ascii_diagram
+  call_type: resolved
+- caller: pyqual.report_generator.generate_report
+  callee: pyqual.report_generator.generate_metrics_table
+  call_type: resolved
+- caller: pyqual.report_generator.generate_report
+  callee: pyqual.report_generator.generate_stage_details
+  call_type: resolved
+- caller: pyqual.report_generator.main
+  callee: pyqual.report_generator.generate_report
+  call_type: resolved
+- caller: pyqual.report_generator.main
+  callee: Taskfile.print
+  call_type: resolved
+- caller: pyqual.tools._load_json_presets
+  callee: pyqual.tools._preset_from_dict
+  call_type: resolved
+- caller: pyqual.tools._load_default_presets
+  callee: pyqual.tools._load_json_presets
+  call_type: resolved
+- caller: pyqual.tools.load_user_tools
+  callee: pyqual.tools._load_json_presets
+  call_type: resolved
+- caller: pyqual.tools.dump_presets_json
+  callee: pyqual.tools.preset_to_dict
+  call_type: resolved
+- caller: pyqual.tools.register_custom_tools_from_yaml
+  callee: pyqual.tools.register_preset
+  call_type: resolved
+- caller: pyqual.tools.load_entry_point_presets
+  callee: pyqual.tools.register_preset
+  call_type: resolved
+- caller: pyqual.tools.resolve_stage_command
+  callee: pyqual.tools.get_preset
+  call_type: resolved
+- caller: pyqual.tools.resolve_stage_command
+  callee: pyqual.tools.list_presets
+  call_type: resolved
+- caller: pyqual.auto_closer._close_github_issue
+  callee: Taskfile.print
+  call_type: resolved
+- caller: pyqual.auto_closer._process_ticket
+  callee: Taskfile.print
+  call_type: resolved
+- caller: pyqual.auto_closer._process_ticket
+  callee: pyqual.auto_closer.evaluate_with_llm
+  call_type: resolved
+- caller: pyqual.auto_closer._process_ticket
+  callee: pyqual.auto_closer._close_github_issue
+  call_type: resolved
+- caller: pyqual.auto_closer.main
+  callee: Taskfile.print
+  call_type: resolved
+- caller: pyqual.auto_closer.main
+  callee: pyqual.auto_closer.get_changed_files
+  call_type: resolved
+- caller: pyqual.auto_closer.main
+  callee: pyqual.auto_closer.get_diff_content
+  call_type: resolved
+- caller: pyqual.parallel.run_parallel_fix
+  callee: pyqual.parallel.parse_todo_items
+  call_type: resolved
+- caller: pyqual.stage_names.is_fix_stage_name
+  callee: pyqual.stage_names.normalize_stage_name
+  call_type: resolved
+- caller: pyqual.stage_names.is_verify_stage_name
+  callee: pyqual.stage_names.normalize_stage_name
+  call_type: resolved
+- caller: pyqual.stage_names.is_delivery_stage_name
+  callee: pyqual.stage_names.normalize_stage_name
+  call_type: resolved
+- caller: pyqual.stage_names.get_stage_when_default
+  callee: pyqual.stage_names.normalize_stage_name
+  call_type: resolved
+- caller: pyqual.tickets.sync_planfile_tickets
+  callee: pyqual.tickets._load_sync_integration
+  call_type: resolved
+- caller: pyqual.tickets.sync_planfile_tickets
+  callee: pyqual.tickets._normalize_sources
+  call_type: resolved
+- caller: pyqual.tickets.sync_todo_tickets
+  callee: pyqual.tickets.sync_planfile_tickets
+  call_type: resolved
+- caller: pyqual.tickets.sync_github_tickets
+  callee: pyqual.tickets.sync_planfile_tickets
+  call_type: resolved
+- caller: pyqual.tickets.sync_all_tickets
+  callee: pyqual.tickets.sync_planfile_tickets
+  call_type: resolved
+- caller: pyqual.tickets.sync_from_gates
+  callee: pyqual.tickets.sync_all_tickets
+  call_type: resolved
+- caller: pyqual.tickets.sync_from_gates
+  callee: pyqual.tickets.sync_planfile_tickets
+  call_type: resolved
+- caller: pyqual.cli_bulk_cmds._bulk_init_impl
+  callee: pyqual.bulk_init.bulk_init
+  call_type: resolved
+- caller: pyqual.cli_bulk_cmds._discover_and_validate
+  callee: pyqual.bulk.orchestrator.discover_projects
+  call_type: resolved
+- caller: pyqual.cli_bulk_cmds._bulk_run_impl
+  callee: pyqual.cli_bulk_cmds._discover_and_validate
+  call_type: resolved
+- caller: pyqual.cli_bulk_cmds._bulk_run_impl
+  callee: pyqual.cli_bulk_cmds._output_bulk_result
+  call_type: resolved
+- caller: pyqual.cli_bulk_cmds._bulk_run_impl
+  callee: pyqual.bulk.orchestrator.bulk_run
+  call_type: resolved
+- caller: pyqual.cli_bulk_cmds._bulk_run_impl
+  callee: pyqual.cli_bulk_cmds._run_with_live_dashboard
+  call_type: resolved
+- caller: pyqual.cli_bulk_cmds._run_with_live_dashboard
+  callee: pyqual.bulk.orchestrator.bulk_run
+  call_type: resolved
+- caller: pyqual.cli_bulk_cmds._run_with_live_dashboard
+  callee: pyqual.bulk.orchestrator.build_dashboard_table
+  call_type: resolved
+- caller: pyqual.cli_bulk_cmds.register_bulk_commands
+  callee: pyqual.cli_bulk_cmds._bulk_init_impl
+  call_type: resolved
+- caller: pyqual.api.create_default_config
+  callee: pyqual.profiles.get_profile
+  call_type: resolved
+- caller: pyqual.api.run_pipeline
+  callee: pyqual.api.load_config
+  call_type: resolved
+- caller: pyqual.api.run_pipeline
+  callee: pyqual.api.run
+  call_type: resolved
+- caller: pyqual.api.dry_run
+  callee: pyqual.api.run_pipeline
+  call_type: resolved
+- caller: pyqual.api.run_stage
+  callee: pyqual.tools.get_preset
+  call_type: resolved
+- caller: pyqual.api.get_tool_command
+  callee: pyqual.tools.get_preset
+  call_type: resolved
+- caller: pyqual.github_actions.GitHubActionsReporter.create_issue
+  callee: Taskfile.print
+  call_type: resolved
+- caller: pyqual.github_actions.GitHubActionsReporter.ensure_issue_exists
+  callee: Taskfile.print
+  call_type: resolved
+- caller: pyqual.github_actions.GitHubActionsReporter.set_output
+  callee: Taskfile.print
+  call_type: resolved
+- caller: pyqual.github_actions.GitHubActionsReporter.set_failed
+  callee: Taskfile.print
+  call_type: resolved
+- caller: pyqual.run_parallel_fix.mark_completed_todos
+  callee: Taskfile.print
+  call_type: resolved
+- caller: pyqual.run_parallel_fix.run_tool
+  callee: Taskfile.print
+  call_type: resolved
+- caller: pyqual.run_parallel_fix.git_commit_and_push
+  callee: Taskfile.print
+  call_type: resolved
+- caller: pyqual.run_parallel_fix._print_yaml_results
+  callee: Taskfile.print
+  call_type: resolved
+- caller: pyqual.run_parallel_fix._print_cycle_completion
+  callee: Taskfile.print
+  call_type: resolved
+- caller: pyqual.run_parallel_fix.main
+  callee: pyqual.run_parallel_fix.parse_args
+  call_type: resolved
+- caller: pyqual.run_parallel_fix.main
+  callee: pyqual.run_parallel_fix.get_todo_batch
+  call_type: resolved
+- caller: pyqual.run_parallel_fix.main
+  callee: Taskfile.print
+  call_type: resolved
+- caller: pyqual.run_parallel_fix.main
+  callee: pyqual.run_parallel_fix._setup_batch
+  call_type: resolved
+- caller: pyqual.run_parallel_fix.main
+  callee: pyqual.fix_tools.get_available_tools
+  call_type: resolved
+- caller: pyqual._gate_collectors._from_toon
+  callee: pyqual._gate_collectors._read_artifact_text
+  call_type: resolved
+- caller: pyqual._gate_collectors._from_vallm
+  callee: pyqual._gate_collectors._read_artifact_text
+  call_type: resolved
+- caller: pyqual._gate_collectors._from_security
+  callee: pyqual._gate_collectors._from_bandit
+  call_type: resolved
+- caller: pyqual._gate_collectors._from_security
+  callee: pyqual._gate_collectors._from_vulnerabilities
+  call_type: resolved
+- caller: pyqual._gate_collectors._from_security
+  callee: pyqual._gate_collectors._from_secrets
+  call_type: resolved
+- caller: pyqual._gate_collectors._from_code_health
+  callee: pyqual._gate_collectors._from_vulture
+  call_type: resolved
+- caller: pyqual._gate_collectors._from_code_health
+  callee: pyqual._gate_collectors._from_pyroma
+  call_type: resolved
+- caller: pyqual._gate_collectors._from_code_health
+  callee: pyqual._gate_collectors._from_radon
+  call_type: resolved
+- caller: pyqual._gate_collectors._from_code_health
+  callee: pyqual._gate_collectors._from_interrogate
+  call_type: resolved
+- caller: pyqual._gate_collectors._from_radon
+  callee: pyqual._gate_collectors._parse_radon_json
+  call_type: resolved
+- caller: pyqual._gate_collectors._from_lint
+  callee: pyqual._gate_collectors._from_ruff
+  call_type: resolved
+- caller: pyqual._gate_collectors._from_lint
+  callee: pyqual._gate_collectors._from_mypy
+  call_type: resolved
+- caller: pyqual._gate_collectors._from_lint
+  callee: pyqual._gate_collectors._from_pylint
+  call_type: resolved
+- caller: pyqual._gate_collectors._from_lint
+  callee: pyqual._gate_collectors._from_flake8
+  call_type: resolved
+- caller: pyqual._gate_collectors._from_pylint
+  callee: pyqual._gate_collectors._count_pylint_by_type
+  call_type: resolved
+- caller: pyqual.yaml_fixer._detect_quote_issues
+  callee: pyqual.yaml_fixer._is_multiline_quote
+  call_type: resolved
+- caller: pyqual.yaml_fixer._detect_bracket_issues
+  callee: pyqual.yaml_fixer._get_context
+  call_type: resolved
+- caller: pyqual.yaml_fixer.analyze_yaml_syntax
+  callee: pyqual.yaml_fixer._try_parse_yaml
+  call_type: resolved
+- caller: pyqual.yaml_fixer._parse_pyyaml_error
+  callee: pyqual.yaml_fixer._get_context
+  call_type: resolved
+- caller: pyqual.yaml_fixer.fix_yaml_file
+  callee: pyqual.yaml_fixer.analyze_yaml_syntax
+  call_type: resolved
+- caller: pyqual.release_check._print_result
+  callee: Taskfile.print
+  call_type: resolved
+- caller: pyqual.release_check.main
+  callee: pyqual.validation.release.validate_release_state
+  call_type: resolved
+- caller: pyqual.release_check.main
+  callee: pyqual.release_check._print_result
+  call_type: resolved
+- caller: pyqual.setup_deps.check_all
+  callee: pyqual.setup_deps._check_pip
+  call_type: resolved
+- caller: pyqual.setup_deps.check_all
+  callee: pyqual.setup_deps._install_pip
+  call_type: resolved
+- caller: pyqual.setup_deps.check_all
+  callee: pyqual.setup_deps._check_cli
+  call_type: resolved
+- caller: pyqual.setup_deps.main
+  callee: pyqual.setup_deps.check_all
+  call_type: resolved
+- caller: pyqual.setup_deps.main
+  callee: Taskfile.print
+  call_type: resolved
+- caller: pyqual.bulk_init.classify_with_llm
+  callee: pyqual.bulk_init._build_llm_prompt
+  call_type: resolved
+- caller: pyqual.bulk_init._classify_heuristic
+  callee: pyqual.bulk_init_classify.check_skip_conditions
+  call_type: resolved
+- caller: pyqual.bulk_init.generate_pyqual_yaml
+  callee: pyqual.bulk_init._safe_name
+  call_type: resolved
+- caller: pyqual.bulk_init._classify_project
+  callee: pyqual.bulk_init._classify_heuristic
+  call_type: resolved
+- caller: pyqual.bulk_init._classify_project
+  callee: pyqual.bulk_init.classify_with_llm
+  call_type: resolved
+- caller: pyqual.bulk_init.bulk_init
+  callee: pyqual.bulk_init_fingerprint.collect_fingerprint
+  call_type: resolved
+- caller: pyqual.bulk_init.bulk_init
+  callee: pyqual.bulk_init._classify_project
+  call_type: resolved
+- caller: pyqual.bulk_init.bulk_init
+  callee: pyqual.bulk_init.generate_pyqual_yaml
+  call_type: resolved
+- caller: pyqual.bulk_init.bulk_init
+  callee: pyqual.bulk_init._validate_yaml_content
+  call_type: resolved
+- caller: pyqual.bulk_init.bulk_init
+  callee: pyqual.bulk_init._write_pyqual_yaml
+  call_type: resolved
+- caller: pyqual.bulk_init_fingerprint._collect_json_scripts
+  callee: pyqual.bulk_init_fingerprint._load_json_object
+  call_type: resolved
+- caller: pyqual.bulk_init_fingerprint.collect_fingerprint
+  callee: pyqual.bulk_init_fingerprint._collect_top_level_entries
+  call_type: resolved
+- caller: pyqual.bulk_init_fingerprint.collect_fingerprint
+  callee: pyqual.bulk_init_fingerprint._collect_manifests
+  call_type: resolved
+- caller: pyqual.bulk_init_fingerprint.collect_fingerprint
+  callee: pyqual.bulk_init_fingerprint._collect_file_extensions
+  call_type: resolved
+- caller: pyqual.bulk_init_fingerprint.collect_fingerprint
+  callee: pyqual.bulk_init_fingerprint._collect_json_scripts
+  call_type: resolved
+- caller: pyqual.bulk_init_fingerprint.collect_fingerprint
+  callee: pyqual.bulk_init_fingerprint._collect_makefile_targets
+  call_type: resolved
+- caller: pyqual.bulk_init_fingerprint.collect_fingerprint
+  callee: pyqual.bulk_init_fingerprint._collect_pyproject_metadata
+  call_type: resolved
+- caller: pyqual.bulk_init_fingerprint.collect_fingerprint
+  callee: pyqual.bulk_init_fingerprint._collect_readme_excerpt
+  call_type: resolved
+- caller: pyqual.pipeline.Pipeline._iteration_stagnated
+  callee: pyqual.stage_names.is_fix_stage_name
+  call_type: resolved
+- caller: pyqual.pipeline.Pipeline._resolve_tool_stage
+  callee: pyqual.tools.get_preset
+  call_type: resolved
+- caller: pyqual.pipeline.Pipeline._is_fix_stage
+  callee: pyqual.stage_names.is_fix_stage_name
+  call_type: resolved
+- caller: pyqual.pipeline.Pipeline._log_stage
+  callee: pyqual.tools.get_preset
+  call_type: resolved
+- caller: pyqual.cli_observe._output_human_logs
+  callee: pyqual.cli_observe._print_stage_output
+  call_type: resolved
+- caller: pyqual.cli_observe._logs_impl
+  callee: pyqual.cli_observe._output_sql_query
+  call_type: resolved
+- caller: pyqual.cli_observe._logs_impl
+  callee: pyqual.cli_observe._output_json_entries
+  call_type: resolved
+- caller: pyqual.cli_observe._history_impl
+  callee: pyqual.cli_observe._load_history_entries
+  call_type: resolved
+- caller: pyqual.cli_observe._history_impl
+  callee: pyqual.cli_observe._print_history_table
+  call_type: resolved
+- caller: pyqual.cli_observe._history_impl
+  callee: pyqual.cli_observe._print_history_summary
+  call_type: resolved
+- caller: pyqual.cli_run_helpers.extract_fix_stage_summary
+  callee: pyqual.stage_names.is_fix_stage_name
+  call_type: resolved
+- caller: pyqual.cli_run_helpers.extract_stage_summary
+  callee: pyqual.cli_run_helpers.extract_pytest_stage_summary
+  call_type: resolved
+- caller: pyqual.cli_run_helpers.extract_stage_summary
+  callee: pyqual.cli_run_helpers.extract_lint_stage_summary
+  call_type: resolved
+- caller: pyqual.cli_run_helpers.enrich_from_artifacts
+  callee: pyqual.cli_run_helpers._enrich_analysis
+  call_type: resolved
+- caller: pyqual.cli_run_helpers.enrich_from_artifacts
+  callee: pyqual.cli_run_helpers._enrich_validation
+  call_type: resolved
+- caller: pyqual.cli_run_helpers.enrich_from_artifacts
+  callee: pyqual.cli_run_helpers._enrich_todo
+  call_type: resolved
+- caller: pyqual.cli_run_helpers._extract_fix_summary
+  callee: pyqual.cli_run_helpers.infer_fix_result
+  call_type: resolved
+- caller: pyqual.cli_run_helpers._extract_delivery_summary
+  callee: pyqual.stage_names.is_delivery_stage_name
+  call_type: resolved
+- caller: pyqual.cli_run_helpers.build_run_summary
+  callee: pyqual.cli_run_helpers._extract_todo_summary
+  call_type: resolved
+- caller: pyqual.cli_run_helpers.build_run_summary
+  callee: pyqual.cli_run_helpers._extract_fix_summary
+  call_type: resolved
+- caller: pyqual.cli_run_helpers.build_run_summary
+  callee: pyqual.cli_run_helpers._extract_delivery_summary
+  call_type: resolved
+- caller: pyqual.cli_run_helpers.format_run_summary
+  callee: pyqual.cli_run_helpers._format_ticket_summary
+  call_type: resolved
+- caller: pyqual.cli_run_helpers.format_run_summary
+  callee: pyqual.cli_run_helpers._format_fix_summary
+  call_type: resolved
+- caller: pyqual.cli_run_helpers.format_run_summary
+  callee: pyqual.cli_run_helpers._format_delivery_summary
+  call_type: resolved
+- caller: pyqual.report._read_pyproject
+  callee: pyqual.report._parse_pyproject_fallback
+  call_type: resolved
+- caller: pyqual.report._read_costs_data
+  callee: pyqual.report._read_costs_json
+  call_type: resolved
+- caller: pyqual.report._read_costs_data
+  callee: pyqual.report._read_costs_package
+  call_type: resolved
+- caller: pyqual.report.collect_project_metadata
+  callee: pyqual.report._read_pyproject
+  call_type: resolved
+- caller: pyqual.report.collect_project_metadata
+  callee: pyqual.report._read_version
+  call_type: resolved
+- caller: pyqual.report.collect_project_metadata
+  callee: pyqual.report._read_git_commit_count
+  call_type: resolved
+- caller: pyqual.report.collect_project_metadata
+  callee: pyqual.report._read_costs_data
+  call_type: resolved
+- caller: pyqual.report.generate_report
+  callee: pyqual.report.collect_all_metrics
+  call_type: resolved
+- caller: pyqual.report.generate_report
+  callee: pyqual.report.evaluate_gates
+  call_type: resolved
+- caller: pyqual.report.generate_report
+  callee: pyqual.report.collect_project_metadata
+  call_type: resolved
+- caller: pyqual.report._build_project_badges
+  callee: pyqual.report._badge_url
+  call_type: resolved
+- caller: pyqual.report._build_quality_badges
+  callee: pyqual.report._badge_url
+  call_type: resolved
+- caller: pyqual.report.build_badges
+  callee: pyqual.report._build_quality_badges
+  call_type: resolved
+- caller: pyqual.report.build_badges
+  callee: pyqual.report._build_project_badges
+  call_type: resolved
+- caller: pyqual.report.update_readme_badges
+  callee: pyqual.report.build_badges
+  call_type: resolved
+- caller: pyqual.report.run
+  callee: pyqual.report.collect_all_metrics
+  call_type: resolved
+- caller: pyqual.report.run
+  callee: pyqual.report.evaluate_gates
+  call_type: resolved
+- caller: pyqual.report.run
+  callee: pyqual.report.collect_project_metadata
+  call_type: resolved
+- caller: pyqual.report.run
+  callee: pyqual.report.generate_report
+  call_type: resolved
+- caller: pyqual.report.run
+  callee: Taskfile.print
+  call_type: resolved
+- caller: pyqual.report.main
+  callee: pyqual.report.run
+  call_type: resolved
+- caller: pyqual.gate_collectors.legacy._from_toon
+  callee: pyqual._gate_collectors._read_artifact_text
+  call_type: resolved
+- caller: pyqual.gate_collectors.legacy._from_vallm
+  callee: pyqual._gate_collectors._read_artifact_text
+  call_type: resolved
+- caller: pyqual.cli.cmd_git.git_status_cmd
+  callee: pyqual.plugins.git.status.git_status
+  call_type: resolved
+- caller: pyqual.cli.cmd_git.git_status_cmd
+  callee: pyqual.cli.cmd_git._print_file_list
+  call_type: resolved
+- caller: pyqual.cli.cmd_git.git_add_cmd
+  callee: pyqual.plugins.git.main.git_add
+  call_type: resolved
+- caller: pyqual.cli.cmd_git.git_scan_cmd
+  callee: pyqual.plugins.git.main.scan_for_secrets
+  call_type: resolved
+- caller: pyqual.cli.cmd_git.git_commit_cmd
+  callee: pyqual.plugins.git.main.git_commit
+  call_type: resolved
+- caller: pyqual.cli.cmd_git._run_preflight_checks
+  callee: pyqual.plugins.git.main.preflight_push_check
+  call_type: resolved
+- caller: pyqual.cli.cmd_init.init
+  callee: pyqual.profiles.get_profile
+  call_type: resolved
+- caller: pyqual.cli.cmd_run._emit_yaml_items
+  callee: pyqual.cli.cmd_run._emit
+  call_type: resolved
+- caller: pyqual.cli.cmd_run._handle_config_env_error
+  callee: pyqual.api.validate_config
+  call_type: resolved
+- caller: pyqual.cli.cmd_run._handle_config_env_error
+  callee: pyqual.cli.cmd_run._run_auto_fix_config
+  call_type: resolved
+- caller: pyqual.cli.cmd_run._run_auto_fix_config
+  callee: pyqual.validation.project.detect_project_facts
+  call_type: resolved
+- caller: pyqual.cli.cmd_run._on_stage_error_impl
+  callee: pyqual.cli.cmd_run._handle_config_env_error
+  call_type: resolved
+- caller: pyqual.cli.cmd_run._on_stage_error_impl
+  callee: pyqual.cli.cmd_run._handle_llm_error
+  call_type: resolved
+- caller: pyqual.cli.cmd_run._on_stage_error_impl
+  callee: pyqual.cli.cmd_run._handle_pipeline_error
+  call_type: resolved
+- caller: pyqual.cli.cmd_run._create_tickets_if_needed
+  callee: pyqual.tickets.sync_all_tickets
+  call_type: resolved
+- caller: pyqual.cli.cmd_run._create_tickets_if_needed
+  callee: pyqual.tickets.sync_planfile_tickets
+  call_type: resolved
+- caller: pyqual.cli.cmd_run._rebuild_iterations_from_result
+  callee: pyqual.cli.cmd_run._emit
+  call_type: resolved
+- caller: pyqual.cli.cmd_run._rebuild_iterations_from_result
+  callee: pyqual.cli.cmd_run._build_stage_dict
+  call_type: resolved
+- caller: pyqual.cli.cmd_run._rebuild_iterations_from_result
+  callee: pyqual.cli.cmd_run._emit_yaml_items
+  call_type: resolved
+- caller: pyqual.cli.cmd_run._rebuild_iterations_from_result
+  callee: pyqual.cli.cmd_run._build_gate_dict
+  call_type: resolved
+- caller: pyqual.cli.cmd_run.run
+  callee: pyqual.cli.main.setup_logging
+  call_type: resolved
+- caller: pyqual.cli.cmd_tune.tune_thresholds
+  callee: pyqual.cli.cmd_tune._load_latest_metrics
+  call_type: resolved
+- caller: pyqual.cli.cmd_tune.tune_thresholds
+  callee: pyqual.cli.cmd_tune._calculate_thresholds
+  call_type: resolved
+- caller: pyqual.cli.cmd_tune.tune_thresholds
+  callee: pyqual.cli.cmd_tune._display_comparison
+  call_type: resolved
+- caller: pyqual.cli.cmd_tune.tune_show
+  callee: pyqual.cli.cmd_tune._load_latest_metrics
+  call_type: resolved
+- caller: pyqual.cli.cmd_tickets.tickets_todo
+  callee: pyqual.tickets.sync_todo_tickets
+  call_type: resolved
+- caller: pyqual.cli.cmd_tickets.tickets_github
+  callee: pyqual.tickets.sync_github_tickets
+  call_type: resolved
+- caller: pyqual.cli.cmd_tickets.tickets_all
+  callee: pyqual.tickets.sync_all_tickets
+  call_type: resolved
+- caller: pyqual.cli.cmd_tickets.tickets_fetch
+  callee: pyqual.github_tasks.fetch_github_tasks
+  call_type: resolved
+- caller: pyqual.cli.main.tune_thresholds_cmd
+  callee: pyqual.cli.main._load_latest_metrics_for_tune
+  call_type: resolved
+- caller: pyqual.cli.main.tune_thresholds_cmd
+  callee: pyqual.cli.main._calculate_thresholds_for_tune
+  call_type: resolved
+- caller: pyqual.cli.main.tune_thresholds_cmd
+  callee: pyqual.cli.main._display_comparison_for_tune
+  call_type: resolved
+- caller: pyqual.cli.cmd_config.validate
+  callee: pyqual.api.validate_config
+  call_type: resolved
+- caller: pyqual.cli.cmd_config.validate
+  callee: pyqual.cli.cmd_config._print_issues
+  call_type: resolved
+- caller: pyqual.cli.cmd_config.fix_config
+  callee: pyqual.api.validate_config
+  call_type: resolved
+- caller: pyqual.cli.cmd_config.fix_config
+  callee: pyqual.validation.project.detect_project_facts
+  call_type: resolved
+- caller: pyqual.cli.cmd_plugin.plugin
+  callee: pyqual.plugins.get_available_plugins
+  call_type: resolved
+- caller: pyqual.cli.cmd_plugin.plugin
+  callee: pyqual.plugins.cli_helpers.plugin_list
+  call_type: resolved
+- caller: pyqual.cli.cmd_plugin.plugin
+  callee: pyqual.plugins.cli_helpers.plugin_search
+  call_type: resolved
+- caller: pyqual.cli.cmd_plugin.plugin
+  callee: pyqual.plugins.cli_helpers.plugin_info
+  call_type: resolved
+- caller: pyqual.plugins.cli_helpers.plugin_add
+  callee: pyqual.plugins.install_plugin_config
+  call_type: resolved
+- caller: pyqual.plugins.docs.test.TestCheckReadme.test_readme_not_found
+  callee: pyqual.plugins.docs.main.check_readme
+  call_type: resolved
+- caller: pyqual.plugins.docs.test.TestCheckReadme.test_readme_quality_check
+  callee: pyqual.plugins.docs.main.check_readme
+  call_type: resolved
+- caller: pyqual.plugins.docs.test.TestInterrogate.test_interrogate_not_found
+  callee: pyqual.plugins.docs.main.run_interrogate
+  call_type: resolved
+- caller: pyqual.plugins.docs.test.TestCheckLinks.test_lychee_not_found
+  callee: pyqual.plugins.docs.main.check_links
+  call_type: resolved
+- caller: pyqual.plugins.docs.test.TestDocsQualitySummary.test_summary_structure
+  callee: pyqual.plugins.docs.main.docs_quality_summary
+  call_type: resolved
+- caller: pyqual.plugins.docs.main.docs_quality_summary
+  callee: pyqual.plugins.docs.main.check_readme
+  call_type: resolved
+- caller: pyqual.plugins.docs.main.docs_quality_summary
+  callee: pyqual.plugins.docs.main.run_interrogate
+  call_type: resolved
+- caller: pyqual.plugins.docs.main.docs_quality_summary
+  callee: pyqual.plugins.docs.main.check_links
+  call_type: resolved
+- caller: pyqual.plugins.security.test.TestBanditCheck.test_bandit_not_found
+  callee: pyqual.plugins.security.main.run_bandit_check
+  call_type: resolved
+- caller: pyqual.plugins.security.test.TestPipAudit.test_pip_audit_not_found
+  callee: pyqual.plugins.security.main.run_pip_audit
+  call_type: resolved
+- caller: pyqual.plugins.security.test.TestDetectSecrets.test_detect_secrets_not_found
+  callee: pyqual.plugins.security.main.run_detect_secrets
+  call_type: resolved
+- caller: pyqual.plugins.security.test.TestSecuritySummary.test_security_summary_empty
+  callee: pyqual.plugins.security.main.security_summary
+  call_type: resolved
+- caller: pyqual.plugins.security.test.TestSecuritySummary.test_security_summary_with_issues
+  callee: pyqual.plugins.security.main.security_summary
+  call_type: resolved
+- caller: pyqual.plugins.attack.__main__.cmd_check
+  callee: pyqual.plugins.attack.__main__._ensure_dir
+  call_type: resolved
+- caller: pyqual.plugins.attack.__main__.cmd_check
+  callee: pyqual.plugins.attack.main.attack_check
+  call_type: resolved
+- caller: pyqual.plugins.attack.__main__.cmd_check
+  callee: Taskfile.print
+  call_type: resolved
+- caller: pyqual.plugins.attack.__main__.cmd_merge
+  callee: pyqual.plugins.attack.__main__._ensure_dir
+  call_type: resolved
+- caller: pyqual.plugins.attack.__main__.cmd_merge
+  callee: pyqual.plugins.attack.main.attack_check
+  call_type: resolved
+- caller: pyqual.plugins.attack.__main__.cmd_merge
+  callee: Taskfile.print
+  call_type: resolved
+- caller: pyqual.plugins.attack.__main__.cmd_merge
+  callee: pyqual.plugins.attack.main.attack_merge
+  call_type: resolved
+- caller: pyqual.plugins.attack.__main__.main
+  callee: Taskfile.print
+  call_type: resolved
+- caller: pyqual.plugins.attack.__main__.main
+  callee: pyqual.plugins.attack.__main__.cmd_check
+  call_type: resolved
+- caller: pyqual.plugins.attack.__main__.main
+  callee: pyqual.plugins.attack.__main__.cmd_merge
+  call_type: resolved
+- caller: pyqual.plugins.attack.test.TestAttackCheck.test_not_git_repo
+  callee: pyqual.plugins.attack.main.attack_check
+  call_type: resolved
+- caller: pyqual.plugins.attack.test.TestAttackCheck.test_successful_check
+  callee: pyqual.plugins.attack.main.attack_check
+  call_type: resolved
+- caller: pyqual.plugins.attack.test.TestAttackMerge.test_not_git_repo
+  callee: pyqual.plugins.attack.main.attack_merge
+  call_type: resolved
+- caller: pyqual.plugins.attack.test.TestAttackMerge.test_dry_run_merge
+  callee: pyqual.plugins.attack.main.attack_merge
+  call_type: resolved
+- caller: pyqual.plugins.attack.test.TestAutoMergePR.test_pr_merge_with_gh_cli
+  callee: pyqual.plugins.attack.main.auto_merge_pr
+  call_type: resolved
+- caller: pyqual.plugins.attack.test.TestAutoMergePR.test_pr_merge_failure
+  callee: pyqual.plugins.attack.main.auto_merge_pr
+  call_type: resolved
+- caller: pyqual.plugins.attack.test.TestAutoMergePR.test_no_pr_or_branch
+  callee: pyqual.plugins.attack.main.auto_merge_pr
+  call_type: resolved
+- caller: pyqual.plugins.attack.main.attack_check
+  callee: pyqual.plugins.attack.main.run_git_command
+  call_type: resolved
+- caller: pyqual.plugins.attack.main.attack_merge
+  callee: pyqual.plugins.attack.main.run_git_command
+  call_type: resolved
+- caller: pyqual.plugins.attack.main.attack_merge
+  callee: pyqual.plugins.attack.main._merge_theirs
+  call_type: resolved
+- caller: pyqual.plugins.attack.main._merge_theirs
+  callee: pyqual.plugins.attack.main.run_git_command
+  call_type: resolved
+- caller: pyqual.plugins.attack.main.auto_merge_pr
+  callee: pyqual.plugins.attack.main.run_git_command
+  call_type: resolved
+- caller: pyqual.plugins.attack.main.auto_merge_pr
+  callee: pyqual.plugins.attack.main.attack_merge
+  call_type: resolved
+- caller: pyqual.plugins.docker.test.TestHadolint.test_hadolint_not_found
+  callee: pyqual.plugins.docker.main.run_hadolint
+  call_type: resolved
+- caller: pyqual.plugins.docker.test.TestTrivyScan.test_trivy_not_found
+  callee: pyqual.plugins.docker.main.run_trivy_scan
+  call_type: resolved
+- caller: pyqual.plugins.docker.test.TestDockerSecurityCheck.test_security_check_without_image
+  callee: pyqual.plugins.docker.main.docker_security_check
+  call_type: resolved
+- caller: pyqual.plugins.docker.test.TestDockerSecurityCheck.test_security_check_structure
+  callee: pyqual.plugins.docker.main.docker_security_check
+  call_type: resolved
+- caller: pyqual.plugins.docker.main.docker_security_check
+  callee: pyqual.plugins.docker.main.run_hadolint
+  call_type: resolved
+- caller: pyqual.plugins.docker.main.docker_security_check
+  callee: pyqual.plugins.docker.main.run_trivy_scan
+  call_type: resolved
+- caller: pyqual.plugins.docker.main.docker_security_check
+  callee: pyqual.plugins.docker.main.get_image_info
+  call_type: resolved
+- caller: pyqual.plugins.deps.test.TestGetOutdatedPackages.test_pip_not_available
+  callee: pyqual.plugins.deps.main.get_outdated_packages
+  call_type: resolved
+- caller: pyqual.plugins.deps.test.TestGetDependencyTree.test_pipdeptree_not_available
+  callee: pyqual.plugins.deps.main.get_dependency_tree
+  call_type: resolved
+- caller: pyqual.plugins.deps.test.TestCheckRequirements.test_requirements_not_found
+  callee: pyqual.plugins.deps.main.check_requirements
+  call_type: resolved
+- caller: pyqual.plugins.deps.test.TestCheckRequirements.test_requirements_parsing
+  callee: pyqual.plugins.deps.main.check_requirements
+  call_type: resolved
+- caller: pyqual.plugins.deps.test.TestCheckRequirements.test_fully_pinned_requirements
+  callee: pyqual.plugins.deps.main.check_requirements
+  call_type: resolved
+- caller: pyqual.plugins.deps.test.TestDepsHealthCheck.test_health_check_structure
+  callee: pyqual.plugins.deps.main.deps_health_check
+  call_type: resolved
+- caller: pyqual.plugins.deps.main.check_requirements
+  callee: pyqual.plugins.deps.main._is_pinned_req
+  call_type: resolved
+- caller: pyqual.plugins.deps.main.deps_health_check
+  callee: pyqual.plugins.deps.main.get_outdated_packages
+  call_type: resolved
+- caller: pyqual.plugins.deps.main.deps_health_check
+  callee: pyqual.plugins.deps.main.get_dependency_tree
+  call_type: resolved
+- caller: pyqual.plugins.deps.main.deps_health_check
+  callee: pyqual.plugins.deps.main.check_requirements
+  call_type: resolved
+- caller: pyqual.plugins.git.status.git_status
+  callee: pyqual.plugins.attack.main.run_git_command
+  call_type: resolved
+- caller: pyqual.plugins.git.status.git_status
+  callee: pyqual.plugins.git.status._parse_branch_line
+  call_type: resolved
+- caller: pyqual.plugins.git.status.git_status
+  callee: pyqual.plugins.git.status._parse_file_status
+  call_type: resolved
+- caller: pyqual.plugins.git.git_command.run_git_command
+  callee: pyqual.parallel.ParallelExecutor.run
+  call_type: resolved
+- caller: pyqual.plugins.git.test.TestGitStatus.test_status_in_empty_repo
+  callee: pyqual.plugins.git.status.git_status
+  call_type: resolved
+- caller: pyqual.plugins.git.test.TestGitStatus.test_status_with_untracked_file
+  callee: pyqual.plugins.git.status.git_status
+  call_type: resolved
+- caller: pyqual.plugins.git.test.TestGitStatus.test_status_not_a_git_repo
+  callee: pyqual.plugins.git.status.git_status
+  call_type: resolved
+- caller: pyqual.plugins.git.test.TestGitCommit.test_commit_with_changes
+  callee: pyqual.plugins.git.main.git_commit
+  call_type: resolved
+- caller: pyqual.plugins.git.test.TestGitCommit.test_commit_only_if_changed_no_changes
+  callee: pyqual.plugins.git.main.git_commit
+  call_type: resolved
+- caller: pyqual.plugins.git.test.TestSecretScanning.test_scan_finds_github_token
+  callee: pyqual.plugins.git.main.scan_for_secrets
+  call_type: resolved
+- caller: pyqual.plugins.git.test.TestSecretScanning.test_scan_finds_aws_key
+  callee: pyqual.plugins.git.main.scan_for_secrets
+  call_type: resolved
+- caller: pyqual.plugins.git.test.TestSecretScanning.test_scan_skips_placeholders
+  callee: pyqual.plugins.git.main.scan_for_secrets
+  call_type: resolved
+- caller: pyqual.plugins.git.test.TestSecretScanning.test_false_positive_detection
+  callee: pyqual.plugins.git.main._is_likely_false_positive
+  call_type: resolved
+- caller: pyqual.plugins.git.test.TestSecretScanning.test_provider_mapping
+  callee: pyqual.plugins.git.main._get_provider_for_pattern
+  call_type: resolved
+- caller: pyqual.plugins.git.test.TestSecretScanning.test_severity_mapping
+  callee: pyqual.plugins.git.main._get_severity_for_pattern
+  call_type: resolved
+- caller: pyqual.plugins.git.test.TestPreFlightCheck.test_preflight_with_secrets_blocks_push
+  callee: pyqual.plugins.git.main.preflight_push_check
+  call_type: resolved
+- caller: pyqual.plugins.git.test.TestPreFlightCheck.test_preflight_clean_repo
+  callee: pyqual.plugins.git.main.preflight_push_check
+  call_type: resolved
+- caller: pyqual.plugins.git.main.GitCollector._collect_scan_metrics
+  callee: pyqual._gate_collectors._count_by_severity
+  call_type: resolved
+- caller: pyqual.plugins.git.main.git_status
+  callee: pyqual.plugins.git.main.run_git_command
+  call_type: resolved
+- caller: pyqual.plugins.git.main.git_status
+  callee: pyqual.plugins.git.main._parse_branch_line
+  call_type: resolved
+- caller: pyqual.plugins.git.main.git_status
+  callee: pyqual.plugins.git.main._parse_file_status
+  call_type: resolved
+- caller: pyqual.plugins.git.main.git_commit
+  callee: pyqual.plugins.git.main.run_git_command
+  call_type: resolved
+- caller: pyqual.plugins.git.main.git_commit
+  callee: pyqual.plugins.git.main.git_status
+  call_type: resolved
+- caller: pyqual.plugins.git.main.git_push
+  callee: pyqual.plugins.git.main.run_git_command
+  call_type: resolved
+- caller: pyqual.plugins.git.main.git_push
+  callee: pyqual.plugins.git.main._parse_push_errors
+  call_type: resolved
+- caller: pyqual.plugins.git.main.git_push
+  callee: pyqual.plugins.git.main._count_pushed_commits
+  call_type: resolved
+- caller: pyqual.plugins.git.main._count_pushed_commits
+  callee: pyqual.plugins.git.main.run_git_command
+  call_type: resolved
+- caller: pyqual.plugins.git.main.git_add
+  callee: pyqual.plugins.git.main.run_git_command
+  call_type: resolved
+- caller: pyqual.plugins.git.main.git_add
+  callee: pyqual.plugins.git.main.git_status
+  call_type: resolved
+- caller: pyqual.plugins.git.main.scan_for_secrets
+  callee: pyqual.plugins.git.main._run_enabled_scanners
+  call_type: resolved
+- caller: pyqual.plugins.git.main.scan_for_secrets
+  callee: pyqual.plugins.git.main.git_status
+  call_type: resolved
+- caller: pyqual.plugins.git.main._run_enabled_scanners
+  callee: pyqual.plugins.git.main._scan_with_patterns
+  call_type: resolved
+- caller: pyqual.plugins.git.main._scan_with_trufflehog
+  callee: pyqual.plugins.git.main.run_git_command
+  call_type: resolved
+- caller: pyqual.plugins.git.main._scan_with_gitleaks
+  callee: pyqual.plugins.git.main.run_git_command
+  call_type: resolved
+- caller: pyqual.plugins.git.main._scan_with_patterns
+  callee: pyqual.plugins.git.main._is_likely_false_positive
+  call_type: resolved
+- caller: pyqual.plugins.git.main._scan_with_patterns
+  callee: pyqual.plugins.git.main._get_provider_for_pattern
+  call_type: resolved
+- caller: pyqual.plugins.git.main._scan_with_patterns
+  callee: pyqual.plugins.git.main._get_severity_for_pattern
+  call_type: resolved
+- caller: pyqual.plugins.git.main.preflight_push_check
+  callee: pyqual.plugins.git.main.git_status
+  call_type: resolved
+- caller: pyqual.plugins.git.main.preflight_push_check
+  callee: pyqual.plugins.git.main.scan_for_secrets
+  call_type: resolved
+- caller: pyqual.plugins.git.main.preflight_push_check
+  callee: pyqual.plugins.git.main._classify_secret_findings
+  call_type: resolved
+- caller: pyqual.plugins.example_plugin.test.TestHelperFunctions.test_example_helper_function
+  callee: pyqual.plugins.example_plugin.main.example_helper_function
+  call_type: resolved
+- caller: pyqual.validation.errors._classify_failure
+  callee: pyqual.validation.errors._match_fix_env_subtype
+  call_type: resolved
+- caller: pyqual.validation.errors._classify_failure
+  callee: pyqual.validation.errors._match_env_subtype
+  call_type: resolved
+- caller: pyqual.validation.project.detect_project_facts
+  callee: pyqual.validation.project._detect_language
+  call_type: resolved
+- caller: pyqual.validation.release._read_pyproject
+  callee: pyqual.validation.release._parse_pyproject_fallback
+  call_type: resolved
+- caller: pyqual.validation.release._read_project_metadata
+  callee: pyqual.validation.release._read_pyproject
+  call_type: resolved
+- caller: pyqual.validation.release._read_project_metadata
+  callee: pyqual.validation.release._read_version_file
+  call_type: resolved
+- caller: pyqual.validation.release._read_project_metadata
+  callee: pyqual.validation.release._read_package_init_version
+  call_type: resolved
+- caller: pyqual.validation.release._resolve_release_version
+  callee: pyqual.validation.release._bump_patch_version
+  call_type: resolved
+- caller: pyqual.validation.release._check_registry
+  callee: pyqual.validation.release._check_pypi_version
+  call_type: resolved
+- caller: pyqual.validation.release.validate_release_state
+  callee: pyqual.validation.release._check_git_state
+  call_type: resolved
+- caller: pyqual.validation.release.validate_release_state
+  callee: pyqual.validation.release._check_version_metadata
+  call_type: resolved
+- caller: pyqual.validation.release.validate_release_state
+  callee: pyqual.validation.release._resolve_release_version
+  call_type: resolved
+- caller: pyqual.validation.release.validate_release_state
+  callee: pyqual.validation.release._check_registry
+  call_type: resolved
+- caller: pyqual.validation.release.validate_release_state
+  callee: pyqual.plugins.git.status.git_status
+  call_type: resolved
+- caller: pyqual.validation.release.validate_release_state
+  callee: pyqual.validation.release._read_project_metadata
+  call_type: resolved
+- caller: pyqual.validation.config_check._load_yaml_config
+  callee: pyqual.yaml_fixer.analyze_yaml_syntax
+  call_type: resolved
+- caller: pyqual.validation.config_check._load_yaml_config
+  callee: pyqual.validation.config_check._get_issue_severity
+  call_type: resolved
+- caller: pyqual.validation.config_check._load_tool_registry
+  callee: pyqual.tools.load_entry_point_presets
+  call_type: resolved
+- caller: pyqual.validation.config_check._load_tool_registry
+  callee: pyqual.tools.register_custom_tools_from_yaml
+  call_type: resolved
+- caller: pyqual.validation.config_check._validate_stage
+  callee: pyqual.tools.get_preset
+  call_type: resolved
+- caller: pyqual.validation.config_check._validate_gate
+  callee: pyqual.validation.schema._resolve_gate_metric
+  call_type: resolved
+- caller: pyqual.validation.config_check.validate_config
+  callee: pyqual.validation.config_check._load_yaml_config
+  call_type: resolved
+- caller: pyqual.validation.config_check.validate_config
+  callee: pyqual.validation.config_check._load_tool_registry
+  call_type: resolved
+- caller: pyqual.validation.config_check.validate_config
+  callee: pyqual.validation.config_check._validate_stage
+  call_type: resolved
+- caller: pyqual.bulk.runner._run_single_project
+  callee: pyqual.output._parse_output_line
+  call_type: resolved
+- caller: pyqual.bulk.parser._parse_output_line
+  callee: pyqual.bulk.parser._parse_iteration_header
+  call_type: resolved
+- caller: pyqual.bulk.orchestrator.bulk_run
+  callee: pyqual.bulk.orchestrator.discover_projects
+  call_type: resolved
+- caller: pyqual.bulk.orchestrator.bulk_run
+  callee: pyqual.bulk.runner._run_single_project
+  call_type: resolved
+- caller: pyqual.integrations.llx_mcp_service.main
+  callee: pyqual.integrations.llx_mcp_service.build_parser
+  call_type: resolved
+- caller: pyqual.integrations.llx_mcp_service.main
+  callee: pyqual.integrations.llx_mcp_service.run_server
+  call_type: resolved
+- caller: pyqual.integrations.llx_mcp.main
+  callee: pyqual.integrations.llx_mcp.build_parser
+  call_type: resolved
+- caller: pyqual.integrations.llx_mcp.main
+  callee: Taskfile.print
+  call_type: resolved
+modules:
+  Taskfile:
+  - Taskfile.print
+  dashboard.api.main:
+  - dashboard.api.main.get_db_path
+  - dashboard.api.main.get_gate_status
+  - dashboard.api.main.get_latest_run
+  - dashboard.api.main.get_metric_history
+  - dashboard.api.main.get_project_runs
+  - dashboard.api.main.get_project_summary
+  - dashboard.api.main.get_projects
+  - dashboard.api.main.get_stage_performance
+  - dashboard.api.main.query_pipeline_db
+  - dashboard.api.main.read_summary_json
+  - dashboard.api.main.safe_parse
+  dashboard.src.App:
+  - dashboard.src.App.App
+  - dashboard.src.App.loadRepositories
+  dashboard.src.api:
+  - dashboard.src.api.config
+  - dashboard.src.api.fetchLatestRun
+  - dashboard.src.api.fetchRepositories
+  - dashboard.src.api.fetchRepositoriesWithFallback
+  - dashboard.src.api.getRepoPath
+  - dashboard.src.api.loadConfig
+  - dashboard.src.api.match
+  - dashboard.src.api.repositories
+  dashboard.src.components.RepositoryDetail:
+  - dashboard.src.components.RepositoryDetail.RepositoryDetail
+  - dashboard.src.components.RepositoryDetail.navigate
+  examples.custom_gates.composite_gates:
+  - examples.custom_gates.composite_gates.compute_composite_score
+  - examples.custom_gates.composite_gates.main
+  - examples.custom_gates.composite_gates.run_composite_check
+  examples.custom_gates.dynamic_thresholds:
+  - examples.custom_gates.dynamic_thresholds.main
+  examples.custom_gates.metric_history:
+  - examples.custom_gates.metric_history.load_history
+  - examples.custom_gates.metric_history.main
+  - examples.custom_gates.metric_history.print_trend_report
+  - examples.custom_gates.metric_history.save_snapshot
+  examples.integration_example:
+  - examples.integration_example.check_prerequisites
+  - examples.integration_example.preview_pipeline
+  - examples.integration_example.quick_gate_check
+  - examples.integration_example.run_quality_check
+  - examples.integration_example.run_shell_command_example
+  - examples.integration_example.run_single_stage
+  - examples.integration_example.run_with_callbacks
+  examples.multi_gate_pipeline.run_pipeline:
+  - examples.multi_gate_pipeline.run_pipeline.main
+  examples.ticket_workflow.sync_tickets:
+  - examples.ticket_workflow.sync_tickets.main
+  - examples.ticket_workflow.sync_tickets.sync_from_cli
+  - examples.ticket_workflow.sync_tickets.tickets_from_gate_failures
+  pyqual._gate_collectors:
+  - pyqual._gate_collectors._count_by_severity
+  - pyqual._gate_collectors._count_pylint_by_type
+  - pyqual._gate_collectors._from_bandit
+  - pyqual._gate_collectors._from_code_health
+  - pyqual._gate_collectors._from_flake8
+  - pyqual._gate_collectors._from_interrogate
+  - pyqual._gate_collectors._from_lint
+  - pyqual._gate_collectors._from_mypy
+  - pyqual._gate_collectors._from_pylint
+  - pyqual._gate_collectors._from_pyroma
+  - pyqual._gate_collectors._from_radon
+  - pyqual._gate_collectors._from_ruff
+  - pyqual._gate_collectors._from_secrets
+  - pyqual._gate_collectors._from_security
+  - pyqual._gate_collectors._from_toon
+  - pyqual._gate_collectors._from_vallm
+  - pyqual._gate_collectors._from_vulnerabilities
+  - pyqual._gate_collectors._from_vulture
+  - pyqual._gate_collectors._parse_radon_json
+  - pyqual._gate_collectors._read_artifact_text
+  pyqual.api:
+  - pyqual.api.create_default_config
+  - pyqual.api.dry_run
+  - pyqual.api.get_tool_command
+  - pyqual.api.load_config
+  - pyqual.api.run
+  - pyqual.api.run_pipeline
+  - pyqual.api.run_stage
+  - pyqual.api.shell_check
+  - pyqual.api.validate_config
+  pyqual.auto_closer:
+  - pyqual.auto_closer._close_github_issue
+  - pyqual.auto_closer._process_ticket
+  - pyqual.auto_closer.evaluate_with_llm
+  - pyqual.auto_closer.get_changed_files
+  - pyqual.auto_closer.get_diff_content
+  - pyqual.auto_closer.main
+  pyqual.bulk.orchestrator:
+  - pyqual.bulk.orchestrator.build_dashboard_table
+  - pyqual.bulk.orchestrator.bulk_run
+  - pyqual.bulk.orchestrator.discover_projects
+  pyqual.bulk.parser:
+  - pyqual.bulk.parser._parse_iteration_header
+  - pyqual.bulk.parser._parse_output_line
+  pyqual.bulk.runner:
+  - pyqual.bulk.runner._run_single_project
+  pyqual.bulk_init:
+  - pyqual.bulk_init._build_llm_prompt
+  - pyqual.bulk_init._classify_heuristic
+  - pyqual.bulk_init._classify_project
+  - pyqual.bulk_init._safe_name
+  - pyqual.bulk_init._validate_yaml_content
+  - pyqual.bulk_init._write_pyqual_yaml
+  - pyqual.bulk_init.bulk_init
+  - pyqual.bulk_init.classify_with_llm
+  - pyqual.bulk_init.generate_pyqual_yaml
+  pyqual.bulk_init_classify:
+  - pyqual.bulk_init_classify.check_skip_conditions
+  pyqual.bulk_init_fingerprint:
+  - pyqual.bulk_init_fingerprint._collect_file_extensions
+  - pyqual.bulk_init_fingerprint._collect_json_scripts
+  - pyqual.bulk_init_fingerprint._collect_makefile_targets
+  - pyqual.bulk_init_fingerprint._collect_manifests
+  - pyqual.bulk_init_fingerprint._collect_pyproject_metadata
+  - pyqual.bulk_init_fingerprint._collect_readme_excerpt
+  - pyqual.bulk_init_fingerprint._collect_top_level_entries
+  - pyqual.bulk_init_fingerprint._load_json_object
+  - pyqual.bulk_init_fingerprint.collect_fingerprint
+  pyqual.cli.cmd_config:
+  - pyqual.cli.cmd_config._print_issues
+  - pyqual.cli.cmd_config.fix_config
+  - pyqual.cli.cmd_config.validate
+  pyqual.cli.cmd_git:
+  - pyqual.cli.cmd_git._print_file_list
+  - pyqual.cli.cmd_git._run_preflight_checks
+  - pyqual.cli.cmd_git.git_add_cmd
+  - pyqual.cli.cmd_git.git_commit_cmd
+  - pyqual.cli.cmd_git.git_scan_cmd
+  - pyqual.cli.cmd_git.git_status_cmd
+  pyqual.cli.cmd_init:
+  - pyqual.cli.cmd_init.init
+  pyqual.cli.cmd_plugin:
+  - pyqual.cli.cmd_plugin.plugin
+  pyqual.cli.cmd_run:
+  - pyqual.cli.cmd_run._build_gate_dict
+  - pyqual.cli.cmd_run._build_stage_dict
+  - pyqual.cli.cmd_run._create_tickets_if_needed
+  - pyqual.cli.cmd_run._emit
+  - pyqual.cli.cmd_run._emit_yaml_items
+  - pyqual.cli.cmd_run._handle_config_env_error
+  - pyqual.cli.cmd_run._handle_llm_error
+  - pyqual.cli.cmd_run._handle_pipeline_error
+  - pyqual.cli.cmd_run._on_stage_error_impl
+  - pyqual.cli.cmd_run._rebuild_iterations_from_result
+  - pyqual.cli.cmd_run._run_auto_fix_config
+  - pyqual.cli.cmd_run.run
+  pyqual.cli.cmd_tickets:
+  - pyqual.cli.cmd_tickets.tickets_all
+  - pyqual.cli.cmd_tickets.tickets_fetch
+  - pyqual.cli.cmd_tickets.tickets_github
+  - pyqual.cli.cmd_tickets.tickets_todo
+  pyqual.cli.cmd_tune:
+  - pyqual.cli.cmd_tune._calculate_thresholds
+  - pyqual.cli.cmd_tune._display_comparison
+  - pyqual.cli.cmd_tune._load_latest_metrics
+  - pyqual.cli.cmd_tune.tune_show
+  - pyqual.cli.cmd_tune.tune_thresholds
+  pyqual.cli.main:
+  - pyqual.cli.main._calculate_thresholds_for_tune
+  - pyqual.cli.main._display_comparison_for_tune
+  - pyqual.cli.main._load_latest_metrics_for_tune
+  - pyqual.cli.main.setup_logging
+  - pyqual.cli.main.tune_thresholds_cmd
+  pyqual.cli_bulk_cmds:
+  - pyqual.cli_bulk_cmds._bulk_init_impl
+  - pyqual.cli_bulk_cmds._bulk_run_impl
+  - pyqual.cli_bulk_cmds._discover_and_validate
+  - pyqual.cli_bulk_cmds._output_bulk_result
+  - pyqual.cli_bulk_cmds._run_with_live_dashboard
+  - pyqual.cli_bulk_cmds.register_bulk_commands
+  pyqual.cli_observe:
+  - pyqual.cli_observe._history_impl
+  - pyqual.cli_observe._load_history_entries
+  - pyqual.cli_observe._logs_impl
+  - pyqual.cli_observe._output_human_logs
+  - pyqual.cli_observe._output_json_entries
+  - pyqual.cli_observe._output_sql_query
+  - pyqual.cli_observe._print_history_summary
+  - pyqual.cli_observe._print_history_table
+  - pyqual.cli_observe._print_stage_output
+  pyqual.cli_run_helpers:
+  - pyqual.cli_run_helpers._enrich_analysis
+  - pyqual.cli_run_helpers._enrich_todo
+  - pyqual.cli_run_helpers._enrich_validation
+  - pyqual.cli_run_helpers._extract_delivery_summary
+  - pyqual.cli_run_helpers._extract_fix_summary
+  - pyqual.cli_run_helpers._extract_todo_summary
+  - pyqual.cli_run_helpers._format_delivery_summary
+  - pyqual.cli_run_helpers._format_fix_summary
+  - pyqual.cli_run_helpers._format_ticket_summary
+  - pyqual.cli_run_helpers.build_run_summary
+  - pyqual.cli_run_helpers.enrich_from_artifacts
+  - pyqual.cli_run_helpers.extract_fix_stage_summary
+  - pyqual.cli_run_helpers.extract_lint_stage_summary
+  - pyqual.cli_run_helpers.extract_pytest_stage_summary
+  - pyqual.cli_run_helpers.extract_stage_summary
+  - pyqual.cli_run_helpers.format_run_summary
+  - pyqual.cli_run_helpers.infer_fix_result
+  pyqual.config:
+  - pyqual.config.PyqualConfig._parse
+  - pyqual.config.PyqualConfig._validate_stages
+  - pyqual.config.PyqualConfig.load
+  - pyqual.config.StageConfig.__post_init__
+  - pyqual.config._load_env_file
+  pyqual.custom_fix:
+  - pyqual.custom_fix.add_docstring
+  - pyqual.custom_fix.apply_patch
+  - pyqual.custom_fix.parse_and_apply_suggestions
+  pyqual.fix_tools:
+  - pyqual.fix_tools.get_available_tools
+  pyqual.gate_collectors.legacy:
+  - pyqual.gate_collectors.legacy._from_toon
+  - pyqual.gate_collectors.legacy._from_vallm
+  pyqual.github_actions:
+  - pyqual.github_actions.GitHubActionsReporter.create_issue
+  - pyqual.github_actions.GitHubActionsReporter.ensure_issue_exists
+  - pyqual.github_actions.GitHubActionsReporter.set_failed
+  - pyqual.github_actions.GitHubActionsReporter.set_output
+  pyqual.github_tasks:
+  - pyqual.github_tasks.fetch_github_tasks
+  pyqual.integrations.llx_mcp:
+  - pyqual.integrations.llx_mcp.build_parser
+  - pyqual.integrations.llx_mcp.main
+  pyqual.integrations.llx_mcp_service:
+  - pyqual.integrations.llx_mcp_service.build_parser
+  - pyqual.integrations.llx_mcp_service.main
+  - pyqual.integrations.llx_mcp_service.run_server
+  pyqual.output:
+  - pyqual.output._parse_output_line
+  pyqual.parallel:
+  - pyqual.parallel.ParallelExecutor.run
+  - pyqual.parallel.parse_todo_items
+  - pyqual.parallel.run_parallel_fix
+  pyqual.pipeline:
+  - pyqual.pipeline.Pipeline._is_fix_stage
+  - pyqual.pipeline.Pipeline._iteration_stagnated
+  - pyqual.pipeline.Pipeline._log_stage
+  - pyqual.pipeline.Pipeline._resolve_tool_stage
+  pyqual.plugins:
+  - pyqual.plugins.get_available_plugins
+  - pyqual.plugins.install_plugin_config
+  pyqual.plugins.attack.__main__:
+  - pyqual.plugins.attack.__main__._ensure_dir
+  - pyqual.plugins.attack.__main__.cmd_check
+  - pyqual.plugins.attack.__main__.cmd_merge
+  - pyqual.plugins.attack.__main__.main
+  pyqual.plugins.attack.main:
+  - pyqual.plugins.attack.main._merge_theirs
+  - pyqual.plugins.attack.main.attack_check
+  - pyqual.plugins.attack.main.attack_merge
+  - pyqual.plugins.attack.main.auto_merge_pr
+  - pyqual.plugins.attack.main.run_git_command
+  pyqual.plugins.attack.test:
+  - pyqual.plugins.attack.test.TestAttackCheck.test_not_git_repo
+  - pyqual.plugins.attack.test.TestAttackCheck.test_successful_check
+  - pyqual.plugins.attack.test.TestAttackMerge.test_dry_run_merge
+  - pyqual.plugins.attack.test.TestAttackMerge.test_not_git_repo
+  - pyqual.plugins.attack.test.TestAutoMergePR.test_no_pr_or_branch
+  - pyqual.plugins.attack.test.TestAutoMergePR.test_pr_merge_failure
+  - pyqual.plugins.attack.test.TestAutoMergePR.test_pr_merge_with_gh_cli
+  pyqual.plugins.cli_helpers:
+  - pyqual.plugins.cli_helpers.plugin_add
+  - pyqual.plugins.cli_helpers.plugin_info
+  - pyqual.plugins.cli_helpers.plugin_list
+  - pyqual.plugins.cli_helpers.plugin_search
+  pyqual.plugins.deps.main:
+  - pyqual.plugins.deps.main._is_pinned_req
+  - pyqual.plugins.deps.main.check_requirements
+  - pyqual.plugins.deps.main.deps_health_check
+  - pyqual.plugins.deps.main.get_dependency_tree
+  - pyqual.plugins.deps.main.get_outdated_packages
+  pyqual.plugins.deps.test:
+  - pyqual.plugins.deps.test.TestCheckRequirements.test_fully_pinned_requirements
+  - pyqual.plugins.deps.test.TestCheckRequirements.test_requirements_not_found
+  - pyqual.plugins.deps.test.TestCheckRequirements.test_requirements_parsing
+  - pyqual.plugins.deps.test.TestDepsHealthCheck.test_health_check_structure
+  - pyqual.plugins.deps.test.TestGetDependencyTree.test_pipdeptree_not_available
+  - pyqual.plugins.deps.test.TestGetOutdatedPackages.test_pip_not_available
+  pyqual.plugins.docker.main:
+  - pyqual.plugins.docker.main.docker_security_check
+  - pyqual.plugins.docker.main.get_image_info
+  - pyqual.plugins.docker.main.run_hadolint
+  - pyqual.plugins.docker.main.run_trivy_scan
+  pyqual.plugins.docker.test:
+  - pyqual.plugins.docker.test.TestDockerSecurityCheck.test_security_check_structure
+  - pyqual.plugins.docker.test.TestDockerSecurityCheck.test_security_check_without_image
+  - pyqual.plugins.docker.test.TestHadolint.test_hadolint_not_found
+  - pyqual.plugins.docker.test.TestTrivyScan.test_trivy_not_found
+  pyqual.plugins.docs.main:
+  - pyqual.plugins.docs.main.check_links
+  - pyqual.plugins.docs.main.check_readme
+  - pyqual.plugins.docs.main.docs_quality_summary
+  - pyqual.plugins.docs.main.run_interrogate
+  pyqual.plugins.docs.test:
+  - pyqual.plugins.docs.test.TestCheckLinks.test_lychee_not_found
+  - pyqual.plugins.docs.test.TestCheckReadme.test_readme_not_found
+  - pyqual.plugins.docs.test.TestCheckReadme.test_readme_quality_check
+  - pyqual.plugins.docs.test.TestDocsQualitySummary.test_summary_structure
+  - pyqual.plugins.docs.test.TestInterrogate.test_interrogate_not_found
+  pyqual.plugins.example_plugin.main:
+  - pyqual.plugins.example_plugin.main.example_helper_function
+  pyqual.plugins.example_plugin.test:
+  - pyqual.plugins.example_plugin.test.TestHelperFunctions.test_example_helper_function
+  pyqual.plugins.git.git_command:
+  - pyqual.plugins.git.git_command.run_git_command
+  pyqual.plugins.git.main:
+  - pyqual.plugins.git.main.GitCollector._collect_scan_metrics
+  - pyqual.plugins.git.main._classify_secret_findings
+  - pyqual.plugins.git.main._count_pushed_commits
+  - pyqual.plugins.git.main._get_provider_for_pattern
+  - pyqual.plugins.git.main._get_severity_for_pattern
+  - pyqual.plugins.git.main._is_likely_false_positive
+  - pyqual.plugins.git.main._parse_branch_line
+  - pyqual.plugins.git.main._parse_file_status
+  - pyqual.plugins.git.main._parse_push_errors
+  - pyqual.plugins.git.main._run_enabled_scanners
+  - pyqual.plugins.git.main._scan_with_gitleaks
+  - pyqual.plugins.git.main._scan_with_patterns
+  - pyqual.plugins.git.main._scan_with_trufflehog
+  - pyqual.plugins.git.main.git_add
+  - pyqual.plugins.git.main.git_commit
+  - pyqual.plugins.git.main.git_push
+  - pyqual.plugins.git.main.git_status
+  - pyqual.plugins.git.main.preflight_push_check
+  - pyqual.plugins.git.main.run_git_command
+  - pyqual.plugins.git.main.scan_for_secrets
+  pyqual.plugins.git.status:
+  - pyqual.plugins.git.status._parse_branch_line
+  - pyqual.plugins.git.status._parse_file_status
+  - pyqual.plugins.git.status.git_status
+  pyqual.plugins.git.test:
+  - pyqual.plugins.git.test.TestGitCommit.test_commit_only_if_changed_no_changes
+  - pyqual.plugins.git.test.TestGitCommit.test_commit_with_changes
+  - pyqual.plugins.git.test.TestGitStatus.test_status_in_empty_repo
+  - pyqual.plugins.git.test.TestGitStatus.test_status_not_a_git_repo
+  - pyqual.plugins.git.test.TestGitStatus.test_status_with_untracked_file
+  - pyqual.plugins.git.test.TestPreFlightCheck.test_preflight_clean_repo
+  - pyqual.plugins.git.test.TestPreFlightCheck.test_preflight_with_secrets_blocks_push
+  - pyqual.plugins.git.test.TestSecretScanning.test_false_positive_detection
+  - pyqual.plugins.git.test.TestSecretScanning.test_provider_mapping
+  - pyqual.plugins.git.test.TestSecretScanning.test_scan_finds_aws_key
+  - pyqual.plugins.git.test.TestSecretScanning.test_scan_finds_github_token
+  - pyqual.plugins.git.test.TestSecretScanning.test_scan_skips_placeholders
+  - pyqual.plugins.git.test.TestSecretScanning.test_severity_mapping
+  pyqual.plugins.security.main:
+  - pyqual.plugins.security.main.run_bandit_check
+  - pyqual.plugins.security.main.run_detect_secrets
+  - pyqual.plugins.security.main.run_pip_audit
+  - pyqual.plugins.security.main.security_summary
+  pyqual.plugins.security.test:
+  - pyqual.plugins.security.test.TestBanditCheck.test_bandit_not_found
+  - pyqual.plugins.security.test.TestDetectSecrets.test_detect_secrets_not_found
+  - pyqual.plugins.security.test.TestPipAudit.test_pip_audit_not_found
+  - pyqual.plugins.security.test.TestSecuritySummary.test_security_summary_empty
+  - pyqual.plugins.security.test.TestSecuritySummary.test_security_summary_with_issues
+  pyqual.profiles:
+  - pyqual.profiles.get_profile
+  pyqual.release_check:
+  - pyqual.release_check._print_result
+  - pyqual.release_check.main
+  pyqual.report:
+  - pyqual.report._badge_url
+  - pyqual.report._build_project_badges
+  - pyqual.report._build_quality_badges
+  - pyqual.report._parse_pyproject_fallback
+  - pyqual.report._read_costs_data
+  - pyqual.report._read_costs_json
+  - pyqual.report._read_costs_package
+  - pyqual.report._read_git_commit_count
+  - pyqual.report._read_pyproject
+  - pyqual.report._read_version
+  - pyqual.report.build_badges
+  - pyqual.report.collect_all_metrics
+  - pyqual.report.collect_project_metadata
+  - pyqual.report.evaluate_gates
+  - pyqual.report.generate_report
+  - pyqual.report.main
+  - pyqual.report.run
+  - pyqual.report.update_readme_badges
+  pyqual.report_generator:
+  - pyqual.report_generator._build_gate
+  - pyqual.report_generator._build_gates_from_metrics
+  - pyqual.report_generator._build_run_from_rows
+  - pyqual.report_generator.generate_ascii_diagram
+  - pyqual.report_generator.generate_mermaid_diagram
+  - pyqual.report_generator.generate_metrics_table
+  - pyqual.report_generator.generate_report
+  - pyqual.report_generator.generate_stage_details
+  - pyqual.report_generator.get_last_run
+  - pyqual.report_generator.main
+  - pyqual.report_generator.parse_kwargs
+  pyqual.run_parallel_fix:
+  - pyqual.run_parallel_fix._print_cycle_completion
+  - pyqual.run_parallel_fix._print_yaml_results
+  - pyqual.run_parallel_fix._setup_batch
+  - pyqual.run_parallel_fix.get_todo_batch
+  - pyqual.run_parallel_fix.git_commit_and_push
+  - pyqual.run_parallel_fix.main
+  - pyqual.run_parallel_fix.mark_completed_todos
+  - pyqual.run_parallel_fix.parse_args
+  - pyqual.run_parallel_fix.run_tool
+  pyqual.setup_deps:
+  - pyqual.setup_deps._check_cli
+  - pyqual.setup_deps._check_pip
+  - pyqual.setup_deps._install_pip
+  - pyqual.setup_deps.check_all
+  - pyqual.setup_deps.main
+  pyqual.stage_names:
+  - pyqual.stage_names.get_stage_when_default
+  - pyqual.stage_names.is_delivery_stage_name
+  - pyqual.stage_names.is_fix_stage_name
+  - pyqual.stage_names.is_verify_stage_name
+  - pyqual.stage_names.normalize_stage_name
+  pyqual.tickets:
+  - pyqual.tickets._load_sync_integration
+  - pyqual.tickets._normalize_sources
+  - pyqual.tickets.sync_all_tickets
+  - pyqual.tickets.sync_from_gates
+  - pyqual.tickets.sync_github_tickets
+  - pyqual.tickets.sync_planfile_tickets
+  - pyqual.tickets.sync_todo_tickets
+  pyqual.tools:
+  - pyqual.tools._load_default_presets
+  - pyqual.tools._load_json_presets
+  - pyqual.tools._preset_from_dict
+  - pyqual.tools.dump_presets_json
+  - pyqual.tools.get_preset
+  - pyqual.tools.list_presets
+  - pyqual.tools.load_entry_point_presets
+  - pyqual.tools.load_user_tools
+  - pyqual.tools.preset_to_dict
+  - pyqual.tools.register_custom_tools_from_yaml
+  - pyqual.tools.register_preset
+  - pyqual.tools.resolve_stage_command
+  pyqual.validation.config_check:
+  - pyqual.validation.config_check._get_issue_severity
+  - pyqual.validation.config_check._load_tool_registry
+  - pyqual.validation.config_check._load_yaml_config
+  - pyqual.validation.config_check._validate_gate
+  - pyqual.validation.config_check._validate_stage
+  - pyqual.validation.config_check.validate_config
+  pyqual.validation.errors:
+  - pyqual.validation.errors._classify_failure
+  - pyqual.validation.errors._match_env_subtype
+  - pyqual.validation.errors._match_fix_env_subtype
+  pyqual.validation.project:
+  - pyqual.validation.project._detect_language
+  - pyqual.validation.project.detect_project_facts
+  pyqual.validation.release:
+  - pyqual.validation.release._bump_patch_version
+  - pyqual.validation.release._check_git_state
+  - pyqual.validation.release._check_pypi_version
+  - pyqual.validation.release._check_registry
+  - pyqual.validation.release._check_version_metadata
+  - pyqual.validation.release._parse_pyproject_fallback
+  - pyqual.validation.release._read_package_init_version
+  - pyqual.validation.release._read_project_metadata
+  - pyqual.validation.release._read_pyproject
+  - pyqual.validation.release._read_version_file
+  - pyqual.validation.release._resolve_release_version
+  - pyqual.validation.release.validate_release_state
+  pyqual.validation.schema:
+  - pyqual.validation.schema._resolve_gate_metric
+  pyqual.yaml_fixer:
+  - pyqual.yaml_fixer._detect_bracket_issues
+  - pyqual.yaml_fixer._detect_quote_issues
+  - pyqual.yaml_fixer._get_context
+  - pyqual.yaml_fixer._is_multiline_quote
+  - pyqual.yaml_fixer._parse_pyyaml_error
+  - pyqual.yaml_fixer._try_parse_yaml
+  - pyqual.yaml_fixer.analyze_yaml_syntax
+  - pyqual.yaml_fixer.fix_yaml_file
+  run_analysis:
+  - run_analysis.main
+  - run_analysis.run_project
+entry_points:
+- dashboard.api.main.get_gate_status
+- dashboard.api.main.get_latest_run
+- dashboard.api.main.get_metric_history
+- dashboard.api.main.get_project_runs
+- dashboard.api.main.get_project_summary
+- dashboard.api.main.get_projects
+- dashboard.api.main.get_stage_performance
+- dashboard.api.main.health_check
+- dashboard.api.main.ingest_results
+- dashboard.src.App.App
+- dashboard.src.App.RepositoryCard
+- dashboard.src.App.handleRepositorySelect
+- dashboard.src.App.lastRun
+- dashboard.src.App.repos
+- dashboard.src.App.runs
+- dashboard.src.App.statusColor
+- dashboard.src.App.statusIcon
+- dashboard.src.api.API_BASE_URL
+- dashboard.src.api.GITHUB_TOKEN
+- dashboard.src.api.config
+- dashboard.src.api.fetchMetricsHistory
+- dashboard.src.api.fetchRepositoriesWithFallback
+- dashboard.src.api.fetchRepositoryRuns
+- dashboard.src.api.lastRun
+- dashboard.src.api.latestRelease
+- dashboard.src.api.releases
+- dashboard.src.api.repos
+- dashboard.src.api.repositories
+- dashboard.src.api.response
+- dashboard.src.api.summaryAsset
+- dashboard.src.api.summaryResponse
+- dashboard.src.components.MetricsChart.MetricsChart
+- dashboard.src.components.MetricsChart.baseCoverage
+- dashboard.src.components.MetricsChart.data
+- dashboard.src.components.MetricsChart.date
+- dashboard.src.components.MetricsChart.days
+- dashboard.src.components.MetricsChart.today
+- dashboard.src.components.MetricsChart.variation
+- dashboard.src.components.MetricsTrendChart.MetricsTrendChart
+- dashboard.src.components.MetricsTrendChart.data
+- dashboard.src.components.Overview.Overview
+- dashboard.src.components.Overview.avgCoverage
+- dashboard.src.components.Overview.failingRepos
+- dashboard.src.components.Overview.passingRepos
+- dashboard.src.components.Overview.totalRepos
+- dashboard.src.components.RepositoryDetail.Icon
+- dashboard.src.components.RepositoryDetail.MetricsSection
+- dashboard.src.components.RepositoryDetail.RepositoryDetail
+- dashboard.src.components.RepositoryDetail.RunDetails
+- dashboard.src.components.RepositoryDetail.StatusBadge
+- dashboard.src.components.RepositoryDetail.bgClass
+- dashboard.src.components.RepositoryDetail.gate
+- dashboard.src.components.RepositoryDetail.iconColor
+- dashboard.src.components.RepositoryDetail.isPassed
+- dashboard.src.components.RepositoryDetail.latestRun
+- dashboard.src.components.RepositoryDetail.repo
+- dashboard.src.components.Settings.Settings
+- dashboard.src.components.StagesChart.StagesChart
+- dashboard.src.components.StagesChart.data
+- examples.custom_gates.composite_gates.main
+- examples.custom_gates.dynamic_thresholds.main
+- examples.custom_gates.metric_history.main
+- examples.custom_plugins.code_health_collector.CodeHealthCollector.collect
+- examples.custom_plugins.code_health_collector.CodeHealthCollector.get_config_example
+- examples.custom_plugins.performance_collector.PerformanceCollector.collect
+- examples.custom_plugins.performance_collector.PerformanceCollector.get_config_example
+- examples.integration_example.check_prerequisites
+- examples.integration_example.preview_pipeline
+- examples.integration_example.quick_gate_check
+- examples.integration_example.run_quality_check
+- examples.integration_example.run_shell_command_example
+- examples.integration_example.run_single_stage
+- examples.integration_example.run_with_callbacks
+- examples.llx.demo.check_tool
+- examples.multi_gate_pipeline.run_pipeline.main
+- examples.ticket_workflow.sync_tickets.main
+- integration.run_matrix.add
+- integration.run_matrix.hello
+- integration.run_matrix.run_case
+- project.map.toon.API_BASE_URL
+- project.map.toon.App
+- project.map.toon.GITHUB_TOKEN
+- project.map.toon.Icon
+- project.map.toon.MetricsChart
+- project.map.toon.MetricsSection
+- project.map.toon.MetricsTrendChart
+- project.map.toon.Overview
+- project.map.toon.Questions
+- project.map.toon.RepositoryCard
+- project.map.toon.RepositoryDetail
+- project.map.toon.RunDetails
+- project.map.toon.Settings
+- project.map.toon.StagesChart
+- project.map.toon.StatusBadge
+- project.map.toon._analyze_project
+- project.map.toon._apply_thresholds
+- project.map.toon._apply_thresholds_for_tune
+- project.map.toon._badge_url
+- project.map.toon._build_gate
+- project.map.toon._build_gate_dict
+- project.map.toon._build_gates_from_metrics
+- project.map.toon._build_llm_prompt
+- project.map.toon._build_project_badges
+- project.map.toon._build_quality_badges
+- project.map.toon._build_run_from_rows
+- project.map.toon._build_stage_dict
+- project.map.toon._bulk_init_impl
+- project.map.toon._bulk_run_impl
+- project.map.toon._bump_patch_version
+- project.map.toon._calculate_thresholds
+- project.map.toon._calculate_thresholds_for_tune
+- project.map.toon._check_cli
+- project.map.toon._check_git_changes
+- project.map.toon._check_git_state
+- project.map.toon._check_pip
+- project.map.toon._check_pypi_version
+- project.map.toon._check_registry
+- project.map.toon._check_version_metadata
+- project.map.toon._classify_failure
+- project.map.toon._classify_go
+- project.map.toon._classify_heuristic
+- project.map.toon._classify_makefile
+- project.map.toon._classify_node
+- project.map.toon._classify_php
+- project.map.toon._classify_project
+- project.map.toon._classify_python
+- project.map.toon._classify_rust
+- project.map.toon._classify_secret_findings
+- project.map.toon._close_github_issue
+- project.map.toon._collect_file_extensions
+- project.map.toon._collect_json_scripts
+- project.map.toon._collect_makefile_targets
+- project.map.toon._collect_manifests
+- project.map.toon._collect_metrics
+- project.map.toon._collect_pyproject_metadata
+- project.map.toon._collect_readme_excerpt
+- project.map.toon._collect_top_level_entries
+- project.map.toon._confirm_apply
+- project.map.toon._count_by_severity
+- project.map.toon._count_pushed_commits
+- project.map.toon._count_pylint_by_type
+- project.map.toon._create_tickets_if_needed
+- project.map.toon._detect_bom
+- project.map.toon._detect_bracket_issues
+- project.map.toon._detect_colon_issues
+- project.map.toon._detect_indentation_issues
+- project.map.toon._detect_language
+- project.map.toon._detect_quote_issues
+- project.map.toon._detect_trailing_spaces
+- project.map.toon._determine_tool_status
+- project.map.toon._discover_and_validate
+- project.map.toon._discover_plugins
+- project.map.toon._display_comparison
+- project.map.toon._display_comparison_for_tune
+- project.map.toon._emit
+- project.map.toon._emit_yaml_items
+- project.map.toon._enrich_analysis
+- project.map.toon._enrich_todo
+- project.map.toon._enrich_validation
+- project.map.toon._ensure_dir
+- project.map.toon._extract_delivery_summary
+- project.map.toon._extract_fix_summary
+- project.map.toon._extract_metrics_from_kwargs
+- project.map.toon._extract_todo_summary
+- project.map.toon._format_delivery_summary
+- project.map.toon._format_fix_summary
+- project.map.toon._format_ticket_summary
+- project.map.toon._from_ai_cost
+- project.map.toon._from_bandit
+- project.map.toon._from_benchmark
+- project.map.toon._from_code_health
+- project.map.toon._from_coverage
+- project.map.toon._from_flake8
+- project.map.toon._from_git_health
+- project.map.toon._from_interrogate
+- project.map.toon._from_lint
+- project.map.toon._from_llm_quality
+- project.map.toon._from_memory_profile
+- project.map.toon._from_my_tool
+- project.map.toon._from_mypy
+- project.map.toon._from_pylint
+- project.map.toon._from_pyroma
+- project.map.toon._from_radon
+- project.map.toon._from_ruff
+- project.map.toon._from_runtime_errors
+- project.map.toon._from_sbom
+- project.map.toon._from_secrets
+- project.map.toon._from_security
+- project.map.toon._from_toon
+- project.map.toon._from_vallm
+- project.map.toon._from_vulnerabilities
+- project.map.toon._from_vulture
+- project.map.toon._generate_recommendations
+- project.map.toon._get_context
+- project.map.toon._get_issue_severity
+- project.map.toon._get_provider_for_pattern
+- project.map.toon._get_severity_for_pattern
+- project.map.toon._get_stage_status
+- project.map.toon._handle_config_env_error
+- project.map.toon._handle_llm_error
+- project.map.toon._handle_pipeline_error
+- project.map.toon._handle_push_result
+- project.map.toon._history_impl
+- project.map.toon._install_pip
+- project.map.toon._is_likely_false_positive
+- project.map.toon._is_multiline_quote
+- project.map.toon._is_pinned_req
+- project.map.toon._load_default_presets
+- project.map.toon._load_env_file
+- project.map.toon._load_history_entries
+- project.map.toon._load_json_object
+- project.map.toon._load_json_presets
+- project.map.toon._load_latest_metrics
+- project.map.toon._load_latest_metrics_for_tune
+- project.map.toon._load_sync_integration
+- project.map.toon._load_tool_registry
+- project.map.toon._load_yaml_config
+- project.map.toon._logs_impl
+- project.map.toon._match_env_subtype
+- project.map.toon._match_fix_env_subtype
+- project.map.toon._merge_theirs
+- project.map.toon._normalize_env_values
+- project.map.toon._normalize_sources
+- project.map.toon._on_stage_error_impl
+- project.map.toon._output_bulk_result
+- project.map.toon._output_human_logs
+- project.map.toon._output_json_entries
+- project.map.toon._output_sql_query
+- project.map.toon._parse_branch_line
+- project.map.toon._parse_file_status
+- project.map.toon._parse_iteration_header
+- project.map.toon._parse_output_line
+- project.map.toon._parse_push_errors
+- project.map.toon._parse_pyproject_fallback
+- project.map.toon._parse_pyyaml_error
+- project.map.toon._parse_radon_json
+- project.map.toon._parse_stage_start
+- project.map.toon._poll_history_file
+- project.map.toon._poll_pipeline_db
+- project.map.toon._preset_from_dict
+- project.map.toon._print_cycle_completion
+- project.map.toon._print_file_list
+- project.map.toon._print_fix_summary
+- project.map.toon._print_history_prompts
+- project.map.toon._print_history_stdout
+- project.map.toon._print_history_summary
+- project.map.toon._print_history_table
+- project.map.toon._print_issues
+- project.map.toon._print_result
+- project.map.toon._print_stage_output
+- project.map.toon._print_yaml_results
+- project.map.toon._process_ticket
+- project.map.toon._read_artifact_text
+- project.map.toon._read_costs_data
+- project.map.toon._read_costs_json
+- project.map.toon._read_costs_package
+- project.map.toon._read_coverage_from_file
+- project.map.toon._read_git_commit_count
+- project.map.toon._read_package_init_version
+- project.map.toon._read_project_metadata
+- project.map.toon._read_pyproject
+- project.map.toon._read_version
+- project.map.toon._read_version_file
+- project.map.toon._rebuild_iterations_from_result
+- project.map.toon._replace_badges_in_text
+- project.map.toon._resolve_gate_metric
+- project.map.toon._resolve_release_version
+- project.map.toon._run_auto_fix_config
+- project.map.toon._run_command
+- project.map.toon._run_enabled_scanners
+- project.map.toon._run_mcp_workflow
+- project.map.toon._run_preflight_checks
+- project.map.toon._run_single_project
+- project.map.toon._run_tools_parallel
+- project.map.toon._run_with_live_dashboard
+- project.map.toon._safe_name
+- project.map.toon._scan_with_gitleaks
+- project.map.toon._scan_with_patterns
+- project.map.toon._scan_with_trufflehog
+- project.map.toon._setup_batch
+- project.map.toon._should_close_ticket
+- project.map.toon._should_skip_stage
+- project.map.toon._try_parse_yaml
+- project.map.toon._validate_gate
+- project.map.toon._validate_loop_config
+- project.map.toon._validate_stage
+- project.map.toon._validate_yaml_content
+- project.map.toon._watch_impl
+- project.map.toon._write_pyqual_yaml
+- project.map.toon.add
+- project.map.toon.add_docstring
+- project.map.toon.analyze_yaml_syntax
+- project.map.toon.apply_patch
+- project.map.toon.attack_check
+- project.map.toon.attack_merge
+- project.map.toon.auto_merge_pr
+- project.map.toon.avgCoverage
+- project.map.toon.baseCoverage
+- project.map.toon.bgClass
+- project.map.toon.build_badges
+- project.map.toon.build_dashboard_table
+- project.map.toon.build_parser
+- project.map.toon.build_report
+- project.map.toon.build_run_summary
+- project.map.toon.bulk_init
+- project.map.toon.bulk_run
+- project.map.toon.check_all
+- project.map.toon.check_gates
+- project.map.toon.check_links
+- project.map.toon.check_prerequisites
+- project.map.toon.check_readme
+- project.map.toon.check_requirements
+- project.map.toon.check_skip_conditions
+- project.map.toon.check_tool
+- project.map.toon.classify_with_llm
+- project.map.toon.cmd_check
+- project.map.toon.cmd_merge
+- project.map.toon.code_health_summary
+- project.map.toon.collect
+- project.map.toon.collect_all_metrics
+- project.map.toon.collect_fingerprint
+- project.map.toon.collect_project_metadata
+- project.map.toon.compute_composite_score
+- project.map.toon.config
+- project.map.toon.count_todo_items
+- project.map.toon.coverage_summary
+- project.map.toon.create_app
+- project.map.toon.create_default_config
+- project.map.toon.data
+- project.map.toon.date
+- project.map.toon.days
+- project.map.toon.deps_health_check
+- project.map.toon.detect_project_facts
+- project.map.toon.detect_regressions
+- project.map.toon.discover_projects
+- project.map.toon.docker_security_check
+- project.map.toon.docs_quality_summary
+- project.map.toon.doctor
+- project.map.toon.dry_run
+- project.map.toon.dump_presets_json
+- project.map.toon.enrich_from_artifacts
+- project.map.toon.error_domain
+- project.map.toon.evaluate_gates
+- project.map.toon.evaluate_with_llm
+- project.map.toon.example_helper_function
+- project.map.toon.exit
+- project.map.toon.export_results_json
+- project.map.toon.extract_bandit_stage_summary
+- project.map.toon.extract_code2llm_stage_summary
+- project.map.toon.extract_fix_stage_summary
+- project.map.toon.extract_lint_stage_summary
+- project.map.toon.extract_mypy_stage_summary
+- project.map.toon.extract_prefact_stage_summary
+- project.map.toon.extract_pytest_stage_summary
+- project.map.toon.extract_stage_summary
+- project.map.toon.extract_validation_stage_summary
+- project.map.toon.failingRepos
+- project.map.toon.fetchLatestRun
+- project.map.toon.fetchMetricsHistory
+- project.map.toon.fetchRepositories
+- project.map.toon.fetchRepositoriesWithFallback
+- project.map.toon.fetchRepositoryRuns
+- project.map.toon.fetch_github_tasks
+- project.map.toon.fix_config
+- project.map.toon.fix_yaml_file
+- project.map.toon.format_log_entry_row
+- project.map.toon.format_result_summary
+- project.map.toon.format_run_summary
+- project.map.toon.gate
+- project.map.toon.gates
+- project.map.toon.generate_ascii_diagram
+- project.map.toon.generate_mermaid_diagram
+- project.map.toon.generate_metrics_table
+- project.map.toon.generate_pyqual_yaml
+- project.map.toon.generate_readme
+- project.map.toon.generate_report
+- project.map.toon.generate_stage_details
+- project.map.toon.getRepoPath
+- project.map.toon.get_available_plugins
+- project.map.toon.get_available_tools
+- project.map.toon.get_changed_files
+- project.map.toon.get_db_path
+- project.map.toon.get_dependency_tree
+- project.map.toon.get_diff_content
+- project.map.toon.get_gate_status
+- project.map.toon.get_image_info
+- project.map.toon.get_last_error_line
+- project.map.toon.get_last_run
+- project.map.toon.get_latest_run
+- project.map.toon.get_metric_history
+- project.map.toon.get_outdated_packages
+- project.map.toon.get_preset
+- project.map.toon.get_profile
+- project.map.toon.get_project_runs
+- project.map.toon.get_project_summary
+- project.map.toon.get_projects
+- project.map.toon.get_stage_performance
+- project.map.toon.get_stage_when_default
+- project.map.toon.get_todo_batch
+- project.map.toon.get_tool_command
+- project.map.toon.git_add
+- project.map.toon.git_add_cmd
+- project.map.toon.git_commit
+- project.map.toon.git_commit_and_push
+- project.map.toon.git_commit_cmd
+- project.map.toon.git_push
+- project.map.toon.git_push_cmd
+- project.map.toon.git_scan_cmd
+- project.map.toon.git_status
+- project.map.toon.git_status_cmd
+- project.map.toon.group_similar_issues
+- project.map.toon.handleRepositorySelect
+- project.map.toon.health_check
+- project.map.toon.hello
+- project.map.toon.iconColor
+- project.map.toon.infer_fix_result
+- project.map.toon.ingest_results
+- project.map.toon.init
+- project.map.toon.install_plugin_config
+- project.map.toon.isPassed
+- project.map.toon.is_builtin
+- project.map.toon.is_delivery_stage_name
+- project.map.toon.is_fix_stage_name
+- project.map.toon.is_verify_stage_name
+- project.map.toon.lastRun
+- project.map.toon.latestRelease
+- project.map.toon.latestRun
+- project.map.toon.lint_summary
+- project.map.toon.list_presets
+- project.map.toon.list_profiles
+- project.map.toon.loadConfig
+- project.map.toon.loadRepositories
+- project.map.toon.load_config
+- project.map.toon.load_entry_point_presets
+- project.map.toon.load_history
+- project.map.toon.load_user_tools
+- project.map.toon.main
+- project.map.toon.mark_completed_todos
+- project.map.toon.match
+- project.map.toon.mcp_fix
+- project.map.toon.mcp_refactor
+- project.map.toon.mcp_service
+- project.map.toon.navigate
+- project.map.toon.normalize_stage_name
+- project.map.toon.parse_and_apply_suggestions
+- project.map.toon.parse_args
+- project.map.toon.parse_kwargs
+- project.map.toon.parse_todo_items
+- project.map.toon.passingRepos
+- project.map.toon.plugin
+- project.map.toon.plugin_add
+- project.map.toon.plugin_info
+- project.map.toon.plugin_list
+- project.map.toon.plugin_remove
+- project.map.toon.plugin_search
+- project.map.toon.plugin_unknown_action
+- project.map.toon.plugin_validate
+- project.map.toon.preflight_push_check
+- project.map.toon.preset_to_dict
+- project.map.toon.preview_pipeline
+- project.map.toon.print
+- project.map.toon.print_trend_report
+- project.map.toon.profiles
+- project.map.toon.query_nfo_db
+- project.map.toon.query_pipeline_db
+- project.map.toon.quick_gate_check
+- project.map.toon.read_summary_json
+- project.map.toon.register_bulk_commands
+- project.map.toon.register_custom_tools_from_yaml
+- project.map.toon.register_observe_commands
+- project.map.toon.register_preset
+- project.map.toon.releases
+- project.map.toon.repo
+- project.map.toon.report
+- project.map.toon.repos
+- project.map.toon.repositories
+- project.map.toon.resolve_stage_command
+- project.map.toon.response
+- project.map.toon.row_to_event_dict
+- project.map.toon.run
+- project.map.toon.run_bandit_check
+- project.map.toon.run_case
+- project.map.toon.run_composite_check
+- project.map.toon.run_detect_secrets
+- project.map.toon.run_git_command
+- project.map.toon.run_hadolint
+- project.map.toon.run_interrogate
+- project.map.toon.run_parallel_fix
+- project.map.toon.run_pip_audit
+- project.map.toon.run_pipeline
+- project.map.toon.run_project
+- project.map.toon.run_quality_check
+- project.map.toon.run_server
+- project.map.toon.run_shell_command_example
+- project.map.toon.run_single_stage
+- project.map.toon.run_stage
+- project.map.toon.run_tool
+- project.map.toon.run_trivy_scan
+- project.map.toon.run_with_callbacks
+- project.map.toon.runs
+- project.map.toon.safe_parse
+- project.map.toon.save_snapshot
+- project.map.toon.save_tasks_to_json
+- project.map.toon.save_tasks_to_todo
+- project.map.toon.scan_for_secrets
+- project.map.toon.security_summary
+- project.map.toon.setup_logging
+- project.map.toon.shell_check
+- project.map.toon.status
+- project.map.toon.statusColor
+- project.map.toon.statusIcon
+- project.map.toon.summaryAsset
+- project.map.toon.summaryResponse
+- project.map.toon.sync_all_tickets
+- project.map.toon.sync_from_cli
+- project.map.toon.sync_from_gates
+- project.map.toon.sync_github_tickets
+- project.map.toon.sync_planfile_tickets
+- project.map.toon.sync_todo_tickets
+- project.map.toon.tickets_all
+- project.map.toon.tickets_comment
+- project.map.toon.tickets_fetch
+- project.map.toon.tickets_from_gate_failures
+- project.map.toon.tickets_github
+- project.map.toon.tickets_sync
+- project.map.toon.tickets_todo
+- project.map.toon.today
+- project.map.toon.tools
+- project.map.toon.totalRepos
+- project.map.toon.tune_show
+- project.map.toon.tune_thresholds
+- project.map.toon.tune_thresholds_cmd
+- project.map.toon.update_readme_badges
+- project.map.toon.validate
+- project.map.toon.validate_config
+- project.map.toon.validate_release_state
+- project.map.toon.variation
+- pyqual._gate_collectors._from_ai_cost
+- pyqual._gate_collectors._from_benchmark
+- pyqual._gate_collectors._from_code_health
+- pyqual._gate_collectors._from_coverage
+- pyqual._gate_collectors._from_git_health
+- pyqual._gate_collectors._from_lint
+- pyqual._gate_collectors._from_llm_quality
+- pyqual._gate_collectors._from_memory_profile
+- pyqual._gate_collectors._from_runtime_errors
+- pyqual._gate_collectors._from_sbom
+- pyqual._gate_collectors._from_security
+- pyqual._gate_collectors._from_toon
+- pyqual._gate_collectors._from_vallm
+- pyqual.analysis._analyze_project
+- pyqual.api.ShellHelper.check
+- pyqual.api.ShellHelper.output
+- pyqual.api.ShellHelper.run
+- pyqual.api.check_gates
+- pyqual.api.create_default_config
+- pyqual.api.dry_run
+- pyqual.api.export_results_json
+- pyqual.api.format_result_summary
+- pyqual.api.get_tool_command
+- pyqual.api.run_stage
+- pyqual.auto_closer.main
+- pyqual.bulk.parser._parse_output_line
+- pyqual.bulk.parser._parse_stage_start
+- pyqual.bulk_init._classify_go
+- pyqual.bulk_init._classify_makefile
+- pyqual.bulk_init._classify_node
+- pyqual.bulk_init._classify_php
+- pyqual.bulk_init._classify_python
+- pyqual.bulk_init._classify_rust
+- pyqual.cli.cmd_config.fix_config
+- pyqual.cli.cmd_config.gates
+- pyqual.cli.cmd_config.report
+- pyqual.cli.cmd_config.status
+- pyqual.cli.cmd_config.validate
+- pyqual.cli.cmd_git.git_add_cmd
+- pyqual.cli.cmd_git.git_commit_cmd
+- pyqual.cli.cmd_git.git_push_cmd
+- pyqual.cli.cmd_git.git_scan_cmd
+- pyqual.cli.cmd_git.git_status_cmd
+- pyqual.cli.cmd_info.doctor
+- pyqual.cli.cmd_info.tools
+- pyqual.cli.cmd_init.init
+- pyqual.cli.cmd_init.profiles
+- pyqual.cli.cmd_mcp.mcp_fix
+- pyqual.cli.cmd_mcp.mcp_refactor
+- pyqual.cli.cmd_mcp.mcp_service
+- pyqual.cli.cmd_plugin.plugin
+- pyqual.cli.cmd_run.run
+- pyqual.cli.cmd_tickets.tickets_all
+- pyqual.cli.cmd_tickets.tickets_comment
+- pyqual.cli.cmd_tickets.tickets_fetch
+- pyqual.cli.cmd_tickets.tickets_github
+- pyqual.cli.cmd_tickets.tickets_sync
+- pyqual.cli.cmd_tickets.tickets_todo
+- pyqual.cli.cmd_tune.tune_show
+- pyqual.cli.cmd_tune.tune_thresholds
+- pyqual.cli.main.tune_thresholds_cmd
+- pyqual.cli_bulk_cmds.register_bulk_commands
+- pyqual.cli_log_helpers.format_log_entry_row
+- pyqual.cli_log_helpers.query_nfo_db
+- pyqual.cli_log_helpers.row_to_event_dict
+- pyqual.cli_observe.register_observe_commands
+- pyqual.cli_run_helpers.build_run_summary
+- pyqual.cli_run_helpers.count_todo_items
+- pyqual.cli_run_helpers.enrich_from_artifacts
+- pyqual.cli_run_helpers.extract_stage_summary
+- pyqual.cli_run_helpers.format_run_summary
+- pyqual.cli_run_helpers.get_last_error_line
+- pyqual.command._run_command
+- pyqual.config.GateConfig.from_dict
+- pyqual.config.PyqualConfig._parse
+- pyqual.config.PyqualConfig._validate_stages
+- pyqual.config.PyqualConfig.default_yaml
+- pyqual.config.PyqualConfig.load
+- pyqual.config.StageConfig.__post_init__
+- pyqual.custom_fix.apply_patch
+- pyqual.custom_fix.parse_and_apply_suggestions
+- pyqual.fix_tools.aider.AiderTool.get_command
+- pyqual.fix_tools.aider.AiderTool.get_timeout
+- pyqual.fix_tools.aider.AiderTool.is_available
+- pyqual.fix_tools.base.FixTool.__init__
+- pyqual.fix_tools.base.FixTool.get_command
+- pyqual.fix_tools.base.FixTool.get_timeout
+- pyqual.fix_tools.base.FixTool.is_available
+- pyqual.fix_tools.base.FixTool.to_config
+- pyqual.fix_tools.claude.ClaudeTool.get_command
+- pyqual.fix_tools.claude.ClaudeTool.get_timeout
+- pyqual.fix_tools.claude.ClaudeTool.is_available
+- pyqual.fix_tools.llx.LlxTool.__init__
+- pyqual.fix_tools.llx.LlxTool.get_command
+- pyqual.fix_tools.llx.LlxTool.get_timeout
+- pyqual.fix_tools.llx.LlxTool.is_available
+- pyqual.gate_collectors.legacy._from_bandit
+- pyqual.gate_collectors.legacy._from_coverage
+- pyqual.gate_collectors.legacy._from_secrets
+- pyqual.gate_collectors.legacy._from_toon
+- pyqual.gate_collectors.legacy._from_vallm
+- pyqual.gate_collectors.legacy._from_vulnerabilities
+- pyqual.gate_collectors.utils._read_artifact_text
+- pyqual.gates.CompositeGateSet.__init__
+- pyqual.gates.CompositeGateSet.check_composite
+- pyqual.gates.CompositeGateSet.compute_score
+- pyqual.gates.Gate.check
+- pyqual.gates.GateResult.__str__
+- pyqual.gates.GateSet.__init__
+- pyqual.gates.GateSet._collect_metrics
+- pyqual.gates.GateSet._completion_rate
+- pyqual.gates.GateSet.all_passed
+- pyqual.gates.GateSet.check_all
+- pyqual.gates.GateSet.completion_percentage
+- pyqual.github_actions.GitHubActionsReporter.__init__
+- pyqual.github_actions.GitHubActionsReporter.close_issue
+- pyqual.github_actions.GitHubActionsReporter.close_pull_request
+- pyqual.github_actions.GitHubActionsReporter.create_issue
+- pyqual.github_actions.GitHubActionsReporter.ensure_issue_exists
+- pyqual.github_actions.GitHubActionsReporter.fetch_issues
+- pyqual.github_actions.GitHubActionsReporter.fetch_pull_requests
+- pyqual.github_actions.GitHubActionsReporter.generate_failure_report
+- pyqual.github_actions.GitHubActionsReporter.get_pr_number
+- pyqual.github_actions.GitHubActionsReporter.is_running_in_github_actions
+- pyqual.github_actions.GitHubActionsReporter.post_issue_comment
+- pyqual.github_actions.GitHubActionsReporter.post_pr_comment
+- pyqual.github_actions.GitHubActionsReporter.set_failed
+- pyqual.github_actions.GitHubActionsReporter.set_output
+- pyqual.github_actions.GitHubTask.__str__
+- pyqual.github_actions.GitHubTask.to_todo_item
+- pyqual.integrations.llx_mcp.main
+- pyqual.integrations.llx_mcp_service.create_app
+- pyqual.integrations.llx_mcp_service.main
+- pyqual.parallel.ParallelExecutor.__init__
+- pyqual.parallel.ParallelExecutor._run_tool_task
+- pyqual.parallel.ParallelExecutor._tool_worker
+- pyqual.parallel.run_parallel_fix
+- pyqual.pipeline.Pipeline.__init__
+- pyqual.pipeline.Pipeline._archive_llx_report
+- pyqual.pipeline.Pipeline._capture_runtime_error
+- pyqual.pipeline.Pipeline._check_optional_binary
+- pyqual.pipeline.Pipeline._classify_error
+- pyqual.pipeline.Pipeline._ensure_pyqual_dir
+- pyqual.pipeline.Pipeline._execute_captured
+- pyqual.pipeline.Pipeline._execute_stage
+- pyqual.pipeline.Pipeline._execute_streaming
+- pyqual.pipeline.Pipeline._extract_error_message
+- pyqual.pipeline.Pipeline._init_nfo
+- pyqual.pipeline.Pipeline._is_fix_stage
+- pyqual.pipeline.Pipeline._iteration_stagnated
+- pyqual.pipeline.Pipeline._log_event
+- pyqual.pipeline.Pipeline._log_gates
+- pyqual.pipeline.Pipeline._log_stage
+- pyqual.pipeline.Pipeline._make_dry_run_result
+- pyqual.pipeline.Pipeline._make_skipped_result
+- pyqual.pipeline.Pipeline._nfo_emit
+- pyqual.pipeline.Pipeline._notify_stage_error
+- pyqual.pipeline.Pipeline._resolve_env
+- pyqual.pipeline.Pipeline._resolve_tool_stage
+- pyqual.pipeline.Pipeline._run_iteration
+- pyqual.pipeline.Pipeline._should_run_stage
+- pyqual.pipeline.Pipeline.check_gates
+- pyqual.pipeline.Pipeline.run
+- pyqual.pipeline_protocols.OnIterationDone.__call__
+- pyqual.pipeline_protocols.OnIterationStart.__call__
+- pyqual.pipeline_protocols.OnStageDone.__call__
+- pyqual.pipeline_protocols.OnStageError.__call__
+- pyqual.pipeline_protocols.OnStageOutput.__call__
+- pyqual.pipeline_protocols.OnStageStart.__call__
+- pyqual.plugins._base.MetricCollector.collect
+- pyqual.plugins._base.MetricCollector.get_config_example
+- pyqual.plugins._base.PluginMetadata.__post_init__
+- pyqual.plugins._base.PluginRegistry.create_instance
+- pyqual.plugins._base.PluginRegistry.get
+- pyqual.plugins._base.PluginRegistry.list_plugins
+- pyqual.plugins._base.PluginRegistry.register
+- pyqual.plugins._discover_plugins
+- pyqual.plugins.attack.__main__.main
+- pyqual.plugins.attack.main.AttackCollector._collect_check_metrics
+- pyqual.plugins.attack.main.AttackCollector._collect_merge_metrics
+- pyqual.plugins.attack.main.AttackCollector._strategy_to_int
+- pyqual.plugins.attack.main.AttackCollector.collect
+- pyqual.plugins.attack.main.AttackCollector.get_config_example
+- pyqual.plugins.attack.test.TestAttackCheck.test_not_git_repo
+- pyqual.plugins.attack.test.TestAttackCheck.test_successful_check
+- pyqual.plugins.attack.test.TestAttackCollector.test_collect_check_metrics
+- pyqual.plugins.attack.test.TestAttackCollector.test_collect_empty_directory
+- pyqual.plugins.attack.test.TestAttackCollector.test_collect_merge_metrics
+- pyqual.plugins.attack.test.TestAttackCollector.test_collector_registration
+- pyqual.plugins.attack.test.TestAttackMerge.test_dry_run_merge
+- pyqual.plugins.attack.test.TestAttackMerge.test_not_git_repo
+- pyqual.plugins.attack.test.TestAutoMergePR.test_no_pr_or_branch
+- pyqual.plugins.attack.test.TestAutoMergePR.test_pr_merge_failure
+- pyqual.plugins.attack.test.TestAutoMergePR.test_pr_merge_with_gh_cli
+- pyqual.plugins.attack.test.TestMergeStrategies.test_collector_strategy_conversion
+- pyqual.plugins.attack.test.TestMergeStrategies.test_strategies_defined
+- pyqual.plugins.builtin.A11yCollector.collect
+- pyqual.plugins.builtin.HallucinationCollector.collect
+- pyqual.plugins.builtin.I18nCollector.collect
+- pyqual.plugins.builtin.LLMBenchCollector.collect
+- pyqual.plugins.builtin.LlxMcpFixCollector._assign_float
+- pyqual.plugins.builtin.LlxMcpFixCollector._collect_aider_metrics
+- pyqual.plugins.builtin.LlxMcpFixCollector._collect_analysis_metrics
+- pyqual.plugins.builtin.LlxMcpFixCollector._count_lines
+- pyqual.plugins.builtin.LlxMcpFixCollector._load_report
+- pyqual.plugins.builtin.LlxMcpFixCollector._tier_rank
+- pyqual.plugins.builtin.LlxMcpFixCollector.collect
+- pyqual.plugins.builtin.LlxMcpFixCollector.get_config_example
+- pyqual.plugins.builtin.RepoMetricsCollector.collect
+- pyqual.plugins.builtin.SBOMCollector.collect
+- pyqual.plugins.code_health.main.CodeHealthCollector._collect_interrogate
+- pyqual.plugins.code_health.main.CodeHealthCollector._collect_pyroma
+- pyqual.plugins.code_health.main.CodeHealthCollector._collect_radon
+- pyqual.plugins.code_health.main.CodeHealthCollector._collect_vulture
+- pyqual.plugins.code_health.main.CodeHealthCollector.collect
+- pyqual.plugins.code_health.main.code_health_summary
+- pyqual.plugins.coverage.main.CoverageCollector.collect
+- pyqual.plugins.coverage.main.coverage_summary
+- pyqual.plugins.deps.main.DepsCollector._collect_deptree
+- pyqual.plugins.deps.main.DepsCollector._collect_licenses
+- pyqual.plugins.deps.main.DepsCollector._collect_outdated
+- pyqual.plugins.deps.main.DepsCollector._collect_requirements
+- pyqual.plugins.deps.main.DepsCollector.collect
+- pyqual.plugins.deps.main.DepsCollector.get_config_example
+- pyqual.plugins.deps.test.TestCheckRequirements.test_fully_pinned_requirements
+- pyqual.plugins.deps.test.TestCheckRequirements.test_requirements_not_found
+- pyqual.plugins.deps.test.TestCheckRequirements.test_requirements_parsing
+- pyqual.plugins.deps.test.TestDepsCollector.test_collect_deptree_results
+- pyqual.plugins.deps.test.TestDepsCollector.test_collect_empty_workdir
+- pyqual.plugins.deps.test.TestDepsCollector.test_collect_licenses
+- pyqual.plugins.deps.test.TestDepsCollector.test_collect_outdated_results
+- pyqual.plugins.deps.test.TestDepsCollector.test_collect_requirements
+- pyqual.plugins.deps.test.TestDepsCollector.test_collector_metadata
+- pyqual.plugins.deps.test.TestDepsCollector.test_collector_name
+- pyqual.plugins.deps.test.TestDepsCollector.test_get_config_example
+- pyqual.plugins.deps.test.TestDepsHealthCheck.test_health_check_structure
+- pyqual.plugins.deps.test.TestGetDependencyTree.test_pipdeptree_not_available
+- pyqual.plugins.deps.test.TestGetOutdatedPackages.test_pip_not_available
+- pyqual.plugins.docker.main.DockerCollector._collect_grype
+- pyqual.plugins.docker.main.DockerCollector._collect_hadolint
+- pyqual.plugins.docker.main.DockerCollector._collect_image_info
+- pyqual.plugins.docker.main.DockerCollector._collect_trivy
+- pyqual.plugins.docker.main.DockerCollector._count_trivy_vulns
+- pyqual.plugins.docker.main.DockerCollector._get_grype_severity
+- pyqual.plugins.docker.main.DockerCollector._set_zero_trivy
+- pyqual.plugins.docker.main.DockerCollector.collect
+- pyqual.plugins.docker.main.DockerCollector.get_config_example
+- pyqual.plugins.docker.test.TestDockerCollector.test_collect_empty_workdir
+- pyqual.plugins.docker.test.TestDockerCollector.test_collect_grype_results
+- pyqual.plugins.docker.test.TestDockerCollector.test_collect_hadolint_results
+- pyqual.plugins.docker.test.TestDockerCollector.test_collect_trivy_results
+- pyqual.plugins.docker.test.TestDockerCollector.test_collector_metadata
+- pyqual.plugins.docker.test.TestDockerCollector.test_collector_name
+- pyqual.plugins.docker.test.TestDockerCollector.test_get_config_example
+- pyqual.plugins.docker.test.TestDockerSecurityCheck.test_security_check_structure
+- pyqual.plugins.docker.test.TestDockerSecurityCheck.test_security_check_without_image
+- pyqual.plugins.docker.test.TestHadolint.test_hadolint_not_found
+- pyqual.plugins.docker.test.TestTrivyScan.test_trivy_not_found
+- pyqual.plugins.docs.main.DocsCollector._collect_changelog_metrics
+- pyqual.plugins.docs.main.DocsCollector._collect_docstring_metrics
+- pyqual.plugins.docs.main.DocsCollector._collect_link_metrics
+- pyqual.plugins.docs.main.DocsCollector._collect_readme_metrics
+- pyqual.plugins.docs.main.DocsCollector._set_zero_readme
+- pyqual.plugins.docs.main.DocsCollector.collect
+- pyqual.plugins.docs.main.DocsCollector.get_config_example
+- pyqual.plugins.docs.test.TestCheckLinks.test_lychee_not_found
+- pyqual.plugins.docs.test.TestCheckReadme.test_readme_not_found
+- pyqual.plugins.docs.test.TestCheckReadme.test_readme_quality_check
+- pyqual.plugins.docs.test.TestDocsCollector.test_collect_docstring_coverage
+- pyqual.plugins.docs.test.TestDocsCollector.test_collect_empty_workdir
+- pyqual.plugins.docs.test.TestDocsCollector.test_collect_link_results
+- pyqual.plugins.docs.test.TestDocsCollector.test_collect_with_readme
+- pyqual.plugins.docs.test.TestDocsCollector.test_collector_metadata
+- pyqual.plugins.docs.test.TestDocsCollector.test_collector_name
+- pyqual.plugins.docs.test.TestDocsCollector.test_get_config_example
+- pyqual.plugins.docs.test.TestDocsQualitySummary.test_summary_structure
+- pyqual.plugins.docs.test.TestInterrogate.test_interrogate_not_found
+- pyqual.plugins.documentation.main.DocumentationCollector._analyze_readme
+- pyqual.plugins.documentation.main.DocumentationCollector._check_docs_folder
+- pyqual.plugins.documentation.main.DocumentationCollector._check_file_exists
+- pyqual.plugins.documentation.main.DocumentationCollector._check_license_type
+- pyqual.plugins.documentation.main.DocumentationCollector._check_pyproject_metadata
+- pyqual.plugins.documentation.main.DocumentationCollector._check_required_files
+- pyqual.plugins.documentation.main.DocumentationCollector._find_file
+- pyqual.plugins.documentation.main.DocumentationCollector._get_docstring_coverage
+- pyqual.plugins.documentation.main.DocumentationCollector._parse_pyproject_fallback
+- pyqual.plugins.documentation.main.DocumentationCollector._read_docs_details
+- pyqual.plugins.documentation.main.DocumentationCollector._read_pyproject
+- pyqual.plugins.documentation.main.DocumentationCollector.collect
+- pyqual.plugins.documentation.test.TestDocumentationCollector.test_collect_empty_workdir
+- pyqual.plugins.documentation.test.TestDocumentationCollector.test_collect_with_docs_folder
+- pyqual.plugins.documentation.test.TestDocumentationCollector.test_collect_with_license
+- pyqual.plugins.documentation.test.TestDocumentationCollector.test_collect_with_pyproject
+- pyqual.plugins.documentation.test.TestDocumentationCollector.test_collect_with_readme
+- pyqual.plugins.documentation.test.TestDocumentationCollector.test_collector_metadata
+- pyqual.plugins.documentation.test.TestDocumentationCollector.test_collector_name
+- pyqual.plugins.documentation.test.TestDocumentationCollector.test_documentation_score_calculation
+- pyqual.plugins.documentation.test.TestDocumentationCollector.test_get_config_example
+- pyqual.plugins.example_plugin.main.ExampleCollector.collect
+- pyqual.plugins.example_plugin.main.ExampleCollector.get_config_example
+- pyqual.plugins.example_plugin.test.TestExampleCollector.test_collect_with_invalid_json
+- pyqual.plugins.example_plugin.test.TestExampleCollector.test_collect_with_valid_artifact
+- pyqual.plugins.example_plugin.test.TestExampleCollector.test_collect_without_artifact
+- pyqual.plugins.example_plugin.test.TestExampleCollector.test_collector_registration
+- pyqual.plugins.example_plugin.test.TestExampleCollector.test_config_example
+- pyqual.plugins.example_plugin.test.TestExampleCollector.test_metadata
+- pyqual.plugins.example_plugin.test.TestHelperFunctions.test_example_helper_function
+- pyqual.plugins.git.git_command.run_git_command
+- pyqual.plugins.git.main.GitCollector._collect_commit_metrics
+- pyqual.plugins.git.main.GitCollector._collect_preflight_metrics
+- pyqual.plugins.git.main.GitCollector._collect_push_metrics
+- pyqual.plugins.git.main.GitCollector._collect_scan_metrics
+- pyqual.plugins.git.main.GitCollector._collect_status_metrics
+- pyqual.plugins.git.main.GitCollector.collect
+- pyqual.plugins.git.main.GitCollector.get_config_example
+- pyqual.plugins.git.main._count_by_severity
+- pyqual.plugins.git.main._scan_with_gitleaks
+- pyqual.plugins.git.main._scan_with_trufflehog
+- pyqual.plugins.git.test.TestGitCollector.test_collector_registration
+- pyqual.plugins.git.test.TestGitCollector.test_config_example
+- pyqual.plugins.git.test.TestGitCollector.test_metadata
+- pyqual.plugins.git.test.TestGitCommit.temp_git_repo
+- pyqual.plugins.git.test.TestGitCommit.test_commit_only_if_changed_no_changes
+- pyqual.plugins.git.test.TestGitCommit.test_commit_with_changes
+- pyqual.plugins.git.test.TestGitStatus.temp_git_repo
+- pyqual.plugins.git.test.TestGitStatus.test_status_in_empty_repo
+- pyqual.plugins.git.test.TestGitStatus.test_status_not_a_git_repo
+- pyqual.plugins.git.test.TestGitStatus.test_status_with_untracked_file
+- pyqual.plugins.git.test.TestPreFlightCheck.temp_git_repo_with_commits
+- pyqual.plugins.git.test.TestPreFlightCheck.test_preflight_clean_repo
+- pyqual.plugins.git.test.TestPreFlightCheck.test_preflight_with_secrets_blocks_push
+- pyqual.plugins.git.test.TestSecretPatterns.test_aws_access_key_pattern
+- pyqual.plugins.git.test.TestSecretPatterns.test_github_token_pattern
+- pyqual.plugins.git.test.TestSecretPatterns.test_jwt_token_pattern
+- pyqual.plugins.git.test.TestSecretPatterns.test_private_key_pattern
+- pyqual.plugins.git.test.TestSecretScanning.temp_repo_with_secrets
+- pyqual.plugins.git.test.TestSecretScanning.test_false_positive_detection
+- pyqual.plugins.git.test.TestSecretScanning.test_provider_mapping
+- pyqual.plugins.git.test.TestSecretScanning.test_scan_finds_aws_key
+- pyqual.plugins.git.test.TestSecretScanning.test_scan_finds_github_token
+- pyqual.plugins.git.test.TestSecretScanning.test_scan_skips_placeholders
+- pyqual.plugins.git.test.TestSecretScanning.test_severity_mapping
+- pyqual.plugins.lint.main.LintCollector._collect_flake8
+- pyqual.plugins.lint.main.LintCollector._collect_mypy
+- pyqual.plugins.lint.main.LintCollector._collect_pylint
+- pyqual.plugins.lint.main.LintCollector._collect_ruff
+- pyqual.plugins.lint.main.LintCollector.collect
+- pyqual.plugins.lint.main.lint_summary
+- pyqual.plugins.security.main.SecurityCollector._collect_audit
+- pyqual.plugins.security.main.SecurityCollector._collect_bandit
+- pyqual.plugins.security.main.SecurityCollector._collect_safety
+- pyqual.plugins.security.main.SecurityCollector._collect_secrets
+- pyqual.plugins.security.main.SecurityCollector._get_severity
+- pyqual.plugins.security.main.SecurityCollector.collect
+- pyqual.plugins.security.main.SecurityCollector.get_config_example
+- pyqual.plugins.security.test.TestBanditCheck.test_bandit_not_found
+- pyqual.plugins.security.test.TestDetectSecrets.test_detect_secrets_not_found
+- pyqual.plugins.security.test.TestPipAudit.test_pip_audit_not_found
+- pyqual.plugins.security.test.TestSecurityCollector.test_collect_audit_results
+- pyqual.plugins.security.test.TestSecurityCollector.test_collect_bandit_results
+- pyqual.plugins.security.test.TestSecurityCollector.test_collect_empty_workdir
+- pyqual.plugins.security.test.TestSecurityCollector.test_collect_safety_results
+- pyqual.plugins.security.test.TestSecurityCollector.test_collect_secrets_results
+- pyqual.plugins.security.test.TestSecurityCollector.test_collector_metadata
+- pyqual.plugins.security.test.TestSecurityCollector.test_collector_name
+- pyqual.plugins.security.test.TestSecurityCollector.test_get_config_example
+- pyqual.plugins.security.test.TestSecuritySummary.test_security_summary_empty
+- pyqual.plugins.security.test.TestSecuritySummary.test_security_summary_with_issues
+- pyqual.release_check.main
+- pyqual.report._replace_badges_in_text
+- pyqual.report.main
+- pyqual.report_generator.main
+- pyqual.run_parallel_fix.main
+- pyqual.run_parallel_fix.run_tool
+- pyqual.setup_deps.main
+- pyqual.stage_names.is_verify_stage_name
+- pyqual.tools.ToolPreset.is_available
+- pyqual.tools.ToolPreset.shell_command
+- pyqual.tools._load_default_presets
+- pyqual.tools.dump_presets_json
+- pyqual.tools.is_builtin
+- pyqual.tools.resolve_stage_command
+- pyqual.validation.config_check.validate_config
+- pyqual.validation.errors._classify_failure
+- pyqual.validation.errors.error_domain
+- pyqual.validation.schema.ValidationResult.add
+- pyqual.yaml_fixer.fix_yaml_file
+- run_analysis.main

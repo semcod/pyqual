@@ -1,12 +1,14 @@
 # code2llm call graph | /home/tom/github/semcod/pyqual
-# nodes: 335 | edges: 314 | modules: 67
-# CC̄=5.1
+# nodes: 403 | edges: 394 | modules: 77
+# CC̄=3.0
 
 HUBS[20]:
+  Taskfile.print
+    CC=0  in:189  out:0  total:189
   pyqual.bulk_init.generate_pyqual_yaml
     CC=7  in:1  out:77  total:78
   pyqual.cli.cmd_run.run
-    CC=17  in:0  out:53  total:53
+    CC=11  in:0  out:47  total:47
   pyqual.cli.cmd_config.fix_config
     CC=13  in:0  out:46  total:46
   pyqual.cli.cmd_git.git_scan_cmd
@@ -15,36 +17,36 @@ HUBS[20]:
     CC=11  in:1  out:38  total:39
   pyqual.run_parallel_fix.main
     CC=13  in:0  out:37  total:37
-  pyqual.validation.release.validate_release_state
-    CC=22  in:1  out:33  total:34
-  pyqual.report_generator.get_last_run
-    CC=15  in:1  out:32  total:33
+  pyqual.run_parallel_fix._print_yaml_results
+    CC=10  in:1  out:33  total:34
   pyqual._gate_collectors._from_flake8
     CC=12  in:1  out:30  total:31
   examples.multi_gate_pipeline.run_pipeline.main
     CC=13  in:0  out:30  total:30
   examples.custom_gates.metric_history.main
     CC=9  in:0  out:29  total:29
-  pyqual.config.PyqualConfig._parse
-    CC=13  in:0  out:28  total:28
-  pyqual.cli_bulk_cmds._bulk_init_impl
-    CC=14  in:1  out:27  total:28
   pyqual._gate_collectors._from_ruff
     CC=12  in:1  out:27  total:28
+  pyqual.cli_bulk_cmds._bulk_init_impl
+    CC=14  in:1  out:27  total:28
+  pyqual.config.PyqualConfig._parse
+    CC=13  in:0  out:28  total:28
   pyqual.auto_closer.main
     CC=11  in:0  out:27  total:27
-  pyqual._gate_collectors._from_vulnerabilities
-    CC=6  in:1  out:26  total:27
   pyqual.bulk_init.classify_with_llm
     CC=9  in:1  out:26  total:27
+  pyqual._gate_collectors._from_vulnerabilities
+    CC=6  in:1  out:26  total:27
+  pyqual.plugins.cli_helpers.plugin_search
+    CC=11  in:1  out:25  total:26
   pyqual.yaml_fixer.analyze_yaml_syntax
     CC=10  in:2  out:24  total:26
-  pyqual.plugins.attack.main.attack_merge
-    CC=15  in:2  out:24  total:26
   pyqual.parallel.ParallelExecutor.run
     CC=15  in:1  out:25  total:26
 
 MODULES:
+  Taskfile  [1 funcs]
+    print  CC=0  out:0
   dashboard.api.main  [11 funcs]
     get_db_path  CC=1  out:1
     get_gate_status  CC=2  out:12
@@ -75,9 +77,12 @@ MODULES:
     compute_composite_score  CC=9  out:12
     main  CC=2  out:13
     run_composite_check  CC=8  out:17
-  examples.custom_gates.metric_history  [3 funcs]
+  examples.custom_gates.dynamic_thresholds  [1 funcs]
+    main  CC=11  out:11
+  examples.custom_gates.metric_history  [4 funcs]
     load_history  CC=4  out:4
     main  CC=9  out:29
+    print_trend_report  CC=8  out:4
     save_snapshot  CC=1  out:7
   examples.integration_example  [7 funcs]
     check_prerequisites  CC=1  out:3
@@ -93,7 +98,7 @@ MODULES:
     main  CC=2  out:3
     sync_from_cli  CC=3  out:10
     tickets_from_gate_failures  CC=7  out:12
-  pyqual._gate_collectors  [19 funcs]
+  pyqual._gate_collectors  [20 funcs]
     _count_by_severity  CC=3  out:3
     _count_pylint_by_type  CC=4  out:6
     _from_bandit  CC=10  out:17
@@ -104,17 +109,16 @@ MODULES:
     _from_mypy  CC=6  out:12
     _from_pylint  CC=8  out:21
     _from_pyroma  CC=8  out:15
-  pyqual.api  [15 funcs]
-    check  CC=2  out:1
-    output  CC=3  out:1
-    run  CC=2  out:2
-    check_gates  CC=1  out:3
+  pyqual.api  [9 funcs]
     create_default_config  CC=3  out:6
     dry_run  CC=1  out:1
-    export_results_json  CC=4  out:5
-    format_result_summary  CC=9  out:7
     get_tool_command  CC=2  out:4
     load_config  CC=2  out:7
+    run  CC=1  out:2
+    run_pipeline  CC=1  out:2
+    run_stage  CC=10  out:18
+    shell_check  CC=1  out:1
+    validate_config  CC=2  out:2
   pyqual.auto_closer  [6 funcs]
     _close_github_issue  CC=4  out:6
     _process_ticket  CC=3  out:10
@@ -153,11 +157,10 @@ MODULES:
     _collect_top_level_entries  CC=7  out:6
     _load_json_object  CC=3  out:3
     collect_fingerprint  CC=2  out:13
-  pyqual.cli.cmd_config  [4 funcs]
+  pyqual.cli.cmd_config  [3 funcs]
+    _print_issues  CC=8  out:3
     fix_config  CC=13  out:46
-    gates  CC=6  out:20
-    status  CC=5  out:23
-    validate  CC=19  out:25
+    validate  CC=8  out:22
   pyqual.cli.cmd_git  [6 funcs]
     _print_file_list  CC=4  out:6
     _run_preflight_checks  CC=9  out:17
@@ -169,7 +172,9 @@ MODULES:
     init  CC=7  out:22
   pyqual.cli.cmd_plugin  [1 funcs]
     plugin  CC=8  out:14
-  pyqual.cli.cmd_run  [9 funcs]
+  pyqual.cli.cmd_run  [12 funcs]
+    _build_gate_dict  CC=2  out:2
+    _build_stage_dict  CC=7  out:5
     _create_tickets_if_needed  CC=7  out:6
     _emit  CC=1  out:2
     _emit_yaml_items  CC=2  out:4
@@ -177,8 +182,7 @@ MODULES:
     _handle_llm_error  CC=5  out:7
     _handle_pipeline_error  CC=2  out:4
     _on_stage_error_impl  CC=6  out:3
-    _run_auto_fix_config  CC=7  out:21
-    run  CC=17  out:53
+    _rebuild_iterations_from_result  CC=7  out:7
   pyqual.cli.cmd_tickets  [4 funcs]
     tickets_all  CC=2  out:8
     tickets_fetch  CC=6  out:15
@@ -230,16 +234,20 @@ MODULES:
     load  CC=2  out:7
     __post_init__  CC=2  out:1
     _load_env_file  CC=2  out:3
-  pyqual.custom_fix  [2 funcs]
+  pyqual.custom_fix  [3 funcs]
     add_docstring  CC=6  out:11
+    apply_patch  CC=3  out:9
     parse_and_apply_suggestions  CC=13  out:21
   pyqual.fix_tools  [1 funcs]
     get_available_tools  CC=5  out:9
   pyqual.gate_collectors.legacy  [2 funcs]
     _from_toon  CC=4  out:7
     _from_vallm  CC=6  out:10
-  pyqual.gates  [1 funcs]
-    _collect_metrics  CC=5  out:6
+  pyqual.github_actions  [4 funcs]
+    create_issue  CC=7  out:8
+    ensure_issue_exists  CC=8  out:8
+    set_failed  CC=1  out:1
+    set_output  CC=2  out:4
   pyqual.github_tasks  [1 funcs]
     fetch_github_tasks  CC=3  out:5
   pyqual.integrations.llx_mcp  [2 funcs]
@@ -263,54 +271,107 @@ MODULES:
   pyqual.plugins  [2 funcs]
     get_available_plugins  CC=2  out:1
     install_plugin_config  CC=2  out:5
-  pyqual.plugins._base  [2 funcs]
-    get  CC=1  out:1
-    list_plugins  CC=5  out:2
   pyqual.plugins.attack.__main__  [4 funcs]
     _ensure_dir  CC=1  out:1
     cmd_check  CC=2  out:10
     cmd_merge  CC=5  out:19
     main  CC=4  out:4
-  pyqual.plugins.attack.main  [4 funcs]
+  pyqual.plugins.attack.main  [5 funcs]
+    _merge_theirs  CC=7  out:14
     attack_check  CC=7  out:9
-    attack_merge  CC=15  out:24
+    attack_merge  CC=9  out:11
     auto_merge_pr  CC=6  out:7
     run_git_command  CC=5  out:3
+  pyqual.plugins.attack.test  [7 funcs]
+    test_not_git_repo  CC=3  out:1
+    test_successful_check  CC=4  out:6
+    test_dry_run_merge  CC=3  out:6
+    test_not_git_repo  CC=3  out:1
+    test_no_pr_or_branch  CC=3  out:1
+    test_pr_merge_failure  CC=3  out:4
+    test_pr_merge_with_gh_cli  CC=3  out:3
   pyqual.plugins.cli_helpers  [4 funcs]
     plugin_add  CC=5  out:19
     plugin_info  CC=5  out:16
     plugin_list  CC=9  out:19
     plugin_search  CC=11  out:25
-  pyqual.plugins.deps.main  [4 funcs]
-    check_requirements  CC=15  out:16
+  pyqual.plugins.deps.main  [5 funcs]
+    _is_pinned_req  CC=2  out:1
+    check_requirements  CC=12  out:17
     deps_health_check  CC=8  out:21
     get_dependency_tree  CC=10  out:7
     get_outdated_packages  CC=9  out:15
+  pyqual.plugins.deps.test  [6 funcs]
+    test_fully_pinned_requirements  CC=3  out:2
+    test_requirements_not_found  CC=3  out:1
+    test_requirements_parsing  CC=6  out:2
+    test_health_check_structure  CC=5  out:1
+    test_pipdeptree_not_available  CC=4  out:5
+    test_pip_not_available  CC=2  out:1
   pyqual.plugins.docker.main  [4 funcs]
     docker_security_check  CC=8  out:7
     get_image_info  CC=6  out:10
     run_hadolint  CC=9  out:6
     run_trivy_scan  CC=14  out:13
+  pyqual.plugins.docker.test  [4 funcs]
+    test_security_check_structure  CC=3  out:1
+    test_security_check_without_image  CC=4  out:2
+    test_hadolint_not_found  CC=4  out:5
+    test_trivy_not_found  CC=4  out:5
   pyqual.plugins.docs.main  [4 funcs]
     check_links  CC=8  out:7
     check_readme  CC=9  out:15
     docs_quality_summary  CC=5  out:12
     run_interrogate  CC=5  out:5
+  pyqual.plugins.docs.test  [5 funcs]
+    test_lychee_not_found  CC=2  out:1
+    test_readme_not_found  CC=3  out:1
+    test_readme_quality_check  CC=7  out:2
+    test_summary_structure  CC=5  out:2
+    test_interrogate_not_found  CC=4  out:6
+  pyqual.plugins.example_plugin.main  [1 funcs]
+    example_helper_function  CC=1  out:0
+  pyqual.plugins.example_plugin.test  [1 funcs]
+    test_example_helper_function  CC=3  out:1
   pyqual.plugins.git.git_command  [1 funcs]
     run_git_command  CC=1  out:1
-  pyqual.plugins.git.main  [14 funcs]
+  pyqual.plugins.git.main  [20 funcs]
     _collect_scan_metrics  CC=4  out:16
+    _classify_secret_findings  CC=9  out:12
+    _count_pushed_commits  CC=5  out:4
     _get_provider_for_pattern  CC=1  out:1
     _get_severity_for_pattern  CC=1  out:1
     _is_likely_false_positive  CC=9  out:6
-    _scan_with_gitleaks  CC=7  out:9
-    _scan_with_patterns  CC=9  out:11
-    _scan_with_trufflehog  CC=10  out:18
-    git_add  CC=4  out:6
-    git_commit  CC=12  out:9
-    git_push  CC=17  out:22
-  pyqual.plugins.git.status  [1 funcs]
-    git_status  CC=18  out:20
+    _parse_branch_line  CC=5  out:10
+    _parse_file_status  CC=5  out:4
+    _parse_push_errors  CC=8  out:10
+    _run_enabled_scanners  CC=9  out:9
+  pyqual.plugins.git.status  [3 funcs]
+    _parse_branch_line  CC=5  out:10
+    _parse_file_status  CC=5  out:4
+    git_status  CC=8  out:8
+  pyqual.plugins.git.test  [13 funcs]
+    test_commit_only_if_changed_no_changes  CC=3  out:1
+    test_commit_with_changes  CC=4  out:3
+    test_status_in_empty_repo  CC=6  out:1
+    test_status_not_a_git_repo  CC=3  out:3
+    test_status_with_untracked_file  CC=4  out:2
+    test_preflight_clean_repo  CC=3  out:1
+    test_preflight_with_secrets_blocks_push  CC=3  out:3
+    test_false_positive_detection  CC=3  out:2
+    test_provider_mapping  CC=5  out:4
+    test_scan_finds_aws_key  CC=5  out:3
+  pyqual.plugins.security.main  [4 funcs]
+    run_bandit_check  CC=10  out:4
+    run_detect_secrets  CC=10  out:11
+    run_pip_audit  CC=11  out:7
+    security_summary  CC=2  out:8
+  pyqual.plugins.security.test  [5 funcs]
+    test_bandit_not_found  CC=4  out:6
+    test_detect_secrets_not_found  CC=4  out:5
+    test_pip_audit_not_found  CC=4  out:5
+    test_security_summary_empty  CC=5  out:1
+    test_security_summary_with_issues  CC=4  out:4
   pyqual.profiles  [1 funcs]
     get_profile  CC=1  out:1
   pyqual.release_check  [2 funcs]
@@ -321,27 +382,33 @@ MODULES:
     _build_project_badges  CC=11  out:20
     _build_quality_badges  CC=8  out:10
     _parse_pyproject_fallback  CC=4  out:5
-    _read_costs_data  CC=3  out:4
+    _read_costs_data  CC=4  out:4
     _read_costs_json  CC=6  out:5
     _read_costs_package  CC=12  out:17
     _read_git_commit_count  CC=3  out:4
     _read_pyproject  CC=5  out:4
     _read_version  CC=3  out:5
-  pyqual.report_generator  [9 funcs]
+  pyqual.report_generator  [11 funcs]
     _build_gate  CC=1  out:1
     _build_gates_from_metrics  CC=3  out:2
+    _build_run_from_rows  CC=11  out:23
     generate_ascii_diagram  CC=7  out:10
     generate_mermaid_diagram  CC=7  out:11
     generate_metrics_table  CC=5  out:11
     generate_report  CC=4  out:12
     generate_stage_details  CC=11  out:16
-    get_last_run  CC=15  out:32
+    get_last_run  CC=3  out:8
     main  CC=1  out:6
-  pyqual.run_parallel_fix  [4 funcs]
+  pyqual.run_parallel_fix  [9 funcs]
+    _print_cycle_completion  CC=2  out:4
+    _print_yaml_results  CC=10  out:33
     _setup_batch  CC=2  out:2
     get_todo_batch  CC=5  out:8
+    git_commit_and_push  CC=4  out:9
     main  CC=13  out:37
+    mark_completed_todos  CC=11  out:19
     parse_args  CC=1  out:7
+    run_tool  CC=6  out:13
   pyqual.setup_deps  [5 funcs]
     _check_cli  CC=1  out:2
     _check_pip  CC=5  out:7
@@ -387,16 +454,17 @@ MODULES:
   pyqual.validation.project  [2 funcs]
     _detect_language  CC=4  out:2
     detect_project_facts  CC=8  out:11
-  pyqual.validation.release  [9 funcs]
+  pyqual.validation.release  [12 funcs]
     _bump_patch_version  CC=2  out:4
+    _check_git_state  CC=10  out:13
     _check_pypi_version  CC=6  out:4
+    _check_registry  CC=4  out:5
+    _check_version_metadata  CC=9  out:8
     _parse_pyproject_fallback  CC=7  out:9
     _read_package_init_version  CC=3  out:5
     _read_project_metadata  CC=8  out:8
     _read_pyproject  CC=5  out:5
     _read_version_file  CC=3  out:3
-    _resolve_release_version  CC=3  out:2
-    validate_release_state  CC=22  out:33
   pyqual.validation.schema  [1 funcs]
     _resolve_gate_metric  CC=3  out:2
   pyqual.yaml_fixer  [8 funcs]
@@ -413,6 +481,9 @@ MODULES:
     run_project  CC=11  out:38
 
 EDGES:
+  run_analysis.run_project → Taskfile.print
+  run_analysis.main → Taskfile.print
+  run_analysis.main → run_analysis.run_project
   dashboard.src.App.App → dashboard.src.App.loadRepositories
   dashboard.src.components.RepositoryDetail.RepositoryDetail → dashboard.src.components.RepositoryDetail.navigate
   dashboard.src.api.fetchRepositories → dashboard.src.api.loadConfig
@@ -422,23 +493,6 @@ EDGES:
   dashboard.src.api.fetchLatestRun → dashboard.src.api.getRepoPath
   dashboard.src.api.getRepoPath → dashboard.src.api.match
   dashboard.src.api.fetchRepositoriesWithFallback → dashboard.src.api.fetchRepositories
-  run_analysis.run_project → pyqual.config.PyqualConfig.load
-  run_analysis.main → run_analysis.run_project
-  examples.integration_example.run_quality_check → pyqual.api.run_pipeline
-  examples.integration_example.run_with_callbacks → pyqual.api.load_config
-  examples.integration_example.run_with_callbacks → pyqual.api.run
-  examples.integration_example.run_with_callbacks → pyqual.api.export_results_json
-  examples.integration_example.check_prerequisites → pyqual.api.shell_check
-  examples.integration_example.run_shell_command_example → pyqual.api.shell_check
-  examples.integration_example.run_single_stage → pyqual.api.run_stage
-  examples.integration_example.preview_pipeline → pyqual.api.dry_run
-  examples.integration_example.preview_pipeline → pyqual.api.format_result_summary
-  examples.integration_example.quick_gate_check → pyqual.api.load_config
-  examples.integration_example.quick_gate_check → pyqual.api.check_gates
-  examples.custom_gates.metric_history.save_snapshot → examples.custom_gates.metric_history.load_history
-  examples.custom_gates.metric_history.main → examples.custom_gates.metric_history.save_snapshot
-  examples.custom_gates.composite_gates.run_composite_check → examples.custom_gates.composite_gates.compute_composite_score
-  examples.custom_gates.composite_gates.main → examples.custom_gates.composite_gates.run_composite_check
   dashboard.api.main.get_projects → dashboard.api.main.read_summary_json
   dashboard.api.main.get_latest_run → dashboard.api.main.read_summary_json
   dashboard.api.main.get_project_runs → dashboard.api.main.get_db_path
@@ -456,10 +510,24 @@ EDGES:
   dashboard.api.main.get_project_summary → dashboard.api.main.get_db_path
   dashboard.api.main.get_project_summary → dashboard.api.main.query_pipeline_db
   dashboard.api.main.get_project_summary → dashboard.api.main.safe_parse
+  examples.integration_example.run_quality_check → pyqual.api.run_pipeline
+  examples.integration_example.run_with_callbacks → Taskfile.print
+  examples.integration_example.check_prerequisites → pyqual.api.shell_check
+  examples.integration_example.run_shell_command_example → pyqual.api.shell_check
+  examples.integration_example.run_shell_command_example → Taskfile.print
+  examples.integration_example.run_single_stage → Taskfile.print
+  examples.integration_example.preview_pipeline → Taskfile.print
+  examples.integration_example.quick_gate_check → Taskfile.print
+  examples.custom_gates.metric_history.save_snapshot → examples.custom_gates.metric_history.load_history
+  examples.custom_gates.metric_history.print_trend_report → Taskfile.print
+  examples.custom_gates.metric_history.main → Taskfile.print
+  examples.custom_gates.metric_history.main → examples.custom_gates.metric_history.save_snapshot
+  examples.custom_gates.composite_gates.run_composite_check → examples.custom_gates.composite_gates.compute_composite_score
+  examples.custom_gates.composite_gates.run_composite_check → Taskfile.print
+  examples.custom_gates.composite_gates.main → Taskfile.print
+  examples.custom_gates.composite_gates.main → examples.custom_gates.composite_gates.run_composite_check
+  examples.custom_gates.dynamic_thresholds.main → Taskfile.print
+  examples.multi_gate_pipeline.run_pipeline.main → Taskfile.print
+  examples.ticket_workflow.sync_tickets.sync_from_cli → Taskfile.print
   examples.ticket_workflow.sync_tickets.sync_from_cli → pyqual.tickets.sync_github_tickets
   examples.ticket_workflow.sync_tickets.sync_from_cli → pyqual.tickets.sync_all_tickets
-  examples.ticket_workflow.sync_tickets.sync_from_cli → pyqual.tickets.sync_todo_tickets
-  examples.ticket_workflow.sync_tickets.tickets_from_gate_failures → pyqual.config.PyqualConfig.load
-  examples.ticket_workflow.sync_tickets.tickets_from_gate_failures → pyqual.tickets.sync_todo_tickets
-  examples.ticket_workflow.sync_tickets.main → examples.ticket_workflow.sync_tickets.sync_from_cli
-  examples.ticket_workflow.sync_tickets.main → examples.ticket_workflow.sync_tickets.tickets_from_gate_failures

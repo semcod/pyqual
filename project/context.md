@@ -4,14 +4,18 @@
 
 - **Project**: /home/tom/github/semcod/pyqual
 - **Primary Language**: python
-- **Languages**: python: 124, typescript: 12, shell: 7, javascript: 2
+- **Languages**: python: 122, yaml: 53, typescript: 12, txt: 9, json: 7
 - **Analysis Mode**: static
-- **Total Functions**: 774
+- **Total Functions**: 1233
 - **Total Classes**: 118
-- **Modules**: 145
-- **Entry Points**: 0
+- **Modules**: 217
+- **Entry Points**: 925
 
 ## Architecture by Module
+
+### project.map.toon
+- **Functions**: 1593
+- **File**: `map.toon.yaml`
 
 ### pyqual._gate_collectors
 - **Functions**: 28
@@ -49,15 +53,15 @@
 - **Classes**: 2
 - **File**: `github_actions.py`
 
-### pyqual.tools
-- **Functions**: 15
-- **Classes**: 1
-- **File**: `tools.py`
-
 ### pyqual.report_generator
 - **Functions**: 15
 - **Classes**: 2
 - **File**: `report_generator.py`
+
+### pyqual.tools
+- **Functions**: 15
+- **Classes**: 1
+- **File**: `tools.py`
 
 ### pyqual.api
 - **Functions**: 15
@@ -97,11 +101,6 @@
 - **Classes**: 5
 - **File**: `test.py`
 
-### pyqual.plugins.docker.main
-- **Functions**: 13
-- **Classes**: 1
-- **File**: `main.py`
-
 ### pyqual.plugins.attack.test
 - **Functions**: 13
 - **Classes**: 5
@@ -111,9 +110,214 @@
 
 Main execution flows into the system:
 
+### pyqual.cli.cmd_run.run
+> Execute pipeline loop until quality gates pass.
+
+Output is streamed as YAML to stdout as each stage completes.
+Diagnostic messages go to stderr.
+- **Calls**: app.command, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, pyqual.cli.main.setup_logging
+
+### pyqual.cli.cmd_config.fix_config
+> Use LLM to auto-repair pyqual.yaml based on project structure.
+
+Scans the project (language, available tools, test framework) and asks the
+LLM to prod
+- **Calls**: app.command, typer.Option, typer.Option, typer.Option, typer.Option, None.resolve, pyqual.api.validate_config, pyqual.validation.project.detect_project_facts
+
+### pyqual.cli.cmd_git.git_scan_cmd
+> Scan files for secrets before push.
+
+Runs multiple scanners in order:
+1. trufflehog (if available) - most comprehensive
+2. gitleaks (if available) - f
+- **Calls**: git_app.command, typer.Argument, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option
+
+### pyqual.cli_log_helpers.format_log_entry_row
+> Return (ts, event_name, name, status, details) for one log entry.
+- **Calls**: entry.get, entry.get, None.replace, entry.get, entry.get, None.join, entry.get, entry.get
+
+### pyqual.run_parallel_fix.main
+> Run parallel fix on TODO.md items - configurable batch size with git push.
+- **Calls**: pyqual.run_parallel_fix.parse_args, Path.cwd, pyqual.run_parallel_fix.get_todo_batch, Taskfile.print, enumerate, pyqual.run_parallel_fix._setup_batch, Taskfile.print, os.environ.get
+
+### examples.multi_gate_pipeline.run_pipeline.main
+- **Calls**: Path, PyqualConfig.load, Pipeline, Taskfile.print, Taskfile.print, Taskfile.print, Taskfile.print, Taskfile.print
+
+### examples.custom_gates.metric_history.main
+> Run the metric history self-test with synthetic history.
+- **Calls**: tempfile.TemporaryDirectory, Path, pyqual_dir.mkdir, Taskfile.print, Taskfile.print, Taskfile.print, Taskfile.print, sorted
+
+### pyqual.config.PyqualConfig._parse
+- **Calls**: raw.get, pyqual.tools.load_entry_point_presets, pyqual.tools.load_user_tools, pipeline.get, pipeline.get, pipeline.get, cls._validate_stages, cls
+
+### pyqual.auto_closer.main
+- **Calls**: Path.cwd, gates_info.get, gates_info.get, Taskfile.print, PlanfileStore, store.list_tickets, Taskfile.print, pyqual.auto_closer.get_changed_files
+
+### pyqual.plugins.docs.main.DocsCollector._collect_readme_metrics
+> Extract README quality metrics.
+- **Calls**: readme_json_path.exists, readme_path.exists, self._set_zero_readme, json.loads, float, float, float, readme_path.read_text
+
+### pyqual.cli_observe.register_observe_commands
+> Register logs, watch, and history commands onto *app*.
+- **Calls**: app.command, app.command, app.command, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option
+
+### pyqual.cli.cmd_git.git_commit_cmd
+> Create a git commit.
+- **Calls**: git_app.command, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, pyqual.plugins.git.main.git_commit, result.get
+
+### pyqual.plugins.lint.main.LintCollector._collect_pylint
+> Extract pylint score and error counts.
+- **Calls**: isinstance, p.exists, json.loads, float, float, float, isinstance, p.read_text
+
+### pyqual.cli.cmd_tickets.tickets_sync
+> Sync tickets from gate failures or explicitly.
+
+Examples:
+    pyqual tickets sync --from-gates              # Check gates, sync if fail
+    pyqual tic
+- **Calls**: tickets_app.command, typer.Option, typer.Option, typer.Option, typer.Option, Path, console.print, console.print
+
+### pyqual.pipeline.Pipeline._execute_streaming
+> Execute stage with real-time output streaming via Popen.
+- **Calls**: subprocess.Popen, proc.wait, StageResult, StageResult, select.select, fd.readline, None.append, None.join
+
+### pyqual.cli.cmd_git.git_status_cmd
+> Show git repository status.
+- **Calls**: git_app.command, typer.Option, typer.Option, pyqual.plugins.git.status.git_status, pyqual.cli.cmd_git._print_file_list, pyqual.cli.cmd_git._print_file_list, pyqual.cli.cmd_git._print_file_list, console.print
+
+### pyqual.cli.cmd_config.status
+> Show current metrics and pipeline config.
+- **Calls**: app.command, typer.Option, typer.Option, PyqualConfig.load, GateSet, gate_set._collect_metrics, console.print, console.print
+
+### pyqual.plugins.lint.main.LintCollector._collect_ruff
+> Extract ruff linter metrics.
+- **Calls**: p.exists, json.loads, isinstance, p.read_text, len, sum, sum, float
+
+### pyqual.cli.cmd_init.init
+> Create pyqual.yaml with sensible defaults.
+
+Use --profile for a minimal config based on a built-in profile:
+
+    pyqual init --profile python         
+- **Calls**: app.command, typer.Argument, typer.Option, target.exists, None.mkdir, console.print, console.print, Path
+
+### pyqual.cli.main.tune_thresholds_cmd
+> Auto-tune quality gate thresholds based on current metrics.
+
+Analyzes collected metrics and suggests optimal thresholds.
+- **Calls**: app.command, typer.Option, typer.Option, typer.Option, typer.Option, console.print, pyqual.cli.main._load_latest_metrics_for_tune, pyqual.cli.main._calculate_thresholds_for_tune
+
+### pyqual.cli.cmd_config.validate
+> Validate pyqual.yaml without running the pipeline.
+
+Checks for:
+- YAML parse errors (with line/column positions)
+- Unknown or missing tool binaries
+- 
+- **Calls**: app.command, typer.Option, typer.Option, typer.Option, typer.Option, pyqual.api.validate_config, console.print, pyqual.cli.cmd_config._print_issues
+
+### pyqual.custom_fix.parse_and_apply_suggestions
+> Parse LLM suggestions and apply patches.
+- **Calls**: re.findall, Path, Taskfile.print, re.search, file_path.exists, Taskfile.print, file_path.read_text, re.search
+
+### pyqual.cli_bulk_cmds.register_bulk_commands
+> Register bulk-init and bulk-run commands onto *app*.
+- **Calls**: app.command, app.command, typer.Argument, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option
+
+### pyqual.plugins.lint.main.LintCollector._collect_flake8
+> Extract flake8 violation count.
+- **Calls**: p.exists, json.loads, isinstance, p.read_text, len, sum, sum, float
+
+### pyqual.cli.cmd_config.gates
+> Check quality gates without running stages.
+- **Calls**: app.command, typer.Option, typer.Option, PyqualConfig.load, GateSet, gate_set.check_all, Table, table.add_column
+
+### pyqual.plugins.git.main.GitCollector.collect
+> Collect git metrics from .pyqual/git_*.json artifacts.
+- **Calls**: status_path.exists, push_path.exists, commit_path.exists, scan_path.exists, preflight_path.exists, json.loads, self._collect_status_metrics, json.loads
+
+### pyqual.cli.cmd_info.tools
+> List built-in tool presets for pipeline stages.
+- **Calls**: app.command, Table, table.add_column, table.add_column, table.add_column, table.add_column, table.add_column, sorted
+
+### pyqual.cli.cmd_tune.tune_thresholds
+> Automatically tune quality gate thresholds to match current metrics.
+
+Analyzes collected metrics and suggests optimal thresholds that will
+result in a
+- **Calls**: app.command, typer.Option, typer.Option, typer.Option, typer.Option, console.print, PyqualConfig.load, pyqual.cli.cmd_tune._load_latest_metrics
+
+### pyqual.plugins.documentation.main.DocumentationCollector.collect
+> Collect all documentation metrics.
+- **Calls**: result.update, result.update, result.update, result.update, result.update, result.update, sum, self._check_required_files
+
+### pyqual.api.run_stage
+> Run a single stage/command directly.
+
+Args:
+    stage_name: Name of the stage (for logging)
+    command: Shell command to run (either command or tool 
+- **Calls**: None.resolve, log.info, time.monotonic, pyqual.tools.get_preset, preset.shell_command, dict, subprocess.run, Path
+
 ## Process Flows
 
 Key execution flows identified:
+
+### Flow 1: run
+```
+run [pyqual.cli.cmd_run]
+```
+
+### Flow 2: fix_config
+```
+fix_config [pyqual.cli.cmd_config]
+```
+
+### Flow 3: git_scan_cmd
+```
+git_scan_cmd [pyqual.cli.cmd_git]
+```
+
+### Flow 4: format_log_entry_row
+```
+format_log_entry_row [pyqual.cli_log_helpers]
+```
+
+### Flow 5: main
+```
+main [pyqual.run_parallel_fix]
+  └─> parse_args
+  └─> get_todo_batch
+  └─ →> print
+```
+
+### Flow 6: _parse
+```
+_parse [pyqual.config.PyqualConfig]
+  └─ →> load_entry_point_presets
+  └─ →> load_user_tools
+      └─> _load_json_presets
+```
+
+### Flow 7: _collect_readme_metrics
+```
+_collect_readme_metrics [pyqual.plugins.docs.main.DocsCollector]
+```
+
+### Flow 8: register_observe_commands
+```
+register_observe_commands [pyqual.cli_observe]
+```
+
+### Flow 9: git_commit_cmd
+```
+git_commit_cmd [pyqual.cli.cmd_git]
+```
+
+### Flow 10: _collect_pylint
+```
+_collect_pylint [pyqual.plugins.lint.main.LintCollector]
+```
 
 ## Key Classes
 
@@ -239,9 +443,7 @@ Key functions that process and transform data:
 
 ### pyqual.custom_fix.parse_and_apply_suggestions
 > Parse LLM suggestions and apply patches.
-- **Output to**: re.findall, Path, print, re.search, file_path.exists
-
-### pyqual.output._parse_output_line
+- **Output to**: re.findall, Path, Taskfile.print, re.search, file_path.exists
 
 ### pyqual.config.PyqualConfig._parse
 - **Output to**: raw.get, pyqual.tools.load_entry_point_presets, pyqual.tools.load_user_tools, pipeline.get, pipeline.get
@@ -250,13 +452,15 @@ Key functions that process and transform data:
 > Validate and construct StageConfig list from raw dicts.
 - **Output to**: StageConfig, stages.append, StageConfig.__dataclass_fields__.values, ValueError, ValueError
 
-### pyqual.auto_closer._process_ticket
-> Process a single ticket for closure. Returns True if closed.
-- **Output to**: print, pyqual.auto_closer.evaluate_with_llm, ticket.sync.get, store.update_ticket, external_id.isdigit
+### pyqual.output._parse_output_line
 
 ### pyqual.report_generator.parse_kwargs
 > Parse kwargs string that might have single quotes.
 - **Output to**: json.loads, ast.literal_eval
+
+### pyqual.auto_closer._process_ticket
+> Process a single ticket for closure. Returns True if closed.
+- **Output to**: Taskfile.print, pyqual.auto_closer.evaluate_with_llm, ticket.sync.get, store.update_ticket, external_id.isdigit
 
 ### pyqual.parallel.parse_todo_items
 > Parse unchecked items from TODO.md.
@@ -287,10 +491,6 @@ Ret
 > Return average maintainability index from parsed radon.json data, or None.
 - **Output to**: float, round, data.values, float, isinstance
 
-### pyqual.bulk_init._validate_yaml_content
-> Validate that YAML content is parseable and has required structure.
-- **Output to**: yaml.safe_load, ValueError, ValueError
-
 ### pyqual.yaml_fixer._try_parse_yaml
 > Try to parse YAML and return success status and error message.
 - **Output to**: yaml.safe_load, str
@@ -298,6 +498,10 @@ Ret
 ### pyqual.yaml_fixer._parse_pyyaml_error
 > Parse PyYAML error message to extract line/column info.
 - **Output to**: YamlSyntaxIssue, re.search, error_str.lower, pyqual.yaml_fixer._get_context, error_str.lower
+
+### pyqual.bulk_init._validate_yaml_content
+> Validate that YAML content is parseable and has required structure.
+- **Output to**: yaml.safe_load, ValueError, ValueError
 
 ### pyqual.cli_run_helpers._format_ticket_summary
 > Format ticket/TODO progress section.
@@ -337,6 +541,13 @@ Checks for:
 ### pyqual.plugins.git.status._parse_branch_line
 > Parse a '## branch...remote [ahead N, behind N]' porcelain line into result.
 - **Output to**: None.strip, re.search, re.search, branch_info.split, int
+
+## Behavioral Patterns
+
+### state_machine_ProjectRunState
+- **Type**: state_machine
+- **Confidence**: 0.70
+- **Functions**: pyqual.bulk.models.ProjectRunState.elapsed, pyqual.bulk.models.ProjectRunState.progress_pct, pyqual.bulk.models.ProjectRunState.gates_label
 
 ## Public API Surface
 
@@ -389,6 +600,36 @@ How components interact:
 
 ```mermaid
 graph TD
+    run --> command
+    run --> Option
+    fix_config --> command
+    fix_config --> Option
+    git_scan_cmd --> command
+    git_scan_cmd --> Argument
+    git_scan_cmd --> Option
+    format_log_entry_row --> get
+    format_log_entry_row --> replace
+    main --> parse_args
+    main --> cwd
+    main --> get_todo_batch
+    main --> print
+    main --> enumerate
+    main --> Path
+    main --> load
+    main --> Pipeline
+    main --> TemporaryDirectory
+    main --> mkdir
+    _parse --> get
+    _parse --> load_entry_point_pre
+    _parse --> load_user_tools
+    main --> get
+    main --> PlanfileStore
+    _collect_readme_metr --> exists
+    _collect_readme_metr --> _set_zero_readme
+    _collect_readme_metr --> loads
+    _collect_readme_metr --> float
+    register_observe_com --> command
+    register_observe_com --> Option
 ```
 
 ## Reverse Engineering Guidelines

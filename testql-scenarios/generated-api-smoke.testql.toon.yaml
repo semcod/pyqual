@@ -1,0 +1,17 @@
+# SCENARIO: Auto-generated API Smoke Tests
+# TYPE: api
+# GENERATED: true
+# DETECTORS: ConfigEndpointDetector
+
+CONFIG[4]{key, value}:
+  base_url, http://localhost:8101
+  timeout_ms, 10000
+  retry_count, 3
+  detected_frameworks, ConfigEndpointDetector
+
+ASSERT[2]{field, operator, expected}:
+  status, <, 500
+  response_time, <, 2000
+
+# Summary by Framework:
+#   docker: 1 endpoints

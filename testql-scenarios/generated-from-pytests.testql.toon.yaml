@@ -1,0 +1,22 @@
+# SCENARIO: Auto-generated from Python Tests
+# TYPE: integration
+# GENERATED: true
+
+LOG[41]{message}:
+  "Test: test_github_connection"
+  "Test: TestReleaseValidationHappyPath_test_clean_git_unique_version_passes"
+  "Test: TestReleaseValidationHappyPath_test_no_bump_validates_current_version"
+  "Test: TestReleaseValidationVersionIssues_test_module_version_mismatch_warning"
+  "Test: TestBumpPatchLogic_test_bump_patch_computes_next_version"
+  "Test: test_clean_git_unique_version_passes"
+  "Test: test_no_bump_validates_current_version"
+  "Test: test_module_version_mismatch_warning"
+  "Test: test_bump_patch_computes_next_version"
+  "Test: TestStageFailure_test_api_key_missing"
+
+INCLUDE[8]{file}:
+  "/home/tom/github/semcod/pyqual/tests/test_report.py"
+  "/home/tom/github/semcod/pyqual/tests/test_report.py"
+  "/home/tom/github/semcod/pyqual/tests/test_runtime_errors.py"
+  "/home/tom/github/semcod/pyqual/tests/test_runtime_errors.py"
+  "/home/tom/github/semcod/pyqual/tests/test_report.py"

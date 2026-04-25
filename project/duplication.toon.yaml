@@ -1,14 +1,26 @@
-# redup/duplication | 10 groups | 114f 19182L | 2026-04-15
+# redup/duplication | 11 groups | 115f 19455L | 2026-04-25
 
 SUMMARY:
-  files_scanned: 114
-  total_lines:   19182
-  dup_groups:    10
-  dup_fragments: 29
-  saved_lines:   155
-  scan_ms:       13681
+  files_scanned: 115
+  total_lines:   19455
+  dup_groups:    11
+  dup_fragments: 31
+  saved_lines:   210
+  scan_ms:       12109
 
-DUPLICATES[10] (ranked by impact):
+HOTSPOTS[7] (files with most duplication):
+  pyqual/plugins/git/main.py  dup=58L  groups=2  frags=2  (0.3%)
+  pyqual/cli/cmd_tune.py  dup=57L  groups=2  frags=2  (0.3%)
+  pyqual/plugins/git/status.py  dup=55L  groups=1  frags=1  (0.3%)
+  pyqual/cli/main.py  dup=52L  groups=2  frags=2  (0.3%)
+  pyqual/cli/cmd_tickets.py  dup=33L  groups=1  frags=3  (0.2%)
+  pyqual/_gate_collectors.py  dup=33L  groups=2  frags=3  (0.2%)
+  pyqual/tickets.py  dup=21L  groups=1  frags=3  (0.1%)
+
+DUPLICATES[11] (ranked by impact):
+  [d357ec2d6847c815] ! EXAC  git_status  L=55 N=2 saved=55 sim=1.00
+      pyqual/plugins/git/main.py:275-329  (git_status)
+      pyqual/plugins/git/status.py:47-101  (git_status)
   [969039c4ca2a3049] ! STRU  _display_comparison  L=40 N=2 saved=40 sim=1.00
       pyqual/cli/cmd_tune.py:158-197  (_display_comparison)
       pyqual/cli/main.py:151-188  (_display_comparison_for_tune)
@@ -37,7 +49,7 @@ DUPLICATES[10] (ranked by impact):
       pyqual/gate_collectors/utils.py:3-12  (_read_artifact_text)
   [83d4e43f6248a283]   STRU  _from_code_health  L=11 N=2 saved=11 sim=1.00
       pyqual/_gate_collectors.py:310-320  (_from_code_health)
-      pyqual/_gate_collectors.py:495-505  (_from_lint)
+      pyqual/_gate_collectors.py:500-510  (_from_lint)
   [5a6d760035a8c5b8]   STRU  _print_history_prompts  L=10 N=2 saved=10 sim=1.00
       pyqual/cli_observe.py:299-308  (_print_history_prompts)
       pyqual/cli_observe.py:311-320  (_print_history_stdout)
@@ -49,38 +61,72 @@ DUPLICATES[10] (ranked by impact):
       pyqual/profiles.py:205-207  (list_profiles)
       pyqual/tools.py:144-146  (list_presets)
 
-REFACTOR[10] (ranked by priority):
-  [1] ◐ extract_function   → pyqual/cli/utils/_display_comparison.py
+REFACTOR[11] (ranked by priority):
+  [1] ◐ extract_module     → pyqual/plugins/git/utils/git_status.py
+      WHY: 2 occurrences of 55-line block across 2 files — saves 55 lines
+      FILES: pyqual/plugins/git/main.py, pyqual/plugins/git/status.py
+  [2] ◐ extract_function   → pyqual/cli/utils/_display_comparison.py
       WHY: 2 occurrences of 40-line block across 2 files — saves 40 lines
       FILES: pyqual/cli/cmd_tune.py, pyqual/cli/main.py
-  [2] ○ extract_function   → pyqual/cli/utils/tickets_todo.py
+  [3] ○ extract_function   → pyqual/cli/utils/tickets_todo.py
       WHY: 3 occurrences of 11-line block across 1 files — saves 22 lines
       FILES: pyqual/cli/cmd_tickets.py
-  [3] ○ extract_function   → pyqual/plugins/utils/get_config_example.py
+  [4] ○ extract_function   → pyqual/plugins/utils/get_config_example.py
       WHY: 8 occurrences of 3-line block across 8 files — saves 21 lines
       FILES: pyqual/plugins/attack/main.py, pyqual/plugins/builtin.py, pyqual/plugins/deps/main.py, pyqual/plugins/docker/main.py, pyqual/plugins/docs/main.py +3 more
-  [4] ○ extract_function   → pyqual/cli/utils/_apply_thresholds.py
+  [5] ○ extract_function   → pyqual/cli/utils/_apply_thresholds.py
       WHY: 2 occurrences of 17-line block across 2 files — saves 17 lines
       FILES: pyqual/cli/cmd_tune.py, pyqual/cli/main.py
-  [5] ○ extract_function   → pyqual/utils/sync_todo_tickets.py
+  [6] ○ extract_function   → pyqual/utils/sync_todo_tickets.py
       WHY: 3 occurrences of 7-line block across 1 files — saves 14 lines
       FILES: pyqual/tickets.py
-  [6] ○ extract_function   → pyqual/utils/_read_artifact_text.py
+  [7] ○ extract_function   → pyqual/utils/_read_artifact_text.py
       WHY: 2 occurrences of 11-line block across 2 files — saves 11 lines
       FILES: pyqual/_gate_collectors.py, pyqual/gate_collectors/utils.py
-  [7] ○ extract_function   → pyqual/utils/_from_code_health.py
+  [8] ○ extract_function   → pyqual/utils/_from_code_health.py
       WHY: 2 occurrences of 11-line block across 1 files — saves 11 lines
       FILES: pyqual/_gate_collectors.py
-  [8] ○ extract_function   → pyqual/utils/_print_history_prompts.py
+  [9] ○ extract_function   → pyqual/utils/_print_history_prompts.py
       WHY: 2 occurrences of 10-line block across 1 files — saves 10 lines
       FILES: pyqual/cli_observe.py
-  [9] ○ extract_function   → pyqual/fix_tools/utils/get_timeout.py
+  [10] ○ extract_function   → pyqual/fix_tools/utils/get_timeout.py
       WHY: 3 occurrences of 3-line block across 3 files — saves 6 lines
       FILES: pyqual/fix_tools/aider.py, pyqual/fix_tools/claude.py, pyqual/fix_tools/llx.py
-  [10] ○ extract_function   → pyqual/utils/list_profiles.py
+  [11] ○ extract_function   → pyqual/utils/list_profiles.py
       WHY: 2 occurrences of 3-line block across 2 files — saves 3 lines
       FILES: pyqual/profiles.py, pyqual/tools.py
 
+QUICK_WINS[8] (low risk, high savings — do first):
+  [3] extract_function   saved=22L  → pyqual/cli/utils/tickets_todo.py
+      FILES: cmd_tickets.py
+  [4] extract_function   saved=21L  → pyqual/plugins/utils/get_config_example.py
+      FILES: main.py, builtin.py, main.py +5
+  [5] extract_function   saved=17L  → pyqual/cli/utils/_apply_thresholds.py
+      FILES: cmd_tune.py, main.py
+  [6] extract_function   saved=14L  → pyqual/utils/sync_todo_tickets.py
+      FILES: tickets.py
+  [7] extract_function   saved=11L  → pyqual/utils/_read_artifact_text.py
+      FILES: _gate_collectors.py, utils.py
+  [8] extract_function   saved=11L  → pyqual/utils/_from_code_health.py
+      FILES: _gate_collectors.py
+  [9] extract_function   saved=10L  → pyqual/utils/_print_history_prompts.py
+      FILES: cli_observe.py
+  [10] extract_function   saved=6L  → pyqual/fix_tools/utils/get_timeout.py
+      FILES: aider.py, claude.py, llx.py
+
+EFFORT_ESTIMATE (total ≈ 8.6h):
+  hard   git_status                          saved=55L  ~165min
+  hard   _display_comparison                 saved=40L  ~120min
+  medium tickets_todo                        saved=22L  ~44min
+  medium get_config_example                  saved=21L  ~42min
+  medium _apply_thresholds                   saved=17L  ~34min
+  easy   sync_todo_tickets                   saved=14L  ~28min
+  easy   _read_artifact_text                 saved=11L  ~22min
+  easy   _from_code_health                   saved=11L  ~22min
+  easy   _print_history_prompts              saved=10L  ~20min
+  easy   get_timeout                         saved=6L  ~12min
+  ... +1 more (~6min)
+
 METRICS-TARGET:
-  dup_groups:  10 → 0
-  saved_lines: 155 lines recoverable
+  dup_groups:  11 → 0
+  saved_lines: 210 lines recoverable

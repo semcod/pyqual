@@ -192,7 +192,7 @@ tasks:
       echo "- [Metrics](#metrics)" >> SUMR.md
       echo "- [Refactoring Analysis](#refactoring-analysis)" >> SUMR.md
       echo "- [Intent](#intent)" >> SUMR.md
-      echo "" >> SUMD.md
+      echo "" >> SUMR.md
       echo "## Metadata" >> SUMR.md
       echo "" >> SUMR.md
       echo "- **name**: \`$(basename $(pwd))\`" >> SUMR.md
