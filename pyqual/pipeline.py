@@ -80,6 +80,31 @@ class Pipeline:
         self._ensure_pyqual_dir()
         self._nfo = self._init_nfo()
 
+    def _run_loop(self, result: PipelineResult, dry_run: bool) -> None:
+        """Execute pipeline iterations until gates pass or stagnation."""
+        for i in range(1, self.config.loop.max_iterations + 1):
+            iteration = self._run_iteration(i, dry_run)
+            result.iterations.append(iteration)
+            if self._should_stop_after_iteration(iteration, i):
+                if iteration.all_gates_passed:
+                    result.final_passed = True
+                break
+
+    def _log_pipeline_completion(self, result: PipelineResult) -> None:
+        """Log structured and plain-text completion info."""
+        self._log_event(
+            "pipeline_end",
+            final_ok=result.final_passed,
+            iterations=result.iteration_count,
+            total_duration_s=round(result.total_duration, CONSTANT_3),
+        )
+        label = "PASS" if result.final_passed else "FAIL"
+        log.info(
+            "pipeline=%s result=%s iterations=%d duration=%.1fs",
+            self.config.name, label,
+            result.iteration_count, result.total_duration,
+        )
+
     def run(self, dry_run: bool = False) -> PipelineResult:
         """Run the full pipeline loop."""
         result = PipelineResult()
@@ -94,24 +119,10 @@ class Pipeline:
                  self.config.name, len(self.config.stages),
                  len(self.config.gates), self.config.loop.max_iterations, dry_run)
 
-        for i in range(1, self.config.loop.max_iterations + 1):
-            iteration = self._run_iteration(i, dry_run)
-            result.iterations.append(iteration)
-
-            if self._should_stop_after_iteration(iteration, i):
-                if iteration.all_gates_passed:
-                    result.final_passed = True
-                break
+        self._run_loop(result, dry_run)
 
         result.total_duration = time.monotonic() - start
-        self._log_event("pipeline_end",
-                        final_ok=result.final_passed,
-                        iterations=result.iteration_count,
-                        total_duration_s=round(result.total_duration, CONSTANT_3))
-        log.info("pipeline=%s result=%s iterations=%d duration=%.1fs",
-                 self.config.name,
-                 "PASS" if result.final_passed else "FAIL",
-                 result.iteration_count, result.total_duration)
+        self._log_pipeline_completion(result)
         return result
 
     def check_gates(self) -> list[GateResult]:

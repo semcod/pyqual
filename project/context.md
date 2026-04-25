@@ -6,19 +6,19 @@
 - **Primary Language**: python
 - **Languages**: python: 122, yaml: 56, typescript: 12, txt: 9, json: 7
 - **Analysis Mode**: static
-- **Total Functions**: 1261
+- **Total Functions**: 1357
 - **Total Classes**: 118
 - **Modules**: 220
-- **Entry Points**: 950
+- **Entry Points**: 1024
 
 ## Architecture by Module
 
 ### project.map.toon
-- **Functions**: 542
+- **Functions**: 1347
 - **File**: `map.toon.yaml`
 
 ### pyqual.pipeline
-- **Functions**: 29
+- **Functions**: 31
 - **Classes**: 1
 - **File**: `pipeline.py`
 
@@ -115,14 +115,14 @@ Main execution flows into the system:
 
 Output is streamed as YAML to stdout as each stage completes.
 Diagnostic messages go to stderr.
-- **Calls**: app.command, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, pyqual.cli.main.setup_logging
+- **Calls**: app.command, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, project.map.toon.setup_logging
 
 ### pyqual.cli.cmd_config.fix_config
 > Use LLM to auto-repair pyqual.yaml based on project structure.
 
 Scans the project (language, available tools, test framework) and asks the
 LLM to prod
-- **Calls**: app.command, typer.Option, typer.Option, typer.Option, typer.Option, None.resolve, pyqual.api.validate_config, pyqual.validation.project.detect_project_facts
+- **Calls**: app.command, typer.Option, typer.Option, typer.Option, typer.Option, None.resolve, project.map.toon.validate_config, project.map.toon.detect_project_facts
 
 ### pyqual.cli.cmd_git.git_scan_cmd
 > Scan files for secrets before push.
@@ -148,7 +148,7 @@ Runs multiple scanners in order:
 - **Calls**: tempfile.TemporaryDirectory, Path, pyqual_dir.mkdir, Taskfile.print, Taskfile.print, Taskfile.print, Taskfile.print, sorted
 
 ### pyqual.config.PyqualConfig._parse
-- **Calls**: raw.get, pyqual.tools.load_entry_point_presets, pyqual.tools.load_user_tools, pipeline.get, pipeline.get, pipeline.get, cls._validate_stages, cls
+- **Calls**: raw.get, project.map.toon.load_entry_point_presets, project.map.toon.load_user_tools, pipeline.get, pipeline.get, pipeline.get, cls._validate_stages, cls
 
 ### pyqual.auto_closer.main
 - **Calls**: Path.cwd, gates_info.get, gates_info.get, Taskfile.print, PlanfileStore, store.list_tickets, Taskfile.print, pyqual.auto_closer.get_changed_files
@@ -161,9 +161,21 @@ Runs multiple scanners in order:
 > Register logs, watch, and history commands onto *app*.
 - **Calls**: app.command, app.command, app.command, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option
 
+### pyqual.parallel.ParallelExecutor.run
+> Run all issues across tools in parallel.
+
+Args:
+    issues: List of issue strings to process
+    group_similar: If True, group similar issues for batc
+- **Calls**: time.monotonic, enumerate, len, log.info, sum, sum, sum, log.info
+
 ### pyqual.cli.cmd_git.git_commit_cmd
 > Create a git commit.
-- **Calls**: git_app.command, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, pyqual.plugins.git.main.git_commit, result.get
+- **Calls**: git_app.command, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option, project.map.toon.git_commit, result.get
+
+### pyqual.plugins.cli_helpers.plugin_search
+> Search plugins by name, description, or tags.
+- **Calls**: query.lower, plugins.items, Table, table.add_column, table.add_column, table.add_column, sorted, console.print
 
 ### pyqual.plugins.lint.main.LintCollector._collect_pylint
 > Extract pylint score and error counts.
@@ -177,9 +189,13 @@ Examples:
     pyqual tic
 - **Calls**: tickets_app.command, typer.Option, typer.Option, typer.Option, typer.Option, Path, console.print, console.print
 
+### pyqual.pipeline.Pipeline._execute_streaming
+> Execute stage with real-time output streaming via Popen.
+- **Calls**: subprocess.Popen, proc.wait, StageResult, StageResult, select.select, fd.readline, None.append, None.join
+
 ### pyqual.cli.cmd_git.git_status_cmd
 > Show git repository status.
-- **Calls**: git_app.command, typer.Option, typer.Option, pyqual.plugins.git.status.git_status, pyqual.cli.cmd_git._print_file_list, pyqual.cli.cmd_git._print_file_list, pyqual.cli.cmd_git._print_file_list, console.print
+- **Calls**: git_app.command, typer.Option, typer.Option, project.map.toon.git_status, pyqual.cli.cmd_git._print_file_list, pyqual.cli.cmd_git._print_file_list, pyqual.cli.cmd_git._print_file_list, console.print
 
 ### pyqual.cli.cmd_config.status
 > Show current metrics and pipeline config.
@@ -188,10 +204,6 @@ Examples:
 ### pyqual.plugins.lint.main.LintCollector._collect_ruff
 > Extract ruff linter metrics.
 - **Calls**: p.exists, json.loads, isinstance, p.read_text, len, sum, sum, float
-
-### pyqual.pipeline.Pipeline._execute_streaming
-> Execute stage with real-time output streaming via Popen.
-- **Calls**: subprocess.Popen, proc.wait, StageResult, StageResult, select.select, fd.readline, None.append, None.join
 
 ### pyqual.cli.cmd_init.init
 > Create pyqual.yaml with sensible defaults.
@@ -214,7 +226,7 @@ Checks for:
 - YAML parse errors (with line/column positions)
 - Unknown or missing tool binaries
 - 
-- **Calls**: app.command, typer.Option, typer.Option, typer.Option, typer.Option, pyqual.api.validate_config, console.print, pyqual.cli.cmd_config._print_issues
+- **Calls**: app.command, typer.Option, typer.Option, typer.Option, typer.Option, project.map.toon.validate_config, console.print, pyqual.cli.cmd_config._print_issues
 
 ### pyqual.custom_fix.parse_and_apply_suggestions
 > Parse LLM suggestions and apply patches.
@@ -223,6 +235,12 @@ Checks for:
 ### pyqual.cli_bulk_cmds.register_bulk_commands
 > Register bulk-init and bulk-run commands onto *app*.
 - **Calls**: app.command, app.command, typer.Argument, typer.Option, typer.Option, typer.Option, typer.Option, typer.Option
+
+### pyqual.plugins.deps.main.deps_health_check
+> Run comprehensive dependency health check.
+
+Returns aggregated metrics from all dependency checks.
+- **Calls**: pyqual.plugins.deps.main.get_outdated_packages, pyqual.plugins.deps.main.get_dependency_tree, pyqual.plugins.deps.main.check_requirements, DepsCollector, collector.collect, outdated.get, Path.cwd, reqs.get
 
 ### pyqual.plugins.lint.main.LintCollector._collect_flake8
 > Extract flake8 violation count.
@@ -239,25 +257,6 @@ Checks for:
 ### pyqual.cli.cmd_info.tools
 > List built-in tool presets for pipeline stages.
 - **Calls**: app.command, Table, table.add_column, table.add_column, table.add_column, table.add_column, table.add_column, sorted
-
-### pyqual.cli.cmd_tune.tune_thresholds
-> Automatically tune quality gate thresholds to match current metrics.
-
-Analyzes collected metrics and suggests optimal thresholds that will
-result in a
-- **Calls**: app.command, typer.Option, typer.Option, typer.Option, typer.Option, console.print, PyqualConfig.load, pyqual.cli.cmd_tune._load_latest_metrics
-
-### pyqual.plugins.documentation.main.DocumentationCollector.collect
-> Collect all documentation metrics.
-- **Calls**: result.update, result.update, result.update, result.update, result.update, result.update, sum, self._check_required_files
-
-### pyqual.api.run_stage
-> Run a single stage/command directly.
-
-Args:
-    stage_name: Name of the stage (for logging)
-    command: Shell command to run (either command or tool 
-- **Calls**: None.resolve, log.info, time.monotonic, pyqual.tools.get_preset, preset.shell_command, dict, subprocess.run, Path
 
 ## Process Flows
 
@@ -296,7 +295,6 @@ main [pyqual.run_parallel_fix]
 _parse [pyqual.config.PyqualConfig]
   └─ →> load_entry_point_presets
   └─ →> load_user_tools
-      └─> _load_json_presets
 ```
 
 ### Flow 7: _collect_readme_metrics
@@ -314,17 +312,17 @@ register_observe_commands [pyqual.cli_observe]
 git_commit_cmd [pyqual.cli.cmd_git]
 ```
 
-### Flow 10: _collect_pylint
+### Flow 10: plugin_search
 ```
-_collect_pylint [pyqual.plugins.lint.main.LintCollector]
+plugin_search [pyqual.plugins.cli_helpers]
 ```
 
 ## Key Classes
 
 ### pyqual.pipeline.Pipeline
 > Execute pipeline stages in a loop until quality gates pass.
-- **Methods**: 29
-- **Key Methods**: pyqual.pipeline.Pipeline.__init__, pyqual.pipeline.Pipeline.run, pyqual.pipeline.Pipeline.check_gates, pyqual.pipeline.Pipeline._run_iteration, pyqual.pipeline.Pipeline._iteration_stagnated, pyqual.pipeline.Pipeline._should_stop_after_iteration, pyqual.pipeline.Pipeline._should_run_stage, pyqual.pipeline.Pipeline._resolve_tool_stage, pyqual.pipeline.Pipeline._resolve_env, pyqual.pipeline.Pipeline._check_optional_binary
+- **Methods**: 31
+- **Key Methods**: pyqual.pipeline.Pipeline.__init__, pyqual.pipeline.Pipeline._run_loop, pyqual.pipeline.Pipeline._log_pipeline_completion, pyqual.pipeline.Pipeline.run, pyqual.pipeline.Pipeline.check_gates, pyqual.pipeline.Pipeline._run_iteration, pyqual.pipeline.Pipeline._iteration_stagnated, pyqual.pipeline.Pipeline._should_stop_after_iteration, pyqual.pipeline.Pipeline._should_run_stage, pyqual.pipeline.Pipeline._resolve_tool_stage
 
 ### pyqual.github_actions.GitHubActionsReporter
 > Reports pyqual results to GitHub Actions and PRs.
@@ -441,106 +439,53 @@ Key functions that process and transform data:
 > Parse kwargs from SQLite, handling both JSON and Python repr formats.
 - **Output to**: json.loads, ast.literal_eval
 
-### pyqual.custom_fix.parse_and_apply_suggestions
-> Parse LLM suggestions and apply patches.
-- **Output to**: re.findall, Path, Taskfile.print, re.search, file_path.exists
+### project.map.toon.parse_todo_items
 
-### pyqual.config.PyqualConfig._parse
-- **Output to**: raw.get, pyqual.tools.load_entry_point_presets, pyqual.tools.load_user_tools, pipeline.get, pipeline.get
+### project.map.toon._discover_and_validate
 
-### pyqual.config.PyqualConfig._validate_stages
-> Validate and construct StageConfig list from raw dicts.
-- **Output to**: StageConfig, stages.append, StageConfig.__dataclass_fields__.values, ValueError, ValueError
+### project.map.toon._parse_radon_json
 
-### pyqual.output._parse_output_line
+### project.map.toon._validate_yaml_content
 
-### pyqual.report_generator.parse_kwargs
-> Parse kwargs string that might have single quotes.
-- **Output to**: json.loads, ast.literal_eval
+### project.map.toon.format_log_entry_row
 
-### pyqual.auto_closer._process_ticket
-> Process a single ticket for closure. Returns True if closed.
-- **Output to**: Taskfile.print, pyqual.auto_closer.evaluate_with_llm, ticket.sync.get, store.update_ticket, external_id.isdigit
+### project.map.toon.parse_and_apply_suggestions
 
-### pyqual.parallel.parse_todo_items
-> Parse unchecked items from TODO.md.
-- **Output to**: todo_path.read_text, content.splitlines, todo_path.exists, line.strip, line.startswith
+### project.map.toon.parse_args
 
-### pyqual.cli_bulk_cmds._discover_and_validate
-> Discover projects and validate path. Returns states or raises Exit.
-- **Output to**: project.map.toon.discover_projects, path.is_dir, _console.print, typer.Exit, _console.print
+### project.map.toon.validate
 
-### pyqual.api.validate_config
-> Validate configuration and return list of errors (empty if valid).
-- **Output to**: _validate, str
+### project.map.toon._parse_pyproject_fallback
 
-### pyqual.api.format_result_summary
-> Format pipeline result as human-readable summary.
+### project.map.toon._parse_branch_line
 
-Args:
-    result: Pipeline result object
-    
-Ret
-- **Output to**: enumerate, None.join, lines.append, lines.append, lines.append
+### project.map.toon._parse_file_status
 
-### pyqual.run_parallel_fix.parse_args
-> Parse command line arguments.
-- **Output to**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.add_argument, parser.parse_args
+### project.map.toon._parse_push_errors
 
-### pyqual._gate_collectors._parse_radon_json
-> Return average maintainability index from parsed radon.json data, or None.
-- **Output to**: float, round, data.values, float, isinstance
+### project.map.toon.parse_kwargs
 
-### pyqual.yaml_fixer._try_parse_yaml
-> Try to parse YAML and return success status and error message.
-- **Output to**: yaml.safe_load, str
+### project.map.toon._process_ticket
 
-### pyqual.yaml_fixer._parse_pyyaml_error
-> Parse PyYAML error message to extract line/column info.
-- **Output to**: YamlSyntaxIssue, re.search, error_str.lower, pyqual.yaml_fixer._get_context, error_str.lower
+### project.map.toon._format_ticket_summary
 
-### pyqual.bulk_init._validate_yaml_content
-> Validate that YAML content is parseable and has required structure.
-- **Output to**: yaml.safe_load, ValueError, ValueError
+### project.map.toon._format_fix_summary
 
-### pyqual.cli_run_helpers._format_ticket_summary
-> Format ticket/TODO progress section.
-- **Output to**: summary.get, summary.get, summary.get, parts.append, None.join
+### project.map.toon._format_delivery_summary
 
-### pyqual.cli_run_helpers._format_fix_summary
-> Format fix stage outcomes section.
-- **Output to**: summary.get, summary.get, summary.get, summary.get, fix_parts.append
+### project.map.toon.format_run_summary
 
-### pyqual.cli_run_helpers._format_delivery_summary
-> Format delivery/push outcomes section.
-- **Output to**: isinstance, None.join, str
+### project.map.toon.plugin_validate
 
-### pyqual.cli_run_helpers.format_run_summary
-> Format run summary dict into human-readable string with ticket outcomes.
-- **Output to**: pyqual.cli_run_helpers._format_ticket_summary, pyqual.cli_run_helpers._format_fix_summary, pyqual.cli_run_helpers._format_delivery_summary, parts.append, parts.append
+### project.map.toon.validate_config
 
-### pyqual.cli_log_helpers.format_log_entry_row
-> Return (ts, event_name, name, status, details) for one log entry.
-- **Output to**: entry.get, entry.get, None.replace, entry.get, entry.get
+### project.map.toon.format_result_summary
 
-### pyqual.report._parse_pyproject_fallback
-> Minimal regex parser for pyproject.toml when tomllib is unavailable.
-- **Output to**: path.read_text, re.search, re.search, m.group, m.group
+### project.map.toon._try_parse_yaml
 
-### pyqual.cli.cmd_config.validate
-> Validate pyqual.yaml without running the pipeline.
+### project.map.toon._parse_pyyaml_error
 
-Checks for:
-- YAML parse errors (with line/colum
-- **Output to**: app.command, typer.Option, typer.Option, typer.Option, typer.Option
-
-### pyqual.plugins.cli_helpers.plugin_validate
-> Validate that configured plugins in pyqual.yaml are available.
-- **Output to**: config_path.read_text, console.print, console.print, set, set
-
-### pyqual.plugins.git.status._parse_branch_line
-> Parse a '## branch...remote [ahead N, behind N]' porcelain line into result.
-- **Output to**: None.strip, re.search, re.search, branch_info.split, int
+### project.map.toon.validate_release_state
 
 ## Behavioral Patterns
 

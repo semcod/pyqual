@@ -3,458 +3,490 @@ flowchart LR
         Taskfile__print["print"]
     end
     subgraph dashboard__api
-        dashboard__api__main__safe_parse["safe_parse"]
-        dashboard__api__main__query_pipeline_db["query_pipeline_db"]
-        dashboard__api__main__get_db_path["get_db_path"]
         dashboard__api__main__get_project_runs["get_project_runs"]
-        dashboard__api__main__get_stage_performance["get_stage_performance"]
-        dashboard__api__main__get_gate_status["get_gate_status"]
-        dashboard__api__main__get_project_summary["get_project_summary"]
+        dashboard__api__main__query_pipeline_db["query_pipeline_db"]
         dashboard__api__main__read_summary_json["read_summary_json"]
+        dashboard__api__main__safe_parse["safe_parse"]
+        dashboard__api__main__get_db_path["get_db_path"]
         dashboard__api__main__get_metric_history["get_metric_history"]
+        dashboard__api__main__get_gate_status["get_gate_status"]
         dashboard__api__main__get_latest_run["get_latest_run"]
         dashboard__api__main__get_projects["get_projects"]
+        dashboard__api__main__get_project_summary["get_project_summary"]
+        dashboard__api__main__get_stage_performance["get_stage_performance"]
     end
     subgraph dashboard__src
-        dashboard__src__api__loadConfig["loadConfig"]
-        dashboard__src__components__RepositoryDetail__navigate["navigate"]
-        dashboard__src__App__loadRepositories["loadRepositories"]
-        dashboard__src__api__config["config"]
-        dashboard__src__api__fetchRepositories["fetchRepositories"]
-        dashboard__src__api__match["match"]
-        dashboard__src__api__fetchRepositoriesWithFallback["fetchRepositoriesWithFallback"]
         dashboard__src__api__getRepoPath["getRepoPath"]
-        dashboard__src__api__repositories["repositories"]
-        dashboard__src__components__RepositoryDetail__RepositoryDetail["RepositoryDetail"]
+        dashboard__src__api__config["config"]
+        dashboard__src__components__RepositoryDetail__navigate["navigate"]
+        dashboard__src__api__fetchRepositoriesWithFallback["fetchRepositoriesWithFallback"]
+        dashboard__src__api__loadConfig["loadConfig"]
+        dashboard__src__api__match["match"]
+        dashboard__src__App__loadRepositories["loadRepositories"]
         dashboard__src__App__App["App"]
+        dashboard__src__api__repositories["repositories"]
         dashboard__src__api__fetchLatestRun["fetchLatestRun"]
+        dashboard__src__api__fetchRepositories["fetchRepositories"]
+        dashboard__src__components__RepositoryDetail__RepositoryDetail["RepositoryDetail"]
     end
     subgraph examples__custom_gates
         examples__custom_gates__metric_history__load_history["load_history"]
         examples__custom_gates__dynamic_thresholds__main["main"]
         examples__custom_gates__composite_gates__run_composite_check["run_composite_check"]
-        examples__custom_gates__metric_history__save_snapshot["save_snapshot"]
-        examples__custom_gates__composite_gates__compute_composite_score["compute_composite_score"]
         examples__custom_gates__metric_history__print_trend_report["print_trend_report"]
         examples__custom_gates__composite_gates__main["main"]
+        examples__custom_gates__composite_gates__compute_composite_score["compute_composite_score"]
+        examples__custom_gates__metric_history__save_snapshot["save_snapshot"]
         examples__custom_gates__metric_history__main["main"]
     end
     subgraph examples__integration_example
+        examples__integration_example__run_shell_command_example["run_shell_command_example"]
+        examples__integration_example__quick_gate_check["quick_gate_check"]
+        examples__integration_example__run_quality_check["run_quality_check"]
+        examples__integration_example__run_single_stage["run_single_stage"]
         examples__integration_example__preview_pipeline["preview_pipeline"]
         examples__integration_example__run_with_callbacks["run_with_callbacks"]
-        examples__integration_example__run_single_stage["run_single_stage"]
-        examples__integration_example__quick_gate_check["quick_gate_check"]
         examples__integration_example__check_prerequisites["check_prerequisites"]
-        examples__integration_example__run_quality_check["run_quality_check"]
-        examples__integration_example__run_shell_command_example["run_shell_command_example"]
     end
     subgraph examples__multi_gate_pipeline
         examples__multi_gate_pipeline__run_pipeline__main["main"]
     end
     subgraph examples__ticket_workflow
-        examples__ticket_workflow__sync_tickets__tickets_from_gate_failures["tickets_from_gate_failures"]
         examples__ticket_workflow__sync_tickets__sync_from_cli["sync_from_cli"]
         examples__ticket_workflow__sync_tickets__main["main"]
+        examples__ticket_workflow__sync_tickets__tickets_from_gate_failures["tickets_from_gate_failures"]
     end
     subgraph project__map
-        project__map__toon__discover_projects["discover_projects"]
-        project__map__toon__build_dashboard_table["build_dashboard_table"]
+        project__map__toon__fetch_github_tasks["fetch_github_tasks"]
+        project__map__toon__security_summary["security_summary"]
+        project__map__toon___get_provider_for_pattern["_get_provider_for_pattern"]
+        project__map__toon__check_links["check_links"]
+        project__map__toon__check_readme["check_readme"]
+        project__map__toon__get_profile["get_profile"]
+        project__map__toon__plugin_info["plugin_info"]
+        project__map__toon__load_entry_point_presets["load_entry_point_presets"]
+        project__map__toon__scan_for_secrets["scan_for_secrets"]
+        project__map__toon__check_requirements["check_requirements"]
+        project__map__toon__get_preset["get_preset"]
+        project__map__toon__shell_check["shell_check"]
+        project__map__toon__setup_logging["setup_logging"]
+        project__map__toon__sync_planfile_tickets["sync_planfile_tickets"]
+        project__map__toon___get_severity_for_pattern["_get_severity_for_pattern"]
+        project__map__toon__attack_check["attack_check"]
+        project__map__toon__get_available_plugins["get_available_plugins"]
         project__map__toon__bulk_run["bulk_run"]
+        project__map__toon__run_trivy_scan["run_trivy_scan"]
+        project__map__toon__auto_merge_pr["auto_merge_pr"]
+        project__map__toon__list_presets["list_presets"]
+        project__map__toon__get_stage_when_default["get_stage_when_default"]
+        project__map__toon__bulk_init["bulk_init"]
+        project__map__toon___load_env_file["_load_env_file"]
+        project__map__toon__get_outdated_packages["get_outdated_packages"]
+        project__map__toon___read_artifact_text["_read_artifact_text"]
+        project__map__toon__run["run"]
+        project__map__toon__get_dependency_tree["get_dependency_tree"]
+        project__map__toon__validate_release_state["validate_release_state"]
+        project__map__toon__run_bandit_check["run_bandit_check"]
+        project__map__toon__build_dashboard_table["build_dashboard_table"]
+        project__map__toon__git_status["git_status"]
+        project__map__toon__run_pip_audit["run_pip_audit"]
+        project__map__toon__run_git_command["run_git_command"]
+        project__map__toon__is_delivery_stage_name["is_delivery_stage_name"]
+        project__map__toon__deps_health_check["deps_health_check"]
+        project__map__toon__sync_all_tickets["sync_all_tickets"]
+        project__map__toon__register_custom_tools_from_yaml["register_custom_tools_from_yam"]
+        project__map__toon__run_detect_secrets["run_detect_secrets"]
+        project__map__toon__run_pipeline["run_pipeline"]
+        project__map__toon__plugin_search["plugin_search"]
+        project__map__toon__install_plugin_config["install_plugin_config"]
+        project__map__toon__docs_quality_summary["docs_quality_summary"]
+        project__map__toon__plugin_list["plugin_list"]
+        project__map__toon__load_user_tools["load_user_tools"]
+        project__map__toon__sync_todo_tickets["sync_todo_tickets"]
+        project__map__toon__run_hadolint["run_hadolint"]
+        project__map__toon__docker_security_check["docker_security_check"]
+        project__map__toon__check_skip_conditions["check_skip_conditions"]
+        project__map__toon__preflight_push_check["preflight_push_check"]
+        project__map__toon__collect_fingerprint["collect_fingerprint"]
+        project__map__toon___is_likely_false_positive["_is_likely_false_positive"]
+        project__map__toon__detect_project_facts["detect_project_facts"]
+        project__map__toon__example_helper_function["example_helper_function"]
+        project__map__toon__attack_merge["attack_merge"]
+        project__map__toon__git_add["git_add"]
+        project__map__toon__is_fix_stage_name["is_fix_stage_name"]
+        project__map__toon__run_interrogate["run_interrogate"]
+        project__map__toon___count_by_severity["_count_by_severity"]
+        project__map__toon__discover_projects["discover_projects"]
+        project__map__toon__get_available_tools["get_available_tools"]
+        project__map__toon__sync_github_tickets["sync_github_tickets"]
+        project__map__toon__git_commit["git_commit"]
+        project__map__toon__validate_config["validate_config"]
     end
     subgraph pyqual___gate_collectors
-        pyqual___gate_collectors___from_vallm["_from_vallm"]
-        pyqual___gate_collectors___read_artifact_text["_read_artifact_text"]
-        pyqual___gate_collectors___from_security["_from_security"]
-        pyqual___gate_collectors___count_pylint_by_type["_count_pylint_by_type"]
         pyqual___gate_collectors___from_interrogate["_from_interrogate"]
-        pyqual___gate_collectors___from_bandit["_from_bandit"]
-        pyqual___gate_collectors___from_ruff["_from_ruff"]
-        pyqual___gate_collectors___from_mypy["_from_mypy"]
-        pyqual___gate_collectors___from_vulnerabilities["_from_vulnerabilities"]
-        pyqual___gate_collectors___from_vulture["_from_vulture"]
-        pyqual___gate_collectors___from_pyroma["_from_pyroma"]
-        pyqual___gate_collectors___from_secrets["_from_secrets"]
-        pyqual___gate_collectors___from_pylint["_from_pylint"]
         pyqual___gate_collectors___from_code_health["_from_code_health"]
+        pyqual___gate_collectors___from_secrets["_from_secrets"]
+        pyqual___gate_collectors___from_mypy["_from_mypy"]
+        pyqual___gate_collectors___from_pylint["_from_pylint"]
+        pyqual___gate_collectors___from_security["_from_security"]
+        pyqual___gate_collectors___from_vulnerabilities["_from_vulnerabilities"]
         pyqual___gate_collectors___from_radon["_from_radon"]
-        pyqual___gate_collectors___count_by_severity["_count_by_severity"]
-        pyqual___gate_collectors___parse_radon_json["_parse_radon_json"]
-        pyqual___gate_collectors___from_toon["_from_toon"]
-        pyqual___gate_collectors___from_flake8["_from_flake8"]
+        pyqual___gate_collectors___from_vulture["_from_vulture"]
+        pyqual___gate_collectors___from_ruff["_from_ruff"]
+        pyqual___gate_collectors___from_vallm["_from_vallm"]
         pyqual___gate_collectors___from_lint["_from_lint"]
+        pyqual___gate_collectors___read_artifact_text["_read_artifact_text"]
+        pyqual___gate_collectors___parse_radon_json["_parse_radon_json"]
+        pyqual___gate_collectors___count_pylint_by_type["_count_pylint_by_type"]
+        pyqual___gate_collectors___from_flake8["_from_flake8"]
+        pyqual___gate_collectors___from_pyroma["_from_pyroma"]
+        pyqual___gate_collectors___from_bandit["_from_bandit"]
+        pyqual___gate_collectors___from_toon["_from_toon"]
     end
     subgraph pyqual__api
-        pyqual__api__run_stage["run_stage"]
-        pyqual__api__run["run"]
-        pyqual__api__load_config["load_config"]
-        pyqual__api__validate_config["validate_config"]
-        pyqual__api__create_default_config["create_default_config"]
         pyqual__api__get_tool_command["get_tool_command"]
-        pyqual__api__shell_check["shell_check"]
+        pyqual__api__run["run"]
+        pyqual__api__run_stage["run_stage"]
         pyqual__api__dry_run["dry_run"]
+        pyqual__api__load_config["load_config"]
+        pyqual__api__create_default_config["create_default_config"]
         pyqual__api__run_pipeline["run_pipeline"]
     end
     subgraph pyqual__auto_closer
-        pyqual__auto_closer__get_changed_files["get_changed_files"]
-        pyqual__auto_closer__main["main"]
-        pyqual__auto_closer___close_github_issue["_close_github_issue"]
         pyqual__auto_closer__get_diff_content["get_diff_content"]
         pyqual__auto_closer__evaluate_with_llm["evaluate_with_llm"]
+        pyqual__auto_closer__get_changed_files["get_changed_files"]
         pyqual__auto_closer___process_ticket["_process_ticket"]
+        pyqual__auto_closer__main["main"]
+        pyqual__auto_closer___close_github_issue["_close_github_issue"]
     end
     subgraph pyqual__bulk_init
-        pyqual__bulk_init__classify_with_llm["classify_with_llm"]
+        pyqual__bulk_init___classify_project["_classify_project"]
+        pyqual__bulk_init___validate_yaml_content["_validate_yaml_content"]
         pyqual__bulk_init___write_pyqual_yaml["_write_pyqual_yaml"]
-        pyqual__bulk_init__generate_pyqual_yaml["generate_pyqual_yaml"]
+        pyqual__bulk_init___classify_heuristic["_classify_heuristic"]
         pyqual__bulk_init___build_llm_prompt["_build_llm_prompt"]
         pyqual__bulk_init___safe_name["_safe_name"]
-        pyqual__bulk_init___classify_project["_classify_project"]
-        pyqual__bulk_init___classify_heuristic["_classify_heuristic"]
+        pyqual__bulk_init__classify_with_llm["classify_with_llm"]
+        pyqual__bulk_init__generate_pyqual_yaml["generate_pyqual_yaml"]
         pyqual__bulk_init__bulk_init["bulk_init"]
-        pyqual__bulk_init___validate_yaml_content["_validate_yaml_content"]
-    end
-    subgraph pyqual__bulk_init_classify
-        pyqual__bulk_init_classify__check_skip_conditions["check_skip_conditions"]
     end
     subgraph pyqual__bulk_init_fingerprint
-        pyqual__bulk_init_fingerprint__collect_fingerprint["collect_fingerprint"]
-        pyqual__bulk_init_fingerprint___collect_file_extensions["_collect_file_extensions"]
-        pyqual__bulk_init_fingerprint___collect_json_scripts["_collect_json_scripts"]
-        pyqual__bulk_init_fingerprint___collect_makefile_targets["_collect_makefile_targets"]
         pyqual__bulk_init_fingerprint___collect_top_level_entries["_collect_top_level_entries"]
-        pyqual__bulk_init_fingerprint___load_json_object["_load_json_object"]
-        pyqual__bulk_init_fingerprint___collect_pyproject_metadata["_collect_pyproject_metadata"]
         pyqual__bulk_init_fingerprint___collect_readme_excerpt["_collect_readme_excerpt"]
         pyqual__bulk_init_fingerprint___collect_manifests["_collect_manifests"]
+        pyqual__bulk_init_fingerprint___collect_file_extensions["_collect_file_extensions"]
+        pyqual__bulk_init_fingerprint___collect_makefile_targets["_collect_makefile_targets"]
+        pyqual__bulk_init_fingerprint__collect_fingerprint["collect_fingerprint"]
+        pyqual__bulk_init_fingerprint___collect_pyproject_metadata["_collect_pyproject_metadata"]
+        pyqual__bulk_init_fingerprint___load_json_object["_load_json_object"]
+        pyqual__bulk_init_fingerprint___collect_json_scripts["_collect_json_scripts"]
     end
     subgraph pyqual__cli
-        pyqual__cli__cmd_run___emit_yaml_items["_emit_yaml_items"]
-        pyqual__cli__main__tune_thresholds_cmd["tune_thresholds_cmd"]
-        pyqual__cli__cmd_config__validate["validate"]
-        pyqual__cli__cmd_run___handle_llm_error["_handle_llm_error"]
-        pyqual__cli__cmd_run___run_auto_fix_config["_run_auto_fix_config"]
-        pyqual__cli__main___display_comparison_for_tune["_display_comparison_for_tune"]
-        pyqual__cli__cmd_git__git_scan_cmd["git_scan_cmd"]
-        pyqual__cli__cmd_run___build_stage_dict["_build_stage_dict"]
-        pyqual__cli__cmd_run___handle_pipeline_error["_handle_pipeline_error"]
-        pyqual__cli__cmd_tickets__tickets_all["tickets_all"]
-        pyqual__cli__cmd_run___handle_config_env_error["_handle_config_env_error"]
-        pyqual__cli__cmd_tickets__tickets_fetch["tickets_fetch"]
-        pyqual__cli__cmd_tune___calculate_thresholds["_calculate_thresholds"]
-        pyqual__cli__cmd_tune___load_latest_metrics["_load_latest_metrics"]
-        pyqual__cli__cmd_plugin__plugin["plugin"]
-        pyqual__cli__cmd_git___print_file_list["_print_file_list"]
-        pyqual__cli__cmd_run__run["run"]
-        pyqual__cli__cmd_run___rebuild_iterations_from_result["_rebuild_iterations_from_resul"]
-        pyqual__cli__cmd_run___on_stage_error_impl["_on_stage_error_impl"]
-        pyqual__cli__cmd_config__fix_config["fix_config"]
-        pyqual__cli__cmd_git___run_preflight_checks["_run_preflight_checks"]
-        pyqual__cli__cmd_git__git_status_cmd["git_status_cmd"]
-        pyqual__cli__cmd_tickets__tickets_github["tickets_github"]
-        pyqual__cli__main___calculate_thresholds_for_tune["_calculate_thresholds_for_tune"]
-        pyqual__cli__cmd_git__git_add_cmd["git_add_cmd"]
-        pyqual__cli__cmd_git__git_commit_cmd["git_commit_cmd"]
-        pyqual__cli__cmd_run___create_tickets_if_needed["_create_tickets_if_needed"]
-        pyqual__cli__cmd_tune__tune_thresholds["tune_thresholds"]
-        pyqual__cli__cmd_tickets__tickets_todo["tickets_todo"]
-        pyqual__cli__cmd_config___print_issues["_print_issues"]
-        pyqual__cli__cmd_tune___display_comparison["_display_comparison"]
-        pyqual__cli__cmd_run___build_gate_dict["_build_gate_dict"]
-        pyqual__cli__cmd_run___emit["_emit"]
         pyqual__cli__cmd_tune__tune_show["tune_show"]
-        pyqual__cli__main___load_latest_metrics_for_tune["_load_latest_metrics_for_tune"]
-        pyqual__cli__main__setup_logging["setup_logging"]
+        pyqual__cli__main__tune_thresholds_cmd["tune_thresholds_cmd"]
+        pyqual__cli__cmd_tune__tune_thresholds["tune_thresholds"]
+        pyqual__cli__cmd_run___handle_config_env_error["_handle_config_env_error"]
+        pyqual__cli__cmd_tickets__tickets_github["tickets_github"]
         pyqual__cli__cmd_init__init["init"]
+        pyqual__cli__cmd_run___create_tickets_if_needed["_create_tickets_if_needed"]
+        pyqual__cli__cmd_plugin__plugin["plugin"]
+        pyqual__cli__cmd_run___emit_yaml_items["_emit_yaml_items"]
+        pyqual__cli__cmd_run___run_auto_fix_config["_run_auto_fix_config"]
+        pyqual__cli__cmd_run___on_stage_error_impl["_on_stage_error_impl"]
+        pyqual__cli__cmd_run___rebuild_iterations_from_result["_rebuild_iterations_from_resul"]
+        pyqual__cli__main___display_comparison_for_tune["_display_comparison_for_tune"]
+        pyqual__cli__cmd_tune___display_comparison["_display_comparison"]
+        pyqual__cli__main___load_latest_metrics_for_tune["_load_latest_metrics_for_tune"]
+        pyqual__cli__cmd_tune___load_latest_metrics["_load_latest_metrics"]
+        pyqual__cli__cmd_git__git_commit_cmd["git_commit_cmd"]
+        pyqual__cli__cmd_run___build_gate_dict["_build_gate_dict"]
+        pyqual__cli__cmd_config___print_issues["_print_issues"]
+        pyqual__cli__cmd_run___handle_pipeline_error["_handle_pipeline_error"]
+        pyqual__cli__cmd_run___build_stage_dict["_build_stage_dict"]
+        pyqual__cli__cmd_git___print_file_list["_print_file_list"]
+        pyqual__cli__cmd_tune___calculate_thresholds["_calculate_thresholds"]
+        pyqual__cli__cmd_config__validate["validate"]
+        pyqual__cli__cmd_config__fix_config["fix_config"]
+        pyqual__cli__cmd_tickets__tickets_todo["tickets_todo"]
+        pyqual__cli__cmd_git__git_add_cmd["git_add_cmd"]
+        pyqual__cli__cmd_git___run_preflight_checks["_run_preflight_checks"]
+        pyqual__cli__cmd_run___emit["_emit"]
+        pyqual__cli__cmd_git__git_scan_cmd["git_scan_cmd"]
+        pyqual__cli__cmd_tickets__tickets_fetch["tickets_fetch"]
+        pyqual__cli__main___calculate_thresholds_for_tune["_calculate_thresholds_for_tune"]
+        pyqual__cli__cmd_tickets__tickets_all["tickets_all"]
+        pyqual__cli__cmd_run___handle_llm_error["_handle_llm_error"]
+        pyqual__cli__cmd_run__run["run"]
+        pyqual__cli__cmd_git__git_status_cmd["git_status_cmd"]
     end
     subgraph pyqual__cli_bulk_cmds
-        pyqual__cli_bulk_cmds___discover_and_validate["_discover_and_validate"]
-        pyqual__cli_bulk_cmds___output_bulk_result["_output_bulk_result"]
         pyqual__cli_bulk_cmds___bulk_run_impl["_bulk_run_impl"]
-        pyqual__cli_bulk_cmds__register_bulk_commands["register_bulk_commands"]
-        pyqual__cli_bulk_cmds___run_with_live_dashboard["_run_with_live_dashboard"]
         pyqual__cli_bulk_cmds___bulk_init_impl["_bulk_init_impl"]
+        pyqual__cli_bulk_cmds__register_bulk_commands["register_bulk_commands"]
+        pyqual__cli_bulk_cmds___discover_and_validate["_discover_and_validate"]
+        pyqual__cli_bulk_cmds___run_with_live_dashboard["_run_with_live_dashboard"]
+        pyqual__cli_bulk_cmds___output_bulk_result["_output_bulk_result"]
     end
     subgraph pyqual__cli_observe
-        pyqual__cli_observe___logs_impl["_logs_impl"]
-        pyqual__cli_observe___print_stage_output["_print_stage_output"]
-        pyqual__cli_observe___output_json_entries["_output_json_entries"]
-        pyqual__cli_observe___output_human_logs["_output_human_logs"]
-        pyqual__cli_observe___output_sql_query["_output_sql_query"]
-        pyqual__cli_observe___print_history_table["_print_history_table"]
         pyqual__cli_observe___load_history_entries["_load_history_entries"]
+        pyqual__cli_observe___output_json_entries["_output_json_entries"]
         pyqual__cli_observe___history_impl["_history_impl"]
+        pyqual__cli_observe___output_human_logs["_output_human_logs"]
+        pyqual__cli_observe___logs_impl["_logs_impl"]
         pyqual__cli_observe___print_history_summary["_print_history_summary"]
+        pyqual__cli_observe___print_history_table["_print_history_table"]
+        pyqual__cli_observe___output_sql_query["_output_sql_query"]
+        pyqual__cli_observe___print_stage_output["_print_stage_output"]
     end
     subgraph pyqual__cli_run_helpers
+        pyqual__cli_run_helpers__infer_fix_result["infer_fix_result"]
+        pyqual__cli_run_helpers___extract_fix_summary["_extract_fix_summary"]
+        pyqual__cli_run_helpers__extract_fix_stage_summary["extract_fix_stage_summary"]
+        pyqual__cli_run_helpers__extract_lint_stage_summary["extract_lint_stage_summary"]
+        pyqual__cli_run_helpers___extract_delivery_summary["_extract_delivery_summary"]
+        pyqual__cli_run_helpers__extract_pytest_stage_summary["extract_pytest_stage_summary"]
+        pyqual__cli_run_helpers__extract_stage_summary["extract_stage_summary"]
+        pyqual__cli_run_helpers__build_run_summary["build_run_summary"]
+        pyqual__cli_run_helpers___format_delivery_summary["_format_delivery_summary"]
+        pyqual__cli_run_helpers___enrich_todo["_enrich_todo"]
+        pyqual__cli_run_helpers___enrich_analysis["_enrich_analysis"]
+        pyqual__cli_run_helpers__format_run_summary["format_run_summary"]
+        pyqual__cli_run_helpers___extract_todo_summary["_extract_todo_summary"]
         pyqual__cli_run_helpers__enrich_from_artifacts["enrich_from_artifacts"]
         pyqual__cli_run_helpers___enrich_validation["_enrich_validation"]
-        pyqual__cli_run_helpers___extract_todo_summary["_extract_todo_summary"]
-        pyqual__cli_run_helpers__extract_lint_stage_summary["extract_lint_stage_summary"]
         pyqual__cli_run_helpers___format_ticket_summary["_format_ticket_summary"]
         pyqual__cli_run_helpers___format_fix_summary["_format_fix_summary"]
-        pyqual__cli_run_helpers___enrich_todo["_enrich_todo"]
-        pyqual__cli_run_helpers__format_run_summary["format_run_summary"]
-        pyqual__cli_run_helpers___enrich_analysis["_enrich_analysis"]
-        pyqual__cli_run_helpers__extract_stage_summary["extract_stage_summary"]
-        pyqual__cli_run_helpers___extract_fix_summary["_extract_fix_summary"]
-        pyqual__cli_run_helpers__extract_pytest_stage_summary["extract_pytest_stage_summary"]
-        pyqual__cli_run_helpers___format_delivery_summary["_format_delivery_summary"]
-        pyqual__cli_run_helpers__build_run_summary["build_run_summary"]
-        pyqual__cli_run_helpers___extract_delivery_summary["_extract_delivery_summary"]
-        pyqual__cli_run_helpers__extract_fix_stage_summary["extract_fix_stage_summary"]
-        pyqual__cli_run_helpers__infer_fix_result["infer_fix_result"]
     end
     subgraph pyqual__config
         pyqual__config__PyqualConfig___parse["_parse"]
-        pyqual__config__PyqualConfig__load["load"]
-        pyqual__config__StageConfig____post_init__["__post_init__"]
-        pyqual__config___load_env_file["_load_env_file"]
         pyqual__config__PyqualConfig___validate_stages["_validate_stages"]
+        pyqual__config__StageConfig____post_init__["__post_init__"]
+        pyqual__config__PyqualConfig__load["load"]
     end
     subgraph pyqual__custom_fix
-        pyqual__custom_fix__parse_and_apply_suggestions["parse_and_apply_suggestions"]
         pyqual__custom_fix__add_docstring["add_docstring"]
+        pyqual__custom_fix__parse_and_apply_suggestions["parse_and_apply_suggestions"]
         pyqual__custom_fix__apply_patch["apply_patch"]
     end
-    subgraph pyqual__fix_tools
-        pyqual__fix_tools__get_available_tools["get_available_tools"]
-    end
     subgraph pyqual__gate_collectors
-        pyqual__gate_collectors__legacy___from_toon["_from_toon"]
         pyqual__gate_collectors__legacy___from_vallm["_from_vallm"]
+        pyqual__gate_collectors__legacy___from_toon["_from_toon"]
     end
     subgraph pyqual__github_actions
         pyqual__github_actions__GitHubActionsReporter__create_issue["create_issue"]
         pyqual__github_actions__GitHubActionsReporter__ensure_issue_exists["ensure_issue_exists"]
-        pyqual__github_actions__GitHubActionsReporter__set_output["set_output"]
         pyqual__github_actions__GitHubActionsReporter__set_failed["set_failed"]
-    end
-    subgraph pyqual__github_tasks
-        pyqual__github_tasks__fetch_github_tasks["fetch_github_tasks"]
+        pyqual__github_actions__GitHubActionsReporter__set_output["set_output"]
     end
     subgraph pyqual__parallel
-        pyqual__parallel__ParallelExecutor__run["run"]
         pyqual__parallel__parse_todo_items["parse_todo_items"]
         pyqual__parallel__run_parallel_fix["run_parallel_fix"]
     end
+    subgraph pyqual__pipeline
+        pyqual__pipeline__Pipeline___is_fix_stage["_is_fix_stage"]
+        pyqual__pipeline__Pipeline___iteration_stagnated["_iteration_stagnated"]
+        pyqual__pipeline__Pipeline___log_stage["_log_stage"]
+        pyqual__pipeline__Pipeline___resolve_tool_stage["_resolve_tool_stage"]
+    end
     subgraph pyqual__plugins
-        pyqual__plugins__git__test__TestPreFlightCheck__test_preflight_with_secrets_blocks_push["test_preflight_with_secrets_bl"]
+        pyqual__plugins__deps__test__TestGetDependencyTree__test_pipdeptree_not_available["test_pipdeptree_not_available"]
         pyqual__plugins__git__test__TestGitCommit__test_commit_with_changes["test_commit_with_changes"]
-        pyqual__plugins__attack__test__TestAttackCheck__test_successful_check["test_successful_check"]
+        pyqual__plugins__attack__main__attack_merge["attack_merge"]
+        pyqual__plugins__security__test__TestBanditCheck__test_bandit_not_found["test_bandit_not_found"]
+        pyqual__plugins__attack__main__attack_check["attack_check"]
+        pyqual__plugins__git__main__run_git_command["run_git_command"]
+        pyqual__plugins__git__test__TestSecretScanning__test_provider_mapping["test_provider_mapping"]
+        pyqual__plugins__docs__main__run_interrogate["run_interrogate"]
+        pyqual__plugins__docs__test__TestCheckLinks__test_lychee_not_found["test_lychee_not_found"]
+        pyqual__plugins__git__main___count_pushed_commits["_count_pushed_commits"]
+        pyqual__plugins__git__main___run_enabled_scanners["_run_enabled_scanners"]
+        pyqual__plugins__deps__main__get_dependency_tree["get_dependency_tree"]
+        pyqual__plugins__git__main__git_commit["git_commit"]
+        pyqual__plugins__git__main__git_push["git_push"]
+        pyqual__plugins__docker__test__TestTrivyScan__test_trivy_not_found["test_trivy_not_found"]
+        pyqual__plugins__security__test__TestSecuritySummary__test_security_summary_with_issues["test_security_summary_with_iss"]
+        pyqual__plugins__security__test__TestDetectSecrets__test_detect_secrets_not_found["test_detect_secrets_not_found"]
+        pyqual__plugins__docs__main__docs_quality_summary["docs_quality_summary"]
+        pyqual__plugins__docs__main__check_readme["check_readme"]
+        pyqual__plugins__docker__test__TestDockerSecurityCheck__test_security_check_without_image["test_security_check_without_im"]
+        pyqual__plugins__deps__test__TestDepsHealthCheck__test_health_check_structure["test_health_check_structure"]
+        pyqual__plugins__attack__main__run_git_command["run_git_command"]
+        pyqual__plugins__deps__test__TestCheckRequirements__test_fully_pinned_requirements["test_fully_pinned_requirements"]
+        pyqual__plugins__deps__test__TestGetOutdatedPackages__test_pip_not_available["test_pip_not_available"]
+        pyqual__plugins__docker__test__TestDockerSecurityCheck__test_security_check_structure["test_security_check_structure"]
+        pyqual__plugins__git__test__TestSecretScanning__test_scan_skips_placeholders["test_scan_skips_placeholders"]
+        pyqual__plugins__deps__main__check_requirements["check_requirements"]
+        pyqual__plugins__git__main___scan_with_patterns["_scan_with_patterns"]
+        pyqual__plugins__git__status___parse_file_status["_parse_file_status"]
+        pyqual__plugins__git__test__TestGitStatus__test_status_with_untracked_file["test_status_with_untracked_fil"]
+        pyqual__plugins__git__test__TestSecretScanning__test_scan_finds_aws_key["test_scan_finds_aws_key"]
+        pyqual__plugins__attack__test__TestAttackCheck__test_not_git_repo["test_not_git_repo"]
+        pyqual__plugins__git__test__TestSecretScanning__test_false_positive_detection["test_false_positive_detection"]
+        pyqual__plugins__security__test__TestPipAudit__test_pip_audit_not_found["test_pip_audit_not_found"]
+        pyqual__plugins__git__main__preflight_push_check["preflight_push_check"]
+        pyqual__plugins__docs__test__TestCheckReadme__test_readme_quality_check["test_readme_quality_check"]
+        pyqual__plugins__git__test__TestGitStatus__test_status_not_a_git_repo["test_status_not_a_git_repo"]
+        pyqual__plugins__git__test__TestGitCommit__test_commit_only_if_changed_no_changes["test_commit_only_if_changed_no"]
+        pyqual__plugins__docker__test__TestHadolint__test_hadolint_not_found["test_hadolint_not_found"]
+        pyqual__plugins__git__main___scan_with_trufflehog["_scan_with_trufflehog"]
+        pyqual__plugins__docs__test__TestCheckReadme__test_readme_not_found["test_readme_not_found"]
+        pyqual__plugins__git__test__TestPreFlightCheck__test_preflight_clean_repo["test_preflight_clean_repo"]
+        pyqual__plugins__git__main___is_likely_false_positive["_is_likely_false_positive"]
+        pyqual__plugins__docker__main__run_hadolint["run_hadolint"]
+        pyqual__plugins__attack__test__TestAttackMerge__test_dry_run_merge["test_dry_run_merge"]
+        pyqual__plugins__docker__main__run_trivy_scan["run_trivy_scan"]
+        pyqual__plugins__docs__test__TestInterrogate__test_interrogate_not_found["test_interrogate_not_found"]
+        pyqual__plugins__docker__main__get_image_info["get_image_info"]
+        pyqual__plugins__git__main___parse_branch_line["_parse_branch_line"]
+        pyqual__plugins__docs__main__check_links["check_links"]
+        pyqual__plugins__git__test__TestSecretScanning__test_severity_mapping["test_severity_mapping"]
+        pyqual__plugins__git__main__scan_for_secrets["scan_for_secrets"]
+        pyqual__plugins__attack____main____cmd_check["cmd_check"]
+        pyqual__plugins__deps__main__get_outdated_packages["get_outdated_packages"]
+        pyqual__plugins__git__main___get_provider_for_pattern["_get_provider_for_pattern"]
+        pyqual__plugins__attack__test__TestAutoMergePR__test_pr_merge_with_gh_cli["test_pr_merge_with_gh_cli"]
+        pyqual__plugins__git__status___parse_branch_line["_parse_branch_line"]
+        pyqual__plugins__attack____main_____ensure_dir["_ensure_dir"]
+        pyqual__plugins__security__test__TestSecuritySummary__test_security_summary_empty["test_security_summary_empty"]
+        pyqual__plugins__docs__test__TestDocsQualitySummary__test_summary_structure["test_summary_structure"]
+        pyqual__plugins__git__status__git_status["git_status"]
+        pyqual__plugins__git__main___scan_with_gitleaks["_scan_with_gitleaks"]
+        pyqual__plugins__docker__main__docker_security_check["docker_security_check"]
+        pyqual__plugins__attack__test__TestAutoMergePR__test_pr_merge_failure["test_pr_merge_failure"]
+        pyqual__plugins__git__main___get_severity_for_pattern["_get_severity_for_pattern"]
         pyqual__plugins__git__main___parse_push_errors["_parse_push_errors"]
         pyqual__plugins__attack__test__TestAutoMergePR__test_no_pr_or_branch["test_no_pr_or_branch"]
-        pyqual__plugins__docs__main__check_links["check_links"]
-        pyqual__plugins__git__main__git_status["git_status"]
-        pyqual__plugins__security__main__run_pip_audit["run_pip_audit"]
-        pyqual__plugins__git__main__run_git_command["run_git_command"]
-        pyqual__plugins__cli_helpers__plugin_list["plugin_list"]
-        pyqual__plugins__deps__test__TestGetDependencyTree__test_pipdeptree_not_available["test_pipdeptree_not_available"]
-        pyqual__plugins__attack__main__auto_merge_pr["auto_merge_pr"]
-        pyqual__plugins__git__main___scan_with_gitleaks["_scan_with_gitleaks"]
-        pyqual__plugins__attack____main____cmd_check["cmd_check"]
-        pyqual__plugins__git__main___count_pushed_commits["_count_pushed_commits"]
-        pyqual__plugins__git__main__git_add["git_add"]
-        pyqual__plugins__security__test__TestSecuritySummary__test_security_summary_empty["test_security_summary_empty"]
-        pyqual__plugins__git__test__TestSecretScanning__test_provider_mapping["test_provider_mapping"]
-        pyqual__plugins__git__main___scan_with_trufflehog["_scan_with_trufflehog"]
-        pyqual__plugins__attack__test__TestAttackCheck__test_not_git_repo["test_not_git_repo"]
-        pyqual__plugins__attack__test__TestAttackMerge__test_dry_run_merge["test_dry_run_merge"]
-        pyqual__plugins__git__main___get_severity_for_pattern["_get_severity_for_pattern"]
         pyqual__plugins__deps__test__TestCheckRequirements__test_requirements_not_found["test_requirements_not_found"]
-        pyqual__plugins__git__main___is_likely_false_positive["_is_likely_false_positive"]
-        pyqual__plugins__git__test__TestGitStatus__test_status_in_empty_repo["test_status_in_empty_repo"]
-        pyqual__plugins__deps__main___is_pinned_req["_is_pinned_req"]
-        pyqual__plugins__security__test__TestDetectSecrets__test_detect_secrets_not_found["test_detect_secrets_not_found"]
-        pyqual__plugins__docs__test__TestCheckReadme__test_readme_quality_check["test_readme_quality_check"]
-        pyqual__plugins__deps__main__deps_health_check["deps_health_check"]
-        pyqual__plugins__attack__test__TestAutoMergePR__test_pr_merge_failure["test_pr_merge_failure"]
-        pyqual__plugins__git__main___parse_branch_line["_parse_branch_line"]
-        pyqual__plugins__cli_helpers__plugin_add["plugin_add"]
-        pyqual__plugins__git__git_command__run_git_command["run_git_command"]
-        pyqual__plugins__attack__test__TestAttackMerge__test_not_git_repo["test_not_git_repo"]
-        pyqual__plugins__attack__test__TestAutoMergePR__test_pr_merge_with_gh_cli["test_pr_merge_with_gh_cli"]
-        pyqual__plugins__docs__main__check_readme["check_readme"]
-        pyqual__plugins__install_plugin_config["install_plugin_config"]
-        pyqual__plugins__git__test__TestSecretScanning__test_scan_skips_placeholders["test_scan_skips_placeholders"]
-        pyqual__plugins__attack____main_____ensure_dir["_ensure_dir"]
-        pyqual__plugins__git__main___parse_file_status["_parse_file_status"]
-        pyqual__plugins__docs__test__TestDocsQualitySummary__test_summary_structure["test_summary_structure"]
-        pyqual__plugins__docker__test__TestDockerSecurityCheck__test_security_check_without_image["test_security_check_without_im"]
-        pyqual__plugins__deps__main__get_outdated_packages["get_outdated_packages"]
-        pyqual__plugins__git__main___classify_secret_findings["_classify_secret_findings"]
-        pyqual__plugins__git__main__git_push["git_push"]
-        pyqual__plugins__example_plugin__test__TestHelperFunctions__test_example_helper_function["test_example_helper_function"]
-        pyqual__plugins__attack____main____main["main"]
-        pyqual__plugins__git__status___parse_file_status["_parse_file_status"]
-        pyqual__plugins__git__test__TestSecretScanning__test_scan_finds_github_token["test_scan_finds_github_token"]
-        pyqual__plugins__deps__test__TestDepsHealthCheck__test_health_check_structure["test_health_check_structure"]
-        pyqual__plugins__git__main___get_provider_for_pattern["_get_provider_for_pattern"]
-        pyqual__plugins__git__test__TestGitStatus__test_status_not_a_git_repo["test_status_not_a_git_repo"]
-        pyqual__plugins__docs__test__TestCheckLinks__test_lychee_not_found["test_lychee_not_found"]
-        pyqual__plugins__docs__main__docs_quality_summary["docs_quality_summary"]
-        pyqual__plugins__attack__main__attack_merge["attack_merge"]
-        pyqual__plugins__attack____main____cmd_merge["cmd_merge"]
-        pyqual__plugins__deps__test__TestGetOutdatedPackages__test_pip_not_available["test_pip_not_available"]
-        pyqual__plugins__deps__test__TestCheckRequirements__test_fully_pinned_requirements["test_fully_pinned_requirements"]
-        pyqual__plugins__git__test__TestGitCommit__test_commit_only_if_changed_no_changes["test_commit_only_if_changed_no"]
-        pyqual__plugins__cli_helpers__plugin_info["plugin_info"]
-        pyqual__plugins__docker__test__TestDockerSecurityCheck__test_security_check_structure["test_security_check_structure"]
         pyqual__plugins__attack__main___merge_theirs["_merge_theirs"]
-        pyqual__plugins__deps__main__check_requirements["check_requirements"]
-        pyqual__plugins__docker__main__get_image_info["get_image_info"]
-        pyqual__plugins__git__main__scan_for_secrets["scan_for_secrets"]
-        pyqual__plugins__git__test__TestSecretScanning__test_scan_finds_aws_key["test_scan_finds_aws_key"]
-        pyqual__plugins__git__test__TestPreFlightCheck__test_preflight_clean_repo["test_preflight_clean_repo"]
-        pyqual__plugins__git__test__TestSecretScanning__test_severity_mapping["test_severity_mapping"]
-        pyqual__plugins__security__test__TestBanditCheck__test_bandit_not_found["test_bandit_not_found"]
-        pyqual__plugins__security__main__run_bandit_check["run_bandit_check"]
-        pyqual__plugins__git__main__git_commit["git_commit"]
-        pyqual__plugins__security__main__run_detect_secrets["run_detect_secrets"]
-        pyqual__plugins__git__test__TestSecretScanning__test_false_positive_detection["test_false_positive_detection"]
-        pyqual__plugins__git__main__preflight_push_check["preflight_push_check"]
-        pyqual__plugins__deps__main__get_dependency_tree["get_dependency_tree"]
-        pyqual__plugins__git__test__TestGitStatus__test_status_with_untracked_file["test_status_with_untracked_fil"]
-        pyqual__plugins__docker__main__run_trivy_scan["run_trivy_scan"]
-        pyqual__plugins__docker__test__TestTrivyScan__test_trivy_not_found["test_trivy_not_found"]
-        pyqual__plugins__get_available_plugins["get_available_plugins"]
-        pyqual__plugins__example_plugin__main__example_helper_function["example_helper_function"]
-        pyqual__plugins__cli_helpers__plugin_search["plugin_search"]
-        pyqual__plugins__docs__main__run_interrogate["run_interrogate"]
+        pyqual__plugins__git__git_command__run_git_command["run_git_command"]
+        pyqual__plugins__attack____main____main["main"]
+        pyqual__plugins__attack__test__TestAttackCheck__test_successful_check["test_successful_check"]
         pyqual__plugins__deps__test__TestCheckRequirements__test_requirements_parsing["test_requirements_parsing"]
-        pyqual__plugins__security__test__TestSecuritySummary__test_security_summary_with_issues["test_security_summary_with_iss"]
-        pyqual__plugins__git__main___scan_with_patterns["_scan_with_patterns"]
-        pyqual__plugins__attack__main__run_git_command["run_git_command"]
-        pyqual__plugins__docker__main__run_hadolint["run_hadolint"]
+        pyqual__plugins__git__main___classify_secret_findings["_classify_secret_findings"]
         pyqual__plugins__git__main__GitCollector___collect_scan_metrics["_collect_scan_metrics"]
-        pyqual__plugins__attack__main__attack_check["attack_check"]
-        pyqual__plugins__git__main___run_enabled_scanners["_run_enabled_scanners"]
-        pyqual__plugins__docs__test__TestInterrogate__test_interrogate_not_found["test_interrogate_not_found"]
-        pyqual__plugins__security__main__security_summary["security_summary"]
-        pyqual__plugins__docker__test__TestHadolint__test_hadolint_not_found["test_hadolint_not_found"]
-        pyqual__plugins__docker__main__docker_security_check["docker_security_check"]
-        pyqual__plugins__security__test__TestPipAudit__test_pip_audit_not_found["test_pip_audit_not_found"]
-        pyqual__plugins__git__status__git_status["git_status"]
-        pyqual__plugins__docs__test__TestCheckReadme__test_readme_not_found["test_readme_not_found"]
-        pyqual__plugins__git__status___parse_branch_line["_parse_branch_line"]
-    end
-    subgraph pyqual__profiles
-        pyqual__profiles__get_profile["get_profile"]
+        pyqual__plugins__cli_helpers__plugin_add["plugin_add"]
+        pyqual__plugins__git__main__git_add["git_add"]
+        pyqual__plugins__git__test__TestPreFlightCheck__test_preflight_with_secrets_blocks_push["test_preflight_with_secrets_bl"]
+        pyqual__plugins__example_plugin__test__TestHelperFunctions__test_example_helper_function["test_example_helper_function"]
+        pyqual__plugins__attack__test__TestAttackMerge__test_not_git_repo["test_not_git_repo"]
+        pyqual__plugins__attack____main____cmd_merge["cmd_merge"]
+        pyqual__plugins__attack__main__auto_merge_pr["auto_merge_pr"]
+        pyqual__plugins__git__test__TestGitStatus__test_status_in_empty_repo["test_status_in_empty_repo"]
+        pyqual__plugins__git__main___parse_file_status["_parse_file_status"]
+        pyqual__plugins__deps__main___is_pinned_req["_is_pinned_req"]
+        pyqual__plugins__deps__main__deps_health_check["deps_health_check"]
+        pyqual__plugins__git__test__TestSecretScanning__test_scan_finds_github_token["test_scan_finds_github_token"]
+        pyqual__plugins__git__main__git_status["git_status"]
     end
     subgraph pyqual__release_check
-        pyqual__release_check__main["main"]
         pyqual__release_check___print_result["_print_result"]
+        pyqual__release_check__main["main"]
     end
     subgraph pyqual__report
-        pyqual__report__main["main"]
-        pyqual__report__collect_project_metadata["collect_project_metadata"]
-        pyqual__report___build_quality_badges["_build_quality_badges"]
+        pyqual__report__generate_report["generate_report"]
         pyqual__report___read_pyproject["_read_pyproject"]
         pyqual__report__update_readme_badges["update_readme_badges"]
+        pyqual__report___badge_url["_badge_url"]
+        pyqual__report___build_quality_badges["_build_quality_badges"]
+        pyqual__report__main["main"]
         pyqual__report___read_costs_package["_read_costs_package"]
+        pyqual__report__collect_project_metadata["collect_project_metadata"]
         pyqual__report___read_version["_read_version"]
-        pyqual__report__generate_report["generate_report"]
-        pyqual__report__build_badges["build_badges"]
-        pyqual__report___parse_pyproject_fallback["_parse_pyproject_fallback"]
-        pyqual__report___read_git_commit_count["_read_git_commit_count"]
-        pyqual__report__run["run"]
-        pyqual__report___read_costs_data["_read_costs_data"]
-        pyqual__report___read_costs_json["_read_costs_json"]
-        pyqual__report__evaluate_gates["evaluate_gates"]
         pyqual__report___build_project_badges["_build_project_badges"]
         pyqual__report__collect_all_metrics["collect_all_metrics"]
-        pyqual__report___badge_url["_badge_url"]
+        pyqual__report___read_costs_data["_read_costs_data"]
+        pyqual__report__run["run"]
+        pyqual__report___parse_pyproject_fallback["_parse_pyproject_fallback"]
+        pyqual__report__build_badges["build_badges"]
+        pyqual__report___read_costs_json["_read_costs_json"]
+        pyqual__report__evaluate_gates["evaluate_gates"]
+        pyqual__report___read_git_commit_count["_read_git_commit_count"]
     end
     subgraph pyqual__report_generator
-        pyqual__report_generator__generate_metrics_table["generate_metrics_table"]
-        pyqual__report_generator___build_gates_from_metrics["_build_gates_from_metrics"]
-        pyqual__report_generator__main["main"]
-        pyqual__report_generator__generate_report["generate_report"]
-        pyqual__report_generator__generate_stage_details["generate_stage_details"]
-        pyqual__report_generator___build_gate["_build_gate"]
-        pyqual__report_generator__parse_kwargs["parse_kwargs"]
         pyqual__report_generator__generate_ascii_diagram["generate_ascii_diagram"]
-        pyqual__report_generator__get_last_run["get_last_run"]
         pyqual__report_generator___build_run_from_rows["_build_run_from_rows"]
+        pyqual__report_generator___build_gates_from_metrics["_build_gates_from_metrics"]
+        pyqual__report_generator__generate_stage_details["generate_stage_details"]
+        pyqual__report_generator__parse_kwargs["parse_kwargs"]
+        pyqual__report_generator__generate_metrics_table["generate_metrics_table"]
         pyqual__report_generator__generate_mermaid_diagram["generate_mermaid_diagram"]
+        pyqual__report_generator__generate_report["generate_report"]
+        pyqual__report_generator__main["main"]
+        pyqual__report_generator___build_gate["_build_gate"]
+        pyqual__report_generator__get_last_run["get_last_run"]
     end
     subgraph pyqual__run_parallel_fix
-        pyqual__run_parallel_fix__git_commit_and_push["git_commit_and_push"]
-        pyqual__run_parallel_fix__parse_args["parse_args"]
-        pyqual__run_parallel_fix__mark_completed_todos["mark_completed_todos"]
-        pyqual__run_parallel_fix___print_cycle_completion["_print_cycle_completion"]
         pyqual__run_parallel_fix___print_yaml_results["_print_yaml_results"]
+        pyqual__run_parallel_fix__mark_completed_todos["mark_completed_todos"]
         pyqual__run_parallel_fix___setup_batch["_setup_batch"]
         pyqual__run_parallel_fix__get_todo_batch["get_todo_batch"]
+        pyqual__run_parallel_fix__git_commit_and_push["git_commit_and_push"]
+        pyqual__run_parallel_fix__parse_args["parse_args"]
+        pyqual__run_parallel_fix___print_cycle_completion["_print_cycle_completion"]
         pyqual__run_parallel_fix__run_tool["run_tool"]
         pyqual__run_parallel_fix__main["main"]
     end
     subgraph pyqual__setup_deps
         pyqual__setup_deps__check_all["check_all"]
-        pyqual__setup_deps__main["main"]
-        pyqual__setup_deps___install_pip["_install_pip"]
         pyqual__setup_deps___check_pip["_check_pip"]
+        pyqual__setup_deps___install_pip["_install_pip"]
+        pyqual__setup_deps__main["main"]
         pyqual__setup_deps___check_cli["_check_cli"]
     end
     subgraph pyqual__stage_names
-        pyqual__stage_names__get_stage_when_default["get_stage_when_default"]
-        pyqual__stage_names__is_fix_stage_name["is_fix_stage_name"]
         pyqual__stage_names__normalize_stage_name["normalize_stage_name"]
-        pyqual__stage_names__is_verify_stage_name["is_verify_stage_name"]
+        pyqual__stage_names__is_fix_stage_name["is_fix_stage_name"]
         pyqual__stage_names__is_delivery_stage_name["is_delivery_stage_name"]
+        pyqual__stage_names__is_verify_stage_name["is_verify_stage_name"]
+        pyqual__stage_names__get_stage_when_default["get_stage_when_default"]
     end
     subgraph pyqual__tickets
+        pyqual__tickets__sync_from_gates["sync_from_gates"]
+        pyqual__tickets___load_sync_integration["_load_sync_integration"]
         pyqual__tickets__sync_todo_tickets["sync_todo_tickets"]
         pyqual__tickets___normalize_sources["_normalize_sources"]
-        pyqual__tickets___load_sync_integration["_load_sync_integration"]
-        pyqual__tickets__sync_from_gates["sync_from_gates"]
-        pyqual__tickets__sync_github_tickets["sync_github_tickets"]
         pyqual__tickets__sync_planfile_tickets["sync_planfile_tickets"]
         pyqual__tickets__sync_all_tickets["sync_all_tickets"]
+        pyqual__tickets__sync_github_tickets["sync_github_tickets"]
     end
     subgraph pyqual__tools
         pyqual__tools___load_default_presets["_load_default_presets"]
-        pyqual__tools__dump_presets_json["dump_presets_json"]
-        pyqual__tools___preset_from_dict["_preset_from_dict"]
-        pyqual__tools__load_entry_point_presets["load_entry_point_presets"]
         pyqual__tools__get_preset["get_preset"]
-        pyqual__tools__register_custom_tools_from_yaml["register_custom_tools_from_yam"]
-        pyqual__tools__resolve_stage_command["resolve_stage_command"]
-        pyqual__tools__register_preset["register_preset"]
-        pyqual__tools__list_presets["list_presets"]
-        pyqual__tools__load_user_tools["load_user_tools"]
         pyqual__tools__preset_to_dict["preset_to_dict"]
+        pyqual__tools__list_presets["list_presets"]
+        pyqual__tools__register_preset["register_preset"]
+        pyqual__tools__resolve_stage_command["resolve_stage_command"]
+        pyqual__tools__load_user_tools["load_user_tools"]
         pyqual__tools___load_json_presets["_load_json_presets"]
+        pyqual__tools___preset_from_dict["_preset_from_dict"]
+        pyqual__tools__register_custom_tools_from_yaml["register_custom_tools_from_yam"]
+        pyqual__tools__dump_presets_json["dump_presets_json"]
+        pyqual__tools__load_entry_point_presets["load_entry_point_presets"]
     end
     subgraph pyqual__validation
-        pyqual__validation__release___read_version_file["_read_version_file"]
-        pyqual__validation__project___detect_language["_detect_language"]
-        pyqual__validation__errors___match_env_subtype["_match_env_subtype"]
-        pyqual__validation__project__detect_project_facts["detect_project_facts"]
-        pyqual__validation__release___check_registry["_check_registry"]
-        pyqual__validation__errors___classify_failure["_classify_failure"]
-        pyqual__validation__release___bump_patch_version["_bump_patch_version"]
-        pyqual__validation__release___read_package_init_version["_read_package_init_version"]
         pyqual__validation__release___read_pyproject["_read_pyproject"]
-        pyqual__validation__release___read_project_metadata["_read_project_metadata"]
-        pyqual__validation__release___resolve_release_version["_resolve_release_version"]
-        pyqual__validation__release___parse_pyproject_fallback["_parse_pyproject_fallback"]
-        pyqual__validation__release___check_pypi_version["_check_pypi_version"]
-        pyqual__validation__release__validate_release_state["validate_release_state"]
+        pyqual__validation__project__detect_project_facts["detect_project_facts"]
+        pyqual__validation__errors___classify_failure["_classify_failure"]
         pyqual__validation__errors___match_fix_env_subtype["_match_fix_env_subtype"]
+        pyqual__validation__errors___match_env_subtype["_match_env_subtype"]
+        pyqual__validation__release___read_project_metadata["_read_project_metadata"]
+        pyqual__validation__project___detect_language["_detect_language"]
+        pyqual__validation__release___parse_pyproject_fallback["_parse_pyproject_fallback"]
     end
     subgraph pyqual__yaml_fixer
-        pyqual__yaml_fixer___try_parse_yaml["_try_parse_yaml"]
-        pyqual__yaml_fixer___is_multiline_quote["_is_multiline_quote"]
-        pyqual__yaml_fixer__analyze_yaml_syntax["analyze_yaml_syntax"]
-        pyqual__yaml_fixer___parse_pyyaml_error["_parse_pyyaml_error"]
-        pyqual__yaml_fixer__fix_yaml_file["fix_yaml_file"]
-        pyqual__yaml_fixer___detect_quote_issues["_detect_quote_issues"]
-        pyqual__yaml_fixer___get_context["_get_context"]
         pyqual__yaml_fixer___detect_bracket_issues["_detect_bracket_issues"]
+        pyqual__yaml_fixer__fix_yaml_file["fix_yaml_file"]
+        pyqual__yaml_fixer__analyze_yaml_syntax["analyze_yaml_syntax"]
+        pyqual__yaml_fixer___try_parse_yaml["_try_parse_yaml"]
+        pyqual__yaml_fixer___parse_pyyaml_error["_parse_pyyaml_error"]
+        pyqual__yaml_fixer___detect_quote_issues["_detect_quote_issues"]
+        pyqual__yaml_fixer___is_multiline_quote["_is_multiline_quote"]
+        pyqual__yaml_fixer___get_context["_get_context"]
     end
     subgraph run_analysis
-        run_analysis__main["main"]
         run_analysis__run_project["run_project"]
+        run_analysis__main["main"]
     end
     run_analysis__run_project --> Taskfile__print
     run_analysis__main --> Taskfile__print
@@ -485,10 +517,10 @@ flowchart LR
     dashboard__api__main__get_project_summary --> dashboard__api__main__get_db_path
     dashboard__api__main__get_project_summary --> dashboard__api__main__query_pipeline_db
     dashboard__api__main__get_project_summary --> dashboard__api__main__safe_parse
-    examples__integration_example__run_quality_check --> pyqual__api__run_pipeline
+    examples__integration_example__run_quality_check --> project__map__toon__run_pipeline
     examples__integration_example__run_with_callbacks --> Taskfile__print
-    examples__integration_example__check_prerequisites --> pyqual__api__shell_check
-    examples__integration_example__run_shell_command_example --> pyqual__api__shell_check
+    examples__integration_example__check_prerequisites --> project__map__toon__shell_check
+    examples__integration_example__run_shell_command_example --> project__map__toon__shell_check
     examples__integration_example__run_shell_command_example --> Taskfile__print
     examples__integration_example__run_single_stage --> Taskfile__print
     examples__integration_example__preview_pipeline --> Taskfile__print
@@ -504,25 +536,25 @@ flowchart LR
     examples__custom_gates__dynamic_thresholds__main --> Taskfile__print
     examples__multi_gate_pipeline__run_pipeline__main --> Taskfile__print
     examples__ticket_workflow__sync_tickets__sync_from_cli --> Taskfile__print
-    examples__ticket_workflow__sync_tickets__sync_from_cli --> pyqual__tickets__sync_github_tickets
-    examples__ticket_workflow__sync_tickets__sync_from_cli --> pyqual__tickets__sync_all_tickets
-    examples__ticket_workflow__sync_tickets__sync_from_cli --> pyqual__tickets__sync_todo_tickets
+    examples__ticket_workflow__sync_tickets__sync_from_cli --> project__map__toon__sync_github_tickets
+    examples__ticket_workflow__sync_tickets__sync_from_cli --> project__map__toon__sync_all_tickets
+    examples__ticket_workflow__sync_tickets__sync_from_cli --> project__map__toon__sync_todo_tickets
     examples__ticket_workflow__sync_tickets__tickets_from_gate_failures --> Taskfile__print
-    examples__ticket_workflow__sync_tickets__tickets_from_gate_failures --> pyqual__tickets__sync_todo_tickets
+    examples__ticket_workflow__sync_tickets__tickets_from_gate_failures --> project__map__toon__sync_todo_tickets
     examples__ticket_workflow__sync_tickets__main --> examples__ticket_workflow__sync_tickets__sync_from_cli
     examples__ticket_workflow__sync_tickets__main --> examples__ticket_workflow__sync_tickets__tickets_from_gate_failures
     pyqual__custom_fix__apply_patch --> Taskfile__print
     pyqual__custom_fix__add_docstring --> Taskfile__print
     pyqual__custom_fix__parse_and_apply_suggestions --> Taskfile__print
     pyqual__custom_fix__parse_and_apply_suggestions --> pyqual__custom_fix__add_docstring
-    pyqual__config__StageConfig____post_init__ --> pyqual__stage_names__get_stage_when_default
-    pyqual__config__PyqualConfig__load --> pyqual__config___load_env_file
-    pyqual__config__PyqualConfig___parse --> pyqual__tools__load_entry_point_presets
-    pyqual__config__PyqualConfig___parse --> pyqual__tools__load_user_tools
-    pyqual__config__PyqualConfig___parse --> pyqual__tools__register_custom_tools_from_yaml
-    pyqual__config__PyqualConfig___parse --> pyqual__profiles__get_profile
-    pyqual__config__PyqualConfig___validate_stages --> pyqual__tools__get_preset
-    pyqual__config__PyqualConfig___validate_stages --> pyqual__tools__list_presets
+    pyqual__config__StageConfig____post_init__ --> project__map__toon__get_stage_when_default
+    pyqual__config__PyqualConfig__load --> project__map__toon___load_env_file
+    pyqual__config__PyqualConfig___parse --> project__map__toon__load_entry_point_presets
+    pyqual__config__PyqualConfig___parse --> project__map__toon__load_user_tools
+    pyqual__config__PyqualConfig___parse --> project__map__toon__register_custom_tools_from_yaml
+    pyqual__config__PyqualConfig___parse --> project__map__toon__get_profile
+    pyqual__config__PyqualConfig___validate_stages --> project__map__toon__get_preset
+    pyqual__config__PyqualConfig___validate_stages --> project__map__toon__list_presets
     pyqual__report_generator___build_gates_from_metrics --> pyqual__report_generator___build_gate
     pyqual__report_generator__get_last_run --> pyqual__report_generator___build_run_from_rows
     pyqual__report_generator___build_run_from_rows --> pyqual__report_generator___build_gates_from_metrics
@@ -561,7 +593,7 @@ flowchart LR
     pyqual__tickets__sync_all_tickets --> pyqual__tickets__sync_planfile_tickets
     pyqual__tickets__sync_from_gates --> pyqual__tickets__sync_all_tickets
     pyqual__tickets__sync_from_gates --> pyqual__tickets__sync_planfile_tickets
-    pyqual__cli_bulk_cmds___bulk_init_impl --> pyqual__bulk_init__bulk_init
+    pyqual__cli_bulk_cmds___bulk_init_impl --> project__map__toon__bulk_init
     pyqual__cli_bulk_cmds___discover_and_validate --> project__map__toon__discover_projects
     pyqual__cli_bulk_cmds___bulk_run_impl --> pyqual__cli_bulk_cmds___discover_and_validate
     pyqual__cli_bulk_cmds___bulk_run_impl --> pyqual__cli_bulk_cmds___output_bulk_result
@@ -570,12 +602,12 @@ flowchart LR
     pyqual__cli_bulk_cmds___run_with_live_dashboard --> project__map__toon__bulk_run
     pyqual__cli_bulk_cmds___run_with_live_dashboard --> project__map__toon__build_dashboard_table
     pyqual__cli_bulk_cmds__register_bulk_commands --> pyqual__cli_bulk_cmds___bulk_init_impl
-    pyqual__api__create_default_config --> pyqual__profiles__get_profile
+    pyqual__api__create_default_config --> project__map__toon__get_profile
     pyqual__api__run_pipeline --> pyqual__api__load_config
     pyqual__api__run_pipeline --> pyqual__api__run
     pyqual__api__dry_run --> pyqual__api__run_pipeline
-    pyqual__api__run_stage --> pyqual__tools__get_preset
-    pyqual__api__get_tool_command --> pyqual__tools__get_preset
+    pyqual__api__run_stage --> project__map__toon__get_preset
+    pyqual__api__get_tool_command --> project__map__toon__get_preset
     pyqual__github_actions__GitHubActionsReporter__create_issue --> Taskfile__print
     pyqual__github_actions__GitHubActionsReporter__ensure_issue_exists --> Taskfile__print
     pyqual__github_actions__GitHubActionsReporter__set_output --> Taskfile__print
@@ -589,7 +621,7 @@ flowchart LR
     pyqual__run_parallel_fix__main --> pyqual__run_parallel_fix__get_todo_batch
     pyqual__run_parallel_fix__main --> Taskfile__print
     pyqual__run_parallel_fix__main --> pyqual__run_parallel_fix___setup_batch
-    pyqual__run_parallel_fix__main --> pyqual__fix_tools__get_available_tools
+    pyqual__run_parallel_fix__main --> project__map__toon__get_available_tools
     pyqual___gate_collectors___from_toon --> pyqual___gate_collectors___read_artifact_text
     pyqual___gate_collectors___from_vallm --> pyqual___gate_collectors___read_artifact_text
     pyqual___gate_collectors___from_security --> pyqual___gate_collectors___from_bandit
@@ -611,7 +643,7 @@ flowchart LR
     pyqual__yaml_fixer___parse_pyyaml_error --> pyqual__yaml_fixer___get_context
     pyqual__yaml_fixer__fix_yaml_file --> pyqual__yaml_fixer__analyze_yaml_syntax
     pyqual__release_check___print_result --> Taskfile__print
-    pyqual__release_check__main --> pyqual__validation__release__validate_release_state
+    pyqual__release_check__main --> project__map__toon__validate_release_state
     pyqual__release_check__main --> pyqual__release_check___print_result
     pyqual__setup_deps__check_all --> pyqual__setup_deps___check_pip
     pyqual__setup_deps__check_all --> pyqual__setup_deps___install_pip
@@ -619,11 +651,11 @@ flowchart LR
     pyqual__setup_deps__main --> pyqual__setup_deps__check_all
     pyqual__setup_deps__main --> Taskfile__print
     pyqual__bulk_init__classify_with_llm --> pyqual__bulk_init___build_llm_prompt
-    pyqual__bulk_init___classify_heuristic --> pyqual__bulk_init_classify__check_skip_conditions
+    pyqual__bulk_init___classify_heuristic --> project__map__toon__check_skip_conditions
     pyqual__bulk_init__generate_pyqual_yaml --> pyqual__bulk_init___safe_name
     pyqual__bulk_init___classify_project --> pyqual__bulk_init___classify_heuristic
     pyqual__bulk_init___classify_project --> pyqual__bulk_init__classify_with_llm
-    pyqual__bulk_init__bulk_init --> pyqual__bulk_init_fingerprint__collect_fingerprint
+    pyqual__bulk_init__bulk_init --> project__map__toon__collect_fingerprint
     pyqual__bulk_init__bulk_init --> pyqual__bulk_init___classify_project
     pyqual__bulk_init__bulk_init --> pyqual__bulk_init__generate_pyqual_yaml
     pyqual__bulk_init__bulk_init --> pyqual__bulk_init___validate_yaml_content
@@ -636,20 +668,24 @@ flowchart LR
     pyqual__bulk_init_fingerprint__collect_fingerprint --> pyqual__bulk_init_fingerprint___collect_makefile_targets
     pyqual__bulk_init_fingerprint__collect_fingerprint --> pyqual__bulk_init_fingerprint___collect_pyproject_metadata
     pyqual__bulk_init_fingerprint__collect_fingerprint --> pyqual__bulk_init_fingerprint___collect_readme_excerpt
+    pyqual__pipeline__Pipeline___iteration_stagnated --> project__map__toon__is_fix_stage_name
+    pyqual__pipeline__Pipeline___resolve_tool_stage --> project__map__toon__get_preset
+    pyqual__pipeline__Pipeline___is_fix_stage --> project__map__toon__is_fix_stage_name
+    pyqual__pipeline__Pipeline___log_stage --> project__map__toon__get_preset
     pyqual__cli_observe___output_human_logs --> pyqual__cli_observe___print_stage_output
     pyqual__cli_observe___logs_impl --> pyqual__cli_observe___output_sql_query
     pyqual__cli_observe___logs_impl --> pyqual__cli_observe___output_json_entries
     pyqual__cli_observe___history_impl --> pyqual__cli_observe___load_history_entries
     pyqual__cli_observe___history_impl --> pyqual__cli_observe___print_history_table
     pyqual__cli_observe___history_impl --> pyqual__cli_observe___print_history_summary
-    pyqual__cli_run_helpers__extract_fix_stage_summary --> pyqual__stage_names__is_fix_stage_name
+    pyqual__cli_run_helpers__extract_fix_stage_summary --> project__map__toon__is_fix_stage_name
     pyqual__cli_run_helpers__extract_stage_summary --> pyqual__cli_run_helpers__extract_pytest_stage_summary
     pyqual__cli_run_helpers__extract_stage_summary --> pyqual__cli_run_helpers__extract_lint_stage_summary
     pyqual__cli_run_helpers__enrich_from_artifacts --> pyqual__cli_run_helpers___enrich_analysis
     pyqual__cli_run_helpers__enrich_from_artifacts --> pyqual__cli_run_helpers___enrich_validation
     pyqual__cli_run_helpers__enrich_from_artifacts --> pyqual__cli_run_helpers___enrich_todo
     pyqual__cli_run_helpers___extract_fix_summary --> pyqual__cli_run_helpers__infer_fix_result
-    pyqual__cli_run_helpers___extract_delivery_summary --> pyqual__stage_names__is_delivery_stage_name
+    pyqual__cli_run_helpers___extract_delivery_summary --> project__map__toon__is_delivery_stage_name
     pyqual__cli_run_helpers__build_run_summary --> pyqual__cli_run_helpers___extract_todo_summary
     pyqual__cli_run_helpers__build_run_summary --> pyqual__cli_run_helpers___extract_fix_summary
     pyqual__cli_run_helpers__build_run_summary --> pyqual__cli_run_helpers___extract_delivery_summary
@@ -677,120 +713,120 @@ flowchart LR
     pyqual__report__run --> pyqual__report__generate_report
     pyqual__report__run --> Taskfile__print
     pyqual__report__main --> pyqual__report__run
-    pyqual__gate_collectors__legacy___from_toon --> pyqual___gate_collectors___read_artifact_text
-    pyqual__gate_collectors__legacy___from_vallm --> pyqual___gate_collectors___read_artifact_text
-    pyqual__cli__cmd_git__git_status_cmd --> pyqual__plugins__git__status__git_status
+    pyqual__gate_collectors__legacy___from_toon --> project__map__toon___read_artifact_text
+    pyqual__gate_collectors__legacy___from_vallm --> project__map__toon___read_artifact_text
+    pyqual__cli__cmd_git__git_status_cmd --> project__map__toon__git_status
     pyqual__cli__cmd_git__git_status_cmd --> pyqual__cli__cmd_git___print_file_list
-    pyqual__cli__cmd_git__git_add_cmd --> pyqual__plugins__git__main__git_add
-    pyqual__cli__cmd_git__git_scan_cmd --> pyqual__plugins__git__main__scan_for_secrets
-    pyqual__cli__cmd_git__git_commit_cmd --> pyqual__plugins__git__main__git_commit
-    pyqual__cli__cmd_git___run_preflight_checks --> pyqual__plugins__git__main__preflight_push_check
-    pyqual__cli__cmd_init__init --> pyqual__profiles__get_profile
+    pyqual__cli__cmd_git__git_add_cmd --> project__map__toon__git_add
+    pyqual__cli__cmd_git__git_scan_cmd --> project__map__toon__scan_for_secrets
+    pyqual__cli__cmd_git__git_commit_cmd --> project__map__toon__git_commit
+    pyqual__cli__cmd_git___run_preflight_checks --> project__map__toon__preflight_push_check
+    pyqual__cli__cmd_init__init --> project__map__toon__get_profile
     pyqual__cli__cmd_run___emit_yaml_items --> pyqual__cli__cmd_run___emit
-    pyqual__cli__cmd_run___handle_config_env_error --> pyqual__api__validate_config
+    pyqual__cli__cmd_run___handle_config_env_error --> project__map__toon__validate_config
     pyqual__cli__cmd_run___handle_config_env_error --> pyqual__cli__cmd_run___run_auto_fix_config
-    pyqual__cli__cmd_run___run_auto_fix_config --> pyqual__validation__project__detect_project_facts
+    pyqual__cli__cmd_run___run_auto_fix_config --> project__map__toon__detect_project_facts
     pyqual__cli__cmd_run___on_stage_error_impl --> pyqual__cli__cmd_run___handle_config_env_error
     pyqual__cli__cmd_run___on_stage_error_impl --> pyqual__cli__cmd_run___handle_llm_error
     pyqual__cli__cmd_run___on_stage_error_impl --> pyqual__cli__cmd_run___handle_pipeline_error
-    pyqual__cli__cmd_run___create_tickets_if_needed --> pyqual__tickets__sync_all_tickets
-    pyqual__cli__cmd_run___create_tickets_if_needed --> pyqual__tickets__sync_planfile_tickets
+    pyqual__cli__cmd_run___create_tickets_if_needed --> project__map__toon__sync_all_tickets
+    pyqual__cli__cmd_run___create_tickets_if_needed --> project__map__toon__sync_planfile_tickets
     pyqual__cli__cmd_run___rebuild_iterations_from_result --> pyqual__cli__cmd_run___emit
     pyqual__cli__cmd_run___rebuild_iterations_from_result --> pyqual__cli__cmd_run___build_stage_dict
     pyqual__cli__cmd_run___rebuild_iterations_from_result --> pyqual__cli__cmd_run___emit_yaml_items
     pyqual__cli__cmd_run___rebuild_iterations_from_result --> pyqual__cli__cmd_run___build_gate_dict
-    pyqual__cli__cmd_run__run --> pyqual__cli__main__setup_logging
+    pyqual__cli__cmd_run__run --> project__map__toon__setup_logging
     pyqual__cli__cmd_tune__tune_thresholds --> pyqual__cli__cmd_tune___load_latest_metrics
     pyqual__cli__cmd_tune__tune_thresholds --> pyqual__cli__cmd_tune___calculate_thresholds
     pyqual__cli__cmd_tune__tune_thresholds --> pyqual__cli__cmd_tune___display_comparison
     pyqual__cli__cmd_tune__tune_show --> pyqual__cli__cmd_tune___load_latest_metrics
-    pyqual__cli__cmd_tickets__tickets_todo --> pyqual__tickets__sync_todo_tickets
-    pyqual__cli__cmd_tickets__tickets_github --> pyqual__tickets__sync_github_tickets
-    pyqual__cli__cmd_tickets__tickets_all --> pyqual__tickets__sync_all_tickets
-    pyqual__cli__cmd_tickets__tickets_fetch --> pyqual__github_tasks__fetch_github_tasks
+    pyqual__cli__cmd_tickets__tickets_todo --> project__map__toon__sync_todo_tickets
+    pyqual__cli__cmd_tickets__tickets_github --> project__map__toon__sync_github_tickets
+    pyqual__cli__cmd_tickets__tickets_all --> project__map__toon__sync_all_tickets
+    pyqual__cli__cmd_tickets__tickets_fetch --> project__map__toon__fetch_github_tasks
     pyqual__cli__main__tune_thresholds_cmd --> pyqual__cli__main___load_latest_metrics_for_tune
     pyqual__cli__main__tune_thresholds_cmd --> pyqual__cli__main___calculate_thresholds_for_tune
     pyqual__cli__main__tune_thresholds_cmd --> pyqual__cli__main___display_comparison_for_tune
-    pyqual__cli__cmd_config__validate --> pyqual__api__validate_config
+    pyqual__cli__cmd_config__validate --> project__map__toon__validate_config
     pyqual__cli__cmd_config__validate --> pyqual__cli__cmd_config___print_issues
-    pyqual__cli__cmd_config__fix_config --> pyqual__api__validate_config
-    pyqual__cli__cmd_config__fix_config --> pyqual__validation__project__detect_project_facts
-    pyqual__cli__cmd_plugin__plugin --> pyqual__plugins__get_available_plugins
-    pyqual__cli__cmd_plugin__plugin --> pyqual__plugins__cli_helpers__plugin_list
-    pyqual__cli__cmd_plugin__plugin --> pyqual__plugins__cli_helpers__plugin_search
-    pyqual__cli__cmd_plugin__plugin --> pyqual__plugins__cli_helpers__plugin_info
-    pyqual__plugins__cli_helpers__plugin_add --> pyqual__plugins__install_plugin_config
-    pyqual__plugins__docs__test__TestCheckReadme__test_readme_not_found --> pyqual__plugins__docs__main__check_readme
-    pyqual__plugins__docs__test__TestCheckReadme__test_readme_quality_check --> pyqual__plugins__docs__main__check_readme
-    pyqual__plugins__docs__test__TestInterrogate__test_interrogate_not_found --> pyqual__plugins__docs__main__run_interrogate
-    pyqual__plugins__docs__test__TestCheckLinks__test_lychee_not_found --> pyqual__plugins__docs__main__check_links
-    pyqual__plugins__docs__test__TestDocsQualitySummary__test_summary_structure --> pyqual__plugins__docs__main__docs_quality_summary
+    pyqual__cli__cmd_config__fix_config --> project__map__toon__validate_config
+    pyqual__cli__cmd_config__fix_config --> project__map__toon__detect_project_facts
+    pyqual__cli__cmd_plugin__plugin --> project__map__toon__get_available_plugins
+    pyqual__cli__cmd_plugin__plugin --> project__map__toon__plugin_list
+    pyqual__cli__cmd_plugin__plugin --> project__map__toon__plugin_search
+    pyqual__cli__cmd_plugin__plugin --> project__map__toon__plugin_info
+    pyqual__plugins__cli_helpers__plugin_add --> project__map__toon__install_plugin_config
+    pyqual__plugins__docs__test__TestCheckReadme__test_readme_not_found --> project__map__toon__check_readme
+    pyqual__plugins__docs__test__TestCheckReadme__test_readme_quality_check --> project__map__toon__check_readme
+    pyqual__plugins__docs__test__TestInterrogate__test_interrogate_not_found --> project__map__toon__run_interrogate
+    pyqual__plugins__docs__test__TestCheckLinks__test_lychee_not_found --> project__map__toon__check_links
+    pyqual__plugins__docs__test__TestDocsQualitySummary__test_summary_structure --> project__map__toon__docs_quality_summary
     pyqual__plugins__docs__main__docs_quality_summary --> pyqual__plugins__docs__main__check_readme
     pyqual__plugins__docs__main__docs_quality_summary --> pyqual__plugins__docs__main__run_interrogate
     pyqual__plugins__docs__main__docs_quality_summary --> pyqual__plugins__docs__main__check_links
-    pyqual__plugins__security__test__TestBanditCheck__test_bandit_not_found --> pyqual__plugins__security__main__run_bandit_check
-    pyqual__plugins__security__test__TestPipAudit__test_pip_audit_not_found --> pyqual__plugins__security__main__run_pip_audit
-    pyqual__plugins__security__test__TestDetectSecrets__test_detect_secrets_not_found --> pyqual__plugins__security__main__run_detect_secrets
-    pyqual__plugins__security__test__TestSecuritySummary__test_security_summary_empty --> pyqual__plugins__security__main__security_summary
-    pyqual__plugins__security__test__TestSecuritySummary__test_security_summary_with_issues --> pyqual__plugins__security__main__security_summary
+    pyqual__plugins__security__test__TestBanditCheck__test_bandit_not_found --> project__map__toon__run_bandit_check
+    pyqual__plugins__security__test__TestPipAudit__test_pip_audit_not_found --> project__map__toon__run_pip_audit
+    pyqual__plugins__security__test__TestDetectSecrets__test_detect_secrets_not_found --> project__map__toon__run_detect_secrets
+    pyqual__plugins__security__test__TestSecuritySummary__test_security_summary_empty --> project__map__toon__security_summary
+    pyqual__plugins__security__test__TestSecuritySummary__test_security_summary_with_issues --> project__map__toon__security_summary
     pyqual__plugins__attack____main____cmd_check --> pyqual__plugins__attack____main_____ensure_dir
-    pyqual__plugins__attack____main____cmd_check --> pyqual__plugins__attack__main__attack_check
+    pyqual__plugins__attack____main____cmd_check --> project__map__toon__attack_check
     pyqual__plugins__attack____main____cmd_check --> Taskfile__print
     pyqual__plugins__attack____main____cmd_merge --> pyqual__plugins__attack____main_____ensure_dir
-    pyqual__plugins__attack____main____cmd_merge --> pyqual__plugins__attack__main__attack_check
+    pyqual__plugins__attack____main____cmd_merge --> project__map__toon__attack_check
     pyqual__plugins__attack____main____cmd_merge --> Taskfile__print
-    pyqual__plugins__attack____main____cmd_merge --> pyqual__plugins__attack__main__attack_merge
+    pyqual__plugins__attack____main____cmd_merge --> project__map__toon__attack_merge
     pyqual__plugins__attack____main____main --> Taskfile__print
     pyqual__plugins__attack____main____main --> pyqual__plugins__attack____main____cmd_check
     pyqual__plugins__attack____main____main --> pyqual__plugins__attack____main____cmd_merge
-    pyqual__plugins__attack__test__TestAttackCheck__test_not_git_repo --> pyqual__plugins__attack__main__attack_check
-    pyqual__plugins__attack__test__TestAttackCheck__test_successful_check --> pyqual__plugins__attack__main__attack_check
-    pyqual__plugins__attack__test__TestAttackMerge__test_not_git_repo --> pyqual__plugins__attack__main__attack_merge
-    pyqual__plugins__attack__test__TestAttackMerge__test_dry_run_merge --> pyqual__plugins__attack__main__attack_merge
-    pyqual__plugins__attack__test__TestAutoMergePR__test_pr_merge_with_gh_cli --> pyqual__plugins__attack__main__auto_merge_pr
-    pyqual__plugins__attack__test__TestAutoMergePR__test_pr_merge_failure --> pyqual__plugins__attack__main__auto_merge_pr
-    pyqual__plugins__attack__test__TestAutoMergePR__test_no_pr_or_branch --> pyqual__plugins__attack__main__auto_merge_pr
+    pyqual__plugins__attack__test__TestAttackCheck__test_not_git_repo --> project__map__toon__attack_check
+    pyqual__plugins__attack__test__TestAttackCheck__test_successful_check --> project__map__toon__attack_check
+    pyqual__plugins__attack__test__TestAttackMerge__test_not_git_repo --> project__map__toon__attack_merge
+    pyqual__plugins__attack__test__TestAttackMerge__test_dry_run_merge --> project__map__toon__attack_merge
+    pyqual__plugins__attack__test__TestAutoMergePR__test_pr_merge_with_gh_cli --> project__map__toon__auto_merge_pr
+    pyqual__plugins__attack__test__TestAutoMergePR__test_pr_merge_failure --> project__map__toon__auto_merge_pr
+    pyqual__plugins__attack__test__TestAutoMergePR__test_no_pr_or_branch --> project__map__toon__auto_merge_pr
     pyqual__plugins__attack__main__attack_check --> pyqual__plugins__attack__main__run_git_command
     pyqual__plugins__attack__main__attack_merge --> pyqual__plugins__attack__main__run_git_command
     pyqual__plugins__attack__main__attack_merge --> pyqual__plugins__attack__main___merge_theirs
     pyqual__plugins__attack__main___merge_theirs --> pyqual__plugins__attack__main__run_git_command
     pyqual__plugins__attack__main__auto_merge_pr --> pyqual__plugins__attack__main__run_git_command
     pyqual__plugins__attack__main__auto_merge_pr --> pyqual__plugins__attack__main__attack_merge
-    pyqual__plugins__docker__test__TestHadolint__test_hadolint_not_found --> pyqual__plugins__docker__main__run_hadolint
-    pyqual__plugins__docker__test__TestTrivyScan__test_trivy_not_found --> pyqual__plugins__docker__main__run_trivy_scan
-    pyqual__plugins__docker__test__TestDockerSecurityCheck__test_security_check_without_image --> pyqual__plugins__docker__main__docker_security_check
-    pyqual__plugins__docker__test__TestDockerSecurityCheck__test_security_check_structure --> pyqual__plugins__docker__main__docker_security_check
+    pyqual__plugins__docker__test__TestHadolint__test_hadolint_not_found --> project__map__toon__run_hadolint
+    pyqual__plugins__docker__test__TestTrivyScan__test_trivy_not_found --> project__map__toon__run_trivy_scan
+    pyqual__plugins__docker__test__TestDockerSecurityCheck__test_security_check_without_image --> project__map__toon__docker_security_check
+    pyqual__plugins__docker__test__TestDockerSecurityCheck__test_security_check_structure --> project__map__toon__docker_security_check
     pyqual__plugins__docker__main__docker_security_check --> pyqual__plugins__docker__main__run_hadolint
     pyqual__plugins__docker__main__docker_security_check --> pyqual__plugins__docker__main__run_trivy_scan
     pyqual__plugins__docker__main__docker_security_check --> pyqual__plugins__docker__main__get_image_info
-    pyqual__plugins__deps__test__TestGetOutdatedPackages__test_pip_not_available --> pyqual__plugins__deps__main__get_outdated_packages
-    pyqual__plugins__deps__test__TestGetDependencyTree__test_pipdeptree_not_available --> pyqual__plugins__deps__main__get_dependency_tree
-    pyqual__plugins__deps__test__TestCheckRequirements__test_requirements_not_found --> pyqual__plugins__deps__main__check_requirements
-    pyqual__plugins__deps__test__TestCheckRequirements__test_requirements_parsing --> pyqual__plugins__deps__main__check_requirements
-    pyqual__plugins__deps__test__TestCheckRequirements__test_fully_pinned_requirements --> pyqual__plugins__deps__main__check_requirements
-    pyqual__plugins__deps__test__TestDepsHealthCheck__test_health_check_structure --> pyqual__plugins__deps__main__deps_health_check
+    pyqual__plugins__deps__test__TestGetOutdatedPackages__test_pip_not_available --> project__map__toon__get_outdated_packages
+    pyqual__plugins__deps__test__TestGetDependencyTree__test_pipdeptree_not_available --> project__map__toon__get_dependency_tree
+    pyqual__plugins__deps__test__TestCheckRequirements__test_requirements_not_found --> project__map__toon__check_requirements
+    pyqual__plugins__deps__test__TestCheckRequirements__test_requirements_parsing --> project__map__toon__check_requirements
+    pyqual__plugins__deps__test__TestCheckRequirements__test_fully_pinned_requirements --> project__map__toon__check_requirements
+    pyqual__plugins__deps__test__TestDepsHealthCheck__test_health_check_structure --> project__map__toon__deps_health_check
     pyqual__plugins__deps__main__check_requirements --> pyqual__plugins__deps__main___is_pinned_req
     pyqual__plugins__deps__main__deps_health_check --> pyqual__plugins__deps__main__get_outdated_packages
     pyqual__plugins__deps__main__deps_health_check --> pyqual__plugins__deps__main__get_dependency_tree
     pyqual__plugins__deps__main__deps_health_check --> pyqual__plugins__deps__main__check_requirements
-    pyqual__plugins__git__status__git_status --> pyqual__plugins__attack__main__run_git_command
+    pyqual__plugins__git__status__git_status --> project__map__toon__run_git_command
     pyqual__plugins__git__status__git_status --> pyqual__plugins__git__status___parse_branch_line
     pyqual__plugins__git__status__git_status --> pyqual__plugins__git__status___parse_file_status
-    pyqual__plugins__git__git_command__run_git_command --> pyqual__parallel__ParallelExecutor__run
-    pyqual__plugins__git__test__TestGitStatus__test_status_in_empty_repo --> pyqual__plugins__git__status__git_status
-    pyqual__plugins__git__test__TestGitStatus__test_status_with_untracked_file --> pyqual__plugins__git__status__git_status
-    pyqual__plugins__git__test__TestGitStatus__test_status_not_a_git_repo --> pyqual__plugins__git__status__git_status
-    pyqual__plugins__git__test__TestGitCommit__test_commit_with_changes --> pyqual__plugins__git__main__git_commit
-    pyqual__plugins__git__test__TestGitCommit__test_commit_only_if_changed_no_changes --> pyqual__plugins__git__main__git_commit
-    pyqual__plugins__git__test__TestSecretScanning__test_scan_finds_github_token --> pyqual__plugins__git__main__scan_for_secrets
-    pyqual__plugins__git__test__TestSecretScanning__test_scan_finds_aws_key --> pyqual__plugins__git__main__scan_for_secrets
-    pyqual__plugins__git__test__TestSecretScanning__test_scan_skips_placeholders --> pyqual__plugins__git__main__scan_for_secrets
-    pyqual__plugins__git__test__TestSecretScanning__test_false_positive_detection --> pyqual__plugins__git__main___is_likely_false_positive
-    pyqual__plugins__git__test__TestSecretScanning__test_provider_mapping --> pyqual__plugins__git__main___get_provider_for_pattern
-    pyqual__plugins__git__test__TestSecretScanning__test_severity_mapping --> pyqual__plugins__git__main___get_severity_for_pattern
-    pyqual__plugins__git__test__TestPreFlightCheck__test_preflight_with_secrets_blocks_push --> pyqual__plugins__git__main__preflight_push_check
-    pyqual__plugins__git__test__TestPreFlightCheck__test_preflight_clean_repo --> pyqual__plugins__git__main__preflight_push_check
-    pyqual__plugins__git__main__GitCollector___collect_scan_metrics --> pyqual___gate_collectors___count_by_severity
+    pyqual__plugins__git__git_command__run_git_command --> project__map__toon__run
+    pyqual__plugins__git__test__TestGitStatus__test_status_in_empty_repo --> project__map__toon__git_status
+    pyqual__plugins__git__test__TestGitStatus__test_status_with_untracked_file --> project__map__toon__git_status
+    pyqual__plugins__git__test__TestGitStatus__test_status_not_a_git_repo --> project__map__toon__git_status
+    pyqual__plugins__git__test__TestGitCommit__test_commit_with_changes --> project__map__toon__git_commit
+    pyqual__plugins__git__test__TestGitCommit__test_commit_only_if_changed_no_changes --> project__map__toon__git_commit
+    pyqual__plugins__git__test__TestSecretScanning__test_scan_finds_github_token --> project__map__toon__scan_for_secrets
+    pyqual__plugins__git__test__TestSecretScanning__test_scan_finds_aws_key --> project__map__toon__scan_for_secrets
+    pyqual__plugins__git__test__TestSecretScanning__test_scan_skips_placeholders --> project__map__toon__scan_for_secrets
+    pyqual__plugins__git__test__TestSecretScanning__test_false_positive_detection --> project__map__toon___is_likely_false_positive
+    pyqual__plugins__git__test__TestSecretScanning__test_provider_mapping --> project__map__toon___get_provider_for_pattern
+    pyqual__plugins__git__test__TestSecretScanning__test_severity_mapping --> project__map__toon___get_severity_for_pattern
+    pyqual__plugins__git__test__TestPreFlightCheck__test_preflight_with_secrets_blocks_push --> project__map__toon__preflight_push_check
+    pyqual__plugins__git__test__TestPreFlightCheck__test_preflight_clean_repo --> project__map__toon__preflight_push_check
+    pyqual__plugins__git__main__GitCollector___collect_scan_metrics --> project__map__toon___count_by_severity
     pyqual__plugins__git__main__git_status --> pyqual__plugins__git__main__run_git_command
     pyqual__plugins__git__main__git_status --> pyqual__plugins__git__main___parse_branch_line
     pyqual__plugins__git__main__git_status --> pyqual__plugins__git__main___parse_file_status
@@ -813,13 +849,9 @@ flowchart LR
     pyqual__plugins__git__main__preflight_push_check --> pyqual__plugins__git__main__git_status
     pyqual__plugins__git__main__preflight_push_check --> pyqual__plugins__git__main__scan_for_secrets
     pyqual__plugins__git__main__preflight_push_check --> pyqual__plugins__git__main___classify_secret_findings
-    pyqual__plugins__example_plugin__test__TestHelperFunctions__test_example_helper_function --> pyqual__plugins__example_plugin__main__example_helper_function
+    pyqual__plugins__example_plugin__test__TestHelperFunctions__test_example_helper_function --> project__map__toon__example_helper_function
     pyqual__validation__errors___classify_failure --> pyqual__validation__errors___match_fix_env_subtype
     pyqual__validation__errors___classify_failure --> pyqual__validation__errors___match_env_subtype
     pyqual__validation__project__detect_project_facts --> pyqual__validation__project___detect_language
     pyqual__validation__release___read_pyproject --> pyqual__validation__release___parse_pyproject_fallback
     pyqual__validation__release___read_project_metadata --> pyqual__validation__release___read_pyproject
-    pyqual__validation__release___read_project_metadata --> pyqual__validation__release___read_version_file
-    pyqual__validation__release___read_project_metadata --> pyqual__validation__release___read_package_init_version
-    pyqual__validation__release___resolve_release_version --> pyqual__validation__release___bump_patch_version
-    pyqual__validation__release___check_registry --> pyqual__validation__release___check_pypi_version

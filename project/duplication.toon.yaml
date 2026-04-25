@@ -1,12 +1,12 @@
-# redup/duplication | 11 groups | 115f 19490L | 2026-04-25
+# redup/duplication | 11 groups | 115f 19501L | 2026-04-25
 
 SUMMARY:
   files_scanned: 115
-  total_lines:   19490
+  total_lines:   19501
   dup_groups:    11
   dup_fragments: 31
   saved_lines:   210
-  scan_ms:       8008
+  scan_ms:       12233
 
 HOTSPOTS[7] (files with most duplication):
   pyqual/plugins/git/main.py  dup=58L  groups=2  frags=2  (0.3%)
