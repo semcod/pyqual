@@ -98,13 +98,9 @@ class Pipeline:
             iteration = self._run_iteration(i, dry_run)
             result.iterations.append(iteration)
 
-            if iteration.all_gates_passed:
-                result.final_passed = True
-                break
-
-            if i > 1 and self._iteration_stagnated(iteration):
-                log.info("pipeline=%s status=stagnated iteration=%d reason=fix_no_changes",
-                         self.config.name, i)
+            if self._should_stop_after_iteration(iteration, i):
+                if iteration.all_gates_passed:
+                    result.final_passed = True
                 break
 
         result.total_duration = time.monotonic() - start
@@ -163,6 +159,20 @@ class Pipeline:
                 combined = (stage.stdout or "") + (stage.stderr or "")
                 if combined and "+++ b/" not in combined:
                     return True
+        return False
+
+    def _should_stop_after_iteration(
+        self, iteration: IterationResult, iteration_num: int,
+    ) -> bool:
+        """Return True if the pipeline should stop after this iteration."""
+        if iteration.all_gates_passed:
+            return True
+        if iteration_num > 1 and self._iteration_stagnated(iteration):
+            log.info(
+                "pipeline=%s status=stagnated iteration=%d reason=fix_no_changes",
+                self.config.name, iteration_num,
+            )
+            return True
         return False
 
     def _should_run_stage(
@@ -289,20 +299,44 @@ class Pipeline:
         self._log_stage(stage, result)
         return result
 
+    def _resolve_stage_command_and_policy(
+        self, stage: StageConfig,
+    ) -> tuple[str, bool, StageResult | None]:
+        """Resolve command string and failure policy for a stage.
+
+        Returns ``(command, allow_failure, skip_result)``.  When *skip_result*
+        is not ``None`` the caller should return it immediately.
+        """
+        if stage.tool:
+            command, allow_failure = self._resolve_tool_stage(stage)
+            if not command:
+                return "", False, self._make_skipped_result(
+                    stage, f"Tool '{stage.tool}' not found (optional)"
+                )
+            return command, allow_failure, None
+        if stage.optional and stage.run:
+            missing = self._check_optional_binary(stage.run)
+            if missing:
+                return "", False, self._make_skipped_result(
+                    stage, f"'{missing}' not found on PATH (optional)"
+                )
+        return stage.run or "", False, None
+
+    def _handle_stage_failure(
+        self, stage: StageConfig, result: StageResult, is_fix_stage: bool,
+    ) -> None:
+        """Capture runtime errors and notify callbacks for failed stages."""
+        if result.passed or result.skipped or result.original_returncode == 0:
+            return
+        self._capture_runtime_error(stage, result)
+        if self.on_stage_error:
+            self._notify_stage_error(stage, result, is_fix_stage)
+
     def _execute_stage(self, stage: StageConfig, dry_run: bool) -> StageResult:
         """Execute a single stage command."""
-        command = stage.run
-        allow_failure = False
-
-        if stage.tool:
-            resolved = self._resolve_tool_stage(stage)
-            command, allow_failure = resolved
-            if not command:
-                return self._make_skipped_result(stage, f"Tool '{stage.tool}' not found (optional)")
-        elif stage.optional and command:
-            missing = self._check_optional_binary(command)
-            if missing:
-                return self._make_skipped_result(stage, f"'{missing}' not found on PATH (optional)")
+        command, allow_failure, skip = self._resolve_stage_command_and_policy(stage)
+        if skip:
+            return skip
 
         if dry_run:
             return self._make_dry_run_result(stage, command)
@@ -312,7 +346,6 @@ class Pipeline:
             self.on_stage_start(stage.name)
 
         is_fix_stage = self._is_fix_stage(stage)
-
         env = {**os.environ, **self._resolve_env()}
         start = time.monotonic()
 
@@ -322,14 +355,7 @@ class Pipeline:
             result = self._execute_captured(stage, command, allow_failure, env, start)
 
         self._log_stage(stage, result)
-
-        # Capture runtime errors for failed stages
-        if not result.passed and not result.skipped and result.original_returncode != 0:
-            self._capture_runtime_error(stage, result)
-
-        if not result.passed and not result.skipped and self.on_stage_error:
-            self._notify_stage_error(stage, result, is_fix_stage)
-
+        self._handle_stage_failure(stage, result, is_fix_stage)
         return result
 
     def _notify_stage_error(self, stage: StageConfig, result: StageResult, is_fix_stage: bool) -> None:

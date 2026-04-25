@@ -47,6 +47,31 @@ def discover_projects(root: Path) -> list[ProjectRunState]:
     return states
 
 
+def _make_summary_title(states: list[ProjectRunState]) -> str:
+    n_pass = sum(1 for s in states if s.status == RunStatus.PASSED)
+    n_fail = sum(1 for s in states if s.status == RunStatus.FAILED)
+    n_run = sum(1 for s in states if s.status == RunStatus.RUNNING)
+    return f"pass:{n_pass}  fail:{n_fail}  running:{n_run}"
+
+
+def _build_status_row(
+    s: ProjectRunState, show_last_line: bool,
+) -> tuple[list[str], str]:
+    icon = STATUS_ICON.get(s.status, "?")
+    style = STATUS_STYLE.get(s.status, "")
+    elapsed = f"{s.elapsed:.1f}s" if s.elapsed else "-"
+    row: list[str] = [
+        s.name,
+        f"{icon} {s.status.value}",
+        str(s.iteration) if s.iteration else "-",
+        s.gates_label or "-",
+        elapsed,
+    ]
+    if show_last_line:
+        row.append(s.last_line or "")
+    return row, style
+
+
 def build_dashboard_table(
     states: list[ProjectRunState],
     show_last_line: bool = False,
@@ -56,12 +81,7 @@ def build_dashboard_table(
     except ImportError:  # pragma: no cover
         raise ImportError("rich is required for build_dashboard_table")
 
-    n_pass = sum(1 for s in states if s.status == RunStatus.PASSED)
-    n_fail = sum(1 for s in states if s.status == RunStatus.FAILED)
-    n_run = sum(1 for s in states if s.status == RunStatus.RUNNING)
-    title = f"pass:{n_pass}  fail:{n_fail}  running:{n_run}"
-
-    table = Table(title=title, show_header=True, header_style="bold")
+    table = Table(title=_make_summary_title(states), show_header=True, header_style="bold")
     table.add_column("Project")
     table.add_column("Status")
     table.add_column("Iter")
@@ -71,18 +91,7 @@ def build_dashboard_table(
         table.add_column("Last Output")
 
     for s in states:
-        icon = STATUS_ICON.get(s.status, "?")
-        style = STATUS_STYLE.get(s.status, "")
-        elapsed = f"{s.elapsed:.1f}s" if s.elapsed else "-"
-        row = [
-            s.name,
-            f"{icon} {s.status.value}",
-            str(s.iteration) if s.iteration else "-",
-            s.gates_label or "-",
-            elapsed,
-        ]
-        if show_last_line:
-            row.append(s.last_line or "")
+        row, style = _build_status_row(s, show_last_line)
         table.add_row(*row, style=style)
 
     return table

@@ -24,7 +24,7 @@ Declarative quality gate loops for AI-assisted development
 ## Metadata
 
 - **name**: `pyqual`
-- **version**: `0.1.143`
+- **version**: `0.1.144`
 - **python_requires**: `>=3.9`
 - **license**: Apache-2.0
 - **ai_model**: `openrouter/x-ai/grok-code-fast-1`
@@ -44,7 +44,7 @@ SUMD (description) → DOQL/source (code) → taskfile (automation) → testql (
 
 app {
   name: pyqual;
-  version: 0.1.143;
+  version: 0.1.144;
 }
 
 dependencies {
@@ -802,7 +802,7 @@ pipeline:
 ```yaml
 project:
   name: pyqual
-  version: 0.1.143
+  version: 0.1.144
   env: local
 ```
 
@@ -883,9 +883,9 @@ pip install -e .[dev]
 ### `project/map.toon.yaml`
 
 ```toon markpact:analysis path=project/map.toon.yaml
-# pyqual | 179f 28274L | python:162,shell:6,typescript:4,css:3,javascript:3,less:1 | 2026-04-25
-# stats: 542 func | 168 cls | 179 mod | CC̄=5.2 | critical:66 | cycles:0
-# alerts[5]: CC test_pipeline_writes_nfo_sqlite_log=17; CC build_dashboard_table=15; CC _from_benchmark=14; fan-out run=26; fan-out fix_config=21
+# pyqual | 179f 28309L | python:162,shell:6,typescript:4,css:3,javascript:3,less:1 | 2026-04-25
+# stats: 544 func | 168 cls | 179 mod | CC̄=5.2 | critical:65 | cycles:0
+# alerts[5]: CC test_pipeline_writes_nfo_sqlite_log=17; CC _from_benchmark=14; CC bulk_init=14; fan-out run=26; fan-out fix_config=21
 # hotspots[5]: run fan=26; fix_config fan=21; main fan=21; analyze_yaml_syntax fan=18; run_project fan=18
 # evolution: baseline
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
@@ -929,7 +929,7 @@ M[179]:
   pyqual/api.py,524
   pyqual/auto_closer.py,218
   pyqual/bulk/models.py,56
-  pyqual/bulk/orchestrator.py,142
+  pyqual/bulk/orchestrator.py,151
   pyqual/bulk/parser.py,55
   pyqual/bulk/runner.py,32
   pyqual/bulk_init.py,568
@@ -972,7 +972,7 @@ M[179]:
   pyqual/llm.py,127
   pyqual/output.py,5
   pyqual/parallel.py,329
-  pyqual/pipeline.py,701
+  pyqual/pipeline.py,727
   pyqual/pipeline_protocols.py,45
   pyqual/pipeline_results.py,53
   pyqual/plugins/__init__.py,85
@@ -1195,9 +1195,11 @@ D:
     RunStatus:
     ProjectRunState: elapsed(0),progress_pct(0),gates_label(0)
   pyqual/bulk/orchestrator.py:
-    e: discover_projects,build_dashboard_table,bulk_run,BulkRunResult
+    e: discover_projects,_make_summary_title,_build_status_row,build_dashboard_table,bulk_run,BulkRunResult
     BulkRunResult:
     discover_projects(root)
+    _make_summary_title(states)
+    _build_status_row(s;show_last_line)
     build_dashboard_table(states;show_last_line)
     bulk_run(root;parallel;pyqual_cmd;filter_names;dry_run;timeout;log_dir;live_callback)
   pyqual/bulk/parser.py:
@@ -1461,7 +1463,7 @@ D:
     run_parallel_fix(workdir;tools;todo_path;issues;env;group_similar;on_task_done)
   pyqual/pipeline.py:
     e: Pipeline
-    Pipeline: __init__(9),run(1),check_gates(0),_run_iteration(2),_iteration_stagnated(1),_should_run_stage(4),_resolve_tool_stage(1),_resolve_env(0),_check_optional_binary(1),_make_skipped_result(2),_make_dry_run_result(2),_execute_stage(2),_notify_stage_error(3),_execute_captured(5),_execute_streaming(5),_init_nfo(0),_nfo_emit(4),_is_fix_stage(1),_log_stage(2),_archive_llx_report(2),_log_gates(2),_log_event(1),_ensure_pyqual_dir(0),_capture_runtime_error(2),_classify_error(1),_extract_error_message(1)  # Execute pipeline stages in a loop until quality gates pass.
+    Pipeline: __init__(9),run(1),check_gates(0),_run_iteration(2),_iteration_stagnated(1),_should_stop_after_iteration(2),_should_run_stage(4),_resolve_tool_stage(1),_resolve_env(0),_check_optional_binary(1),_make_skipped_result(2),_make_dry_run_result(2),_resolve_stage_command_and_policy(1),_handle_stage_failure(3),_execute_stage(2),_notify_stage_error(3),_execute_captured(5),_execute_streaming(5),_init_nfo(0),_nfo_emit(4),_is_fix_stage(1),_log_stage(2),_archive_llx_report(2),_log_gates(2),_log_event(1),_ensure_pyqual_dir(0),_capture_runtime_error(2),_classify_error(1),_extract_error_message(1)  # Execute pipeline stages in a loop until quality gates pass.
   pyqual/pipeline_protocols.py:
     e: OnStageStart,OnIterationStart,OnStageError,OnStageDone,OnStageOutput,OnIterationDone
     OnStageStart: __call__(1)
@@ -2079,6 +2081,41 @@ D:
 
 *Top 5 modules by symbol density — signatures for LLM orientation.*
 
+### `pyqual.pipeline` (`pyqual/pipeline.py`)
+
+```python
+class Pipeline:  # Execute pipeline stages in a loop until quality gates pass.
+    def __init__(config, workdir, on_stage_start, on_iteration_start, on_stage_error, on_stage_done, on_stage_output, stream, on_iteration_done)  # CC=1
+    def run(dry_run)  # CC=5
+    def check_gates()  # CC=1
+    def _run_iteration(num, dry_run)  # CC=8
+    def _iteration_stagnated(iteration)  # CC=8
+    def _should_stop_after_iteration(iteration, iteration_num)  # CC=4
+    def _should_run_stage(stage, gates_pass, stages_so_far, iteration)  # CC=4
+    def _resolve_tool_stage(stage)  # CC=5
+    def _resolve_env()  # CC=6
+    def _check_optional_binary(command)  # CC=8
+    def _make_skipped_result(stage, reason)  # CC=1
+    def _make_dry_run_result(stage, command)  # CC=2
+    def _resolve_stage_command_and_policy(stage)  # CC=7
+    def _handle_stage_failure(stage, result, is_fix_stage)  # CC=5
+    def _execute_stage(stage, dry_run)  # CC=6
+    def _notify_stage_error(stage, result, is_fix_stage)  # CC=1
+    def _execute_captured(stage, command, allow_failure, env, start)  # CC=8
+    def _execute_streaming(stage, command, allow_failure, env, start)  # CC=13 ⚠
+    def _init_nfo()  # CC=1
+    def _nfo_emit(event, level, kwargs, duration_ms)  # CC=2
+    def _is_fix_stage(stage)  # CC=6
+    def _log_stage(stage, result)  # CC=12 ⚠
+    def _archive_llx_report(stage, result)  # CC=6
+    def _log_gates(iteration, gates)  # CC=5
+    def _log_event(event)  # CC=1
+    def _ensure_pyqual_dir()  # CC=1
+    def _capture_runtime_error(stage, result)  # CC=9
+    def _classify_error(result)  # CC=6
+    def _extract_error_message(result)  # CC=12 ⚠
+```
+
 ### `pyqual._gate_collectors` (`pyqual/_gate_collectors.py`)
 
 ```python
@@ -2110,38 +2147,6 @@ def _from_pylint(workdir)  # CC=8, fan=9
 def _from_flake8(workdir)  # CC=12, fan=11 ⚠
 def _from_runtime_errors(workdir)  # CC=8, fan=13
 def _from_interrogate(workdir)  # CC=10, fan=6 ⚠
-```
-
-### `pyqual.pipeline` (`pyqual/pipeline.py`)
-
-```python
-class Pipeline:  # Execute pipeline stages in a loop until quality gates pass.
-    def __init__(config, workdir, on_stage_start, on_iteration_start, on_stage_error, on_stage_done, on_stage_output, stream, on_iteration_done)  # CC=1
-    def run(dry_run)  # CC=6
-    def check_gates()  # CC=1
-    def _run_iteration(num, dry_run)  # CC=8
-    def _iteration_stagnated(iteration)  # CC=8
-    def _should_run_stage(stage, gates_pass, stages_so_far, iteration)  # CC=4
-    def _resolve_tool_stage(stage)  # CC=5
-    def _resolve_env()  # CC=6
-    def _check_optional_binary(command)  # CC=8
-    def _make_skipped_result(stage, reason)  # CC=1
-    def _make_dry_run_result(stage, command)  # CC=2
-    def _execute_stage(stage, dry_run)  # CC=16 ⚠
-    def _notify_stage_error(stage, result, is_fix_stage)  # CC=1
-    def _execute_captured(stage, command, allow_failure, env, start)  # CC=8
-    def _execute_streaming(stage, command, allow_failure, env, start)  # CC=13 ⚠
-    def _init_nfo()  # CC=1
-    def _nfo_emit(event, level, kwargs, duration_ms)  # CC=2
-    def _is_fix_stage(stage)  # CC=6
-    def _log_stage(stage, result)  # CC=12 ⚠
-    def _archive_llx_report(stage, result)  # CC=6
-    def _log_gates(iteration, gates)  # CC=5
-    def _log_event(event)  # CC=1
-    def _ensure_pyqual_dir()  # CC=1
-    def _capture_runtime_error(stage, result)  # CC=9
-    def _classify_error(result)  # CC=6
-    def _extract_error_message(result)  # CC=12 ⚠
 ```
 
 ### `pyqual.cli_run_helpers` (`pyqual/cli_run_helpers.py`)
@@ -2221,7 +2226,7 @@ class BulkInitResult:  # Summary of a bulk-init run.
 
 ## Call Graph
 
-*403 nodes · 394 edges · 77 modules · CC̄=3.0*
+*407 nodes · 395 edges · 78 modules · CC̄=3.0*
 
 ### Hubs (by degree)
 
@@ -2238,7 +2243,7 @@ class BulkInitResult:  # Summary of a bulk-init run.
 
 ```toon markpact:analysis path=project/calls.toon.yaml
 # code2llm call graph | /home/tom/github/semcod/pyqual
-# nodes: 403 | edges: 394 | modules: 77
+# nodes: 407 | edges: 395 | modules: 78
 # CC̄=3.0
 
 HUBS[20]:
@@ -2264,24 +2269,24 @@ HUBS[20]:
     CC=13  in:0  out:30  total:30
   examples.custom_gates.metric_history.main
     CC=9  in:0  out:29  total:29
+  pyqual.config.PyqualConfig._parse
+    CC=13  in:0  out:28  total:28
   pyqual._gate_collectors._from_ruff
     CC=12  in:1  out:27  total:28
   pyqual.cli_bulk_cmds._bulk_init_impl
     CC=14  in:1  out:27  total:28
-  pyqual.config.PyqualConfig._parse
-    CC=13  in:0  out:28  total:28
-  pyqual.auto_closer.main
-    CC=11  in:0  out:27  total:27
   pyqual.bulk_init.classify_with_llm
     CC=9  in:1  out:26  total:27
   pyqual._gate_collectors._from_vulnerabilities
     CC=6  in:1  out:26  total:27
-  pyqual.plugins.cli_helpers.plugin_search
-    CC=11  in:1  out:25  total:26
-  pyqual.yaml_fixer.analyze_yaml_syntax
-    CC=10  in:2  out:24  total:26
+  pyqual.auto_closer.main
+    CC=11  in:0  out:27  total:27
   pyqual.parallel.ParallelExecutor.run
     CC=15  in:1  out:25  total:26
+  pyqual.yaml_fixer.analyze_yaml_syntax
+    CC=10  in:2  out:24  total:26
+  pyqual.plugins.cli_helpers.plugin_search
+    CC=11  in:1  out:25  total:26
 
 MODULES:
   Taskfile  [1 funcs]
@@ -2337,6 +2342,10 @@ MODULES:
     main  CC=2  out:3
     sync_from_cli  CC=3  out:10
     tickets_from_gate_failures  CC=7  out:12
+  project.map.toon  [3 funcs]
+    build_dashboard_table  CC=0  out:0
+    bulk_run  CC=0  out:0
+    discover_projects  CC=0  out:0
   pyqual._gate_collectors  [20 funcs]
     _count_by_severity  CC=3  out:3
     _count_pylint_by_type  CC=4  out:6
@@ -2365,8 +2374,9 @@ MODULES:
     get_changed_files  CC=4  out:9
     get_diff_content  CC=2  out:2
     main  CC=11  out:27
-  pyqual.bulk.orchestrator  [3 funcs]
-    build_dashboard_table  CC=15  out:16
+  pyqual.bulk.orchestrator  [4 funcs]
+    _build_status_row  CC=6  out:4
+    build_dashboard_table  CC=4  out:11
     bulk_run  CC=11  out:16
     discover_projects  CC=5  out:7
   pyqual.bulk.parser  [2 funcs]

@@ -1,7 +1,7 @@
-# pyqual | 1233 func | 106f | 132296L | python | 2026-04-25
+# pyqual | 1261 func | 106f | 136598L | python | 2026-04-25
 
 HEALTH:
-  CC̄=3.0  critical=84 (limit:10)  dup=3  cycles=0
+  CC̄=3.0  critical=82 (limit:10)  dup=3  cycles=0
 
 ALERTS[20]:
   !!! high_fan_out     run = 27 (limit:10)
@@ -15,14 +15,14 @@ ALERTS[20]:
   !!  high_fan_out     ParallelExecutor.run = 17 (limit:10)
   !!  high_fan_out     plugin_search = 17 (limit:10)
 
-MODULES[217] (top by size):
-  M[project/calls.yaml] 5436L C:0 F:0 CC↑0 D:0 (yaml)
+MODULES[220] (top by size):
+  M[project/calls.yaml] 5418L C:0 F:0 CC↑0 D:0 (yaml)
   M[planfile.yaml] 3152L C:0 F:0 CC↑0 D:0 (yaml)
-  M[project/map.toon.yaml] 2420L C:0 F:458 CC↑0 D:0 (yaml)
   M[project.planfile.yaml] 1244L C:0 F:0 CC↑0 D:0 (yaml)
+  M[project/map.toon.yaml] 1190L C:0 F:481 CC↑0 D:1 (yaml)
   M[pyqual/plugins/git/main.py] 968L C:1 F:27 CC↑12 D:2 (python)
+  M[pyqual/pipeline.py] 726L C:1 F:29 CC↑13 D:0 (python)
   M[pyqual/_gate_collectors.py] 710L C:0 F:28 CC↑14 D:2 (python)
-  M[pyqual/pipeline.py] 700L C:1 F:26 CC↑16 D:0 (python)
   M[pyqual/report.py] 592L C:0 F:19 CC↑12 D:0 (python)
   M[pyqual/bulk_init.py] 567L C:1 F:15 CC↑14 D:1 (python)
   M[project/calls.toon.yaml] 533L C:0 F:0 CC↑0 D:0 (yaml)
@@ -31,7 +31,7 @@ MODULES[217] (top by size):
   M[pyqual/plugins/docs/main.py] 485L C:1 F:12 CC↑11 D:1 (python)
   M[pyqual/plugins/deps/main.py] 465L C:1 F:11 CC↑13 D:1 (python)
   M[pyqual/plugins/docker/main.py] 427L C:1 F:13 CC↑14 D:1 (python)
-  LANGS: python:122/yaml:53/typescript:12/txt:9/json:7/shell:6/other:3/yml:2/javascript:2/toml:1
+  LANGS: python:122/yaml:56/typescript:12/txt:9/json:7/shell:6/other:3/yml:2/javascript:2/toml:1
 
 HOTSPOTS[10]:
   ★ run fan=27  // Execute pipeline loop until quality gates pass.
@@ -45,11 +45,11 @@ Scans the projec
   ★ run_project fan=19  // Orchestrates 19 calls
 
 REFACTOR[15]:
-  [1] H/H Split god module pyqual/pipeline.py (700L, 1 classes)
-  [2] H/H Split god module pyqual/_gate_collectors.py (710L, 0 classes)
-  [3] H/H Split god module pyqual/bulk_init.py (567L, 1 classes)
+  [1] H/H Split god module pyqual/_gate_collectors.py (710L, 0 classes)
+  [2] H/H Split god module pyqual/bulk_init.py (567L, 1 classes)
+  [3] H/H Split god module pyqual/pipeline.py (726L, 1 classes)
   [4] H/H Split god module pyqual/plugins/git/main.py (968L, 1 classes)
   [5] H/H Split god module pyqual/report.py (592L, 0 classes)
 
 EVOLUTION:
-  2026-04-25 CC̄=3.0 crit=84 132296L // Automated analysis
+  2026-04-25 CC̄=3.0 crit=82 136598L // Automated analysis

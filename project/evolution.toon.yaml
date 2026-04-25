@@ -1,37 +1,33 @@
-# code2llm/evolution | 1207 func | 97f | 2026-04-25
+# code2llm/evolution | 1235 func | 97f | 2026-04-25
 
-NEXT[5] (ranked by impact):
+NEXT[4] (ranked by impact):
   [1] !! SPLIT           pyqual/plugins/git/main.py
       WHY: 968L, 1 classes, max CC=12
       EFFORT: ~4h  IMPACT: 11616
 
-  [2] !! SPLIT           pyqual/pipeline.py
-      WHY: 700L, 1 classes, max CC=16
-      EFFORT: ~4h  IMPACT: 11200
-
-  [3] !! SPLIT           pyqual/_gate_collectors.py
+  [2] !! SPLIT           pyqual/_gate_collectors.py
       WHY: 710L, 0 classes, max CC=14
       EFFORT: ~4h  IMPACT: 9940
+
+  [3] !! SPLIT           pyqual/pipeline.py
+      WHY: 726L, 1 classes, max CC=13
+      EFFORT: ~4h  IMPACT: 9438
 
   [4] !  SPLIT-FUNC      ParallelExecutor.run  CC=15  fan=17
       WHY: CC=15 exceeds 15
       EFFORT: ~1h  IMPACT: 255
 
-  [5] !  SPLIT-FUNC      Pipeline._execute_stage  CC=16  fan=14
-      WHY: CC=16 exceeds 15
-      EFFORT: ~1h  IMPACT: 224
-
 
 RISKS[3]:
   ⚠ Splitting pyqual/plugins/git/main.py may break 27 import paths
+  ⚠ Splitting pyqual/pipeline.py may break 29 import paths
   ⚠ Splitting pyqual/_gate_collectors.py may break 28 import paths
-  ⚠ Splitting pyqual/pipeline.py may break 26 import paths
 
 METRICS-TARGET:
-  CC̄:          3.0 → ≤2.1
-  max-CC:      16 → ≤8
+  CC̄:          2.9 → ≤2.0
+  max-CC:      15 → ≤7
   god-modules: 7 → 0
-  high-CC(≥15): 3 → ≤1
+  high-CC(≥15): 1 → ≤0
   hub-types:   0 → ≤0
 
 PATTERNS (language parser shared logic):
@@ -59,4 +55,4 @@ PATTERNS (language parser shared logic):
     - Standardized FunctionInfo/ClassInfo models
 
 HISTORY:
-  prev CC̄=2.9 → now CC̄=3.0
+  prev CC̄=3.0 → now CC̄=2.9

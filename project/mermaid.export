@@ -120,18 +120,36 @@ flowchart TD
         integration__run_matrix__add["add"]
     end
     subgraph project__map
-        project__map__toon__parse_todo_items["parse_todo_items"]
-        project__map__toon__group_similar_issues["group_similar_issues"]
-        project__map__toon__run_parallel_fix["run_parallel_fix"]
-        project__map__toon__discover_projects["discover_projects"]
-        project__map__toon__build_dashboard_table["build_dashboard_table"]
-        project__map__toon__bulk_run["bulk_run"]
-        project__map__toon___bulk_init_impl["_bulk_init_impl"]
-        project__map__toon___discover_and_validate["_discover_and_validate"]
-        project__map__toon___output_bulk_result["_output_bulk_result"]
-        project__map__toon___bulk_run_impl["_bulk_run_impl"]
-        project__map__toon___run_with_live_dashboard["_run_with_live_dashboard"]
-        project__map__toon__register_bulk_commands["register_bulk_commands"]
+        project__map__toon__get_db_path["get_db_path"]
+        project__map__toon__read_summary_json["read_summary_json"]
+        project__map__toon__query_pipeline_db["query_pipeline_db"]
+        project__map__toon__safe_parse["safe_parse"]
+        project__map__toon__get_projects["get_projects"]
+        project__map__toon__get_latest_run["get_latest_run"]
+        project__map__toon__get_project_runs["get_project_runs"]
+        project__map__toon__get_metric_history["get_metric_history"]
+        project__map__toon__get_stage_performance["get_stage_performance"]
+        project__map__toon__get_gate_status["get_gate_status"]
+        project__map__toon__get_project_summary["get_project_summary"]
+        project__map__toon__ingest_results["ingest_results"]
+        project__map__toon__health_check["health_check"]
+        project__map__toon__compute_composite_score["compute_composite_score"]
+        project__map__toon__run_composite_check["run_composite_check"]
+        project__map__toon__main["main"]
+        project__map__toon__load_history["load_history"]
+        project__map__toon__save_snapshot["save_snapshot"]
+        project__map__toon__detect_regressions["detect_regressions"]
+        project__map__toon__print_trend_report["print_trend_report"]
+        project__map__toon__run_quality_check["run_quality_check"]
+        project__map__toon__run_with_callbacks["run_with_callbacks"]
+        project__map__toon__check_prerequisites["check_prerequisites"]
+        project__map__toon__run_shell_command_example["run_shell_command_example"]
+        project__map__toon__run_single_stage["run_single_stage"]
+        project__map__toon__preview_pipeline["preview_pipeline"]
+        project__map__toon__quick_gate_check["quick_gate_check"]
+        project__map__toon__build_report["build_report"]
+        project__map__toon__sync_from_cli["sync_from_cli"]
+        project__map__toon__tickets_from_gate_failures["tickets_from_gate_failures"]
         project__map__toon___read_artifact_text["_read_artifact_text"]
         project__map__toon___from_toon["_from_toon"]
         project__map__toon___from_vallm["_from_vallm"]
@@ -160,26 +178,8 @@ flowchart TD
         project__map__toon___from_flake8["_from_flake8"]
         project__map__toon___from_runtime_errors["_from_runtime_errors"]
         project__map__toon___from_interrogate["_from_interrogate"]
-        project__map__toon___print_result["_print_result"]
-        project__map__toon__main["main"]
-        project__map__toon___build_llm_prompt["_build_llm_prompt"]
-        project__map__toon__classify_with_llm["classify_with_llm"]
-        project__map__toon___classify_python["_classify_python"]
-        project__map__toon___classify_node["_classify_node"]
-        project__map__toon___classify_php["_classify_php"]
-        project__map__toon___classify_rust["_classify_rust"]
-        project__map__toon___classify_go["_classify_go"]
-        project__map__toon___classify_makefile["_classify_makefile"]
-        project__map__toon___classify_heuristic["_classify_heuristic"]
-        project__map__toon___safe_name["_safe_name"]
-        project__map__toon__generate_pyqual_yaml["generate_pyqual_yaml"]
-        project__map__toon___validate_yaml_content["_validate_yaml_content"]
-        project__map__toon___write_pyqual_yaml["_write_pyqual_yaml"]
-        project__map__toon___classify_project["_classify_project"]
-        project__map__toon__bulk_init["bulk_init"]
-        project__map__toon__query_nfo_db["query_nfo_db"]
-        project__map__toon__row_to_event_dict["row_to_event_dict"]
-        project__map__toon__format_log_entry_row["format_log_entry_row"]
+        project__map__toon___analyze_project["_analyze_project"]
+        project__map__toon__load_config["load_config"]
     end
     subgraph pyqual___gate_collectors
         pyqual___gate_collectors___read_artifact_text["_read_artifact_text"]
@@ -246,7 +246,9 @@ flowchart TD
         pyqual__bulk__parser___parse_iteration_header["_parse_iteration_header"]
         pyqual__bulk__parser___parse_output_line["_parse_output_line"]
         pyqual__bulk__orchestrator__discover_projects["discover_projects"]
-        pyqual__bulk__orchestrator__build_dashboard_table{{build_dashboard_table CC=15}}
+        pyqual__bulk__orchestrator___make_summary_title["_make_summary_title"]
+        pyqual__bulk__orchestrator___build_status_row["_build_status_row"]
+        pyqual__bulk__orchestrator__build_dashboard_table["build_dashboard_table"]
         pyqual__bulk__orchestrator__bulk_run("bulk_run CC=11")
     end
     subgraph pyqual__bulk_init
@@ -500,13 +502,16 @@ flowchart TD
         pyqual__pipeline__Pipeline__check_gates["check_gates"]
         pyqual__pipeline__Pipeline___run_iteration("_run_iteration CC=8")
         pyqual__pipeline__Pipeline___iteration_stagnated("_iteration_stagnated CC=8")
+        pyqual__pipeline__Pipeline___should_stop_after_iteration["_should_stop_after_iteration"]
         pyqual__pipeline__Pipeline___should_run_stage["_should_run_stage"]
         pyqual__pipeline__Pipeline___resolve_tool_stage["_resolve_tool_stage"]
         pyqual__pipeline__Pipeline___resolve_env["_resolve_env"]
         pyqual__pipeline__Pipeline___check_optional_binary("_check_optional_binary CC=8")
         pyqual__pipeline__Pipeline___make_skipped_result["_make_skipped_result"]
         pyqual__pipeline__Pipeline___make_dry_run_result["_make_dry_run_result"]
-        pyqual__pipeline__Pipeline___execute_stage{{_execute_stage CC=16}}
+        pyqual__pipeline__Pipeline___resolve_stage_command_and_policy["_resolve_stage_command_and_policy"]
+        pyqual__pipeline__Pipeline___handle_stage_failure["_handle_stage_failure"]
+        pyqual__pipeline__Pipeline___execute_stage["_execute_stage"]
         pyqual__pipeline__Pipeline___notify_stage_error["_notify_stage_error"]
         pyqual__pipeline__Pipeline___execute_captured("_execute_captured CC=8")
         pyqual__pipeline__Pipeline___execute_streaming("_execute_streaming CC=13")
@@ -850,13 +855,13 @@ flowchart TD
     pyqual__tickets__sync_from_gates --> pyqual__tickets__sync_all_tickets
     pyqual__tickets__sync_from_gates --> pyqual__tickets__sync_planfile_tickets
     pyqual__cli_bulk_cmds___bulk_init_impl --> pyqual__bulk_init__bulk_init
-    pyqual__cli_bulk_cmds___discover_and_validate --> pyqual__bulk__orchestrator__discover_projects
+    pyqual__cli_bulk_cmds___discover_and_validate --> project__map__toon__discover_projects
     pyqual__cli_bulk_cmds___bulk_run_impl --> pyqual__cli_bulk_cmds___discover_and_validate
     pyqual__cli_bulk_cmds___bulk_run_impl --> pyqual__cli_bulk_cmds___output_bulk_result
-    pyqual__cli_bulk_cmds___bulk_run_impl --> pyqual__bulk__orchestrator__bulk_run
+    pyqual__cli_bulk_cmds___bulk_run_impl --> project__map__toon__bulk_run
     pyqual__cli_bulk_cmds___bulk_run_impl --> pyqual__cli_bulk_cmds___run_with_live_dashboard
-    pyqual__cli_bulk_cmds___run_with_live_dashboard --> pyqual__bulk__orchestrator__bulk_run
-    pyqual__cli_bulk_cmds___run_with_live_dashboard --> pyqual__bulk__orchestrator__build_dashboard_table
+    pyqual__cli_bulk_cmds___run_with_live_dashboard --> project__map__toon__bulk_run
+    pyqual__cli_bulk_cmds___run_with_live_dashboard --> project__map__toon__build_dashboard_table
     pyqual__cli_bulk_cmds__register_bulk_commands --> pyqual__cli_bulk_cmds___bulk_init_impl
     pyqual__api__create_default_config --> pyqual__profiles__get_profile
     pyqual__api__run_pipeline --> pyqual__api__load_config
@@ -935,10 +940,6 @@ flowchart TD
     pyqual__bulk_init_fingerprint__collect_fingerprint --> pyqual__bulk_init_fingerprint___collect_makefile_targets
     pyqual__bulk_init_fingerprint__collect_fingerprint --> pyqual__bulk_init_fingerprint___collect_pyproject_metadata
     pyqual__bulk_init_fingerprint__collect_fingerprint --> pyqual__bulk_init_fingerprint___collect_readme_excerpt
-    pyqual__pipeline__Pipeline___iteration_stagnated --> pyqual__stage_names__is_fix_stage_name
-    pyqual__pipeline__Pipeline___resolve_tool_stage --> pyqual__tools__get_preset
-    pyqual__pipeline__Pipeline___is_fix_stage --> pyqual__stage_names__is_fix_stage_name
-    pyqual__pipeline__Pipeline___log_stage --> pyqual__tools__get_preset
     pyqual__cli_observe___output_human_logs --> pyqual__cli_observe___print_stage_output
     pyqual__cli_observe___logs_impl --> pyqual__cli_observe___output_sql_query
     pyqual__cli_observe___logs_impl --> pyqual__cli_observe___output_json_entries
@@ -1175,14 +1176,20 @@ flowchart TD
     pyqual__validation__config_check__validate_config --> pyqual__validation__config_check___validate_loop_config
     pyqual__bulk__runner___run_single_project --> pyqual__output___parse_output_line
     pyqual__bulk__parser___parse_output_line --> pyqual__bulk__parser___parse_iteration_header
-    pyqual__bulk__orchestrator__bulk_run --> pyqual__bulk__orchestrator__discover_projects
-    pyqual__bulk__orchestrator__bulk_run --> pyqual__bulk__runner___run_single_project
     pyqual__integrations__llx_mcp_service__main --> pyqual__integrations__llx_mcp_service__build_parser
     pyqual__integrations__llx_mcp_service__main --> pyqual__integrations__llx_mcp_service__run_server
     pyqual__integrations__llx_mcp__main --> pyqual__integrations__llx_mcp__build_parser
     pyqual__integrations__llx_mcp__main --> Taskfile__print
+    pyqual__bulk__orchestrator__build_dashboard_table --> pyqual__bulk__orchestrator___build_status_row
+    pyqual__bulk__orchestrator__build_dashboard_table --> pyqual__bulk__orchestrator___make_summary_title
+    pyqual__bulk__orchestrator__bulk_run --> pyqual__bulk__orchestrator__discover_projects
+    pyqual__bulk__orchestrator__bulk_run --> pyqual__bulk__runner___run_single_project
+    pyqual__pipeline__Pipeline___iteration_stagnated --> pyqual__stage_names__is_fix_stage_name
+    pyqual__pipeline__Pipeline___resolve_tool_stage --> pyqual__tools__get_preset
+    pyqual__pipeline__Pipeline___is_fix_stage --> pyqual__stage_names__is_fix_stage_name
+    pyqual__pipeline__Pipeline___log_stage --> pyqual__tools__get_preset
 
     classDef highCC fill:#ff6b6b,stroke:#c92a2a,color:#fff
     classDef medCC fill:#ffd43b,stroke:#f08c00,color:#000
-    class pyqual__parallel__ParallelExecutor__run,pyqual__pipeline__Pipeline___execute_stage,pyqual__bulk__orchestrator__build_dashboard_table highCC
+    class pyqual__parallel__ParallelExecutor__run highCC
     class run_analysis__run_project,dashboard__src__App__App,dashboard__src__App__RepositoryCard,dashboard__src__components__Overview__Overview,dashboard__src__components__RepositoryDetail__RepositoryDetail,dashboard__src__api__fetchLatestRun,examples__custom_gates__metric_history__detect_regressions,examples__custom_gates__metric_history__print_trend_report,examples__custom_gates__metric_history__main,examples__custom_gates__composite_gates__compute_composite_score,examples__custom_gates__composite_gates__run_composite_check,examples__custom_gates__dynamic_thresholds__main,examples__custom_plugins__performance_collector__PerformanceCollector__collect,examples__multi_gate_pipeline__run_pipeline__main,pyqual__custom_fix__parse_and_apply_suggestions,pyqual__config__PyqualConfig___parse,pyqual__config__PyqualConfig___validate_stages,pyqual__report_generator___build_run_from_rows,pyqual__report_generator__generate_stage_details,pyqual__tools__load_entry_point_presets,pyqual__auto_closer__main,pyqual__bulk_init_classify__check_skip_conditions,pyqual__gates__CompositeGateSet__compute_score,pyqual__tickets__sync_from_gates,pyqual__cli_bulk_cmds___bulk_init_impl,pyqual__cli_bulk_cmds___output_bulk_result,pyqual__cli_bulk_cmds___bulk_run_impl,pyqual__api__run_stage,pyqual__api__format_result_summary,pyqual__github_actions__GitHubActionsReporter__ensure_issue_exists medCC

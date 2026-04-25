@@ -18,7 +18,7 @@ SUMD - Structured Unified Markdown Descriptor for AI-aware project refactorizati
 ## Metadata
 
 - **name**: `pyqual`
-- **version**: `0.1.143`
+- **version**: `0.1.144`
 - **python_requires**: `>=3.9`
 - **license**: Apache-2.0
 - **ai_model**: `openrouter/x-ai/grok-code-fast-1`
@@ -38,7 +38,7 @@ SUMD (description) → DOQL/source (code) → taskfile (automation) → testql (
 
 app {
   name: pyqual;
-  version: 0.1.143;
+  version: 0.1.144;
 }
 
 dependencies {
@@ -737,6 +737,41 @@ tox>=4.0.0
 
 *Top 5 modules by symbol density — signatures for LLM orientation.*
 
+### `pyqual.pipeline` (`pyqual/pipeline.py`)
+
+```python
+class Pipeline:  # Execute pipeline stages in a loop until quality gates pass.
+    def __init__(config, workdir, on_stage_start, on_iteration_start, on_stage_error, on_stage_done, on_stage_output, stream, on_iteration_done)  # CC=1
+    def run(dry_run)  # CC=5
+    def check_gates()  # CC=1
+    def _run_iteration(num, dry_run)  # CC=8
+    def _iteration_stagnated(iteration)  # CC=8
+    def _should_stop_after_iteration(iteration, iteration_num)  # CC=4
+    def _should_run_stage(stage, gates_pass, stages_so_far, iteration)  # CC=4
+    def _resolve_tool_stage(stage)  # CC=5
+    def _resolve_env()  # CC=6
+    def _check_optional_binary(command)  # CC=8
+    def _make_skipped_result(stage, reason)  # CC=1
+    def _make_dry_run_result(stage, command)  # CC=2
+    def _resolve_stage_command_and_policy(stage)  # CC=7
+    def _handle_stage_failure(stage, result, is_fix_stage)  # CC=5
+    def _execute_stage(stage, dry_run)  # CC=6
+    def _notify_stage_error(stage, result, is_fix_stage)  # CC=1
+    def _execute_captured(stage, command, allow_failure, env, start)  # CC=8
+    def _execute_streaming(stage, command, allow_failure, env, start)  # CC=13 ⚠
+    def _init_nfo()  # CC=1
+    def _nfo_emit(event, level, kwargs, duration_ms)  # CC=2
+    def _is_fix_stage(stage)  # CC=6
+    def _log_stage(stage, result)  # CC=12 ⚠
+    def _archive_llx_report(stage, result)  # CC=6
+    def _log_gates(iteration, gates)  # CC=5
+    def _log_event(event)  # CC=1
+    def _ensure_pyqual_dir()  # CC=1
+    def _capture_runtime_error(stage, result)  # CC=9
+    def _classify_error(result)  # CC=6
+    def _extract_error_message(result)  # CC=12 ⚠
+```
+
 ### `pyqual._gate_collectors` (`pyqual/_gate_collectors.py`)
 
 ```python
@@ -768,38 +803,6 @@ def _from_pylint(workdir)  # CC=8, fan=9
 def _from_flake8(workdir)  # CC=12, fan=11 ⚠
 def _from_runtime_errors(workdir)  # CC=8, fan=13
 def _from_interrogate(workdir)  # CC=10, fan=6 ⚠
-```
-
-### `pyqual.pipeline` (`pyqual/pipeline.py`)
-
-```python
-class Pipeline:  # Execute pipeline stages in a loop until quality gates pass.
-    def __init__(config, workdir, on_stage_start, on_iteration_start, on_stage_error, on_stage_done, on_stage_output, stream, on_iteration_done)  # CC=1
-    def run(dry_run)  # CC=6
-    def check_gates()  # CC=1
-    def _run_iteration(num, dry_run)  # CC=8
-    def _iteration_stagnated(iteration)  # CC=8
-    def _should_run_stage(stage, gates_pass, stages_so_far, iteration)  # CC=4
-    def _resolve_tool_stage(stage)  # CC=5
-    def _resolve_env()  # CC=6
-    def _check_optional_binary(command)  # CC=8
-    def _make_skipped_result(stage, reason)  # CC=1
-    def _make_dry_run_result(stage, command)  # CC=2
-    def _execute_stage(stage, dry_run)  # CC=16 ⚠
-    def _notify_stage_error(stage, result, is_fix_stage)  # CC=1
-    def _execute_captured(stage, command, allow_failure, env, start)  # CC=8
-    def _execute_streaming(stage, command, allow_failure, env, start)  # CC=13 ⚠
-    def _init_nfo()  # CC=1
-    def _nfo_emit(event, level, kwargs, duration_ms)  # CC=2
-    def _is_fix_stage(stage)  # CC=6
-    def _log_stage(stage, result)  # CC=12 ⚠
-    def _archive_llx_report(stage, result)  # CC=6
-    def _log_gates(iteration, gates)  # CC=5
-    def _log_event(event)  # CC=1
-    def _ensure_pyqual_dir()  # CC=1
-    def _capture_runtime_error(stage, result)  # CC=9
-    def _classify_error(result)  # CC=6
-    def _extract_error_message(result)  # CC=12 ⚠
 ```
 
 ### `pyqual.cli_run_helpers` (`pyqual/cli_run_helpers.py`)
@@ -879,7 +882,7 @@ class BulkInitResult:  # Summary of a bulk-init run.
 
 ## Call Graph
 
-*403 nodes · 394 edges · 77 modules · CC̄=3.0*
+*407 nodes · 395 edges · 78 modules · CC̄=3.0*
 
 ### Hubs (by degree)
 
@@ -896,7 +899,7 @@ class BulkInitResult:  # Summary of a bulk-init run.
 
 ```toon markpact:analysis path=project/calls.toon.yaml
 # code2llm call graph | /home/tom/github/semcod/pyqual
-# nodes: 403 | edges: 394 | modules: 77
+# nodes: 407 | edges: 395 | modules: 78
 # CC̄=3.0
 
 HUBS[20]:
@@ -922,24 +925,24 @@ HUBS[20]:
     CC=13  in:0  out:30  total:30
   examples.custom_gates.metric_history.main
     CC=9  in:0  out:29  total:29
+  pyqual.config.PyqualConfig._parse
+    CC=13  in:0  out:28  total:28
   pyqual._gate_collectors._from_ruff
     CC=12  in:1  out:27  total:28
   pyqual.cli_bulk_cmds._bulk_init_impl
     CC=14  in:1  out:27  total:28
-  pyqual.config.PyqualConfig._parse
-    CC=13  in:0  out:28  total:28
-  pyqual.auto_closer.main
-    CC=11  in:0  out:27  total:27
   pyqual.bulk_init.classify_with_llm
     CC=9  in:1  out:26  total:27
   pyqual._gate_collectors._from_vulnerabilities
     CC=6  in:1  out:26  total:27
-  pyqual.plugins.cli_helpers.plugin_search
-    CC=11  in:1  out:25  total:26
-  pyqual.yaml_fixer.analyze_yaml_syntax
-    CC=10  in:2  out:24  total:26
+  pyqual.auto_closer.main
+    CC=11  in:0  out:27  total:27
   pyqual.parallel.ParallelExecutor.run
     CC=15  in:1  out:25  total:26
+  pyqual.yaml_fixer.analyze_yaml_syntax
+    CC=10  in:2  out:24  total:26
+  pyqual.plugins.cli_helpers.plugin_search
+    CC=11  in:1  out:25  total:26
 
 MODULES:
   Taskfile  [1 funcs]
@@ -995,6 +998,10 @@ MODULES:
     main  CC=2  out:3
     sync_from_cli  CC=3  out:10
     tickets_from_gate_failures  CC=7  out:12
+  project.map.toon  [3 funcs]
+    build_dashboard_table  CC=0  out:0
+    bulk_run  CC=0  out:0
+    discover_projects  CC=0  out:0
   pyqual._gate_collectors  [20 funcs]
     _count_by_severity  CC=3  out:3
     _count_pylint_by_type  CC=4  out:6
@@ -1023,8 +1030,9 @@ MODULES:
     get_changed_files  CC=4  out:9
     get_diff_content  CC=2  out:2
     main  CC=11  out:27
-  pyqual.bulk.orchestrator  [3 funcs]
-    build_dashboard_table  CC=15  out:16
+  pyqual.bulk.orchestrator  [4 funcs]
+    _build_status_row  CC=6  out:4
+    build_dashboard_table  CC=4  out:11
     bulk_run  CC=11  out:16
     discover_projects  CC=5  out:7
   pyqual.bulk.parser  [2 funcs]
@@ -1457,7 +1465,7 @@ EDGES:
 
 ```toon markpact:analysis path=project/calls.toon.yaml
 # code2llm call graph | /home/tom/github/semcod/pyqual
-# nodes: 403 | edges: 394 | modules: 77
+# nodes: 407 | edges: 395 | modules: 78
 # CC̄=3.0
 
 HUBS[20]:
@@ -1483,24 +1491,24 @@ HUBS[20]:
     CC=13  in:0  out:30  total:30
   examples.custom_gates.metric_history.main
     CC=9  in:0  out:29  total:29
+  pyqual.config.PyqualConfig._parse
+    CC=13  in:0  out:28  total:28
   pyqual._gate_collectors._from_ruff
     CC=12  in:1  out:27  total:28
   pyqual.cli_bulk_cmds._bulk_init_impl
     CC=14  in:1  out:27  total:28
-  pyqual.config.PyqualConfig._parse
-    CC=13  in:0  out:28  total:28
-  pyqual.auto_closer.main
-    CC=11  in:0  out:27  total:27
   pyqual.bulk_init.classify_with_llm
     CC=9  in:1  out:26  total:27
   pyqual._gate_collectors._from_vulnerabilities
     CC=6  in:1  out:26  total:27
-  pyqual.plugins.cli_helpers.plugin_search
-    CC=11  in:1  out:25  total:26
-  pyqual.yaml_fixer.analyze_yaml_syntax
-    CC=10  in:2  out:24  total:26
+  pyqual.auto_closer.main
+    CC=11  in:0  out:27  total:27
   pyqual.parallel.ParallelExecutor.run
     CC=15  in:1  out:25  total:26
+  pyqual.yaml_fixer.analyze_yaml_syntax
+    CC=10  in:2  out:24  total:26
+  pyqual.plugins.cli_helpers.plugin_search
+    CC=11  in:1  out:25  total:26
 
 MODULES:
   Taskfile  [1 funcs]
@@ -1556,6 +1564,10 @@ MODULES:
     main  CC=2  out:3
     sync_from_cli  CC=3  out:10
     tickets_from_gate_failures  CC=7  out:12
+  project.map.toon  [3 funcs]
+    build_dashboard_table  CC=0  out:0
+    bulk_run  CC=0  out:0
+    discover_projects  CC=0  out:0
   pyqual._gate_collectors  [20 funcs]
     _count_by_severity  CC=3  out:3
     _count_pylint_by_type  CC=4  out:6
@@ -1584,8 +1596,9 @@ MODULES:
     get_changed_files  CC=4  out:9
     get_diff_content  CC=2  out:2
     main  CC=11  out:27
-  pyqual.bulk.orchestrator  [3 funcs]
-    build_dashboard_table  CC=15  out:16
+  pyqual.bulk.orchestrator  [4 funcs]
+    _build_status_row  CC=6  out:4
+    build_dashboard_table  CC=4  out:11
     bulk_run  CC=11  out:16
     discover_projects  CC=5  out:7
   pyqual.bulk.parser  [2 funcs]
@@ -1994,18 +2007,16 @@ EDGES:
 ### Code Analysis (`project/analysis.toon.yaml`)
 
 ```toon markpact:analysis path=project/analysis.toon.yaml
-# code2llm | 217f 39033L | python:122,yaml:53,typescript:12,txt:9,json:7,shell:6,yml:2,javascript:2,toml:1 | 2026-04-25
-# CC̄=3.0 | critical:3/1233 | dups:0 | cycles:0
+# code2llm | 220f 37814L | python:122,yaml:56,typescript:12,txt:9,json:7,shell:6,yml:2,javascript:2,toml:1 | 2026-04-25
+# CC̄=3.0 | critical:1/1261 | dups:0 | cycles:0
 
-HEALTH[3]:
+HEALTH[1]:
   🟡 CC    run CC=15 (limit:15)
-  🟡 CC    _execute_stage CC=16 (limit:15)
-  🟡 CC    build_dashboard_table CC=15 (limit:15)
 
 REFACTOR[1]:
-  1. split 3 high-CC methods  (CC>15)
+  1. split 1 high-CC methods  (CC>15)
 
-PIPELINES[402]:
+PIPELINES[407]:
   [1] Src [main]: main → print
       PURITY: 100% pure
   [2] Src [App]: App → loadRepositories
@@ -2035,10 +2046,10 @@ LAYERS:
   │ tree.sh                      1L  0C    0m  CC=0.0    ←0
   │ Makefile                     0L  0C    0m  CC=0.0    ←0
   │
-  pyqual/                         CC̄=5.0    ←in:56  →out:108  !! split
+  pyqual/                         CC̄=4.9    ←in:56  →out:108  !! split
   │ !! main                       968L  1C   27m  CC=12     ←2
+  │ !! pipeline                   726L  1C   29m  CC=13     ←0
   │ !! _gate_collectors           710L  0C   28m  CC=14     ←2
-  │ !! pipeline                   700L  1C   26m  CC=16     ←0
   │ !! report                     592L  0C   19m  CC=12     ←0
   │ !! bulk_init                  567L  1C   15m  CC=14     ←1
   │ !! api                        523L  1C   15m  CC=10     ←3
@@ -2085,7 +2096,7 @@ LAYERS:
   │ test                       159L  4C   11m  CC=4      ←0
   │ main                       157L  1C    6m  CC=14     ←0
   │ __init__                   154L  0C    0m  CC=0.0    ←0
-  │ !! orchestrator               141L  1C    3m  CC=15     ←1
+  │ orchestrator               150L  1C    5m  CC=11     ←0
   │ test                       139L  1C    9m  CC=8      ←0
   │ setup_deps                 136L  1C    5m  CC=10     ←0
   │ llm                        126L  0C    0m  CC=0.0    ←0
@@ -2232,10 +2243,10 @@ LAYERS:
   │ Dockerfile                   0L  0C    0m  CC=0.0    ←0
   │
   project/                        CC̄=0.0    ←in:0  →out:0
-  │ !! calls.yaml                5436L  0C    0m  CC=0.0    ←0
-  │ !! map.toon.yaml             2420L  0C  458m  CC=0.0    ←0
+  │ !! calls.yaml                5418L  0C    0m  CC=0.0    ←0
+  │ !! map.toon.yaml             1190L  0C  481m  CC=0.0    ←1
   │ !! calls.toon.yaml            533L  0C    0m  CC=0.0    ←0
-  │ analysis.toon.yaml         359L  0C    0m  CC=0.0    ←0
+  │ analysis.toon.yaml         294L  0C    0m  CC=0.0    ←0
   │ analysis.toon.yaml         179L  0C    0m  CC=0.0    ←0
   │ validation.toon.yaml       174L  0C    0m  CC=0.0    ←0
   │ validation.toon.yaml       160L  0C    0m  CC=0.0    ←0
@@ -2251,39 +2262,45 @@ LAYERS:
   .planfile_analysis/             CC̄=0.0    ←in:0  →out:0
   │ analysis_summary.json       27L  0C    0m  CC=0.0    ←0
   │
+  testql-scenarios/               CC̄=0.0    ←in:0  →out:0
+  │ generated-from-pytests.testql.toon.yaml    22L  0C    0m  CC=0.0    ←0
+  │ generated-cli-tests.testql.toon.yaml    20L  0C    0m  CC=0.0    ←0
+  │ generated-api-smoke.testql.toon.yaml    17L  0C    0m  CC=0.0    ←0
+  │
   ── zero ──
      Makefile                                  0L
      examples/llm_fix/Dockerfile               0L
      integration/Dockerfile                    0L
 
 COUPLING:
-                                                    Taskfile                        pyqual                    pyqual.cli                pyqual.plugins                      examples         examples.custom_gates                  run_analysis  examples.multi_gate_pipeline      examples.ticket_workflow             pyqual.validation                   pyqual.bulk        pyqual.gate_collectors           pyqual.integrations
-                      Taskfile                            ──                           ←98                                                          ←8                           ←14                           ←25                           ←18                           ←14                           ←10                                                                                                                      ←2  hub
-                        pyqual                            98                            ──                           ←22                             3                           ←13                                                          ←1                            ←1                            ←5                             1                             6                            ←2                                hub
-                    pyqual.cli                                                          22                            ──                            13                                                                                                                                                                                   2                                                                                            !! fan-out
-                pyqual.plugins                             8                             6                           ←13                            ──                                                                                                                                                                                  ←1                                                                                            hub
-                      examples                            14                            13                                                                                        ──                                                                                                                                                                                                                                                  !! fan-out
-         examples.custom_gates                            25                                                                                                                                                    ──                                                                                                                                                                                                                    !! fan-out
-                  run_analysis                            18                             1                                                                                                                                                    ──                                                                                                                                                                                      !! fan-out
-  examples.multi_gate_pipeline                            14                             1                                                                                                                                                                                  ──                                                                                                                                                        !! fan-out
-      examples.ticket_workflow                            10                             5                                                                                                                                                                                                                ──                                                                                                                          !! fan-out
-             pyqual.validation                                                           5                            ←2                             1                                                                                                                                                                                  ──                                                                                          
-                   pyqual.bulk                                                           1                                                                                                                                                                                                                                                                            ──                                                              hub
-        pyqual.gate_collectors                                                           2                                                                                                                                                                                                                                                                                                          ──                              
-           pyqual.integrations                             2                                                                                                                                                                                                                                                                                                                                                                      ──
+                                                    Taskfile                        pyqual                    pyqual.cli                pyqual.plugins                      examples         examples.custom_gates                  run_analysis  examples.multi_gate_pipeline      examples.ticket_workflow             pyqual.validation                   project.map        pyqual.gate_collectors           pyqual.integrations                   pyqual.bulk
+                      Taskfile                            ──                           ←98                                                          ←8                           ←14                           ←25                           ←18                           ←14                           ←10                                                                                                                      ←2                                hub
+                        pyqual                            98                            ──                           ←22                             3                           ←13                                                          ←1                            ←1                            ←5                             1                             6                            ←2                                                          ←1  hub
+                    pyqual.cli                                                          22                            ──                            13                                                                                                                                                                                   2                                                                                                                          !! fan-out
+                pyqual.plugins                             8                             6                           ←13                            ──                                                                                                                                                                                  ←1                                                                                                                          hub
+                      examples                            14                            13                                                                                        ──                                                                                                                                                                                                                                                                                !! fan-out
+         examples.custom_gates                            25                                                                                                                                                    ──                                                                                                                                                                                                                                                  !! fan-out
+                  run_analysis                            18                             1                                                                                                                                                    ──                                                                                                                                                                                                                    !! fan-out
+  examples.multi_gate_pipeline                            14                             1                                                                                                                                                                                  ──                                                                                                                                                                                      !! fan-out
+      examples.ticket_workflow                            10                             5                                                                                                                                                                                                                ──                                                                                                                                                        !! fan-out
+             pyqual.validation                                                           5                            ←2                             1                                                                                                                                                                                  ──                                                                                                                        
+                   project.map                                                          ←6                                                                                                                                                                                                                                                                            ──                                                                                            hub
+        pyqual.gate_collectors                                                           2                                                                                                                                                                                                                                                                                                          ──                                                            
+           pyqual.integrations                             2                                                                                                                                                                                                                                                                                                                                                                      ──                              
+                   pyqual.bulk                                                           1                                                                                                                                                                                                                                                                                                                                                                      ──
   CYCLES: none
   HUB: Taskfile/ (fan-in=189)
-  HUB: pyqual.bulk/ (fan-in=6)
-  HUB: pyqual/ (fan-in=56)
   HUB: pyqual.plugins/ (fan-in=17)
+  HUB: project.map/ (fan-in=6)
+  HUB: pyqual/ (fan-in=56)
   SMELL: examples.custom_gates/ fan-out=25 → split needed
-  SMELL: run_analysis/ fan-out=19 → split needed
-  SMELL: examples.ticket_workflow/ fan-out=15 → split needed
-  SMELL: examples/ fan-out=27 → split needed
-  SMELL: pyqual/ fan-out=108 → split needed
   SMELL: pyqual.plugins/ fan-out=14 → split needed
-  SMELL: examples.multi_gate_pipeline/ fan-out=15 → split needed
   SMELL: pyqual.cli/ fan-out=37 → split needed
+  SMELL: examples/ fan-out=27 → split needed
+  SMELL: examples.ticket_workflow/ fan-out=15 → split needed
+  SMELL: examples.multi_gate_pipeline/ fan-out=15 → split needed
+  SMELL: pyqual/ fan-out=108 → split needed
+  SMELL: run_analysis/ fan-out=19 → split needed
 
 EXTERNAL:
   validation: run `vallm batch .` → validation.toon
@@ -2293,15 +2310,15 @@ EXTERNAL:
 ### Duplication (`project/duplication.toon.yaml`)
 
 ```toon markpact:analysis path=project/duplication.toon.yaml
-# redup/duplication | 11 groups | 115f 19455L | 2026-04-25
+# redup/duplication | 11 groups | 115f 19490L | 2026-04-25
 
 SUMMARY:
   files_scanned: 115
-  total_lines:   19455
+  total_lines:   19490
   dup_groups:    11
   dup_fragments: 31
   saved_lines:   210
-  scan_ms:       12109
+  scan_ms:       8008
 
 HOTSPOTS[7] (files with most duplication):
   pyqual/plugins/git/main.py  dup=58L  groups=2  frags=2  (0.3%)
@@ -2430,40 +2447,36 @@ METRICS-TARGET:
 ### Evolution / Churn (`project/evolution.toon.yaml`)
 
 ```toon markpact:analysis path=project/evolution.toon.yaml
-# code2llm/evolution | 1207 func | 97f | 2026-04-25
+# code2llm/evolution | 1235 func | 97f | 2026-04-25
 
-NEXT[5] (ranked by impact):
+NEXT[4] (ranked by impact):
   [1] !! SPLIT           pyqual/plugins/git/main.py
       WHY: 968L, 1 classes, max CC=12
       EFFORT: ~4h  IMPACT: 11616
 
-  [2] !! SPLIT           pyqual/pipeline.py
-      WHY: 700L, 1 classes, max CC=16
-      EFFORT: ~4h  IMPACT: 11200
-
-  [3] !! SPLIT           pyqual/_gate_collectors.py
+  [2] !! SPLIT           pyqual/_gate_collectors.py
       WHY: 710L, 0 classes, max CC=14
       EFFORT: ~4h  IMPACT: 9940
+
+  [3] !! SPLIT           pyqual/pipeline.py
+      WHY: 726L, 1 classes, max CC=13
+      EFFORT: ~4h  IMPACT: 9438
 
   [4] !  SPLIT-FUNC      ParallelExecutor.run  CC=15  fan=17
       WHY: CC=15 exceeds 15
       EFFORT: ~1h  IMPACT: 255
 
-  [5] !  SPLIT-FUNC      Pipeline._execute_stage  CC=16  fan=14
-      WHY: CC=16 exceeds 15
-      EFFORT: ~1h  IMPACT: 224
-
 
 RISKS[3]:
   ⚠ Splitting pyqual/plugins/git/main.py may break 27 import paths
+  ⚠ Splitting pyqual/pipeline.py may break 29 import paths
   ⚠ Splitting pyqual/_gate_collectors.py may break 28 import paths
-  ⚠ Splitting pyqual/pipeline.py may break 26 import paths
 
 METRICS-TARGET:
-  CC̄:          3.0 → ≤2.1
-  max-CC:      16 → ≤8
+  CC̄:          2.9 → ≤2.0
+  max-CC:      15 → ≤7
   god-modules: 7 → 0
-  high-CC(≥15): 3 → ≤1
+  high-CC(≥15): 1 → ≤0
   hub-types:   0 → ≤0
 
 PATTERNS (language parser shared logic):
@@ -2491,7 +2504,7 @@ PATTERNS (language parser shared logic):
     - Standardized FunctionInfo/ClassInfo models
 
 HISTORY:
-  prev CC̄=2.9 → now CC̄=3.0
+  prev CC̄=3.0 → now CC̄=2.9
 ```
 
 ### Validation (`project/validation.toon.yaml`)

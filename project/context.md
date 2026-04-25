@@ -4,18 +4,23 @@
 
 - **Project**: /home/tom/github/semcod/pyqual
 - **Primary Language**: python
-- **Languages**: python: 122, yaml: 53, typescript: 12, txt: 9, json: 7
+- **Languages**: python: 122, yaml: 56, typescript: 12, txt: 9, json: 7
 - **Analysis Mode**: static
-- **Total Functions**: 1233
+- **Total Functions**: 1261
 - **Total Classes**: 118
-- **Modules**: 217
-- **Entry Points**: 925
+- **Modules**: 220
+- **Entry Points**: 950
 
 ## Architecture by Module
 
 ### project.map.toon
-- **Functions**: 1593
+- **Functions**: 542
 - **File**: `map.toon.yaml`
+
+### pyqual.pipeline
+- **Functions**: 29
+- **Classes**: 1
+- **File**: `pipeline.py`
 
 ### pyqual._gate_collectors
 - **Functions**: 28
@@ -25,11 +30,6 @@
 - **Functions**: 27
 - **Classes**: 1
 - **File**: `main.py`
-
-### pyqual.pipeline
-- **Functions**: 26
-- **Classes**: 1
-- **File**: `pipeline.py`
 
 ### pyqual.cli_run_helpers
 - **Functions**: 24
@@ -177,10 +177,6 @@ Examples:
     pyqual tic
 - **Calls**: tickets_app.command, typer.Option, typer.Option, typer.Option, typer.Option, Path, console.print, console.print
 
-### pyqual.pipeline.Pipeline._execute_streaming
-> Execute stage with real-time output streaming via Popen.
-- **Calls**: subprocess.Popen, proc.wait, StageResult, StageResult, select.select, fd.readline, None.append, None.join
-
 ### pyqual.cli.cmd_git.git_status_cmd
 > Show git repository status.
 - **Calls**: git_app.command, typer.Option, typer.Option, pyqual.plugins.git.status.git_status, pyqual.cli.cmd_git._print_file_list, pyqual.cli.cmd_git._print_file_list, pyqual.cli.cmd_git._print_file_list, console.print
@@ -192,6 +188,10 @@ Examples:
 ### pyqual.plugins.lint.main.LintCollector._collect_ruff
 > Extract ruff linter metrics.
 - **Calls**: p.exists, json.loads, isinstance, p.read_text, len, sum, sum, float
+
+### pyqual.pipeline.Pipeline._execute_streaming
+> Execute stage with real-time output streaming via Popen.
+- **Calls**: subprocess.Popen, proc.wait, StageResult, StageResult, select.select, fd.readline, None.append, None.join
 
 ### pyqual.cli.cmd_init.init
 > Create pyqual.yaml with sensible defaults.
@@ -323,8 +323,8 @@ _collect_pylint [pyqual.plugins.lint.main.LintCollector]
 
 ### pyqual.pipeline.Pipeline
 > Execute pipeline stages in a loop until quality gates pass.
-- **Methods**: 26
-- **Key Methods**: pyqual.pipeline.Pipeline.__init__, pyqual.pipeline.Pipeline.run, pyqual.pipeline.Pipeline.check_gates, pyqual.pipeline.Pipeline._run_iteration, pyqual.pipeline.Pipeline._iteration_stagnated, pyqual.pipeline.Pipeline._should_run_stage, pyqual.pipeline.Pipeline._resolve_tool_stage, pyqual.pipeline.Pipeline._resolve_env, pyqual.pipeline.Pipeline._check_optional_binary, pyqual.pipeline.Pipeline._make_skipped_result
+- **Methods**: 29
+- **Key Methods**: pyqual.pipeline.Pipeline.__init__, pyqual.pipeline.Pipeline.run, pyqual.pipeline.Pipeline.check_gates, pyqual.pipeline.Pipeline._run_iteration, pyqual.pipeline.Pipeline._iteration_stagnated, pyqual.pipeline.Pipeline._should_stop_after_iteration, pyqual.pipeline.Pipeline._should_run_stage, pyqual.pipeline.Pipeline._resolve_tool_stage, pyqual.pipeline.Pipeline._resolve_env, pyqual.pipeline.Pipeline._check_optional_binary
 
 ### pyqual.github_actions.GitHubActionsReporter
 > Reports pyqual results to GitHub Actions and PRs.
@@ -468,7 +468,7 @@ Key functions that process and transform data:
 
 ### pyqual.cli_bulk_cmds._discover_and_validate
 > Discover projects and validate path. Returns states or raises Exit.
-- **Output to**: pyqual.bulk.orchestrator.discover_projects, path.is_dir, _console.print, typer.Exit, _console.print
+- **Output to**: project.map.toon.discover_projects, path.is_dir, _console.print, typer.Exit, _console.print
 
 ### pyqual.api.validate_config
 > Validate configuration and return list of errors (empty if valid).

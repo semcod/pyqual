@@ -1,15 +1,13 @@
-# code2llm | 217f 39033L | python:122,yaml:53,typescript:12,txt:9,json:7,shell:6,yml:2,javascript:2,toml:1 | 2026-04-25
-# CC̄=3.0 | critical:3/1233 | dups:0 | cycles:0
+# code2llm | 220f 37814L | python:122,yaml:56,typescript:12,txt:9,json:7,shell:6,yml:2,javascript:2,toml:1 | 2026-04-25
+# CC̄=3.0 | critical:1/1261 | dups:0 | cycles:0
 
-HEALTH[3]:
+HEALTH[1]:
   🟡 CC    run CC=15 (limit:15)
-  🟡 CC    _execute_stage CC=16 (limit:15)
-  🟡 CC    build_dashboard_table CC=15 (limit:15)
 
 REFACTOR[1]:
-  1. split 3 high-CC methods  (CC>15)
+  1. split 1 high-CC methods  (CC>15)
 
-PIPELINES[402]:
+PIPELINES[407]:
   [1] Src [main]: main → print
       PURITY: 100% pure
   [2] Src [App]: App → loadRepositories
@@ -39,10 +37,10 @@ LAYERS:
   │ tree.sh                      1L  0C    0m  CC=0.0    ←0
   │ Makefile                     0L  0C    0m  CC=0.0    ←0
   │
-  pyqual/                         CC̄=5.0    ←in:56  →out:108  !! split
+  pyqual/                         CC̄=4.9    ←in:56  →out:108  !! split
   │ !! main                       968L  1C   27m  CC=12     ←2
+  │ !! pipeline                   726L  1C   29m  CC=13     ←0
   │ !! _gate_collectors           710L  0C   28m  CC=14     ←2
-  │ !! pipeline                   700L  1C   26m  CC=16     ←0
   │ !! report                     592L  0C   19m  CC=12     ←0
   │ !! bulk_init                  567L  1C   15m  CC=14     ←1
   │ !! api                        523L  1C   15m  CC=10     ←3
@@ -89,7 +87,7 @@ LAYERS:
   │ test                       159L  4C   11m  CC=4      ←0
   │ main                       157L  1C    6m  CC=14     ←0
   │ __init__                   154L  0C    0m  CC=0.0    ←0
-  │ !! orchestrator               141L  1C    3m  CC=15     ←1
+  │ orchestrator               150L  1C    5m  CC=11     ←0
   │ test                       139L  1C    9m  CC=8      ←0
   │ setup_deps                 136L  1C    5m  CC=10     ←0
   │ llm                        126L  0C    0m  CC=0.0    ←0
@@ -236,10 +234,10 @@ LAYERS:
   │ Dockerfile                   0L  0C    0m  CC=0.0    ←0
   │
   project/                        CC̄=0.0    ←in:0  →out:0
-  │ !! calls.yaml                5436L  0C    0m  CC=0.0    ←0
-  │ !! map.toon.yaml             2420L  0C  458m  CC=0.0    ←0
+  │ !! calls.yaml                5418L  0C    0m  CC=0.0    ←0
+  │ !! map.toon.yaml             1190L  0C  481m  CC=0.0    ←1
   │ !! calls.toon.yaml            533L  0C    0m  CC=0.0    ←0
-  │ analysis.toon.yaml         359L  0C    0m  CC=0.0    ←0
+  │ analysis.toon.yaml         294L  0C    0m  CC=0.0    ←0
   │ analysis.toon.yaml         179L  0C    0m  CC=0.0    ←0
   │ validation.toon.yaml       174L  0C    0m  CC=0.0    ←0
   │ validation.toon.yaml       160L  0C    0m  CC=0.0    ←0
@@ -255,39 +253,45 @@ LAYERS:
   .planfile_analysis/             CC̄=0.0    ←in:0  →out:0
   │ analysis_summary.json       27L  0C    0m  CC=0.0    ←0
   │
+  testql-scenarios/               CC̄=0.0    ←in:0  →out:0
+  │ generated-from-pytests.testql.toon.yaml    22L  0C    0m  CC=0.0    ←0
+  │ generated-cli-tests.testql.toon.yaml    20L  0C    0m  CC=0.0    ←0
+  │ generated-api-smoke.testql.toon.yaml    17L  0C    0m  CC=0.0    ←0
+  │
   ── zero ──
      Makefile                                  0L
      examples/llm_fix/Dockerfile               0L
      integration/Dockerfile                    0L
 
 COUPLING:
-                                                    Taskfile                        pyqual                    pyqual.cli                pyqual.plugins                      examples         examples.custom_gates                  run_analysis  examples.multi_gate_pipeline      examples.ticket_workflow             pyqual.validation                   pyqual.bulk        pyqual.gate_collectors           pyqual.integrations
-                      Taskfile                            ──                           ←98                                                          ←8                           ←14                           ←25                           ←18                           ←14                           ←10                                                                                                                      ←2  hub
-                        pyqual                            98                            ──                           ←22                             3                           ←13                                                          ←1                            ←1                            ←5                             1                             6                            ←2                                hub
-                    pyqual.cli                                                          22                            ──                            13                                                                                                                                                                                   2                                                                                            !! fan-out
-                pyqual.plugins                             8                             6                           ←13                            ──                                                                                                                                                                                  ←1                                                                                            hub
-                      examples                            14                            13                                                                                        ──                                                                                                                                                                                                                                                  !! fan-out
-         examples.custom_gates                            25                                                                                                                                                    ──                                                                                                                                                                                                                    !! fan-out
-                  run_analysis                            18                             1                                                                                                                                                    ──                                                                                                                                                                                      !! fan-out
-  examples.multi_gate_pipeline                            14                             1                                                                                                                                                                                  ──                                                                                                                                                        !! fan-out
-      examples.ticket_workflow                            10                             5                                                                                                                                                                                                                ──                                                                                                                          !! fan-out
-             pyqual.validation                                                           5                            ←2                             1                                                                                                                                                                                  ──                                                                                          
-                   pyqual.bulk                                                           1                                                                                                                                                                                                                                                                            ──                                                              hub
-        pyqual.gate_collectors                                                           2                                                                                                                                                                                                                                                                                                          ──                              
-           pyqual.integrations                             2                                                                                                                                                                                                                                                                                                                                                                      ──
+                                                    Taskfile                        pyqual                    pyqual.cli                pyqual.plugins                      examples         examples.custom_gates                  run_analysis  examples.multi_gate_pipeline      examples.ticket_workflow             pyqual.validation                   project.map        pyqual.gate_collectors           pyqual.integrations                   pyqual.bulk
+                      Taskfile                            ──                           ←98                                                          ←8                           ←14                           ←25                           ←18                           ←14                           ←10                                                                                                                      ←2                                hub
+                        pyqual                            98                            ──                           ←22                             3                           ←13                                                          ←1                            ←1                            ←5                             1                             6                            ←2                                                          ←1  hub
+                    pyqual.cli                                                          22                            ──                            13                                                                                                                                                                                   2                                                                                                                          !! fan-out
+                pyqual.plugins                             8                             6                           ←13                            ──                                                                                                                                                                                  ←1                                                                                                                          hub
+                      examples                            14                            13                                                                                        ──                                                                                                                                                                                                                                                                                !! fan-out
+         examples.custom_gates                            25                                                                                                                                                    ──                                                                                                                                                                                                                                                  !! fan-out
+                  run_analysis                            18                             1                                                                                                                                                    ──                                                                                                                                                                                                                    !! fan-out
+  examples.multi_gate_pipeline                            14                             1                                                                                                                                                                                  ──                                                                                                                                                                                      !! fan-out
+      examples.ticket_workflow                            10                             5                                                                                                                                                                                                                ──                                                                                                                                                        !! fan-out
+             pyqual.validation                                                           5                            ←2                             1                                                                                                                                                                                  ──                                                                                                                        
+                   project.map                                                          ←6                                                                                                                                                                                                                                                                            ──                                                                                            hub
+        pyqual.gate_collectors                                                           2                                                                                                                                                                                                                                                                                                          ──                                                            
+           pyqual.integrations                             2                                                                                                                                                                                                                                                                                                                                                                      ──                              
+                   pyqual.bulk                                                           1                                                                                                                                                                                                                                                                                                                                                                      ──
   CYCLES: none
   HUB: Taskfile/ (fan-in=189)
-  HUB: pyqual.bulk/ (fan-in=6)
-  HUB: pyqual/ (fan-in=56)
   HUB: pyqual.plugins/ (fan-in=17)
+  HUB: project.map/ (fan-in=6)
+  HUB: pyqual/ (fan-in=56)
   SMELL: examples.custom_gates/ fan-out=25 → split needed
-  SMELL: run_analysis/ fan-out=19 → split needed
-  SMELL: examples.ticket_workflow/ fan-out=15 → split needed
-  SMELL: examples/ fan-out=27 → split needed
-  SMELL: pyqual/ fan-out=108 → split needed
   SMELL: pyqual.plugins/ fan-out=14 → split needed
-  SMELL: examples.multi_gate_pipeline/ fan-out=15 → split needed
   SMELL: pyqual.cli/ fan-out=37 → split needed
+  SMELL: examples/ fan-out=27 → split needed
+  SMELL: examples.ticket_workflow/ fan-out=15 → split needed
+  SMELL: examples.multi_gate_pipeline/ fan-out=15 → split needed
+  SMELL: pyqual/ fan-out=108 → split needed
+  SMELL: run_analysis/ fan-out=19 → split needed
 
 EXTERNAL:
   validation: run `vallm batch .` → validation.toon

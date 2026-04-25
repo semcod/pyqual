@@ -4,10 +4,11 @@ flowchart TD
     examples__integration_example["examples.integration_example<br/>7 funcs"]
     examples__multi_gate_pipeline["examples.multi_gate_pipeline<br/>2 funcs"]
     examples__ticket_workflow["examples.ticket_workflow<br/>3 funcs"]
+    project__map["project.map<br/>481 funcs"]
     pyqual___gate_collectors["pyqual._gate_collectors<br/>28 funcs"]
     pyqual__api["pyqual.api<br/>15 funcs"]
     pyqual__auto_closer["pyqual.auto_closer<br/>7 funcs"]
-    pyqual__bulk["pyqual.bulk<br/>7 funcs"]
+    pyqual__bulk["pyqual.bulk<br/>9 funcs"]
     pyqual__bulk_init["pyqual.bulk_init<br/>15 funcs"]
     pyqual__bulk_init_classify["pyqual.bulk_init_classify<br/>1 funcs"]
     pyqual__bulk_init_fingerprint["pyqual.bulk_init_fingerprint<br/>9 funcs"]
@@ -23,7 +24,7 @@ flowchart TD
     pyqual__integrations["pyqual.integrations<br/>6 funcs"]
     pyqual__output["pyqual.output<br/>1 funcs"]
     pyqual__parallel["pyqual.parallel<br/>7 funcs"]
-    pyqual__pipeline["pyqual.pipeline<br/>26 funcs"]
+    pyqual__pipeline["pyqual.pipeline<br/>29 funcs"]
     pyqual__plugins["pyqual.plugins<br/>255 funcs"]
     pyqual__profiles["pyqual.profiles<br/>2 funcs"]
     pyqual__release_check["pyqual.release_check<br/>2 funcs"]
@@ -49,7 +50,7 @@ flowchart TD
     pyqual__release_check ==>|8| Taskfile
     pyqual__plugins ==>|8| Taskfile
     pyqual__github_actions ==>|7| Taskfile
-    pyqual__cli_bulk_cmds ==>|6| pyqual__bulk
+    pyqual__cli_bulk_cmds ==>|6| project__map
     pyqual__cli ==>|6| pyqual__tickets
     examples__integration_example ==>|5| pyqual__api
     pyqual__config ==>|5| pyqual__tools
@@ -63,12 +64,12 @@ flowchart TD
     pyqual__config -->|2| pyqual__profiles
     pyqual__report_generator -->|2| Taskfile
     pyqual__api -->|2| pyqual__tools
-    pyqual__pipeline -->|2| pyqual__stage_names
-    pyqual__pipeline -->|2| pyqual__tools
     pyqual__gate_collectors -->|2| pyqual___gate_collectors
     pyqual__cli -->|2| pyqual__profiles
     pyqual__cli -->|2| pyqual__validation
     pyqual__integrations -->|2| Taskfile
+    pyqual__pipeline -->|2| pyqual__stage_names
+    pyqual__pipeline -->|2| pyqual__tools
     pyqual__config -->|1| pyqual__stage_names
     pyqual__cli_bulk_cmds -->|1| pyqual__bulk_init
     pyqual__api -->|1| pyqual__profiles

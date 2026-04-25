@@ -1,6 +1,6 @@
-# pyqual | 179f 28274L | python:162,shell:6,typescript:4,css:3,javascript:3,less:1 | 2026-04-25
-# stats: 542 func | 168 cls | 179 mod | CC̄=5.2 | critical:66 | cycles:0
-# alerts[5]: CC test_pipeline_writes_nfo_sqlite_log=17; CC build_dashboard_table=15; CC _from_benchmark=14; fan-out run=26; fan-out fix_config=21
+# pyqual | 179f 28309L | python:162,shell:6,typescript:4,css:3,javascript:3,less:1 | 2026-04-25
+# stats: 544 func | 168 cls | 179 mod | CC̄=5.2 | critical:65 | cycles:0
+# alerts[5]: CC test_pipeline_writes_nfo_sqlite_log=17; CC _from_benchmark=14; CC bulk_init=14; fan-out run=26; fan-out fix_config=21
 # hotspots[5]: run fan=26; fix_config fan=21; main fan=21; analyze_yaml_syntax fan=18; run_project fan=18
 # evolution: baseline
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
@@ -44,7 +44,7 @@ M[179]:
   pyqual/api.py,524
   pyqual/auto_closer.py,218
   pyqual/bulk/models.py,56
-  pyqual/bulk/orchestrator.py,142
+  pyqual/bulk/orchestrator.py,151
   pyqual/bulk/parser.py,55
   pyqual/bulk/runner.py,32
   pyqual/bulk_init.py,568
@@ -87,7 +87,7 @@ M[179]:
   pyqual/llm.py,127
   pyqual/output.py,5
   pyqual/parallel.py,329
-  pyqual/pipeline.py,701
+  pyqual/pipeline.py,727
   pyqual/pipeline_protocols.py,45
   pyqual/pipeline_results.py,53
   pyqual/plugins/__init__.py,85
@@ -310,9 +310,11 @@ D:
     RunStatus:
     ProjectRunState: elapsed(0),progress_pct(0),gates_label(0)
   pyqual/bulk/orchestrator.py:
-    e: discover_projects,build_dashboard_table,bulk_run,BulkRunResult
+    e: discover_projects,_make_summary_title,_build_status_row,build_dashboard_table,bulk_run,BulkRunResult
     BulkRunResult:
     discover_projects(root)
+    _make_summary_title(states)
+    _build_status_row(s;show_last_line)
     build_dashboard_table(states;show_last_line)
     bulk_run(root;parallel;pyqual_cmd;filter_names;dry_run;timeout;log_dir;live_callback)
   pyqual/bulk/parser.py:
@@ -576,7 +578,7 @@ D:
     run_parallel_fix(workdir;tools;todo_path;issues;env;group_similar;on_task_done)
   pyqual/pipeline.py:
     e: Pipeline
-    Pipeline: __init__(9),run(1),check_gates(0),_run_iteration(2),_iteration_stagnated(1),_should_run_stage(4),_resolve_tool_stage(1),_resolve_env(0),_check_optional_binary(1),_make_skipped_result(2),_make_dry_run_result(2),_execute_stage(2),_notify_stage_error(3),_execute_captured(5),_execute_streaming(5),_init_nfo(0),_nfo_emit(4),_is_fix_stage(1),_log_stage(2),_archive_llx_report(2),_log_gates(2),_log_event(1),_ensure_pyqual_dir(0),_capture_runtime_error(2),_classify_error(1),_extract_error_message(1)  # Execute pipeline stages in a loop until quality gates pass.
+    Pipeline: __init__(9),run(1),check_gates(0),_run_iteration(2),_iteration_stagnated(1),_should_stop_after_iteration(2),_should_run_stage(4),_resolve_tool_stage(1),_resolve_env(0),_check_optional_binary(1),_make_skipped_result(2),_make_dry_run_result(2),_resolve_stage_command_and_policy(1),_handle_stage_failure(3),_execute_stage(2),_notify_stage_error(3),_execute_captured(5),_execute_streaming(5),_init_nfo(0),_nfo_emit(4),_is_fix_stage(1),_log_stage(2),_archive_llx_report(2),_log_gates(2),_log_event(1),_ensure_pyqual_dir(0),_capture_runtime_error(2),_classify_error(1),_extract_error_message(1)  # Execute pipeline stages in a loop until quality gates pass.
   pyqual/pipeline_protocols.py:
     e: OnStageStart,OnIterationStart,OnStageError,OnStageDone,OnStageOutput,OnIterationDone
     OnStageStart: __call__(1)

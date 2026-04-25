@@ -1,5 +1,5 @@
 # code2llm call graph | /home/tom/github/semcod/pyqual
-# nodes: 403 | edges: 394 | modules: 77
+# nodes: 407 | edges: 395 | modules: 78
 # CC̄=3.0
 
 HUBS[20]:
@@ -25,24 +25,24 @@ HUBS[20]:
     CC=13  in:0  out:30  total:30
   examples.custom_gates.metric_history.main
     CC=9  in:0  out:29  total:29
+  pyqual.config.PyqualConfig._parse
+    CC=13  in:0  out:28  total:28
   pyqual._gate_collectors._from_ruff
     CC=12  in:1  out:27  total:28
   pyqual.cli_bulk_cmds._bulk_init_impl
     CC=14  in:1  out:27  total:28
-  pyqual.config.PyqualConfig._parse
-    CC=13  in:0  out:28  total:28
-  pyqual.auto_closer.main
-    CC=11  in:0  out:27  total:27
   pyqual.bulk_init.classify_with_llm
     CC=9  in:1  out:26  total:27
   pyqual._gate_collectors._from_vulnerabilities
     CC=6  in:1  out:26  total:27
-  pyqual.plugins.cli_helpers.plugin_search
-    CC=11  in:1  out:25  total:26
-  pyqual.yaml_fixer.analyze_yaml_syntax
-    CC=10  in:2  out:24  total:26
+  pyqual.auto_closer.main
+    CC=11  in:0  out:27  total:27
   pyqual.parallel.ParallelExecutor.run
     CC=15  in:1  out:25  total:26
+  pyqual.yaml_fixer.analyze_yaml_syntax
+    CC=10  in:2  out:24  total:26
+  pyqual.plugins.cli_helpers.plugin_search
+    CC=11  in:1  out:25  total:26
 
 MODULES:
   Taskfile  [1 funcs]
@@ -98,6 +98,10 @@ MODULES:
     main  CC=2  out:3
     sync_from_cli  CC=3  out:10
     tickets_from_gate_failures  CC=7  out:12
+  project.map.toon  [3 funcs]
+    build_dashboard_table  CC=0  out:0
+    bulk_run  CC=0  out:0
+    discover_projects  CC=0  out:0
   pyqual._gate_collectors  [20 funcs]
     _count_by_severity  CC=3  out:3
     _count_pylint_by_type  CC=4  out:6
@@ -126,8 +130,9 @@ MODULES:
     get_changed_files  CC=4  out:9
     get_diff_content  CC=2  out:2
     main  CC=11  out:27
-  pyqual.bulk.orchestrator  [3 funcs]
-    build_dashboard_table  CC=15  out:16
+  pyqual.bulk.orchestrator  [4 funcs]
+    _build_status_row  CC=6  out:4
+    build_dashboard_table  CC=4  out:11
     bulk_run  CC=11  out:16
     discover_projects  CC=5  out:7
   pyqual.bulk.parser  [2 funcs]
