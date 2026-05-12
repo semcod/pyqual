@@ -1,5 +1,7 @@
 """Planfile-backed ticket sync helpers for TODO.md and GitHub."""
 
+import shutil
+import subprocess
 from pathlib import Path
 
 PLANFILE_MARKDOWN_SOURCE = "markdown"
@@ -8,13 +10,12 @@ PLANFILE_TODO_SOURCE = "todo"
 
 
 def _load_sync_integration():
+    """Try to load planfile integration, return None if not available."""
     try:
         from planfile.cli.cmd.cmd_sync import sync_integration
-    except ImportError as exc:  # pragma: no cover - dependency error
-        raise RuntimeError(
-            "planfile is required for ticket sync. Install it with: pip install pyqual[planfile]"
-        ) from exc
-    return sync_integration
+        return sync_integration
+    except ImportError:
+        return None
 
 
 def _normalize_sources(source: str) -> list[str]:
@@ -37,13 +38,33 @@ def sync_planfile_tickets(
     """Sync tickets via planfile backends."""
     sync_integration = _load_sync_integration()
     for index, integration_name in enumerate(_normalize_sources(source)):
-        sync_integration(
-            integration_name,
-            str(workdir),
-            dry_run,
-            direction,
-            show_header=index == 0,
-        )
+        if sync_integration:
+            sync_integration(
+                integration_name,
+                str(workdir),
+                dry_run,
+                direction,
+                show_header=index == 0,
+            )
+        else:
+            # Fallback to shelling out to planfile CLI (e.g. if installed via pipx)
+            planfile_bin = shutil.which("planfile")
+            if not planfile_bin:
+                raise RuntimeError(
+                    "Neither planfile python package nor planfile binary found. "
+                    "Please install planfile to enable ticket syncing."
+                )
+            
+            cmd = [planfile_bin, "sync", integration_name, str(workdir)]
+            cmd.extend(["--direction", direction])
+            if dry_run:
+                cmd.append("--dry-run")
+            
+            # Print standard echo just like pyqual does
+            if index == 0:
+                print(f"🔄 Syncing via planfile CLI ({integration_name})...")
+                
+            subprocess.run(cmd, check=True)
 
 
 def sync_todo_tickets(
@@ -121,3 +142,90 @@ def sync_from_gates(
         "backends": backends,
         "all_passed": False,
     }
+
+
+def create_planfile_tickets_from_ruff(workdir: Path = Path("."), max_items: int = 5) -> int:
+    """Extract ruff issues and directly execute 'planfile ticket create' for each.
+    
+    This delivers direct-to-storage persistence bypasses intermediate format drift.
+    """
+    import json
+    import subprocess
+    import shutil
+    
+    ruff_path = workdir / ".pyqual" / "ruff.json"
+    if not ruff_path.exists():
+        ruff_path = workdir / "ruff.json"
+    if not ruff_path.exists():
+        return 0
+        
+    planfile_bin = shutil.which("planfile")
+    if not planfile_bin:
+        return 0
+
+    try:
+        with open(ruff_path) as f:
+            data = json.load(f)
+    except Exception:
+        return 0
+        
+    if not isinstance(data, list) or not data:
+        return 0
+        
+    # Sort and limit
+    data.sort(key=lambda x: (x.get("filename", ""), x.get("location", {}).get("row", 0)))
+    
+    count = 0
+    seen = set()
+    
+    # Get existing ticket names to prevent duplicates (simple check)
+    try:
+        list_proc = subprocess.run(
+            [planfile_bin, "ticket", "list", "--format", "json"], 
+            capture_output=True, text=True, cwd=str(workdir)
+        )
+        existing_titles = ""
+        if list_proc.returncode == 0:
+            existing_titles = list_proc.stdout.lower()
+    except Exception:
+        existing_titles = ""
+
+    for violation in data:
+        if count >= max_items:
+            break
+            
+        filename = violation.get("filename", "unknown")
+        code = violation.get("code", "LINT")
+        msg = violation.get("message", "Lint failure")
+        line = violation.get("location", {}).get("row", "?")
+        
+        key = f"{filename}:{code}"
+        if key in seen:
+            continue
+        seen.add(key)
+        
+        # Build descriptive title
+        basename = filename.split("/")[-1]
+        title = f"Fix {code} in {basename}"
+        
+        if title.lower() in existing_titles:
+            continue
+            
+        description = f"{msg} at {filename}:{line}"
+        
+        cmd = [
+            planfile_bin, "ticket", "create", title,
+            "--label", "ruff",
+            "--label", "auto-generated",
+            "--description", description,
+            "--source", "pyqual",
+            "--files", filename
+        ]
+        
+        try:
+            subprocess.run(cmd, check=True, capture_output=True, cwd=str(workdir))
+            count += 1
+        except subprocess.CalledProcessError:
+            pass
+                
+    return count

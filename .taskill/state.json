@@ -1,0 +1,11 @@
+{
+  "last_run_iso": "2026-04-25T13:45:12.815367+00:00",
+  "last_commit_sha": "4fe6df693ed2b73acc03f8602ed500d4a05bdb86",
+  "last_coverage_pct": null,
+  "last_failed_tests": null,
+  "last_sumd_hash": "280a51a5236d846a",
+  "file_mtimes": {
+    "SUMD.md": 1777110684.4632556,
+    "SUMR.md": 1777110689.8780632
+  }
+}

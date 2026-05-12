@@ -207,6 +207,13 @@ def _create_tickets_if_needed(
         return
 
     backends = cfg.loop.ticket_backends or ["markdown"]
+    
+    # Step 1: Materialize artifacts (like ruff) DIRECTLY into planfile tickets BEFORE sync.
+    from pyqual.tickets import create_planfile_tickets_from_ruff
+    created = create_planfile_tickets_from_ruff(workdir=workdir)
+    if created > 0:
+        console.print(f"[green]✔ Natively injected {created} new planfile tickets directly from ruff artifacts![/green]")
+
     console.print(f"[yellow]Creating planfile tickets (backends: {', '.join(backends)})...[/yellow]")
     try:
         if "all" in backends:

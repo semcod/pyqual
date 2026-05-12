@@ -123,6 +123,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+- refactor(docs): refactor code analysis engine
+- feat(docs): add configuration management system
+- fix(docs): address issues in configuration management system
+- refactor(tests): update tests for the code analysis engine
+- refactor: reduce complexity in high-CC functions (_from_vulnerabilities, main, git_scan_cmd)
+- fix: apply automated TODO batch fixes [pyqual auto]
+- chore: sync version to 0.1.137
+
+## [0.1.147] - 2026-05-12
+
+### Docs
+- Update CHANGELOG.md
+- Update README.md
+- Update TODO.md
+
+### Other
+- Update .taskill/state.json
+
 ## [0.1.146] - 2026-04-25
 
 ### Docs

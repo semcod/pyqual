@@ -8,9 +8,6 @@
 
 ## ✅ Completed Tasks
 
-- [x] pyqual/pipeline.py:97 - String concatenation can be converted to f-string
-- [x] pyqual/pipeline.py:159 - String concatenation can be converted to f-string
-- [x] pyqual/pipeline.py:711 - String concatenation can be converted to f-string
 
 ## 📋 Current Issues (showing 200 of 466)
 
@@ -218,3 +215,9 @@
 ---
 
 *To execute all tasks, run: `prefact -a --execute-todos`*
+
+## Done (moved to CHANGELOG)
+
+- [x] pyqual/pipeline.py:97 - String concatenation can be converted to f-string
+- [x] pyqual/pipeline.py:159 - String concatenation can be converted to f-string
+- [x] pyqual/pipeline.py:711 - String concatenation can be converted to f-string
