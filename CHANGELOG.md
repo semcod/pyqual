@@ -132,6 +132,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fix: apply automated TODO batch fixes [pyqual auto]
 - chore: sync version to 0.1.137
 
+## [0.1.148] - 2026-05-12
+
+### Docs
+- Update README.md
+
 ## [0.1.147] - 2026-05-12
 
 ### Docs

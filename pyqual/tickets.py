@@ -213,19 +213,52 @@ def create_planfile_tickets_from_ruff(workdir: Path = Path("."), max_items: int 
             
         description = f"{msg} at {filename}:{line}"
         
-        cmd = [
-            planfile_bin, "ticket", "create", title,
-            "--label", "ruff",
-            "--label", "auto-generated",
-            "--description", description,
-            "--source", "pyqual",
-            "--files", filename
-        ]
-        
+        # Try to create using Python API to enrich with autonomous executor properties
+        created_via_api = False
         try:
-            subprocess.run(cmd, check=True, capture_output=True, cwd=str(workdir))
+            from planfile import Planfile
+            from planfile.core.models.ticket import TicketExecutor, TicketExecution
+            
+            pf = Planfile(workdir=str(workdir))
+            # Define fully-autonomous executor to fix without any manual interaction!
+            auto_executor = TicketExecutor(
+                kind="shell", 
+                mode="automatic", 
+                handler=f".venv/bin/ruff check --fix {filename}"
+            )
+            # Mark as immediately ready for queue processor
+            auto_execution = TicketExecution(state="ready")
+            
+            pf.create_ticket(
+                name=title,
+                description=description,
+                source="pyqual",
+                labels=["ruff", "auto-generated", "autonomous"],
+                files=[filename],
+                executor=auto_executor,
+                execution=auto_execution
+            )
+            created_via_api = True
             count += 1
-        except subprocess.CalledProcessError:
-            pass
+        except ImportError:
+            pass # Fallback to CLI below
+        except Exception:
+            pass # Fallback to CLI below
+
+        if not created_via_api:
+            cmd = [
+                planfile_bin, "ticket", "create", title,
+                "--label", "ruff",
+                "--label", "auto-generated",
+                "--description", description,
+                "--source", "pyqual",
+                "--files", filename
+            ]
+            
+            try:
+                subprocess.run(cmd, check=True, capture_output=True, cwd=str(workdir))
+                count += 1
+            except subprocess.CalledProcessError:
+                pass
                 
     return count
