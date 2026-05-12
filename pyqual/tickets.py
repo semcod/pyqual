@@ -219,7 +219,7 @@ def create_planfile_tickets_from_ruff(workdir: Path = Path("."), max_items: int 
             from planfile import Planfile
             from planfile.core.models.ticket import TicketExecutor, TicketExecution
             
-            pf = Planfile(workdir=str(workdir))
+            pf = Planfile(project_path=str(workdir))
             # Define fully-autonomous executor to fix without any manual interaction!
             auto_executor = TicketExecutor(
                 kind="shell", 
@@ -232,7 +232,7 @@ def create_planfile_tickets_from_ruff(workdir: Path = Path("."), max_items: int 
             pf.create_ticket(
                 name=title,
                 description=description,
-                source="pyqual",
+                source={"tool": "pyqual"},
                 labels=["ruff", "auto-generated", "autonomous"],
                 files=[filename],
                 executor=auto_executor,
