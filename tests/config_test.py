@@ -1,5 +1,7 @@
 import yaml
 from pyqual.config import PyqualConfig, GateConfig
+
+
 def test_default_yaml_parses() -> None:
     raw = yaml.safe_load(PyqualConfig.default_yaml())
     config = PyqualConfig._parse(raw)
@@ -7,6 +9,8 @@ def test_default_yaml_parses() -> None:
     assert len(config.stages) == 6
     assert len(config.gates) == 3
     assert config.loop.max_iterations == 3
+
+
 def test_gate_config_from_dict() -> None:
     g1 = GateConfig.from_dict("cc_max", "15")
     assert g1.metric == "cc"

@@ -12,7 +12,9 @@ def test_quality_badges_with_extra_metrics() -> None:
         "mypy_errors": 3.0,
         "docstring_coverage": 90.0,
     }
-    line = _build_quality_badges(metrics, gates_passed=True, gates_passed_count=3, gates_total=3)
+    line = _build_quality_badges(
+        metrics, gates_passed=True, gates_passed_count=3, gates_total=3
+    )
     assert "CC" in line
     assert "coverage" in line
     assert "maintainability" in line.lower() or "Maintainability" in line
@@ -22,5 +24,7 @@ def test_quality_badges_with_extra_metrics() -> None:
 
 
 def test_quality_badges_no_metrics() -> None:
-    line = _build_quality_badges({}, gates_passed=False, gates_passed_count=0, gates_total=0)
+    line = _build_quality_badges(
+        {}, gates_passed=False, gates_passed_count=0, gates_total=0
+    )
     assert "pyqual-fail" in line or "pyqual" in line

@@ -1,5 +1,4 @@
-"""MCP workflow commands: mcp-fix, mcp-refactor, mcp-service.
-"""
+"""MCP workflow commands: mcp-fix, mcp-refactor, mcp-service."""
 
 from __future__ import annotations
 
@@ -94,21 +93,49 @@ def _run_mcp_workflow(
 
 @app.command("mcp-fix")
 def mcp_fix(
-    workdir: Path = typer.Option(Path("."), "--workdir", "-w", help="Project directory on the host."),
-    project_path: str | None = typer.Option(None, "--project-path", help="Project path as seen by the MCP service container."),
-    issues: Path = typer.Option(Path(".pyqual/errors.json"), "--issues", help="Gate-failure JSON file to summarize."),
-    output: Path = typer.Option(Path(".pyqual/llx_mcp.json"), "--output", help="Where to write the MCP run report."),
-    endpoint: str | None = typer.Option(None, "--endpoint", help="MCP SSE endpoint URL."),
-    model: str | None = typer.Option(None, "--model", help="Override the model selected by llx."),
-    file: list[str] = typer.Option([], "--file", help="Specific file to focus on (repeatable)."),
-    use_docker: bool = typer.Option(False, "--use-docker", help="Let llx's aider tool run inside Docker."),
-    docker_arg: list[str] = typer.Option([], "--docker-arg", help="Extra Docker arguments forwarded to llx's aider tool."),
+    workdir: Path = typer.Option(
+        Path("."), "--workdir", "-w", help="Project directory on the host."
+    ),
+    project_path: str | None = typer.Option(
+        None,
+        "--project-path",
+        help="Project path as seen by the MCP service container.",
+    ),
+    issues: Path = typer.Option(
+        Path(".pyqual/errors.json"),
+        "--issues",
+        help="Gate-failure JSON file to summarize.",
+    ),
+    output: Path = typer.Option(
+        Path(".pyqual/llx_mcp.json"),
+        "--output",
+        help="Where to write the MCP run report.",
+    ),
+    endpoint: str | None = typer.Option(
+        None, "--endpoint", help="MCP SSE endpoint URL."
+    ),
+    model: str | None = typer.Option(
+        None, "--model", help="Override the model selected by llx."
+    ),
+    file: list[str] = typer.Option(
+        [], "--file", help="Specific file to focus on (repeatable)."
+    ),
+    use_docker: bool = typer.Option(
+        False, "--use-docker", help="Let llx's aider tool run inside Docker."
+    ),
+    docker_arg: list[str] = typer.Option(
+        [], "--docker-arg", help="Extra Docker arguments forwarded to llx's aider tool."
+    ),
     task: str = typer.Option("quick_fix", "--task", help="Analysis task hint for llx."),
-    json_output: bool = typer.Option(False, "--json", help="Print the full JSON result."),
+    json_output: bool = typer.Option(
+        False, "--json", help="Print the full JSON result."
+    ),
 ) -> None:
     """Run the llx-backed MCP fix workflow."""
     if run_llx_fix_workflow is None:
-        console.print("[red]llx MCP modules not installed. Install: pip install pyqual[mcp][/red]")
+        console.print(
+            "[red]llx MCP modules not installed. Install: pip install pyqual[mcp][/red]"
+        )
         raise typer.Exit(1)
     _run_mcp_workflow(
         title="llx MCP fix",
@@ -129,20 +156,48 @@ def mcp_fix(
 
 @app.command("mcp-refactor")
 def mcp_refactor(
-    workdir: Path = typer.Option(Path("."), "--workdir", "-w", help="Project directory on the host."),
-    project_path: str | None = typer.Option(None, "--project-path", help="Project path as seen by the MCP service container."),
-    issues: Path = typer.Option(Path(".pyqual/errors.json"), "--issues", help="Gate-failure JSON file to summarize."),
-    output: Path = typer.Option(Path(".pyqual/llx_mcp.json"), "--output", help="Where to write the MCP run report."),
-    endpoint: str | None = typer.Option(None, "--endpoint", help="MCP SSE endpoint URL."),
-    model: str | None = typer.Option(None, "--model", help="Override the model selected by llx."),
-    file: list[str] = typer.Option([], "--file", help="Specific file to focus on (repeatable)."),
-    use_docker: bool = typer.Option(False, "--use-docker", help="Let llx's aider tool run inside Docker."),
-    docker_arg: list[str] = typer.Option([], "--docker-arg", help="Extra Docker arguments forwarded to llx's aider tool."),
-    json_output: bool = typer.Option(False, "--json", help="Print the full JSON result."),
+    workdir: Path = typer.Option(
+        Path("."), "--workdir", "-w", help="Project directory on the host."
+    ),
+    project_path: str | None = typer.Option(
+        None,
+        "--project-path",
+        help="Project path as seen by the MCP service container.",
+    ),
+    issues: Path = typer.Option(
+        Path(".pyqual/errors.json"),
+        "--issues",
+        help="Gate-failure JSON file to summarize.",
+    ),
+    output: Path = typer.Option(
+        Path(".pyqual/llx_mcp.json"),
+        "--output",
+        help="Where to write the MCP run report.",
+    ),
+    endpoint: str | None = typer.Option(
+        None, "--endpoint", help="MCP SSE endpoint URL."
+    ),
+    model: str | None = typer.Option(
+        None, "--model", help="Override the model selected by llx."
+    ),
+    file: list[str] = typer.Option(
+        [], "--file", help="Specific file to focus on (repeatable)."
+    ),
+    use_docker: bool = typer.Option(
+        False, "--use-docker", help="Let llx's aider tool run inside Docker."
+    ),
+    docker_arg: list[str] = typer.Option(
+        [], "--docker-arg", help="Extra Docker arguments forwarded to llx's aider tool."
+    ),
+    json_output: bool = typer.Option(
+        False, "--json", help="Print the full JSON result."
+    ),
 ) -> None:
     """Run the llx-backed MCP refactor workflow."""
     if run_llx_refactor_workflow is None:
-        console.print("[red]llx MCP modules not installed. Install: pip install pyqual[mcp][/red]")
+        console.print(
+            "[red]llx MCP modules not installed. Install: pip install pyqual[mcp][/red]"
+        )
         raise typer.Exit(1)
     _run_mcp_workflow(
         title="llx MCP refactor",
@@ -167,7 +222,9 @@ def mcp_service(
 ) -> None:
     """Run the persistent llx MCP service with health and metrics endpoints."""
     if run_llx_mcp_service is None:
-        console.print("[red]llx MCP modules not installed. Install: pip install pyqual[mcp][/red]")
+        console.print(
+            "[red]llx MCP modules not installed. Install: pip install pyqual[mcp][/red]"
+        )
         raise typer.Exit(1)
     try:
         run_llx_mcp_service(host=host, port=port)

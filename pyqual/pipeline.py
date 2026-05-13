@@ -59,14 +59,18 @@ log = logging.getLogger("pyqual.pipeline")
 class Pipeline:
     """Execute pipeline stages in a loop until quality gates pass."""
 
-    def __init__(self, config: PyqualConfig, workdir: str | Path = ".",
-                 on_stage_start: OnStageStart | None = None,
-                 on_iteration_start: OnIterationStart | None = None,
-                 on_stage_error: OnStageError | None = None,
-                 on_stage_done: OnStageDone | None = None,
-                 on_stage_output: OnStageOutput | None = None,
-                 stream: bool = False,
-                 on_iteration_done: OnIterationDone | None = None):
+    def __init__(
+        self,
+        config: PyqualConfig,
+        workdir: str | Path = ".",
+        on_stage_start: OnStageStart | None = None,
+        on_iteration_start: OnIterationStart | None = None,
+        on_stage_error: OnStageError | None = None,
+        on_stage_done: OnStageDone | None = None,
+        on_stage_output: OnStageOutput | None = None,
+        stream: bool = False,
+        on_iteration_done: OnIterationDone | None = None,
+    ):
         self.config = config
         self.workdir = Path(workdir).resolve()
         self.gate_set = GateSet(config.gates)
@@ -101,8 +105,10 @@ class Pipeline:
         label = "PASS" if result.final_passed else "FAIL"
         log.info(
             "pipeline=%s result=%s iterations=%d duration=%.1fs",
-            self.config.name, label,
-            result.iteration_count, result.total_duration,
+            self.config.name,
+            label,
+            result.iteration_count,
+            result.total_duration,
         )
 
     def run(self, dry_run: bool = False) -> PipelineResult:
@@ -110,14 +116,21 @@ class Pipeline:
         result = PipelineResult()
         start = time.monotonic()
 
-        self._log_event("pipeline_start",
-                        stages=len(self.config.stages),
-                        gates=len(self.config.gates),
-                        max_iterations=self.config.loop.max_iterations,
-                        dry_run=dry_run)
-        log.info("pipeline=%s stages=%d gates=%d max_iter=%d dry_run=%s",
-                 self.config.name, len(self.config.stages),
-                 len(self.config.gates), self.config.loop.max_iterations, dry_run)
+        self._log_event(
+            "pipeline_start",
+            stages=len(self.config.stages),
+            gates=len(self.config.gates),
+            max_iterations=self.config.loop.max_iterations,
+            dry_run=dry_run,
+        )
+        log.info(
+            "pipeline=%s stages=%d gates=%d max_iter=%d dry_run=%s",
+            self.config.name,
+            len(self.config.stages),
+            len(self.config.gates),
+            self.config.loop.max_iterations,
+            dry_run,
+        )
 
         self._run_loop(result, dry_run)
 
@@ -138,11 +151,17 @@ class Pipeline:
         gates_status = self.gate_set.all_passed(self.workdir)
 
         for stage_cfg in self.config.stages:
-            should_run = self._should_run_stage(stage_cfg, gates_status, iteration.stages, num)
+            should_run = self._should_run_stage(
+                stage_cfg, gates_status, iteration.stages, num
+            )
             if not should_run:
                 skipped_result = StageResult(
-                    name=stage_cfg.name, returncode=0,
-                    stdout="", stderr="", duration=0.0, skipped=True,
+                    name=stage_cfg.name,
+                    returncode=0,
+                    stdout="",
+                    stderr="",
+                    duration=0.0,
+                    skipped=True,
                 )
                 iteration.stages.append(skipped_result)
                 if self.on_stage_done:
@@ -173,7 +192,9 @@ class Pipeline:
         return False
 
     def _should_stop_after_iteration(
-        self, iteration: IterationResult, iteration_num: int,
+        self,
+        iteration: IterationResult,
+        iteration_num: int,
     ) -> bool:
         """Return True if the pipeline should stop after this iteration."""
         if iteration.all_gates_passed:
@@ -181,7 +202,8 @@ class Pipeline:
         if iteration_num > 1 and self._iteration_stagnated(iteration):
             log.info(
                 "pipeline=%s status=stagnated iteration=%d reason=fix_no_changes",
-                self.config.name, iteration_num,
+                self.config.name,
+                iteration_num,
             )
             return True
         return False
@@ -194,6 +216,7 @@ class Pipeline:
         iteration: int = 1,
     ) -> bool:
         """Determine if a stage should run based on its 'when' condition."""
+
         def _has_matching_stage(predicate: Any) -> bool:
             return bool(stages_so_far) and any(
                 predicate(s.name) and not s.skipped for s in stages_so_far
@@ -204,8 +227,9 @@ class Pipeline:
             "first_iteration": lambda: iteration == 1,
             "metrics_fail": lambda: not gates_pass,
             "metrics_pass": lambda: gates_pass,
-            "any_stage_fail": lambda: bool(stages_so_far) and any(
-                not s.passed and not s.skipped for s in stages_so_far
+            "any_stage_fail": lambda: (
+                bool(stages_so_far)
+                and any(not s.passed and not s.skipped for s in stages_so_far)
             ),
             "after_fix": lambda: _has_matching_stage(is_fix_stage_name),
             "after_verify_fix": lambda: _has_matching_stage(is_verify_stage_name),
@@ -233,7 +257,11 @@ class Pipeline:
 
         if not preset.is_available():
             if stage.optional:
-                log.info("stage=%s tool=%s status=skipped reason=not_installed", stage.name, stage.tool)
+                log.info(
+                    "stage=%s tool=%s status=skipped reason=not_installed",
+                    stage.name,
+                    stage.tool,
+                )
                 return "", True
             raise RuntimeError(
                 f"Stage '{stage.name}': tool '{stage.tool}' ({preset.binary}) "
@@ -249,7 +277,6 @@ class Pipeline:
             log.debug("stage=%s: appended --exclude %s", stage.name, exclude_str)
 
         return command, preset.allow_failure
-
 
     def _resolve_env(self) -> dict[str, str]:
         """Resolve ${VAR} references in config env values against os.environ.
@@ -280,19 +307,37 @@ class Pipeline:
             cmd_stripped = cmd_stripped.rsplit("|", 1)[-1].strip()
         binary = cmd_stripped.split()[0] if cmd_stripped else ""
         shell_builtins = {
-            "set", "export", "cd", "source", ".", "exec", "eval",
-            "true", "false", "test", "[", "[[",
+            "set",
+            "export",
+            "cd",
+            "source",
+            ".",
+            "exec",
+            "eval",
+            "true",
+            "false",
+            "test",
+            "[",
+            "[[",
         }
-        if binary and binary not in shell_builtins and "=" not in binary and not shutil.which(binary):
+        if (
+            binary
+            and binary not in shell_builtins
+            and "=" not in binary
+            and not shutil.which(binary)
+        ):
             return binary
         return None
 
     def _make_skipped_result(self, stage: StageConfig, reason: str) -> StageResult:
         """Create a skipped stage result."""
         result = StageResult(
-            name=stage.name, returncode=0,
+            name=stage.name,
+            returncode=0,
             stdout=f"[skipped] {reason}",
-            stderr="", duration=0.0, skipped=True,
+            stderr="",
+            duration=0.0,
+            skipped=True,
             tool=stage.tool,
         )
         self._log_stage(stage, result)
@@ -302,16 +347,20 @@ class Pipeline:
         """Create a dry-run stage result."""
         label = f"tool:{stage.tool}" if stage.tool else stage.run
         result = StageResult(
-            name=stage.name, returncode=0,
+            name=stage.name,
+            returncode=0,
             stdout=f"[dry-run] Would execute: {label}",
-            stderr="", duration=0.0,
-            command=command, tool=stage.tool,
+            stderr="",
+            duration=0.0,
+            command=command,
+            tool=stage.tool,
         )
         self._log_stage(stage, result)
         return result
 
     def _resolve_stage_command_and_policy(
-        self, stage: StageConfig,
+        self,
+        stage: StageConfig,
     ) -> tuple[str, bool, StageResult | None]:
         """Resolve command string and failure policy for a stage.
 
@@ -321,20 +370,31 @@ class Pipeline:
         if stage.tool:
             command, allow_failure = self._resolve_tool_stage(stage)
             if not command:
-                return "", False, self._make_skipped_result(
-                    stage, f"Tool '{stage.tool}' not found (optional)"
+                return (
+                    "",
+                    False,
+                    self._make_skipped_result(
+                        stage, f"Tool '{stage.tool}' not found (optional)"
+                    ),
                 )
             return command, allow_failure, None
         if stage.optional and stage.run:
             missing = self._check_optional_binary(stage.run)
             if missing:
-                return "", False, self._make_skipped_result(
-                    stage, f"'{missing}' not found on PATH (optional)"
+                return (
+                    "",
+                    False,
+                    self._make_skipped_result(
+                        stage, f"'{missing}' not found on PATH (optional)"
+                    ),
                 )
         return stage.run or "", False, None
 
     def _handle_stage_failure(
-        self, stage: StageConfig, result: StageResult, is_fix_stage: bool,
+        self,
+        stage: StageConfig,
+        result: StageResult,
+        is_fix_stage: bool,
     ) -> None:
         """Capture runtime errors and notify callbacks for failed stages."""
         if result.passed or result.skipped or result.original_returncode == 0:
@@ -352,7 +412,12 @@ class Pipeline:
         if dry_run:
             return self._make_dry_run_result(stage, command)
 
-        log.info("stage=%s tool=%s command=%r status=started", stage.name, stage.tool or "-", command)
+        log.info(
+            "stage=%s tool=%s command=%r status=started",
+            stage.name,
+            stage.tool or "-",
+            command,
+        )
         if self.on_stage_start:
             self.on_stage_start(stage.name)
 
@@ -369,9 +434,12 @@ class Pipeline:
         self._handle_stage_failure(stage, result, is_fix_stage)
         return result
 
-    def _notify_stage_error(self, stage: StageConfig, result: StageResult, is_fix_stage: bool) -> None:
+    def _notify_stage_error(
+        self, stage: StageConfig, result: StageResult, is_fix_stage: bool
+    ) -> None:
         """Notify callback of stage error."""
         from pyqual.validation import StageFailure
+
         failure = StageFailure(
             stage_name=stage.name,
             returncode=result.returncode,
@@ -383,57 +451,88 @@ class Pipeline:
         )
         self.on_stage_error(failure)
 
-    def _execute_captured(self, stage: StageConfig, command: str,
-                          allow_failure: bool, env: dict, start: float) -> StageResult:
+    def _execute_captured(
+        self,
+        stage: StageConfig,
+        command: str,
+        allow_failure: bool,
+        env: dict,
+        start: float,
+    ) -> StageResult:
         """Execute stage with captured output (default mode)."""
         try:
             effective_timeout = stage.timeout if stage.timeout > 0 else None
             proc = subprocess.run(
-                command, shell=True, cwd=self.workdir,
-                capture_output=stage.capture_output, text=True,
-                timeout=effective_timeout, env=env,
+                command,
+                shell=True,
+                cwd=self.workdir,
+                capture_output=stage.capture_output,
+                text=True,
+                timeout=effective_timeout,
+                env=env,
                 stdin=subprocess.DEVNULL,
             )
             raw_rc = proc.returncode
             rc = 0 if (allow_failure and raw_rc != 0) else raw_rc
             return StageResult(
-                name=stage.name, returncode=rc,
-                stdout=proc.stdout or "", stderr=proc.stderr or "",
+                name=stage.name,
+                returncode=rc,
+                stdout=proc.stdout or "",
+                stderr=proc.stderr or "",
                 duration=time.monotonic() - start,
                 original_returncode=raw_rc,
-                command=command, tool=stage.tool,
+                command=command,
+                tool=stage.tool,
             )
         except subprocess.TimeoutExpired:
             return StageResult(
-                name=stage.name, returncode=TIMEOUT_EXIT_CODE,
-                stdout="", stderr=f"Timeout after {stage.timeout}s",
+                name=stage.name,
+                returncode=TIMEOUT_EXIT_CODE,
+                stdout="",
+                stderr=f"Timeout after {stage.timeout}s",
                 duration=time.monotonic() - start,
                 original_returncode=TIMEOUT_EXIT_CODE,
-                command=command, tool=stage.tool,
+                command=command,
+                tool=stage.tool,
             )
         except Exception as e:
             return StageResult(
-                name=stage.name, returncode=1,
-                stdout="", stderr=str(e),
+                name=stage.name,
+                returncode=1,
+                stdout="",
+                stderr=str(e),
                 duration=time.monotonic() - start,
                 original_returncode=1,
-                command=command, tool=stage.tool,
+                command=command,
+                tool=stage.tool,
             )
 
-    def _execute_streaming(self, stage: StageConfig, command: str,
-                           allow_failure: bool, env: dict, start: float) -> StageResult:
+    def _execute_streaming(
+        self,
+        stage: StageConfig,
+        command: str,
+        allow_failure: bool,
+        env: dict,
+        start: float,
+    ) -> StageResult:
         """Execute stage with real-time output streaming via Popen."""
         stdout_lines: list[str] = []
         stderr_lines: list[str] = []
         effective_timeout = stage.timeout if stage.timeout > 0 else None
         try:
             proc = subprocess.Popen(
-                command, shell=True, cwd=self.workdir,
-                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                text=True, env=env, bufsize=1,
+                command,
+                shell=True,
+                cwd=self.workdir,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                env=env,
+                bufsize=1,
                 stdin=subprocess.DEVNULL,
             )
             import select
+
             readable = [proc.stdout, proc.stderr]
             while readable:
                 if effective_timeout:
@@ -443,12 +542,14 @@ class Pipeline:
                         proc.kill()
                         proc.wait()
                         return StageResult(
-                            name=stage.name, returncode=TIMEOUT_EXIT_CODE,
+                            name=stage.name,
+                            returncode=TIMEOUT_EXIT_CODE,
                             stdout="".join(stdout_lines),
                             stderr=f"Timeout after {stage.timeout}s",
                             duration=time.monotonic() - start,
                             original_returncode=TIMEOUT_EXIT_CODE,
-                            command=command, tool=stage.tool,
+                            command=command,
+                            tool=stage.tool,
                         )
                 else:
                     remaining = 1.0
@@ -470,19 +571,25 @@ class Pipeline:
             raw_rc = proc.returncode
             rc = 0 if (allow_failure and raw_rc != 0) else raw_rc
             return StageResult(
-                name=stage.name, returncode=rc,
-                stdout="".join(stdout_lines), stderr="".join(stderr_lines),
+                name=stage.name,
+                returncode=rc,
+                stdout="".join(stdout_lines),
+                stderr="".join(stderr_lines),
                 duration=time.monotonic() - start,
                 original_returncode=raw_rc,
-                command=command, tool=stage.tool,
+                command=command,
+                tool=stage.tool,
             )
         except Exception as e:
             return StageResult(
-                name=stage.name, returncode=1,
-                stdout="".join(stdout_lines), stderr=str(e),
+                name=stage.name,
+                returncode=1,
+                stdout="".join(stdout_lines),
+                stderr=str(e),
                 duration=time.monotonic() - start,
                 original_returncode=1,
-                command=command, tool=stage.tool,
+                command=command,
+                tool=stage.tool,
             )
 
     # ------------------------------------------------------------------
@@ -496,8 +603,13 @@ class Pipeline:
         nfo = NfoLogger(name="pyqual.pipeline", sinks=[sink], propagate_stdlib=False)
         return nfo
 
-    def _nfo_emit(self, event: str, level: str, kwargs: dict[str, Any],
-                  duration_ms: float | None = None) -> None:
+    def _nfo_emit(
+        self,
+        event: str,
+        level: str,
+        kwargs: dict[str, Any],
+        duration_ms: float | None = None,
+    ) -> None:
         """Emit a structured log entry via nfo."""
         entry = LogEntry(
             timestamp=LogEntry.now(),
@@ -550,13 +662,22 @@ class Pipeline:
             kwargs["stdout_tail"] = result.stdout[-STDOUT_TAIL_CHARS:]
 
         level_str = "INFO" if result.passed else "WARNING"
-        log.log(logging.INFO if result.passed else logging.WARNING,
-                "stage=%s rc=%d original_rc=%d passed=%s duration=%.1fs",
-                stage.name, result.returncode, result.original_returncode,
-                result.passed, result.duration)
+        log.log(
+            logging.INFO if result.passed else logging.WARNING,
+            "stage=%s rc=%d original_rc=%d passed=%s duration=%.1fs",
+            stage.name,
+            result.returncode,
+            result.original_returncode,
+            result.passed,
+            result.duration,
+        )
 
-        self._nfo_emit("stage_done", level_str, kwargs,
-                       duration_ms=round(result.duration * 1000, 1))
+        self._nfo_emit(
+            "stage_done",
+            level_str,
+            kwargs,
+            duration_ms=round(result.duration * 1000, 1),
+        )
 
         if is_fix and not result.skipped:
             self._archive_llx_report(stage, result)
@@ -635,7 +756,7 @@ class Pipeline:
         """Capture runtime error details to .pyqual/runtime_errors.json."""
         errors_path = self.workdir / RUNTIME_ERRORS_FILE
         errors_list: list[dict[str, Any]] = []
-        
+
         # Load existing errors
         if errors_path.exists():
             try:
@@ -644,7 +765,7 @@ class Pipeline:
                     errors_list = []
             except (_json.JSONDecodeError, OSError):
                 errors_list = []
-        
+
         # Create error entry
         error_entry = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -658,24 +779,30 @@ class Pipeline:
             "stdout_tail": result.stdout[-CONSTANT_500:] if result.stdout else "",
             "stderr_tail": result.stderr[-CONSTANT_500:] if result.stderr else "",
         }
-        
+
         errors_list.append(error_entry)
-        
+
         # Keep only last 100 errors to avoid file bloat
         if len(errors_list) > 100:
             errors_list = errors_list[-100:]
-        
+
         try:
-            errors_path.write_text(_json.dumps(errors_list, indent=2, ensure_ascii=False))
-            log.info("runtime_errors: captured error from stage '%s' in %s", stage.name, errors_path)
+            errors_path.write_text(
+                _json.dumps(errors_list, indent=2, ensure_ascii=False)
+            )
+            log.info(
+                "runtime_errors: captured error from stage '%s' in %s",
+                stage.name,
+                errors_path,
+            )
         except OSError as exc:
             log.warning("runtime_errors: failed to write to %s: %s", errors_path, exc)
-    
+
     def _classify_error(self, result: StageResult) -> str:
         """Classify the type of runtime error based on return code and stderr."""
         rc = result.original_returncode
         stderr = (result.stderr or "").lower()
-        
+
         # Return code classification
         rc_error_map = {
             TIMEOUT_EXIT_CODE: "timeout",
@@ -688,7 +815,7 @@ class Pipeline:
             return rc_error_map[rc]
         if CONSTANT_128 <= rc <= CONSTANT_129:
             return "signal"
-        
+
         # Stderr pattern classification
         stderr_patterns = [
             ("importerror", "import_error"),
@@ -703,9 +830,9 @@ class Pipeline:
         for pattern, error_type in stderr_patterns:
             if pattern in stderr:
                 return error_type
-        
+
         return "unknown"
-    
+
     def _extract_error_message(self, result: StageResult) -> str:
         """Extract the most relevant error message from stderr/stdout."""
         # Prefer stderr for error messages
@@ -714,10 +841,19 @@ class Pipeline:
             # Look for common error patterns
             for i, line in enumerate(lines):
                 line_lower = line.lower()
-                if any(pattern in line_lower for pattern in [
-                    "error:", "exception:", "failed:", "traceback",
-                    "file ","line ","in ","traceback (most recent call last)",
-                ]):
+                if any(
+                    pattern in line_lower
+                    for pattern in [
+                        "error:",
+                        "exception:",
+                        "failed:",
+                        "traceback",
+                        "file ",
+                        "line ",
+                        "in ",
+                        "traceback (most recent call last)",
+                    ]
+                ):
                     # Return the line and maybe the next one for context
                     if i + 1 < len(lines) and lines[i + 1].strip():
                         return f"{line.strip()}\n{lines[i + 1].strip()}"
@@ -726,12 +862,12 @@ class Pipeline:
             for line in reversed(lines):
                 if line.strip():
                     return line.strip()
-        
+
         # Fallback to stdout if stderr is empty
         if result.stdout:
             lines = result.stdout.strip().split("\n")
             for line in reversed(lines):
                 if line.strip():
                     return line.strip()
-        
+
         return f"Command exited with code {result.original_returncode}"

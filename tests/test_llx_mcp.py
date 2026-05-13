@@ -8,10 +8,8 @@ import httpx
 import pytest
 from typer.testing import CliRunner
 
-import pyqual.cli as cli_module
 import pyqual.cli.cmd_mcp as cmd_mcp_module
 import llx.mcp.workflows as llx_workflows_module
-import pyqual.integrations.llx_mcp as llx_module
 from pyqual.cli import app
 from pyqual.integrations.llx_mcp import _load_issue_source
 from pyqual.integrations.llx_mcp import build_fix_prompt
@@ -92,7 +90,9 @@ def test_llx_mcp_plugin_config_example_contains_stage() -> None:
     assert "llx_fix_success_min" in snippet
 
 
-def test_run_llx_fix_workflow_uses_todo_md_fallback(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_run_llx_fix_workflow_uses_todo_md_fallback(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     todo_path = tmp_path / "TODO.md"
     todo_path.write_text(
         """# TODO
@@ -107,7 +107,12 @@ def test_run_llx_fix_workflow_uses_todo_md_fallback(tmp_path: Path, monkeypatch:
         def __init__(self, endpoint_url: str | None = None):
             self.endpoint_url = endpoint_url or "http://localhost:8000/sse"
 
-        async def analyze(self, project_path: str, toon_dir: str | None = None, task: str = "quick_fix") -> dict[str, object]:
+        async def analyze(
+            self,
+            project_path: str,
+            toon_dir: str | None = None,
+            task: str = "quick_fix",
+        ) -> dict[str, object]:
             captured["task"] = task
             return {
                 "tool": "llx_analyze",
@@ -180,7 +185,9 @@ def test_run_llx_fix_workflow_uses_todo_md_fallback(tmp_path: Path, monkeypatch:
     assert output_path.exists()
 
 
-def test_run_llx_refactor_workflow_uses_refactor_prompt(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_run_llx_refactor_workflow_uses_refactor_prompt(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     output_path = tmp_path / ".pyqual" / "llx_mcp.json"
     captured: dict[str, object] = {}
 
@@ -188,7 +195,12 @@ def test_run_llx_refactor_workflow_uses_refactor_prompt(tmp_path: Path, monkeypa
         def __init__(self, endpoint_url: str | None = None):
             self.endpoint_url = endpoint_url or "http://localhost:8000/sse"
 
-        async def analyze(self, project_path: str, toon_dir: str | None = None, task: str = "quick_fix") -> dict[str, object]:
+        async def analyze(
+            self,
+            project_path: str,
+            toon_dir: str | None = None,
+            task: str = "quick_fix",
+        ) -> dict[str, object]:
             captured["task"] = task
             return {
                 "tool": "llx_analyze",
@@ -251,7 +263,9 @@ def test_run_llx_refactor_workflow_uses_refactor_prompt(tmp_path: Path, monkeypa
     assert output_path.exists()
 
 
-def test_mcp_fix_cli_invokes_workflow(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_mcp_fix_cli_invokes_workflow(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     output_path = tmp_path / ".pyqual" / "llx_mcp.json"
     captured: dict[str, object] = {}
 
@@ -272,7 +286,9 @@ def test_mcp_fix_cli_invokes_workflow(tmp_path: Path, monkeypatch: pytest.Monkey
             model="claude-sonnet-4",
         )
 
-    monkeypatch.setattr(cmd_mcp_module, "run_llx_fix_workflow", fake_run_llx_fix_workflow)
+    monkeypatch.setattr(
+        cmd_mcp_module, "run_llx_fix_workflow", fake_run_llx_fix_workflow
+    )
 
     runner = CliRunner()
     result = runner.invoke(
@@ -297,7 +313,9 @@ def test_mcp_fix_cli_invokes_workflow(tmp_path: Path, monkeypatch: pytest.Monkey
     assert '"tool_calls": 2' in result.output
 
 
-def test_mcp_refactor_cli_invokes_workflow(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_mcp_refactor_cli_invokes_workflow(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     output_path = tmp_path / ".pyqual" / "llx_mcp.json"
     captured: dict[str, object] = {}
 
@@ -318,7 +336,9 @@ def test_mcp_refactor_cli_invokes_workflow(tmp_path: Path, monkeypatch: pytest.M
             model="claude-sonnet-4",
         )
 
-    monkeypatch.setattr(cmd_mcp_module, "run_llx_refactor_workflow", fake_run_llx_refactor_workflow)
+    monkeypatch.setattr(
+        cmd_mcp_module, "run_llx_refactor_workflow", fake_run_llx_refactor_workflow
+    )
 
     runner = CliRunner()
     result = runner.invoke(
@@ -359,7 +379,9 @@ def test_mcp_service_cli_shows_friendly_error(monkeypatch: pytest.MonkeyPatch) -
 @pytest.mark.anyio
 async def test_persistent_mcp_service_exposes_health_and_metrics() -> None:
     class FakeServer:
-        async def run(self, _read_stream: object, _write_stream: object, _options: object) -> None:
+        async def run(
+            self, _read_stream: object, _write_stream: object, _options: object
+        ) -> None:
             return None
 
         def create_initialization_options(self) -> object:
@@ -368,7 +390,9 @@ async def test_persistent_mcp_service_exposes_health_and_metrics() -> None:
     app = create_app(state=McpServiceState(), llx_server=FakeServer())
     transport = httpx.ASGITransport(app=app)
 
-    async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+    async with httpx.AsyncClient(
+        transport=transport, base_url="http://testserver"
+    ) as client:
         health_response = await client.get("/health")
         assert health_response.status_code == 200
         health = health_response.json()
@@ -388,7 +412,14 @@ async def test_persistent_mcp_service_exposes_health_and_metrics() -> None:
 def test_build_fix_prompt_uses_issue_summary() -> None:
     prompt = build_fix_prompt(
         Path("/workspace/project"),
-        [{"file": "app.py", "line": 12, "severity": "high", "message": "Missing type hint"}],
+        [
+            {
+                "file": "app.py",
+                "line": 12,
+                "severity": "high",
+                "message": "Missing type hint",
+            }
+        ],
         {"selection": {"tier": "balanced", "model_id": "claude-sonnet-4"}},
     )
 

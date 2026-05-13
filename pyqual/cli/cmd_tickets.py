@@ -1,5 +1,4 @@
-"""Tickets subcommands.
-"""
+"""Tickets subcommands."""
 
 from __future__ import annotations
 
@@ -21,30 +20,49 @@ if TYPE_CHECKING:
 
 @tickets_app.command("sync")
 def tickets_sync(
-    workdir: Path = typer.Option(Path("."), "--workdir", "-w", help="Repository root containing pyqual.yaml."),
-    from_gates: bool = typer.Option(False, "--from-gates", help="Only sync if gates fail (checks pyqual.yaml gates first)."),
-    backends: str = typer.Option("markdown", "--backends", "-b", help="Comma-separated backends: markdown,github,all"),
-    dry_run: bool = typer.Option(False, "--dry-run", "-n", help="Preview without making changes."),
+    workdir: Path = typer.Option(
+        Path("."), "--workdir", "-w", help="Repository root containing pyqual.yaml."
+    ),
+    from_gates: bool = typer.Option(
+        False,
+        "--from-gates",
+        help="Only sync if gates fail (checks pyqual.yaml gates first).",
+    ),
+    backends: str = typer.Option(
+        "markdown",
+        "--backends",
+        "-b",
+        help="Comma-separated backends: markdown,github,all",
+    ),
+    dry_run: bool = typer.Option(
+        False, "--dry-run", "-n", help="Preview without making changes."
+    ),
 ) -> None:
     """Sync tickets from gate failures or explicitly.
-    
+
     Examples:
         pyqual tickets sync --from-gates              # Check gates, sync if fail
         pyqual tickets sync --from-gates --backends markdown,github
         pyqual tickets sync --from-gates --dry-run    # Preview only
     """
     from pyqual.tickets import sync_from_gates
-    
+
     if from_gates:
         backend_list = [b.strip() for b in backends.split(",")]
         try:
-            result = sync_from_gates(workdir=workdir, dry_run=dry_run, backends=backend_list)
+            result = sync_from_gates(
+                workdir=workdir, dry_run=dry_run, backends=backend_list
+            )
             if result["all_passed"]:
                 console.print("[green]✅ All gates passed — no tickets needed.[/green]")
             else:
-                console.print(f"[yellow]❌ {len(result['failures'])} gate(s) failed: {', '.join(result['failures'])}[/yellow]")
+                console.print(
+                    f"[yellow]❌ {len(result['failures'])} gate(s) failed: {', '.join(result['failures'])}[/yellow]"
+                )
                 if result["synced"]:
-                    console.print(f"[green]✅ Tickets synced to: {', '.join(result['backends'])}[/green]")
+                    console.print(
+                        f"[green]✅ Tickets synced to: {', '.join(result['backends'])}[/green]"
+                    )
                 else:
                     console.print("[dim]Dry run — no changes made.[/dim]")
         except FileNotFoundError as e:
@@ -54,7 +72,9 @@ def tickets_sync(
             console.print(f"[red]{exc}[/red]")
             raise typer.Exit(1)
     else:
-        console.print("[yellow]Use --from-gates to sync based on gate failures, or use:[/yellow]")
+        console.print(
+            "[yellow]Use --from-gates to sync based on gate failures, or use:[/yellow]"
+        )
         console.print("  pyqual tickets todo       # Sync TODO.md")
         console.print("  pyqual tickets github       # Sync GitHub Issues")
         console.print("  pyqual tickets all          # Sync all backends")
@@ -62,9 +82,18 @@ def tickets_sync(
 
 @tickets_app.command("todo")
 def tickets_todo(
-    workdir: Path = typer.Option(Path("."), "--workdir", "-w", help="Repository root containing TODO.md and .planfile/."),
-    dry_run: bool = typer.Option(False, "--dry-run", help="Show what would be synced without changing files."),
-    direction: str = typer.Option("both", "--direction", help="Sync direction: from, to, or both."),
+    workdir: Path = typer.Option(
+        Path("."),
+        "--workdir",
+        "-w",
+        help="Repository root containing TODO.md and .planfile/.",
+    ),
+    dry_run: bool = typer.Option(
+        False, "--dry-run", help="Show what would be synced without changing files."
+    ),
+    direction: str = typer.Option(
+        "both", "--direction", help="Sync direction: from, to, or both."
+    ),
 ) -> None:
     """Sync TODO.md tickets using planfile's markdown backend."""
     try:
@@ -76,9 +105,18 @@ def tickets_todo(
 
 @tickets_app.command("github")
 def tickets_github(
-    workdir: Path = typer.Option(Path("."), "--workdir", "-w", help="Repository root containing .planfile/ and GitHub sync config."),
-    dry_run: bool = typer.Option(False, "--dry-run", help="Show what would be synced without changing files."),
-    direction: str = typer.Option("both", "--direction", help="Sync direction: from, to, or both."),
+    workdir: Path = typer.Option(
+        Path("."),
+        "--workdir",
+        "-w",
+        help="Repository root containing .planfile/ and GitHub sync config.",
+    ),
+    dry_run: bool = typer.Option(
+        False, "--dry-run", help="Show what would be synced without changing files."
+    ),
+    direction: str = typer.Option(
+        "both", "--direction", help="Sync direction: from, to, or both."
+    ),
 ) -> None:
     """Sync GitHub Issues using planfile's GitHub backend."""
     try:
@@ -90,9 +128,18 @@ def tickets_github(
 
 @tickets_app.command("all")
 def tickets_all(
-    workdir: Path = typer.Option(Path("."), "--workdir", "-w", help="Repository root containing TODO.md and .planfile/."),
-    dry_run: bool = typer.Option(False, "--dry-run", help="Show what would be synced without changing files."),
-    direction: str = typer.Option("both", "--direction", help="Sync direction: from, to, or both."),
+    workdir: Path = typer.Option(
+        Path("."),
+        "--workdir",
+        "-w",
+        help="Repository root containing TODO.md and .planfile/.",
+    ),
+    dry_run: bool = typer.Option(
+        False, "--dry-run", help="Show what would be synced without changing files."
+    ),
+    direction: str = typer.Option(
+        "both", "--direction", help="Sync direction: from, to, or both."
+    ),
 ) -> None:
     """Sync TODO.md and GitHub tickets using planfile."""
     try:
@@ -104,39 +151,53 @@ def tickets_all(
 
 @tickets_app.command("fetch")
 def tickets_fetch(
-    label: str | None = typer.Option(None, "--label", "-l", help="Filter by label (e.g. 'pyqual-fix')"),
-    state: str = typer.Option("open", "--state", "-s", help="Issue state: open, closed, all"),
+    label: str | None = typer.Option(
+        None, "--label", "-l", help="Filter by label (e.g. 'pyqual-fix')"
+    ),
+    state: str = typer.Option(
+        "open", "--state", "-s", help="Issue state: open, closed, all"
+    ),
     output: Path = typer.Option(None, "--output", "-o", help="Output JSON file"),
-    todo_output: Path = typer.Option(None, "--todo-output", "-t", help="Append to TODO.md"),
-    append: bool = typer.Option(False, "--append", "-a", help="Append to TODO.md instead of overwrite"),
+    todo_output: Path = typer.Option(
+        None, "--todo-output", "-t", help="Append to TODO.md"
+    ),
+    append: bool = typer.Option(
+        False, "--append", "-a", help="Append to TODO.md instead of overwrite"
+    ),
 ) -> None:
     """Fetch GitHub issues/PRs as tasks.
-    
+
     Examples:
         pyqual tickets fetch --label pyqual-fix
         pyqual tickets fetch --label bug --output tasks.json
         pyqual tickets fetch --todo-output TODO.md --append
     """
-    from pyqual.github_tasks import fetch_github_tasks, save_tasks_to_json, save_tasks_to_todo
-    
+    from pyqual.github_tasks import (
+        fetch_github_tasks,
+        save_tasks_to_json,
+        save_tasks_to_todo,
+    )
+
     tasks = fetch_github_tasks(
         label=label,
         state=state,
         include_prs=True,
         include_issues=True,
     )
-    
+
     if not tasks:
         console.print("[yellow]No tasks found matching criteria[/yellow]")
         raise typer.Exit(0)
-    
+
     console.print(f"[bold]Found {len(tasks)} tasks[/bold]")
     for t in tasks:
-        console.print(f"  - #{t.number}: {t.title[:50]}{'...' if len(t.title) > 50 else ''}")
-    
+        console.print(
+            f"  - #{t.number}: {t.title[:50]}{'...' if len(t.title) > 50 else ''}"
+        )
+
     if output:
         save_tasks_to_json(tasks, output)
-    
+
     if todo_output:
         save_tasks_to_todo(tasks, todo_output, append=append)
 
@@ -148,22 +209,22 @@ def tickets_comment(
     is_pr: bool = typer.Option(False, "--pr", help="Comment on PR instead of issue"),
 ) -> None:
     """Post a comment on a GitHub issue or PR.
-    
+
     Examples:
         pyqual tickets comment 123 "Fix applied successfully"
         pyqual tickets comment 456 "Failed due to timeout" --pr
     """
     from pyqual.github_actions import GitHubActionsReporter
-    
+
     reporter = GitHubActionsReporter()
-    
+
     if is_pr:
         success = reporter.post_pr_comment(message, issue_number)
     else:
         success = reporter.post_issue_comment(message, issue_number)
-    
+
     if success:
         console.print(f"[green]✅ Comment posted to #{issue_number}[/green]")
     else:
-        console.print(f"[red]❌ Failed to post comment[/red]")
+        console.print("[red]❌ Failed to post comment[/red]")
         raise typer.Exit(1)

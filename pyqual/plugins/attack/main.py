@@ -9,7 +9,6 @@ This plugin provides automatic merge capabilities with an "attack" strategy:
 from __future__ import annotations
 
 import json
-import re
 import subprocess
 from pathlib import Path
 from typing import Any
@@ -68,18 +67,28 @@ stages:
 
         return result
 
-    def _collect_check_metrics(self, result: dict[str, float], data: dict[str, Any]) -> None:
+    def _collect_check_metrics(
+        self, result: dict[str, float], data: dict[str, Any]
+    ) -> None:
         """Extract metrics from attack check results."""
         result["attack_conflicts_detected"] = float(data.get("conflicts_detected", 0))
         result["attack_branches_behind"] = float(data.get("branches_behind", 0))
-        result["attack_can_fast_forward"] = 1.0 if data.get("can_fast_forward", False) else 0.0
+        result["attack_can_fast_forward"] = (
+            1.0 if data.get("can_fast_forward", False) else 0.0
+        )
         result["attack_check_success"] = 1.0 if data.get("success", False) else 0.0
 
-    def _collect_merge_metrics(self, result: dict[str, float], data: dict[str, Any]) -> None:
+    def _collect_merge_metrics(
+        self, result: dict[str, float], data: dict[str, Any]
+    ) -> None:
         """Extract metrics from attack merge results."""
         result["attack_merge_success"] = 1.0 if data.get("success", False) else 0.0
-        result["attack_merge_conflicts_resolved"] = float(data.get("conflicts_resolved", 0))
-        result["attack_merge_strategy_used"] = float(self._strategy_to_int(data.get("strategy", "none")))
+        result["attack_merge_conflicts_resolved"] = float(
+            data.get("conflicts_resolved", 0)
+        )
+        result["attack_merge_strategy_used"] = float(
+            self._strategy_to_int(data.get("strategy", "none"))
+        )
         result["attack_merge_files_changed"] = float(data.get("files_changed", 0))
 
     @staticmethod
@@ -239,7 +248,9 @@ def attack_merge(
         )
         if merge_check.returncode == 0:
             result["conflicts_resolved"] = merge_check.stdout.count("<<<<<<<")
-            result["files_changed"] = len([l for l in merge_check.stdout.split("\n") if l.startswith("changed")])
+            result["files_changed"] = len(
+                [l for l in merge_check.stdout.split("\n") if l.startswith("changed")]
+            )
             result["success"] = True
         return result
 
@@ -254,7 +265,8 @@ def _merge_theirs(result: dict, cwd: "Path | None") -> None:
     run_git_command(["stash", "push", "-m", "attack_merge_stash"], cwd=cwd)
 
     merge_result = run_git_command(
-        ["merge", "origin/main", "--no-commit", "--no-ff"], cwd=cwd,
+        ["merge", "origin/main", "--no-commit", "--no-ff"],
+        cwd=cwd,
     )
     if merge_result.returncode != 0:
         run_git_command(["checkout", "--theirs", "."], cwd=cwd)
@@ -273,7 +285,9 @@ def _merge_theirs(result: dict, cwd: "Path | None") -> None:
     if commit_result.returncode == 0:
         result["success"] = True
         diff_result = run_git_command(["diff", "HEAD~1", "--name-only"], cwd=cwd)
-        result["files_changed"] = len([l for l in diff_result.stdout.split("\n") if l.strip()])
+        result["files_changed"] = len(
+            [l for l in diff_result.stdout.split("\n") if l.strip()]
+        )
 
 
 def auto_merge_pr(

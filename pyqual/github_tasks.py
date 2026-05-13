@@ -19,19 +19,21 @@ def fetch_github_tasks(
     """Fetch tasks from GitHub issues and PRs."""
     reporter = GitHubActionsReporter()
     tasks = []
-    
+
     if include_issues:
         issues = reporter.fetch_issues(state=state, labels=label)
         tasks.extend(issues)
-    
+
     if include_prs:
         prs = reporter.fetch_pull_requests(state=state)
         tasks.extend(prs)
-    
+
     return tasks
 
 
-def save_tasks_to_todo(tasks: list[GitHubTask], todo_path: Path, append: bool = True) -> None:
+def save_tasks_to_todo(
+    tasks: list[GitHubTask], todo_path: Path, append: bool = True
+) -> None:
     """Save tasks to TODO.md file."""
     mode = "a" if append else "w"
 
@@ -49,16 +51,18 @@ def save_tasks_to_json(tasks: list[GitHubTask], json_path: Path) -> None:
 
     tasks_data = []
     for task in tasks:
-        tasks_data.append({
-            "number": task.number,
-            "title": task.title,
-            "body": task.body,
-            "state": task.state,
-            "html_url": task.html_url,
-            "labels": task.labels,
-            "assignees": task.assignees,
-            "source": task.source,
-        })
+        tasks_data.append(
+            {
+                "number": task.number,
+                "title": task.title,
+                "body": task.body,
+                "state": task.state,
+                "html_url": task.html_url,
+                "labels": task.labels,
+                "assignees": task.assignees,
+                "source": task.source,
+            }
+        )
 
     with json_path.open("w") as f:
         json.dump(tasks_data, f, indent=2)

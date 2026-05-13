@@ -41,12 +41,12 @@ stages:
     def collect(self, workdir: Path) -> dict[str, float]:
         """Collect lint metrics from various linter outputs."""
         result: dict[str, float] = {}
-        
+
         self._collect_ruff(workdir, result)
         self._collect_mypy(workdir, result)
         self._collect_pylint(workdir, result)
         self._collect_flake8(workdir, result)
-        
+
         return result
 
     def _collect_ruff(self, workdir: Path, result: dict[str, float]) -> None:
@@ -55,15 +55,23 @@ stages:
         if not p.exists():
             result["ruff_errors"] = 0.0
             return
-            
+
         try:
             data = json.loads(p.read_text())
             if isinstance(data, list):
                 errors = len(data)
-                fatal = sum(1 for e in data if e.get("severity") == "fatal" 
-                           or str(e.get("code", "")).startswith("E"))
-                warning = sum(1 for e in data if e.get("severity") == "warning"
-                             or str(e.get("code", "")).startswith("W"))
+                fatal = sum(
+                    1
+                    for e in data
+                    if e.get("severity") == "fatal"
+                    or str(e.get("code", "")).startswith("E")
+                )
+                warning = sum(
+                    1
+                    for e in data
+                    if e.get("severity") == "warning"
+                    or str(e.get("code", "")).startswith("W")
+                )
                 result["ruff_errors"] = float(errors)
                 result["ruff_fatal"] = float(fatal)
                 result["ruff_warnings"] = float(warning)
@@ -79,7 +87,7 @@ stages:
         if not p.exists():
             result["mypy_errors"] = 0.0
             return
-            
+
         try:
             data = json.loads(p.read_text())
             if isinstance(data, list):
@@ -97,22 +105,30 @@ stages:
         p = workdir / ".pyqual" / "pylint.json"
         if not p.exists():
             return
-            
+
         try:
             data = json.loads(p.read_text())
         except (json.JSONDecodeError, TypeError):
             return
-            
+
         if isinstance(data, list):
             result["pylint_errors"] = float(len(data))
-            result["pylint_fatal"] = float(sum(
-                1 for m in data 
-                if m.get("type") == "fatal" or str(m.get("symbol", "")).startswith("F")
-            ))
-            result["pylint_warnings"] = float(sum(
-                1 for m in data 
-                if m.get("type") == "warning" or str(m.get("symbol", "")).startswith("W")
-            ))
+            result["pylint_fatal"] = float(
+                sum(
+                    1
+                    for m in data
+                    if m.get("type") == "fatal"
+                    or str(m.get("symbol", "")).startswith("F")
+                )
+            )
+            result["pylint_warnings"] = float(
+                sum(
+                    1
+                    for m in data
+                    if m.get("type") == "warning"
+                    or str(m.get("symbol", "")).startswith("W")
+                )
+            )
         elif isinstance(data, dict):
             score = data.get("score") or data.get("rating")
             if score is not None:
@@ -125,13 +141,17 @@ stages:
         p = workdir / ".pyqual" / "flake8.json"
         if not p.exists():
             return
-            
+
         try:
             data = json.loads(p.read_text())
             if isinstance(data, list):
                 violations = len(data)
-                errors = sum(1 for v in data if str(v.get("code", "")).startswith(("E", "F")))
-                warnings = sum(1 for v in data if str(v.get("code", "")).startswith(("W",)))
+                errors = sum(
+                    1 for v in data if str(v.get("code", "")).startswith(("E", "F"))
+                )
+                warnings = sum(
+                    1 for v in data if str(v.get("code", "")).startswith(("W",))
+                )
                 result["flake8_violations"] = float(violations)
                 result["flake8_errors"] = float(errors)
                 result["flake8_warnings"] = float(warnings)
@@ -147,14 +167,14 @@ def lint_summary(workdir: Path | None = None) -> dict[str, Any]:
     workdir = workdir or Path.cwd()
     collector = LintCollector()
     metrics = collector.collect(workdir)
-    
+
     total_errors = (
         metrics.get("ruff_errors", 0)
         + metrics.get("pylint_errors", 0)
         + metrics.get("flake8_violations", 0)
         + metrics.get("mypy_errors", 0)
     )
-    
+
     return {
         "success": True,
         "metrics": metrics,

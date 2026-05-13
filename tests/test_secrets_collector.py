@@ -3,7 +3,6 @@
 import json
 from pathlib import Path
 
-import pytest
 
 from pyqual._gate_collectors import _from_secrets
 

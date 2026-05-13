@@ -46,17 +46,62 @@ __all__ = [
 
 def build_parser() -> argparse.ArgumentParser:
     """Build the CLI parser for the llx MCP helper."""
-    parser = argparse.ArgumentParser(description="Run the llx-backed MCP fix/refactor workflow.")
-    parser.add_argument("--workdir", default=os.getenv("PYQUAL_LLX_PROJECT_ROOT", "."), help="Project working directory.")
-    parser.add_argument("--project-path", default=os.getenv("PYQUAL_LLX_PROJECT_PATH"), help="Project path as seen by the MCP service container.")
-    parser.add_argument("--issues", default=DEFAULT_ISSUES_PATH, help="Path to gate failure JSON.")
-    parser.add_argument("--output", default=DEFAULT_OUTPUT_PATH, help="Where to write the MCP run report.")
-    parser.add_argument("--endpoint", default=os.getenv("PYQUAL_LLX_MCP_URL", DEFAULT_ENDPOINT), help="MCP SSE endpoint.")
-    parser.add_argument("--model", default=None, help="Override the model selected by llx.")
-    parser.add_argument("--file", dest="files", action="append", default=[], help="Specific file to focus on (repeatable).")
-    parser.add_argument("--use-docker", action="store_true", default=os.getenv("PYQUAL_LLX_USE_DOCKER", "false").lower() in {"1", "true", "yes"}, help="Let llx's aider tool run inside Docker.")
-    parser.add_argument("--docker-arg", dest="docker_args", action="append", default=[], help="Extra Docker arguments forwarded to llx's aider tool.")
-    parser.add_argument("--task", default="quick_fix", choices=["refactor", "explain", "quick_fix", "review"], help="Analysis task hint.")
+    parser = argparse.ArgumentParser(
+        description="Run the llx-backed MCP fix/refactor workflow."
+    )
+    parser.add_argument(
+        "--workdir",
+        default=os.getenv("PYQUAL_LLX_PROJECT_ROOT", "."),
+        help="Project working directory.",
+    )
+    parser.add_argument(
+        "--project-path",
+        default=os.getenv("PYQUAL_LLX_PROJECT_PATH"),
+        help="Project path as seen by the MCP service container.",
+    )
+    parser.add_argument(
+        "--issues", default=DEFAULT_ISSUES_PATH, help="Path to gate failure JSON."
+    )
+    parser.add_argument(
+        "--output",
+        default=DEFAULT_OUTPUT_PATH,
+        help="Where to write the MCP run report.",
+    )
+    parser.add_argument(
+        "--endpoint",
+        default=os.getenv("PYQUAL_LLX_MCP_URL", DEFAULT_ENDPOINT),
+        help="MCP SSE endpoint.",
+    )
+    parser.add_argument(
+        "--model", default=None, help="Override the model selected by llx."
+    )
+    parser.add_argument(
+        "--file",
+        dest="files",
+        action="append",
+        default=[],
+        help="Specific file to focus on (repeatable).",
+    )
+    parser.add_argument(
+        "--use-docker",
+        action="store_true",
+        default=os.getenv("PYQUAL_LLX_USE_DOCKER", "false").lower()
+        in {"1", "true", "yes"},
+        help="Let llx's aider tool run inside Docker.",
+    )
+    parser.add_argument(
+        "--docker-arg",
+        dest="docker_args",
+        action="append",
+        default=[],
+        help="Extra Docker arguments forwarded to llx's aider tool.",
+    )
+    parser.add_argument(
+        "--task",
+        default="quick_fix",
+        choices=["refactor", "explain", "quick_fix", "review"],
+        help="Analysis task hint.",
+    )
     return parser
 
 

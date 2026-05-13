@@ -29,19 +29,27 @@ __all__ = [
 ]
 
 
-def create_app(state: McpServiceState | None = None, llx_server: Any | None = None) -> Any:
+def create_app(
+    state: McpServiceState | None = None, llx_server: Any | None = None
+) -> Any:
     """Create an ASGI app — delegates to ``llx.mcp.service.create_service_app``."""
     return create_service_app(state=state, llx_server=llx_server)
 
 
-def run_server(host: str = "0.0.0.0", port: int = DEFAULT_MCP_PORT, state: McpServiceState | None = None) -> None:
+def run_server(
+    host: str = "0.0.0.0",
+    port: int = DEFAULT_MCP_PORT,
+    state: McpServiceState | None = None,
+) -> None:
     """Run the persistent MCP service with uvicorn."""
     _llx_run_service(host=host, port=port, state=state)
 
 
 def build_parser() -> argparse.ArgumentParser:
     """Build the CLI parser for the MCP service."""
-    parser = argparse.ArgumentParser(description="Run llx MCP as a persistent SSE service for pyqual.")
+    parser = argparse.ArgumentParser(
+        description="Run llx MCP as a persistent SSE service for pyqual."
+    )
     parser.add_argument(
         "--host",
         default=os.getenv("PYQUAL_LLX_MCP_HOST", "0.0.0.0"),

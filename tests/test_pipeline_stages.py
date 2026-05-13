@@ -17,8 +17,12 @@ from pyqual.pipeline_results import IterationResult
 
 def _stage(name: str, skipped: bool = False, passed: bool = True) -> StageResult:
     return StageResult(
-        name=name, returncode=0 if passed else 1,
-        stdout="", stderr="", duration=0.1, skipped=skipped,
+        name=name,
+        returncode=0 if passed else 1,
+        stdout="",
+        stderr="",
+        duration=0.1,
+        skipped=skipped,
     )
 
 
@@ -26,10 +30,9 @@ def _stage(name: str, skipped: bool = False, passed: bool = True) -> StageResult
 def pipeline(tmp_path: Path) -> Pipeline:
     """Create a Pipeline with minimal config for testing _should_run_stage."""
     cfg_file = tmp_path / "pyqual.yaml"
-    cfg_file.write_text(
-        "pipeline:\n  name: test\n  stages: []\n  metrics: {}\n"
-    )
+    cfg_file.write_text("pipeline:\n  name: test\n  stages: []\n  metrics: {}\n")
     from pyqual.config import PyqualConfig
+
     cfg = PyqualConfig.load(str(cfg_file))
     return Pipeline(cfg, workdir=tmp_path)
 
@@ -40,38 +43,61 @@ class TestAfterFix:
     def test_exact_name_fix(self, pipeline: Pipeline):
         sc = StageConfig(name="verify", when="after_fix")
         stages = [_stage("fix")]
-        assert pipeline._should_run_stage(sc, gates_pass=False, stages_so_far=stages) is True
+        assert (
+            pipeline._should_run_stage(sc, gates_pass=False, stages_so_far=stages)
+            is True
+        )
 
     def test_fix_regression_name(self, pipeline: Pipeline):
         """The bug fix: 'fix_regression' should match after_fix."""
         sc = StageConfig(name="verify", when="after_fix")
         stages = [_stage("fix_regression")]
-        assert pipeline._should_run_stage(sc, gates_pass=False, stages_so_far=stages) is True
+        assert (
+            pipeline._should_run_stage(sc, gates_pass=False, stages_so_far=stages)
+            is True
+        )
 
     def test_auto_fix_name(self, pipeline: Pipeline):
         sc = StageConfig(name="verify", when="after_fix")
         stages = [_stage("auto_fix")]
-        assert pipeline._should_run_stage(sc, gates_pass=False, stages_so_far=stages) is True
+        assert (
+            pipeline._should_run_stage(sc, gates_pass=False, stages_so_far=stages)
+            is True
+        )
 
     def test_repair_name(self, pipeline: Pipeline):
         sc = StageConfig(name="verify", when="after_fix")
         stages = [_stage("repair")]
-        assert pipeline._should_run_stage(sc, gates_pass=False, stages_so_far=stages) is True
+        assert (
+            pipeline._should_run_stage(sc, gates_pass=False, stages_so_far=stages)
+            is True
+        )
 
     def test_no_fix_ran(self, pipeline: Pipeline):
         sc = StageConfig(name="verify", when="after_fix")
         stages = [_stage("validate"), _stage("test")]
-        assert pipeline._should_run_stage(sc, gates_pass=False, stages_so_far=stages) is False
+        assert (
+            pipeline._should_run_stage(sc, gates_pass=False, stages_so_far=stages)
+            is False
+        )
 
     def test_fix_skipped(self, pipeline: Pipeline):
         sc = StageConfig(name="verify", when="after_fix")
         stages = [_stage("fix", skipped=True)]
-        assert pipeline._should_run_stage(sc, gates_pass=False, stages_so_far=stages) is False
+        assert (
+            pipeline._should_run_stage(sc, gates_pass=False, stages_so_far=stages)
+            is False
+        )
 
     def test_empty_stages(self, pipeline: Pipeline):
         sc = StageConfig(name="verify", when="after_fix")
-        assert pipeline._should_run_stage(sc, gates_pass=False, stages_so_far=[]) is False
-        assert pipeline._should_run_stage(sc, gates_pass=False, stages_so_far=None) is False
+        assert (
+            pipeline._should_run_stage(sc, gates_pass=False, stages_so_far=[]) is False
+        )
+        assert (
+            pipeline._should_run_stage(sc, gates_pass=False, stages_so_far=None)
+            is False
+        )
 
 
 class TestAfterVerifyFix:
@@ -80,21 +106,33 @@ class TestAfterVerifyFix:
     def test_verify_ran(self, pipeline: Pipeline):
         sc = StageConfig(name="report", when="after_verify_fix")
         stages = [_stage("fix"), _stage("verify_fix")]
-        assert pipeline._should_run_stage(sc, gates_pass=False, stages_so_far=stages) is True
+        assert (
+            pipeline._should_run_stage(sc, gates_pass=False, stages_so_far=stages)
+            is True
+        )
 
     def test_verify_not_ran(self, pipeline: Pipeline):
         sc = StageConfig(name="report", when="after_verify_fix")
         stages = [_stage("fix"), _stage("test")]
-        assert pipeline._should_run_stage(sc, gates_pass=False, stages_so_far=stages) is False
+        assert (
+            pipeline._should_run_stage(sc, gates_pass=False, stages_so_far=stages)
+            is False
+        )
 
     def test_verify_skipped(self, pipeline: Pipeline):
         sc = StageConfig(name="report", when="after_verify_fix")
         stages = [_stage("verify_fix", skipped=True)]
-        assert pipeline._should_run_stage(sc, gates_pass=False, stages_so_far=stages) is False
+        assert (
+            pipeline._should_run_stage(sc, gates_pass=False, stages_so_far=stages)
+            is False
+        )
 
     def test_empty_stages(self, pipeline: Pipeline):
         sc = StageConfig(name="report", when="after_verify_fix")
-        assert pipeline._should_run_stage(sc, gates_pass=False, stages_so_far=None) is False
+        assert (
+            pipeline._should_run_stage(sc, gates_pass=False, stages_so_far=None)
+            is False
+        )
 
 
 class TestMetricsPass:
@@ -172,7 +210,10 @@ class TestFullPipelineFlow:
         stages_so_far: list[StageResult] = []
         for sc in stages_config:
             should = pipeline._should_run_stage(
-                sc, gates_pass=True, stages_so_far=stages_so_far, iteration=1,
+                sc,
+                gates_pass=True,
+                stages_so_far=stages_so_far,
+                iteration=1,
             )
             sr = _stage(sc.name, skipped=not should)
             stages_so_far.append(sr)
@@ -198,7 +239,10 @@ class TestFullPipelineFlow:
         stages_so_far: list[StageResult] = []
         for sc in stages_config:
             should = pipeline._should_run_stage(
-                sc, gates_pass=False, stages_so_far=stages_so_far, iteration=1,
+                sc,
+                gates_pass=False,
+                stages_so_far=stages_so_far,
+                iteration=1,
             )
             sr = _stage(sc.name, skipped=not should)
             stages_so_far.append(sr)
@@ -225,7 +269,10 @@ class TestFullPipelineFlow:
         stages_so_far: list[StageResult] = []
         for sc in stages_config:
             should = pipeline._should_run_stage(
-                sc, gates_pass=False, stages_so_far=stages_so_far, iteration=1,
+                sc,
+                gates_pass=False,
+                stages_so_far=stages_so_far,
+                iteration=1,
             )
             sr = _stage(sc.name, skipped=not should)
             stages_so_far.append(sr)
@@ -284,7 +331,9 @@ class TestArchiveLlxReport:
 
         history_path = pipeline.workdir / LLX_HISTORY_FILE
         assert history_path.exists()
-        entries = [json.loads(l) for l in history_path.read_text().splitlines() if l.strip()]
+        entries = [
+            json.loads(l) for l in history_path.read_text().splitlines() if l.strip()
+        ]
         assert len(entries) == 1
         assert entries[0]["stage"] == "fix"
         assert entries[0]["ok"] is True
@@ -307,7 +356,9 @@ class TestArchiveLlxReport:
         pipeline._archive_llx_report(sc, result)
 
         history_path = pipeline.workdir / LLX_HISTORY_FILE
-        entries = [json.loads(l) for l in history_path.read_text().splitlines() if l.strip()]
+        entries = [
+            json.loads(l) for l in history_path.read_text().splitlines() if l.strip()
+        ]
         assert len(entries) == 1
         assert entries[0]["prompt"] == "Fix the code"
         assert entries[0]["model"] == "test-model"
@@ -322,7 +373,9 @@ class TestArchiveLlxReport:
             pipeline._archive_llx_report(sc, result)
 
         history_path = pipeline.workdir / LLX_HISTORY_FILE
-        entries = [json.loads(l) for l in history_path.read_text().splitlines() if l.strip()]
+        entries = [
+            json.loads(l) for l in history_path.read_text().splitlines() if l.strip()
+        ]
         assert len(entries) == 3
         assert entries[0]["ok"] is True
         assert entries[1]["ok"] is False
@@ -332,16 +385,15 @@ class TestArchiveLlxReport:
 class TestStreamingExecution:
     """_execute_streaming sends lines to on_stage_output in real time."""
 
-    def _make_pipeline(self, tmp_path: Path, stream: bool = True,
-                       on_output=None) -> Pipeline:
+    def _make_pipeline(
+        self, tmp_path: Path, stream: bool = True, on_output=None
+    ) -> Pipeline:
         cfg_file = tmp_path / "pyqual.yaml"
-        cfg_file.write_text(
-            "pipeline:\n  name: test\n  stages: []\n  metrics: {}\n"
-        )
+        cfg_file.write_text("pipeline:\n  name: test\n  stages: []\n  metrics: {}\n")
         from pyqual.config import PyqualConfig
+
         cfg = PyqualConfig.load(str(cfg_file))
-        return Pipeline(cfg, workdir=tmp_path, stream=stream,
-                        on_stage_output=on_output)
+        return Pipeline(cfg, workdir=tmp_path, stream=stream, on_stage_output=on_output)
 
     def test_captures_stdout_lines(self, tmp_path: Path):
         collected: list[tuple[str, str, bool]] = []
@@ -352,8 +404,11 @@ class TestStreamingExecution:
         pipe = self._make_pipeline(tmp_path, stream=True, on_output=on_output)
         sc = StageConfig(name="echo_test", run="echo hello && echo world")
         result = pipe._execute_streaming(
-            sc, "echo hello && echo world", False,
-            dict(os.environ), time.monotonic(),
+            sc,
+            "echo hello && echo world",
+            False,
+            dict(os.environ),
+            time.monotonic(),
         )
         assert result.passed
         assert "hello" in result.stdout
@@ -371,8 +426,11 @@ class TestStreamingExecution:
         pipe = self._make_pipeline(tmp_path, stream=True, on_output=on_output)
         sc = StageConfig(name="err_test", run="echo oops >&2")
         result = pipe._execute_streaming(
-            sc, "echo oops >&2", False,
-            dict(os.environ), time.monotonic(),
+            sc,
+            "echo oops >&2",
+            False,
+            dict(os.environ),
+            time.monotonic(),
         )
         assert "oops" in result.stderr
         stderr_lines = [(n, l) for n, l, s in collected if s]
@@ -383,7 +441,11 @@ class TestStreamingExecution:
         pipe = self._make_pipeline(tmp_path, stream=True)
         sc = StageConfig(name="multi", run="echo line1 && echo line2 && echo err1 >&2")
         result = pipe._execute_streaming(
-            sc, sc.run, False, dict(os.environ), time.monotonic(),
+            sc,
+            sc.run,
+            False,
+            dict(os.environ),
+            time.monotonic(),
         )
         assert "line1" in result.stdout
         assert "line2" in result.stdout
@@ -399,7 +461,11 @@ class TestStreamingExecution:
         pipe = self._make_pipeline(tmp_path, stream=False, on_output=on_output)
         sc = StageConfig(name="test", run="echo quiet")
         result = pipe._execute_captured(
-            sc, "echo quiet", False, dict(os.environ), time.monotonic(),
+            sc,
+            "echo quiet",
+            False,
+            dict(os.environ),
+            time.monotonic(),
         )
         assert result.passed
         assert len(called) == 0

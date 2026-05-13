@@ -11,7 +11,9 @@ sys.path.insert(0, str(Path(__file__).parent))
 from pyqual.config import PyqualConfig
 from pyqual.pipeline import Pipeline
 
-PIPELINE_CONFIG = Path(__file__).parent / "examples" / "project_analysis" / "pyqual.yaml"
+PIPELINE_CONFIG = (
+    Path(__file__).parent / "examples" / "project_analysis" / "pyqual.yaml"
+)
 
 PROJECTS = [
     "/home/tom/github/wronai/nlp2cmd",
@@ -21,9 +23,9 @@ PROJECTS = [
 
 def run_project(project_path: str) -> None:
     name = Path(project_path).name
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"  PROJECT: {name} ({project_path})")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
     config = PyqualConfig.load(PIPELINE_CONFIG)
     pipeline = Pipeline(config, workdir=project_path)
@@ -33,13 +35,17 @@ def run_project(project_path: str) -> None:
     total = time.monotonic() - t0
 
     print(f"\n--- {name} RESULTS ---")
-    print(f"Duration: {total:.0f}s ({total/60:.1f} min)")
+    print(f"Duration: {total:.0f}s ({total / 60:.1f} min)")
     print(f"Passed: {result.final_passed}")
     print(f"Iterations: {result.iteration_count}")
 
     for it in result.iterations:
         for s in it.stages:
-            status = "SKIP" if s.skipped else ("OK" if s.passed else f"FAIL(rc={s.returncode})")
+            status = (
+                "SKIP"
+                if s.skipped
+                else ("OK" if s.passed else f"FAIL(rc={s.returncode})")
+            )
             dur = f"{s.duration:.1f}s"
             err = (s.stderr or "")[:120].replace("\n", " ")
             print(f"  {s.name:15s} {status:12s} {dur:>8s}  {err}")
@@ -49,7 +55,9 @@ def run_project(project_path: str) -> None:
     if db_path.exists():
         conn = sqlite3.connect(str(db_path))
         total_rows = conn.execute("SELECT COUNT(*) FROM pipeline_logs").fetchone()[0]
-        warnings = conn.execute("SELECT COUNT(*) FROM pipeline_logs WHERE level='WARNING'").fetchone()[0]
+        warnings = conn.execute(
+            "SELECT COUNT(*) FROM pipeline_logs WHERE level='WARNING'"
+        ).fetchone()[0]
         conn.close()
         print(f"  nfo log: {total_rows} entries, {warnings} warnings")
 

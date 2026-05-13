@@ -52,6 +52,7 @@ except Exception:  # pragma: no cover — llx is optional on Python 3.9
     @dataclass
     class LLMResponse:
         """Response from LLM call."""
+
         content: str
         model: str
         usage: dict[str, Any] | None = None
@@ -95,7 +96,11 @@ except Exception:  # pragma: no cover — llx is optional on Python 3.9
 
             content = response.choices[0].message.content or ""
             usage = response.usage.dict() if response.usage else None
-            cost = response._hidden_params.get("response_cost") if hasattr(response, "_hidden_params") else None
+            cost = (
+                response._hidden_params.get("response_cost")
+                if hasattr(response, "_hidden_params")
+                else None
+            )
 
             return LLMResponse(
                 content=content,

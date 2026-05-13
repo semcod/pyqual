@@ -28,6 +28,7 @@ from pyqual.constants import (
 @dataclass(frozen=True)
 class PipelineProfile:
     """A reusable pipeline template with default stages and metrics."""
+
     description: str
     stages: list[dict[str, Any]]
     metrics: dict[str, float] = field(default_factory=dict)
@@ -46,8 +47,18 @@ PROFILES: dict[str, PipelineProfile] = {
             {"name": "analyze", "tool": "code2llm"},
             {"name": "validate", "tool": "vallm"},
             {"name": "test", "tool": "pytest", "optional": True},
-            {"name": "prefact", "tool": "prefact", "optional": True, "timeout": PREFACT_TIMEOUT},
-            {"name": "fix", "tool": "llx-fix", "optional": True, "timeout": FIX_TIMEOUT},
+            {
+                "name": "prefact",
+                "tool": "prefact",
+                "optional": True,
+                "timeout": PREFACT_TIMEOUT,
+            },
+            {
+                "name": "fix",
+                "tool": "llx-fix",
+                "optional": True,
+                "timeout": FIX_TIMEOUT,
+            },
             {"name": "verify", "tool": "vallm", "optional": True},
         ],
         metrics={
@@ -56,18 +67,37 @@ PROFILES: dict[str, PipelineProfile] = {
             "coverage_min": DEFAULT_COVERAGE_MIN,
         },
     ),
-
     "python-full": PipelineProfile(
         description="Full Python pipeline: analyze → validate → test → fix → verify → push → publish",
         stages=[
             {"name": "analyze", "tool": "code2llm"},
             {"name": "validate", "tool": "vallm"},
             {"name": "test", "tool": "pytest", "optional": True},
-            {"name": "prefact", "tool": "prefact", "optional": True, "timeout": PREFACT_TIMEOUT},
-            {"name": "fix", "tool": "llx-fix", "optional": True, "timeout": FIX_TIMEOUT},
+            {
+                "name": "prefact",
+                "tool": "prefact",
+                "optional": True,
+                "timeout": PREFACT_TIMEOUT,
+            },
+            {
+                "name": "fix",
+                "tool": "llx-fix",
+                "optional": True,
+                "timeout": FIX_TIMEOUT,
+            },
             {"name": "verify", "tool": "vallm", "optional": True},
-            {"name": "push", "run": "goal push --bump patch --no-publish --todo --model ${LLM_MODEL}", "optional": True, "timeout": 120},
-            {"name": "publish", "run": "goal publish", "optional": True, "timeout": 300},
+            {
+                "name": "push",
+                "run": "goal push --bump patch --no-publish --todo --model ${LLM_MODEL}",
+                "optional": True,
+                "timeout": 120,
+            },
+            {
+                "name": "publish",
+                "run": "goal publish",
+                "optional": True,
+                "timeout": 300,
+            },
         ],
         metrics={
             "cc_max": DEFAULT_CC_MAX,
@@ -75,7 +105,6 @@ PROFILES: dict[str, PipelineProfile] = {
             "coverage_min": DEFAULT_COVERAGE_MIN,
         },
     ),
-
     "python-minimal": PipelineProfile(
         description=(
             "Minimal Python quality loop with filtered tools — replaces custom_tools boilerplate. "
@@ -84,11 +113,31 @@ PROFILES: dict[str, PipelineProfile] = {
             "(skips .git, .venv, build, dist, __pycache__, node_modules, etc.)."
         ),
         stages=[
-            {"name": "analyze", "tool": "code2llm-filtered", "optional": True, "timeout": 0},
-            {"name": "validate", "tool": "vallm-filtered", "optional": True, "timeout": 0},
+            {
+                "name": "analyze",
+                "tool": "code2llm-filtered",
+                "optional": True,
+                "timeout": 0,
+            },
+            {
+                "name": "validate",
+                "tool": "vallm-filtered",
+                "optional": True,
+                "timeout": 0,
+            },
             {"name": "lint", "tool": "ruff", "optional": True},
-            {"name": "prefact", "tool": "prefact", "optional": True, "timeout": PREFACT_TIMEOUT},
-            {"name": "fix", "tool": "llx-fix", "optional": True, "timeout": FIX_TIMEOUT},
+            {
+                "name": "prefact",
+                "tool": "prefact",
+                "optional": True,
+                "timeout": PREFACT_TIMEOUT,
+            },
+            {
+                "name": "fix",
+                "tool": "llx-fix",
+                "optional": True,
+                "timeout": FIX_TIMEOUT,
+            },
             {"name": "test", "run": "python3 -m pytest -q", "when": "always"},
         ],
         metrics={
@@ -98,23 +147,52 @@ PROFILES: dict[str, PipelineProfile] = {
         loop={"max_iterations": 3, "on_fail": "report"},
         env={"LLM_MODEL": "openrouter/qwen/qwen3-coder-next"},
     ),
-
     "python-publish": PipelineProfile(
         description=(
             "Full Python pipeline with PyPI publish: analyze → validate → test → fix → verify → push → release-check → publish. "
             "Uses git-push, release-check (version uniqueness + git clean), and make-publish built-in tools."
         ),
         stages=[
-            {"name": "analyze", "tool": "code2llm-filtered", "optional": True, "timeout": 0},
-            {"name": "validate", "tool": "vallm-filtered", "optional": True, "timeout": 0},
+            {
+                "name": "analyze",
+                "tool": "code2llm-filtered",
+                "optional": True,
+                "timeout": 0,
+            },
+            {
+                "name": "validate",
+                "tool": "vallm-filtered",
+                "optional": True,
+                "timeout": 0,
+            },
             {"name": "lint", "tool": "ruff", "optional": True},
             {"name": "test", "run": "python3 -m pytest -q", "when": "always"},
-            {"name": "prefact", "tool": "prefact", "optional": True, "timeout": PREFACT_TIMEOUT},
-            {"name": "fix", "tool": "llx-fix", "optional": True, "timeout": FIX_TIMEOUT},
+            {
+                "name": "prefact",
+                "tool": "prefact",
+                "optional": True,
+                "timeout": PREFACT_TIMEOUT,
+            },
+            {
+                "name": "fix",
+                "tool": "llx-fix",
+                "optional": True,
+                "timeout": FIX_TIMEOUT,
+            },
             {"name": "verify", "tool": "vallm-verify", "optional": True},
             {"name": "push", "tool": "git-push", "optional": True, "timeout": 120},
-            {"name": "release-check", "tool": "release-check", "when": "metrics_pass", "timeout": 60},
-            {"name": "publish", "tool": "make-publish", "optional": True, "timeout": 300},
+            {
+                "name": "release-check",
+                "tool": "release-check",
+                "when": "metrics_pass",
+                "timeout": 60,
+            },
+            {
+                "name": "publish",
+                "tool": "make-publish",
+                "optional": True,
+                "timeout": 300,
+            },
         ],
         metrics={
             "cc_max": DEFAULT_CC_MAX,
@@ -123,22 +201,46 @@ PROFILES: dict[str, PipelineProfile] = {
         loop={"max_iterations": 3, "on_fail": "report"},
         env={"LLM_MODEL": "openrouter/qwen/qwen3-coder-next"},
     ),
-
     "python-secure": PipelineProfile(
         description=(
             "Security-hardened Python pipeline: analyze → validate → audit → bandit → secrets → test → fix. "
             "Adds pip-audit, bandit and detect-secrets scans to the standard quality loop."
         ),
         stages=[
-            {"name": "analyze", "tool": "code2llm-filtered", "optional": True, "timeout": 0},
-            {"name": "validate", "tool": "vallm-filtered", "optional": True, "timeout": 0},
+            {
+                "name": "analyze",
+                "tool": "code2llm-filtered",
+                "optional": True,
+                "timeout": 0,
+            },
+            {
+                "name": "validate",
+                "tool": "vallm-filtered",
+                "optional": True,
+                "timeout": 0,
+            },
             {"name": "lint", "tool": "ruff", "optional": True},
             {"name": "audit", "tool": "pip-audit", "optional": True, "timeout": 120},
             {"name": "bandit", "tool": "bandit", "optional": True, "timeout": 60},
-            {"name": "secrets", "tool": "detect-secrets", "optional": True, "timeout": 60},
+            {
+                "name": "secrets",
+                "tool": "detect-secrets",
+                "optional": True,
+                "timeout": 60,
+            },
             {"name": "test", "run": "python3 -m pytest -q", "when": "always"},
-            {"name": "prefact", "tool": "prefact", "optional": True, "timeout": PREFACT_TIMEOUT},
-            {"name": "fix", "tool": "llx-fix", "optional": True, "timeout": FIX_TIMEOUT},
+            {
+                "name": "prefact",
+                "tool": "prefact",
+                "optional": True,
+                "timeout": PREFACT_TIMEOUT,
+            },
+            {
+                "name": "fix",
+                "tool": "llx-fix",
+                "optional": True,
+                "timeout": FIX_TIMEOUT,
+            },
             {"name": "verify", "tool": "vallm-verify", "optional": True},
         ],
         metrics={
@@ -149,7 +251,6 @@ PROFILES: dict[str, PipelineProfile] = {
         loop={"max_iterations": 3, "on_fail": "report"},
         env={"LLM_MODEL": "openrouter/qwen/qwen3-coder-next"},
     ),
-
     "lint-only": PipelineProfile(
         description="Lint-only pipeline: ruff → mypy (no LLM, no fix)",
         stages=[
@@ -163,7 +264,6 @@ PROFILES: dict[str, PipelineProfile] = {
         },
         loop={"max_iterations": 1},
     ),
-
     "ci": PipelineProfile(
         description="CI pipeline: analyze → validate → test (no fix, report-only)",
         stages=[
@@ -178,7 +278,6 @@ PROFILES: dict[str, PipelineProfile] = {
         },
         loop={"max_iterations": 1, "on_fail": "report"},
     ),
-
     "security": PipelineProfile(
         description="Security-focused: analyze → audit → bandit → secrets → test",
         stages=[

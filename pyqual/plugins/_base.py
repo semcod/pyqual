@@ -14,6 +14,7 @@ from typing import ClassVar, Type
 @dataclass
 class PluginMetadata:
     """Metadata for a pyqual plugin."""
+
     name: str
     description: str
     version: str
@@ -31,9 +32,7 @@ class MetricCollector(ABC):
 
     name: ClassVar[str] = ""
     metadata: ClassVar[PluginMetadata] = PluginMetadata(
-        name="",
-        description="",
-        version="0.1.0"
+        name="", description="", version="0.1.0"
     )
 
     @abstractmethod

@@ -3,7 +3,7 @@ from __future__ import annotations
 import concurrent.futures
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Callable, List, Optional
+from typing import Callable, Optional
 
 from pyqual.bulk.models import ProjectRunState, RunStatus
 from pyqual.bulk.runner import _run_single_project
@@ -55,7 +55,8 @@ def _make_summary_title(states: list[ProjectRunState]) -> str:
 
 
 def _build_status_row(
-    s: ProjectRunState, show_last_line: bool,
+    s: ProjectRunState,
+    show_last_line: bool,
 ) -> tuple[list[str], str]:
     icon = STATUS_ICON.get(s.status, "?")
     style = STATUS_STYLE.get(s.status, "")
@@ -81,7 +82,9 @@ def build_dashboard_table(
     except ImportError:  # pragma: no cover
         raise ImportError("rich is required for build_dashboard_table")
 
-    table = Table(title=_make_summary_title(states), show_header=True, header_style="bold")
+    table = Table(
+        title=_make_summary_title(states), show_header=True, header_style="bold"
+    )
     table.add_column("Project")
     table.add_column("Status")
     table.add_column("Iter")

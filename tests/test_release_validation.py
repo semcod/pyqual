@@ -45,9 +45,7 @@ class TestReleaseValidationHappyPath:
         (pkg / "__init__.py").write_text('__version__ = "0.1.0"\n')
         return tmp_path
 
-    def test_clean_git_unique_version_passes(
-        self, fake_project: Path
-    ) -> None:
+    def test_clean_git_unique_version_passes(self, fake_project: Path) -> None:
         """When git is clean and version doesn't exist on PyPI, validation passes."""
         from urllib.error import HTTPError
 
@@ -70,9 +68,7 @@ class TestReleaseValidationHappyPath:
         errors = [i for i in result.issues if i.severity == Severity.ERROR]
         assert len(errors) == 0
 
-    def test_no_bump_validates_current_version(
-        self, fake_project: Path
-    ) -> None:
+    def test_no_bump_validates_current_version(self, fake_project: Path) -> None:
         """With bump_patch=False, validates current version (0.1.0) not 0.1.1."""
         from urllib.error import HTTPError
 
@@ -170,9 +166,7 @@ class TestReleaseValidationVersionIssues:
         errors = [i for i in result.issues if i.code == EC.RELEASE_VERSION_MISMATCH]
         assert len(errors) == 1
 
-    def test_module_version_mismatch_warning(
-        self, tmp_path: Path
-    ) -> None:
+    def test_module_version_mismatch_warning(self, tmp_path: Path) -> None:
         """Mismatch in __init__.py is a warning, not blocking."""
         (tmp_path / "pyproject.toml").write_text(
             '[project]\nname = "testpkg"\nversion = "0.1.0"\n'
@@ -200,7 +194,9 @@ class TestReleaseValidationVersionIssues:
             ):
                 result = validate_release_state(tmp_path, bump_patch=False)
 
-        warnings = [i for i in result.issues if i.code == EC.RELEASE_MODULE_VERSION_MISMATCH]
+        warnings = [
+            i for i in result.issues if i.code == EC.RELEASE_MODULE_VERSION_MISMATCH
+        ]
         assert len(warnings) == 1
         assert warnings[0].severity == Severity.WARNING
 
@@ -208,9 +204,7 @@ class TestReleaseValidationVersionIssues:
 class TestReleaseValidationRegistry:
     """Tests for PyPI registry checks."""
 
-    def test_existing_version_fails(
-        self, tmp_path: Path
-    ) -> None:
+    def test_existing_version_fails(self, tmp_path: Path) -> None:
         """Version already on PyPI blocks release."""
         (tmp_path / "pyproject.toml").write_text(
             '[project]\nname = "testpkg"\nversion = "0.1.0"\n'
@@ -250,13 +244,13 @@ class TestReleaseValidationRegistry:
             ):
                 result = validate_release_state(tmp_path, bump_patch=False)
 
-        warnings = [i for i in result.issues if i.code == EC.RELEASE_REGISTRY_UNAVAILABLE]
+        warnings = [
+            i for i in result.issues if i.code == EC.RELEASE_REGISTRY_UNAVAILABLE
+        ]
         assert len(warnings) == 1
         assert warnings[0].severity == Severity.WARNING
 
-    def test_unsupported_registry_warns(
-        self, tmp_path: Path
-    ) -> None:
+    def test_unsupported_registry_warns(self, tmp_path: Path) -> None:
         """Non-PyPI registries emit a warning."""
         (tmp_path / "pyproject.toml").write_text(
             '[project]\nname = "testpkg"\nversion = "0.1.0"\n'
@@ -268,7 +262,9 @@ class TestReleaseValidationRegistry:
         ):
             result = validate_release_state(tmp_path, registry="npm", bump_patch=False)
 
-        warnings = [i for i in result.issues if i.code == EC.RELEASE_REGISTRY_UNSUPPORTED]
+        warnings = [
+            i for i in result.issues if i.code == EC.RELEASE_REGISTRY_UNSUPPORTED
+        ]
         assert len(warnings) == 1
 
 

@@ -20,29 +20,33 @@ CONSTANT_6 = 6
 
 
 if TYPE_CHECKING:
-    from pyqual.plugins import MetricCollector
+    pass
 
 # Import plugin collectors (new plugin-based approach)
 try:
     from pyqual.plugins.coverage import CoverageCollector
+
     _coverage_collector: CoverageCollector | None = CoverageCollector()
 except ImportError:
     _coverage_collector = None
 
 try:
     from pyqual.plugins.lint import LintCollector
+
     _lint_collector: LintCollector | None = LintCollector()
 except ImportError:
     _lint_collector = None
 
 try:
     from pyqual.plugins.security import SecurityCollector
+
     _security_collector: SecurityCollector | None = SecurityCollector()
 except ImportError:
     _security_collector = None
 
 try:
     from pyqual.plugins.code_health import CodeHealthCollector
+
     _code_health_collector: CodeHealthCollector | None = CodeHealthCollector()
 except ImportError:
     _code_health_collector = None
@@ -66,7 +70,12 @@ def _from_toon(workdir: Path) -> dict[str, float]:
     result: dict[str, float] = {}
     text = _read_artifact_text(
         workdir,
-        ["analysis.toon.yaml", "analysis_toon.yaml", "analysis.toon", "project_toon.yaml"],
+        [
+            "analysis.toon.yaml",
+            "analysis_toon.yaml",
+            "analysis.toon",
+            "project_toon.yaml",
+        ],
     )
     if not text:
         return result
@@ -82,7 +91,9 @@ def _from_toon(workdir: Path) -> dict[str, float]:
 def _from_vallm(workdir: Path) -> dict[str, float]:
     """Extract vallm pass rate from validation_toon.yaml or errors.json."""
     result: dict[str, float] = {}
-    text = _read_artifact_text(workdir, ["validation.toon.yaml", "validation_toon.yaml", "validation.toon"])
+    text = _read_artifact_text(
+        workdir, ["validation.toon.yaml", "validation_toon.yaml", "validation.toon"]
+    )
     if text:
         pass_match = re.search(r"passed:\s*(\d+)\s*\(([\d.]+)%\)", text)
         if pass_match:
@@ -153,16 +164,21 @@ def _from_bandit(workdir: Path) -> dict[str, float]:
 def _from_secrets(workdir: Path) -> dict[str, float]:
     """Extract secrets metrics from secrets.json."""
     sec_path = workdir / ".pyqual" / "secrets.json"
-    
+
     # Only process if secrets.json exists
     if not sec_path.exists():
         return {}
-    
+
     result: dict[str, float] = {}
     try:
         data = json.loads(sec_path.read_text())
         if isinstance(data, list):
-            severities = {"critical": CONSTANT_4, "high": CONSTANT_3, "medium": 2, "low": 1}
+            severities = {
+                "critical": CONSTANT_4,
+                "high": CONSTANT_3,
+                "medium": 2,
+                "low": 1,
+            }
             max_sev = 0
             for finding in data:
                 sev = finding.get("severity", "").lower()
@@ -256,7 +272,8 @@ def _from_sbom(workdir: Path) -> dict[str, float]:
             if total > 0:
                 result["sbom_compliance"] = (licensed / total) * 100
             forbidden = sum(
-                1 for c in comps
+                1
+                for c in comps
                 for lic in (c.get("licenses", []) or [])
                 if any(f in str(lic).upper() for f in ["GPL", "AGPL", "SSPL"])
             )
@@ -301,7 +318,9 @@ def _from_pyroma(workdir: Path) -> dict[str, float]:
             if isinstance(score, (int, float)):
                 result["pyroma_score"] = float(score)
             elif isinstance(score, str) and score.upper() in "ABCDEF":
-                result["pyroma_score"] = float(CONSTANT_6 - ord(score.upper()[0]) + ord("A"))
+                result["pyroma_score"] = float(
+                    CONSTANT_6 - ord(score.upper()[0]) + ord("A")
+                )
         except (json.JSONDecodeError, TypeError):
             pass
     return result
@@ -407,7 +426,9 @@ def _from_benchmark(workdir: Path) -> dict[str, float]:
             elif isinstance(data, dict):
                 results = data.get("results", {})
                 if isinstance(results, dict) and results:
-                    bench_times = [v for v in results.values() if isinstance(v, (int, float))]
+                    bench_times = [
+                        v for v in results.values() if isinstance(v, (int, float))
+                    ]
                     if bench_times:
                         result["bench_time"] = sum(bench_times) / len(bench_times)
         except (json.JSONDecodeError, TypeError, KeyError):
@@ -440,8 +461,7 @@ def _from_memory_profile(workdir: Path) -> dict[str, float]:
 def _parse_radon_json(data: dict) -> float | None:
     """Return average maintainability index from parsed radon.json data, or None."""
     scores = [
-        float(v["mi"]) for v in data.values()
-        if isinstance(v, dict) and "mi" in v
+        float(v["mi"]) for v in data.values() if isinstance(v, dict) and "mi" in v
     ]
     if not scores:
         scores = [
@@ -528,8 +548,18 @@ def _from_ruff(workdir: Path) -> dict[str, float]:
             data = json.loads(p.read_text())
             if isinstance(data, list):
                 errors = len(data)
-                fatal = sum(1 for e in data if e.get("severity") == "fatal" or str(e.get("code", "")).startswith("E"))
-                warning = sum(1 for e in data if e.get("severity") == "warning" or str(e.get("code", "")).startswith("W"))
+                fatal = sum(
+                    1
+                    for e in data
+                    if e.get("severity") == "fatal"
+                    or str(e.get("code", "")).startswith("E")
+                )
+                warning = sum(
+                    1
+                    for e in data
+                    if e.get("severity") == "warning"
+                    or str(e.get("code", "")).startswith("W")
+                )
                 result["ruff_errors"] = float(errors)
                 result["ruff_fatal"] = float(fatal)
                 result["ruff_warnings"] = float(warning)
@@ -543,10 +573,14 @@ def _from_ruff(workdir: Path) -> dict[str, float]:
 
 def _count_pylint_by_type(messages: list, type_name: str, symbol_prefix: str) -> float:
     """Count pylint messages matching a type or symbol prefix."""
-    return float(sum(
-        1 for m in messages
-        if m.get("type") == type_name or str(m.get("symbol", "")).startswith(symbol_prefix)
-    ))
+    return float(
+        sum(
+            1
+            for m in messages
+            if m.get("type") == type_name
+            or str(m.get("symbol", "")).startswith(symbol_prefix)
+        )
+    )
 
 
 def _from_pylint(workdir: Path) -> dict[str, float]:
@@ -601,9 +635,15 @@ def _from_flake8(workdir: Path) -> dict[str, float]:
             data = json.loads(p.read_text())
             if isinstance(data, list):
                 violations = len(data)
-                errors = sum(1 for v in data if str(v.get("code", "")).startswith(("E", "F")))
-                warnings = sum(1 for v in data if str(v.get("code", "")).startswith(("W",)))
-                conventions = sum(1 for v in data if str(v.get("code", "")).startswith(("C", "N")))
+                errors = sum(
+                    1 for v in data if str(v.get("code", "")).startswith(("E", "F"))
+                )
+                warnings = sum(
+                    1 for v in data if str(v.get("code", "")).startswith(("W",))
+                )
+                conventions = sum(
+                    1 for v in data if str(v.get("code", "")).startswith(("C", "N"))
+                )
                 result["flake8_violations"] = float(violations)
                 result["flake8_errors"] = float(errors)
                 result["flake8_warnings"] = float(warnings)
@@ -630,18 +670,23 @@ def _from_runtime_errors(workdir: Path) -> dict[str, float]:
                 for error in errors:
                     error_type = error.get("error_type", "unknown")
                     error_types[error_type] = error_types.get(error_type, 0) + 1
-                
+
                 # Expose common error types as metrics
                 for error_type, count in error_types.items():
                     metric_name = f"runtime_{error_type}"
                     result[metric_name] = float(count)
-                
+
                 # Check for recent errors (last hour)
                 from datetime import datetime, timezone, timedelta
+
                 one_hour_ago = datetime.now(timezone.utc) - timedelta(hours=1)
                 recent_count = sum(
-                    1 for error in errors
-                    if datetime.fromisoformat(error.get("timestamp", "").replace("Z", "+00:00")) > one_hour_ago
+                    1
+                    for error in errors
+                    if datetime.fromisoformat(
+                        error.get("timestamp", "").replace("Z", "+00:00")
+                    )
+                    > one_hour_ago
                 )
                 result["runtime_errors_recent"] = float(recent_count)
         except (json.JSONDecodeError, TypeError, ValueError, OSError):

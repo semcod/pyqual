@@ -1,6 +1,7 @@
 import yaml
 from pyqual.config import PyqualConfig, GateConfig
 
+
 def test_default_yaml_parses() -> None:
     """Default pyqual.yaml should parse without errors."""
     raw = yaml.safe_load(PyqualConfig.default_yaml())
@@ -9,6 +10,7 @@ def test_default_yaml_parses() -> None:
     assert len(config.stages) == 6
     assert len(config.gates) == 3
     assert config.loop.max_iterations == 3
+
 
 def test_gate_config_from_dict() -> None:
     """Gate config parses suffixes correctly."""

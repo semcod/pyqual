@@ -47,45 +47,45 @@ BULK_STAGE_COLUMN_MAX_WIDTH = 20
 # ---------------------------------------------------------------------------
 # LLM / AI
 # ---------------------------------------------------------------------------
-LLM_FIX_MAX_TOKENS = 1200       # for auto-fix config
-LLM_HISTORY_MAX_TOKENS = 1500   # for history command
+LLM_FIX_MAX_TOKENS = 1200  # for auto-fix config
+LLM_HISTORY_MAX_TOKENS = 1500  # for history command
 
 # ---------------------------------------------------------------------------
 # CLI formatting
 # ---------------------------------------------------------------------------
-TIMESTAMP_COL_WIDTH = 19   # "YYYY-MM-DD HH:MM:SS"
+TIMESTAMP_COL_WIDTH = 19  # "YYYY-MM-DD HH:MM:SS"
 TIMESTAMP_TIME_START = 11  # offset to skip "YYYY-MM-DD " prefix
-BULK_PASS_PREVIEW = 20     # max passed-gate names to show inline
-LOG_DETAIL_MAX_LEN = 80    # max chars for fallback log detail display
+BULK_PASS_PREVIEW = 20  # max passed-gate names to show inline
+LOG_DETAIL_MAX_LEN = 80  # max chars for fallback log detail display
 MODEL_COLUMN_WIDTH = 28  # width for model column in tables
 
 # ---------------------------------------------------------------------------
 # Default timeouts for profile stages
 # ---------------------------------------------------------------------------
-PREFACT_TIMEOUT = 900   # 15 minutes
-FIX_TIMEOUT = 1800      # 30 minutes
+PREFACT_TIMEOUT = 900  # 15 minutes
+FIX_TIMEOUT = 1800  # 30 minutes
 # ---------------------------------------------------------------------------
-DEFAULT_VALLM_PASS_MIN = 90   # default vallm pass percentage minimum
-DEFAULT_COVERAGE_MIN = 80     # default test coverage minimum percentage
+DEFAULT_VALLM_PASS_MIN = 90  # default vallm pass percentage minimum
+DEFAULT_COVERAGE_MIN = 80  # default test coverage minimum percentage
 
 # ---------------------------------------------------------------------------
 # Text truncation limits
 # ---------------------------------------------------------------------------
-TODO_HEAD_CHARS = 500          # chars to read from TODO.md header for parsing
-STAGE_OUTPUT_MAX_CHARS = 200   # max chars for last meaningful output line
-ERROR_MSG_MAX_CHARS = 200      # max chars for error messages in bulk run
-ERROR_MSG_PREVIEW_CHARS = 30   # max chars for error message preview
+TODO_HEAD_CHARS = 500  # chars to read from TODO.md header for parsing
+STAGE_OUTPUT_MAX_CHARS = 200  # max chars for last meaningful output line
+ERROR_MSG_MAX_CHARS = 200  # max chars for error messages in bulk run
+ERROR_MSG_PREVIEW_CHARS = 30  # max chars for error message preview
 
 # ---------------------------------------------------------------------------
 # Additional magic numbers from TODO cleanup
 # ---------------------------------------------------------------------------
-BULK_INIT_MAX_CHARS = 500      # from bulk_init.py:249
-BULK_RUN_ERROR_LINES = 200     # from bulk_run.py:324
+BULK_INIT_MAX_CHARS = 500  # from bulk_init.py:249
+BULK_RUN_ERROR_LINES = 200  # from bulk_run.py:324
 BULK_RUN_STATUS_INTERVAL = 30  # from bulk_run.py:383
-BULK_RUN_TABLE_WIDTH = 50      # from bulk_run.py:431
-REPORT_GATE_COVERAGE = 80      # from report.py:43
-REPORT_GATE_VALLM = 90         # from report.py:44
-REPORT_GATE_SECURITY = 80      # from report.py:47
+BULK_RUN_TABLE_WIDTH = 50  # from bulk_run.py:431
+REPORT_GATE_COVERAGE = 80  # from report.py:43
+REPORT_GATE_VALLM = 90  # from report.py:44
+REPORT_GATE_SECURITY = 80  # from report.py:47
 
 # ---------------------------------------------------------------------------
 # GitHub Integration

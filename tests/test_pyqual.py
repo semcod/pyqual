@@ -56,10 +56,14 @@ class TestExtractStageSummary:
         assert _ess("lint", "All checks passed!", "")["lint_errors"] == 0
 
     def test_prefact_tickets(self) -> None:
-        assert _ess("prefact", "Total issues: 71 active, 0 completed", "")["tickets"] == 71
+        assert (
+            _ess("prefact", "Total issues: 71 active, 0 completed", "")["tickets"] == 71
+        )
 
     def test_prefact_zero_tickets(self) -> None:
-        assert _ess("prefact", "Total issues: 0 active, 5 completed", "")["tickets"] == 0
+        assert (
+            _ess("prefact", "Total issues: 0 active, 5 completed", "")["tickets"] == 0
+        )
 
     def test_validate_cc_critical(self) -> None:
         d = _ess("validate", "cc: 3.1\ncritical: 0", "")
@@ -71,7 +75,9 @@ class TestExtractStageSummary:
         assert d["model"] == "claude-sonnet-4-20250514"
 
     def test_llx_fix_files_changed(self) -> None:
-        assert _ess("fix", "3 files changed, 42 insertions(+)", "")["files_changed"] == 3
+        assert (
+            _ess("fix", "3 files changed, 42 insertions(+)", "")["files_changed"] == 3
+        )
 
     def test_mypy_errors(self) -> None:
         d = _ess("mypy", "", "Found 4 errors in 2 files (checked 12 source files)")
@@ -105,11 +111,13 @@ def test_gate_set_reads_project_toon_artifacts(tmp_path: Path) -> None:
     pyqual_dir.mkdir()
     (pyqual_dir / "coverage.json").write_text('{"totals": {"percent_covered": 28.9}}')
 
-    gate_set = GateSet([
-        GateConfig(metric="cc", operator="le", threshold=15),
-        GateConfig(metric="vallm_pass", operator="ge", threshold=90),
-        GateConfig(metric="coverage", operator="ge", threshold=80),
-    ])
+    gate_set = GateSet(
+        [
+            GateConfig(metric="cc", operator="le", threshold=15),
+            GateConfig(metric="vallm_pass", operator="ge", threshold=90),
+            GateConfig(metric="coverage", operator="ge", threshold=80),
+        ]
+    )
 
     metrics = gate_set._collect_metrics(tmp_path)
 
@@ -133,12 +141,14 @@ def test_gate_set_derives_completion_rate(tmp_path: Path) -> None:
     pyqual_dir.mkdir()
     (pyqual_dir / "coverage.json").write_text('{"totals": {"percent_covered": 28.9}}')
 
-    gate_set = GateSet([
-        GateConfig(metric="cc", operator="le", threshold=15),
-        GateConfig(metric="vallm_pass", operator="ge", threshold=90),
-        GateConfig(metric="coverage", operator="ge", threshold=80),
-        GateConfig(metric="completion_rate", operator="ge", threshold=100),
-    ])
+    gate_set = GateSet(
+        [
+            GateConfig(metric="cc", operator="le", threshold=15),
+            GateConfig(metric="vallm_pass", operator="ge", threshold=90),
+            GateConfig(metric="coverage", operator="ge", threshold=80),
+            GateConfig(metric="completion_rate", operator="ge", threshold=100),
+        ]
+    )
 
     results = gate_set.check_all(tmp_path)
     completion_gate = next(r for r in results if r.metric == "completion_rate")

@@ -24,6 +24,7 @@ from dataclasses import dataclass
 @dataclass
 class DepResult:
     """Result of a single dependency check."""
+
     name: str
     installed: bool
     version: str = ""
@@ -58,7 +59,9 @@ def _check_pip(package: str) -> DepResult:
     try:
         result = subprocess.run(
             [sys.executable, "-m", "pip", "show", package],
-            capture_output=True, text=True, timeout=10,
+            capture_output=True,
+            text=True,
+            timeout=10,
         )
         if result.returncode == 0:
             version = ""
@@ -83,7 +86,9 @@ def _install_pip(package: str) -> bool:
     try:
         result = subprocess.run(
             [sys.executable, "-m", "pip", "install", "-q", package],
-            capture_output=True, text=True, timeout=120,
+            capture_output=True,
+            text=True,
+            timeout=120,
         )
         return result.returncode == 0
     except Exception:
@@ -125,7 +130,9 @@ def main() -> int:
             status = "✓ installed" if dep.install_ok else "✗ install failed"
             print(f"  {status}: {dep.name}")
         else:
-            hint = " (optional)" if dep.name in {"claude", "make", "twine", "goal"} else ""
+            hint = (
+                " (optional)" if dep.name in {"claude", "make", "twine", "goal"} else ""
+            )
             print(f"  ✗ {dep.name}{hint}")
 
     print("=== setup done ===")

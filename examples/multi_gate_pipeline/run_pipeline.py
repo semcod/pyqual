@@ -37,22 +37,26 @@ def build_report(result, gate_results) -> dict:
 
     for iteration in result.iterations:
         for stage in iteration.stages:
-            report["stages"].append({
-                "name": stage.name,
-                "iteration": iteration.iteration,
-                "passed": stage.passed,
-                "skipped": stage.skipped,
-                "duration_s": round(stage.duration, 2),
-                "returncode": stage.returncode,
-            })
+            report["stages"].append(
+                {
+                    "name": stage.name,
+                    "iteration": iteration.iteration,
+                    "passed": stage.passed,
+                    "skipped": stage.skipped,
+                    "duration_s": round(stage.duration, 2),
+                    "returncode": stage.returncode,
+                }
+            )
 
     for gr in gate_results:
-        report["gates"].append({
-            "metric": gr.metric,
-            "value": gr.value,
-            "threshold": gr.threshold,
-            "passed": gr.passed,
-        })
+        report["gates"].append(
+            {
+                "metric": gr.metric,
+                "value": gr.value,
+                "threshold": gr.threshold,
+                "passed": gr.passed,
+            }
+        )
 
     return report
 

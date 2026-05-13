@@ -9,11 +9,22 @@ import ast
 import sqlite3
 from pathlib import Path
 
-from pyqual.constants import LOG_DETAIL_MAX_LEN, PIPELINE_TABLE, TIMESTAMP_COL_WIDTH, TIMESTAMP_TIME_START
+from pyqual.constants import (
+    LOG_DETAIL_MAX_LEN,
+    PIPELINE_TABLE,
+    TIMESTAMP_COL_WIDTH,
+    TIMESTAMP_TIME_START,
+)
 
 
-def query_nfo_db(db_path: Path, event: str = "", failed: bool = False,
-                 tail: int = 0, sql: str = "", stage: str = "") -> list[dict]:
+def query_nfo_db(
+    db_path: Path,
+    event: str = "",
+    failed: bool = False,
+    tail: int = 0,
+    sql: str = "",
+    stage: str = "",
+) -> list[dict]:
     """Query the nfo SQLite pipeline log and return structured dicts."""
     conn = sqlite3.connect(str(db_path))
     conn.row_factory = sqlite3.Row
@@ -60,7 +71,9 @@ def row_to_event_dict(row: dict) -> dict:
     """
     kwargs_raw = row.get("kwargs", "{}")
     try:
-        data = ast.literal_eval(kwargs_raw) if isinstance(kwargs_raw, str) else kwargs_raw
+        data = (
+            ast.literal_eval(kwargs_raw) if isinstance(kwargs_raw, str) else kwargs_raw
+        )
     except (ValueError, SyntaxError):
         data = {}
     data["_timestamp"] = row.get("timestamp", "")
@@ -72,10 +85,16 @@ def row_to_event_dict(row: dict) -> dict:
 
 def format_log_entry_row(entry: dict) -> tuple:
     """Return (ts, event_name, name, status, details) for one log entry."""
-    ts = entry.get("_timestamp", "")[:TIMESTAMP_COL_WIDTH].replace("T", " ")[TIMESTAMP_TIME_START:]
+    ts = entry.get("_timestamp", "")[:TIMESTAMP_COL_WIDTH].replace("T", " ")[
+        TIMESTAMP_TIME_START:
+    ]
     event_name = entry.get("event", entry.get("_function_name", ""))
     ok = entry.get("ok")
-    status = "[green]PASS[/green]" if ok else ("[red]FAIL[/red]" if ok is False else "[dim]—[/dim]")
+    status = (
+        "[green]PASS[/green]"
+        if ok
+        else ("[red]FAIL[/red]" if ok is False else "[dim]—[/dim]")
+    )
     name = ""
     details = ""
 
@@ -93,7 +112,9 @@ def format_log_entry_row(entry: dict) -> tuple:
         name = entry.get("metric", "")
         val = entry.get("value")
         thr = entry.get("threshold")
-        op = {"le": "≤", "ge": "≥", "lt": "<", "gt": ">", "eq": "="}.get(str(entry.get("operator", "")), "?")
+        op = {"le": "≤", "ge": "≥", "lt": "<", "gt": ">", "eq": "="}.get(
+            str(entry.get("operator", "")), "?"
+        )
         val_s = f"{val:.1f}" if val is not None else "N/A"
         details = f"{val_s} {op} {thr}"
     elif event_name in ("pipeline_start", "pipeline_end"):
@@ -109,7 +130,9 @@ def format_log_entry_row(entry: dict) -> tuple:
             parts.append("PASS" if entry.get("final_ok") else "FAIL")
             parts.append(f"iter={entry.get('iterations')}")
             dur_s = entry.get("total_duration_s", 0)
-            parts.append(f"{dur_s:.1f}s" if isinstance(dur_s, (int, float)) else str(dur_s))
+            parts.append(
+                f"{dur_s:.1f}s" if isinstance(dur_s, (int, float)) else str(dur_s)
+            )
         details = " ".join(parts)
     else:
         details = str(entry)[:LOG_DETAIL_MAX_LEN]

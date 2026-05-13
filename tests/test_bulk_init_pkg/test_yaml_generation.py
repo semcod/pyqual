@@ -7,7 +7,12 @@ from pyqual.bulk_init import ProjectConfig, generate_pyqual_yaml
 
 class TestGenerateYaml:
     def test_python_yaml_is_valid(self) -> None:
-        cfg = ProjectConfig(project_type="python", has_tests=True, test_command="python3 -m pytest -q", lint_tool_preset="ruff")
+        cfg = ProjectConfig(
+            project_type="python",
+            has_tests=True,
+            test_command="python3 -m pytest -q",
+            lint_tool_preset="ruff",
+        )
         content = generate_pyqual_yaml("mylib", cfg)
         data = yaml.safe_load(content)
         assert data["pipeline"]["name"] == "mylib-quality"
@@ -21,7 +26,13 @@ class TestGenerateYaml:
         assert "test" in stage_names
 
     def test_node_yaml_has_npm_test(self) -> None:
-        cfg = ProjectConfig(project_type="node", has_tests=True, test_command="npm test", lint_command="npm run lint", build_command="npm run build")
+        cfg = ProjectConfig(
+            project_type="node",
+            has_tests=True,
+            test_command="npm test",
+            lint_command="npm run lint",
+            build_command="npm run build",
+        )
         content = generate_pyqual_yaml("webapp", cfg)
         data = yaml.safe_load(content)
         stages = data["pipeline"]["stages"]

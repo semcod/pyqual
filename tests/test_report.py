@@ -13,7 +13,6 @@ from pyqual.report import (
     BADGE_START,
     build_badges,
     collect_all_metrics,
-    collect_project_metadata,
     generate_report,
     update_readme_badges,
     _build_project_badges,
@@ -23,8 +22,14 @@ from pyqual.report import (
 from pyqual.config import PyqualConfig
 
 
-def _make_project(tmpdir: Path, *, cc: float = 3.6, critical: int = 2,
-                  vallm_pass: float = 85.0, coverage: float = 72.0) -> Path:
+def _make_project(
+    tmpdir: Path,
+    *,
+    cc: float = 3.6,
+    critical: int = 2,
+    vallm_pass: float = 85.0,
+    coverage: float = 72.0,
+) -> Path:
     """Create a minimal project tree with .pyqual/ and toon artifacts."""
     (tmpdir / ".pyqual").mkdir(exist_ok=True)
     (tmpdir / "project").mkdir(exist_ok=True)
@@ -47,21 +52,26 @@ def _make_project(tmpdir: Path, *, cc: float = 3.6, critical: int = 2,
 def _write_config(tmpdir: Path) -> Path:
     """Write a minimal pyqual.yaml and return its path."""
     cfg_path = tmpdir / "pyqual.yaml"
-    cfg_path.write_text(yaml.dump({
-        "pipeline": {
-            "name": "test-report",
-            "metrics": {"cc_max": 15, "coverage_min": 60, "vallm_pass_min": 80},
-            "stages": [
-                {"name": "test", "run": "echo ok"},
-            ],
-        }
-    }))
+    cfg_path.write_text(
+        yaml.dump(
+            {
+                "pipeline": {
+                    "name": "test-report",
+                    "metrics": {"cc_max": 15, "coverage_min": 60, "vallm_pass_min": 80},
+                    "stages": [
+                        {"name": "test", "run": "echo ok"},
+                    ],
+                }
+            }
+        )
+    )
     return cfg_path
 
 
 # ---------------------------------------------------------------------------
 # collect_all_metrics
 # ---------------------------------------------------------------------------
+
 
 def test_collect_all_metrics_reads_toon_and_coverage() -> None:
     with tempfile.TemporaryDirectory() as td:
@@ -82,6 +92,7 @@ def test_collect_all_metrics_empty_dir() -> None:
 # ---------------------------------------------------------------------------
 # generate_report
 # ---------------------------------------------------------------------------
+
 
 def test_generate_report_creates_yaml() -> None:
     with tempfile.TemporaryDirectory() as td:
@@ -128,6 +139,7 @@ def test_generate_report_gates_fail() -> None:
 # build_badges
 # ---------------------------------------------------------------------------
 
+
 def test_build_badges_pass() -> None:
     metrics = {"cc": 3.6, "coverage": 85.0, "vallm_pass": 92.0}
     line = build_badges(metrics, gates_passed=True, gates_passed_count=3, gates_total=3)
@@ -139,7 +151,9 @@ def test_build_badges_pass() -> None:
 
 def test_build_badges_fail() -> None:
     metrics = {"cc": 25.0, "coverage": 30.0}
-    line = build_badges(metrics, gates_passed=False, gates_passed_count=0, gates_total=2)
+    line = build_badges(
+        metrics, gates_passed=False, gates_passed_count=0, gates_total=2
+    )
     assert "pyqual-fail-red" in line
 
 
@@ -161,8 +175,13 @@ def test_build_badges_with_project_meta() -> None:
         "human_hours": 10.5,
         "model": "openrouter/qwen/qwen3-coder-next",
     }
-    block = build_badges(metrics, gates_passed=True, project_meta=meta,
-                         gates_passed_count=2, gates_total=2)
+    block = build_badges(
+        metrics,
+        gates_passed=True,
+        project_meta=meta,
+        gates_passed_count=2,
+        gates_total=2,
+    )
     # Two lines: project info + quality
     lines = block.split("\n")
     assert len(lines) == 2
@@ -182,14 +201,16 @@ def test_build_badges_with_project_meta() -> None:
 
 def test_build_badges_gates_ratio() -> None:
     metrics = {"cc": 5.0}
-    block = build_badges(metrics, gates_passed=False,
-                         gates_passed_count=1, gates_total=3)
+    block = build_badges(
+        metrics, gates_passed=False, gates_passed_count=1, gates_total=3
+    )
     assert "1%2F3" in block or "1/3" in block
 
 
 # ---------------------------------------------------------------------------
 # _build_project_badges
 # ---------------------------------------------------------------------------
+
 
 def test_project_badges_all_fields() -> None:
     meta = {
@@ -234,6 +255,7 @@ def test_project_badges_ai_cost_colors() -> None:
 # _build_quality_badges
 # ---------------------------------------------------------------------------
 
+
 def test_quality_badges_with_extra_metrics() -> None:
     metrics = {
         "cc": 5.0,
@@ -254,17 +276,22 @@ def test_quality_badges_with_extra_metrics() -> None:
 # _read_costs_data
 # ---------------------------------------------------------------------------
 
+
 def test_read_costs_from_json() -> None:
     with tempfile.TemporaryDirectory() as td:
         p = Path(td)
         (p / ".pyqual").mkdir()
-        (p / ".pyqual" / "costs.json").write_text(json.dumps({
-            "total_cost": 5.25,
-            "total_commits": 40,
-            "human_time": 15.0,
-            "human_cost": 1500.0,
-            "model": "gpt-4",
-        }))
+        (p / ".pyqual" / "costs.json").write_text(
+            json.dumps(
+                {
+                    "total_cost": 5.25,
+                    "total_commits": 40,
+                    "human_time": 15.0,
+                    "human_cost": 1500.0,
+                    "model": "gpt-4",
+                }
+            )
+        )
         data = _read_costs_data(p)
         assert data["ai_cost"] == 5.25
         assert data["ai_commits"] == 40
@@ -283,6 +310,7 @@ def test_read_costs_empty_dir() -> None:
 # ---------------------------------------------------------------------------
 # update_readme_badges
 # ---------------------------------------------------------------------------
+
 
 def test_update_readme_inserts_markers_after_existing_badges() -> None:
     with tempfile.TemporaryDirectory() as td:
@@ -364,6 +392,7 @@ def test_update_readme_inserts_at_top_when_no_badges() -> None:
 # run() integration
 # ---------------------------------------------------------------------------
 
+
 def test_run_integration() -> None:
     from pyqual.report import run
 
@@ -397,11 +426,15 @@ def test_run_integration_with_costs() -> None:
         readme.write_text("# Test\n\nHello.\n")
 
         # Add costs.json
-        (p / ".pyqual" / "costs.json").write_text(json.dumps({
-            "total_cost": 2.50,
-            "total_commits": 20,
-            "human_time": 8.5,
-        }))
+        (p / ".pyqual" / "costs.json").write_text(
+            json.dumps(
+                {
+                    "total_cost": 2.50,
+                    "total_commits": 20,
+                    "human_time": 8.5,
+                }
+            )
+        )
 
         rc = run(workdir=p, config_path=cfg_path, readme_path=readme)
         assert rc == 0

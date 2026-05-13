@@ -12,6 +12,7 @@ EXAMPLE_COVERAGE_VALUE = 75.0
 GIT_DIFF_BASE_REF = "HEAD~1"
 PYTHON_FILE_SUFFIX = ".py"
 
+
 def main() -> int:
     """Run the dynamic-threshold gate example."""
     # Detect changed files
@@ -24,7 +25,9 @@ def main() -> int:
     changed_files = [line for line in result.stdout.splitlines() if line.strip()]
 
     # Adjust thresholds based on change size
-    num_changed = sum(1 for filename in changed_files if filename.endswith(PYTHON_FILE_SUFFIX))
+    num_changed = sum(
+        1 for filename in changed_files if filename.endswith(PYTHON_FILE_SUFFIX)
+    )
     coverage_threshold = (
         # Lower threshold for large changes
         LARGE_CHANGE_COVERAGE_THRESHOLD
@@ -45,7 +48,9 @@ def main() -> int:
     results = [g.check(metrics) for g in gate_set.gates]
 
     for r in results:
-        print(f"{'✅' if r.passed else '❌'} {r.metric}: {r.value}% (threshold: {r.threshold}%)")
+        print(
+            f"{'✅' if r.passed else '❌'} {r.metric}: {r.value}% (threshold: {r.threshold}%)"
+        )
 
     return 0 if all(r.passed for r in results) else 1
 

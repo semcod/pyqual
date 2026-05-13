@@ -1,5 +1,4 @@
-"""Config-related commands: gates, validate, fix-config, status, report.
-"""
+"""Config-related commands: gates, validate, fix-config, status, report."""
 
 from __future__ import annotations
 
@@ -37,7 +36,9 @@ def gates(
     for r in results:
         icon = "✅" if r.passed else "❌"
         val = f"{r.value:.1f}" if r.value is not None else "N/A"
-        op = {"le": "≤", "ge": "≥", "lt": "<", "gt": ">", "eq": "="}.get(r.operator, "?")
+        op = {"le": "≤", "ge": "≥", "lt": "<", "gt": ">", "eq": "="}.get(
+            r.operator, "?"
+        )
         table.add_row(icon, r.metric, val, f"{op} {r.threshold}")
 
     console.print(table)
@@ -51,9 +52,9 @@ def gates(
 
 
 _SEV_STYLE = {
-    Severity.ERROR:   ("[bold red]ERROR  [/]", "red"),
+    Severity.ERROR: ("[bold red]ERROR  [/]", "red"),
     Severity.WARNING: ("[yellow]WARNING[/]", "yellow"),
-    Severity.INFO:    ("[dim]INFO   [/]", "dim"),
+    Severity.INFO: ("[dim]INFO   [/]", "dim"),
 }
 
 
@@ -65,7 +66,9 @@ def _print_issues(result: Any, cfg_path: Path, fix: bool) -> None:
         fixed_indicator = ""
         if fix and issue.suggestion and "Auto-fixed:" in issue.suggestion:
             fixed_indicator = " [green][fixed][/green]"
-        console.print(f"  {badge}{location}{fixed_indicator}  [{style}]{issue.message}[/{style}]")
+        console.print(
+            f"  {badge}{location}{fixed_indicator}  [{style}]{issue.message}[/{style}]"
+        )
         if issue.suggestion and not issue.suggestion.startswith("Auto-fixed:"):
             console.print(f"          [dim]→ {issue.suggestion}[/dim]")
 
@@ -74,15 +77,21 @@ def _print_fix_summary(result: Any, cfg_path: Path) -> None:
     """Print count of auto-fixed issues when --fix is active."""
     fixed_count = sum(1 for i in result.issues if "Auto-fixed:" in (i.suggestion or ""))
     if fixed_count:
-        console.print(f"\n[green]✓ Auto-fixed {fixed_count} syntax issue(s)[/green] (backup: {cfg_path.name}.bak)")
+        console.print(
+            f"\n[green]✓ Auto-fixed {fixed_count} syntax issue(s)[/green] (backup: {cfg_path.name}.bak)"
+        )
 
 
 @app.command()
 def validate(
     config: Path = typer.Option("pyqual.yaml", "--config", "-c"),
     workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
-    strict: bool = typer.Option(False, "--strict", "-s", help="Exit 1 on warnings too."),
-    fix: bool = typer.Option(False, "--fix", "-f", help="Auto-fix YAML syntax errors (creates .bak backup)."),
+    strict: bool = typer.Option(
+        False, "--strict", "-s", help="Exit 1 on warnings too."
+    ),
+    fix: bool = typer.Option(
+        False, "--fix", "-f", help="Auto-fix YAML syntax errors (creates .bak backup)."
+    ),
 ) -> None:
     """Validate pyqual.yaml without running the pipeline.
 
@@ -100,16 +109,22 @@ def validate(
         pyqual validate --strict
         pyqual validate --fix
     """
-    cfg_path = Path(workdir) / config if not Path(config).is_absolute() else Path(config)
+    cfg_path = (
+        Path(workdir) / config if not Path(config).is_absolute() else Path(config)
+    )
     result = validate_config(cfg_path, try_fix=fix)
 
     if not result.issues:
-        console.print(f"[bold green]✅ {cfg_path.name} is valid.[/bold green]"
-                      f" ({result.stages_checked} stages, {result.gates_checked} gates)")
+        console.print(
+            f"[bold green]✅ {cfg_path.name} is valid.[/bold green]"
+            f" ({result.stages_checked} stages, {result.gates_checked} gates)"
+        )
         return
 
-    console.print(f"[bold]Validating {cfg_path.name}[/bold]"
-                  f" — {result.stages_checked} stages, {result.gates_checked} gates\n")
+    console.print(
+        f"[bold]Validating {cfg_path.name}[/bold]"
+        f" — {result.stages_checked} stages, {result.gates_checked} gates\n"
+    )
 
     _print_issues(result, cfg_path, fix)
 
@@ -121,10 +136,14 @@ def validate(
     nwarn = len(result.warnings)
     if nerr:
         suffix = f", {nwarn} warning(s)" if nwarn else ""
-        console.print(f"[bold red]{nerr} error(s)[/bold red]{suffix} — pipeline cannot start.")
+        console.print(
+            f"[bold red]{nerr} error(s)[/bold red]{suffix} — pipeline cannot start."
+        )
         raise typer.Exit(1)
     if nwarn:
-        console.print(f"[yellow]{nwarn} warning(s)[/yellow] — pipeline may behave unexpectedly.")
+        console.print(
+            f"[yellow]{nwarn} warning(s)[/yellow] — pipeline may behave unexpectedly."
+        )
         if strict:
             raise typer.Exit(1)
 
@@ -133,7 +152,9 @@ def validate(
 def fix_config(
     config: Path = typer.Option("pyqual.yaml", "--config", "-c"),
     workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
-    dry_run: bool = typer.Option(False, "--dry-run", "-n", help="Print proposed config, do not write."),
+    dry_run: bool = typer.Option(
+        False, "--dry-run", "-n", help="Print proposed config, do not write."
+    ),
     model: str | None = typer.Option(None, "--model", "-m", help="Override LLM model."),
 ) -> None:
     """Use LLM to auto-repair pyqual.yaml based on project structure.
@@ -156,7 +177,9 @@ def fix_config(
     facts = detect_project_facts(workdir_path)
 
     if validation.ok and not validation.warnings:
-        console.print("[bold green]✅ Config is already valid — nothing to fix.[/bold green]")
+        console.print(
+            "[bold green]✅ Config is already valid — nothing to fix.[/bold green]"
+        )
         return
 
     issues_text = "\n".join(
@@ -190,7 +213,9 @@ Rules:
 """
 
     console.print(f"[bold]Asking LLM to fix {cfg_path.name}…[/bold]")
-    console.print(f"[dim]Issues: {len(validation.issues)} | Lang: {facts.get('lang')} | Tools: {available_tools}[/dim]\n")
+    console.print(
+        f"[dim]Issues: {len(validation.issues)} | Lang: {facts.get('lang')} | Tools: {available_tools}[/dim]\n"
+    )
 
     try:
         llm = LLM(model=model)
@@ -203,8 +228,7 @@ Rules:
     if new_yaml.startswith("```"):
         lines = new_yaml.splitlines()
         new_yaml = "\n".join(
-            line for line in lines
-            if not line.startswith("```")
+            line for line in lines if not line.startswith("```")
         ).strip()
 
     console.print(new_yaml)
@@ -223,7 +247,9 @@ Rules:
     if re_check.ok:
         console.print("[bold green]✅ Re-validation passed.[/bold green]")
     else:
-        console.print(f"[yellow]{len(re_check.errors)} issue(s) remain — review manually.[/yellow]")
+        console.print(
+            f"[yellow]{len(re_check.errors)} issue(s) remain — review manually.[/yellow]"
+        )
 
 
 @app.command()
@@ -258,7 +284,9 @@ def status(
 def report(
     config: Path = typer.Option("pyqual.yaml", "--config", "-c"),
     workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
-    readme: Path = typer.Option(None, "--readme", "-r", help="README file to update badges in."),
+    readme: Path = typer.Option(
+        None, "--readme", "-r", help="README file to update badges in."
+    ),
 ) -> None:
     """Generate metrics report (YAML) and update README.md badges."""
     from pyqual.report import run as run_report

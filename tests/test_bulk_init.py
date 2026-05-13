@@ -11,7 +11,6 @@ import yaml
 
 from pyqual.bulk_init import (
     PROJECT_CONFIG_SCHEMA,
-    BulkInitResult,
     ProjectConfig,
     ProjectFingerprint,
     _classify_heuristic,
@@ -26,6 +25,7 @@ from pyqual.bulk_init import (
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def workspace(tmp_path: Path) -> Path:
@@ -42,20 +42,28 @@ def workspace(tmp_path: Path) -> Path:
     # Node project with test script
     node = tmp_path / "webapp"
     node.mkdir()
-    (node / "package.json").write_text(json.dumps({
-        "name": "webapp",
-        "scripts": {"test": "jest", "lint": "eslint .", "build": "tsc"},
-    }))
+    (node / "package.json").write_text(
+        json.dumps(
+            {
+                "name": "webapp",
+                "scripts": {"test": "jest", "lint": "eslint .", "build": "tsc"},
+            }
+        )
+    )
     (node / "src").mkdir()
     (node / "src" / "index.ts").write_text("console.log('hi');\n")
 
     # PHP project
     php = tmp_path / "api-server"
     php.mkdir()
-    (php / "composer.json").write_text(json.dumps({
-        "name": "vendor/api-server",
-        "scripts": {"test": "phpunit"},
-    }))
+    (php / "composer.json").write_text(
+        json.dumps(
+            {
+                "name": "vendor/api-server",
+                "scripts": {"test": "phpunit"},
+            }
+        )
+    )
     (php / "index.php").write_text("<?php echo 'ok'; ?>\n")
 
     # Makefile-only project
@@ -86,6 +94,7 @@ def workspace(tmp_path: Path) -> Path:
 # ---------------------------------------------------------------------------
 # Fingerprint tests
 # ---------------------------------------------------------------------------
+
 
 class TestCollectFingerprint:
     def test_python_project(self, workspace: Path) -> None:
@@ -123,6 +132,7 @@ class TestCollectFingerprint:
 # ---------------------------------------------------------------------------
 # Heuristic classification tests
 # ---------------------------------------------------------------------------
+
 
 class TestClassifyHeuristic:
     def test_python_with_tests(self, workspace: Path) -> None:
@@ -169,6 +179,7 @@ class TestClassifyHeuristic:
 # ---------------------------------------------------------------------------
 # YAML generation tests
 # ---------------------------------------------------------------------------
+
 
 class TestGenerateYaml:
     def test_python_yaml_is_valid(self) -> None:
@@ -231,7 +242,12 @@ class TestGenerateYaml:
             project_type="python",
             test_command="pytest",
             extra_stages=[
-                {"name": "security", "run": "bandit -r src/", "when": "always", "optional": True},
+                {
+                    "name": "security",
+                    "run": "bandit -r src/",
+                    "when": "always",
+                    "optional": True,
+                },
             ],
         )
         content = generate_pyqual_yaml("secure", cfg)
@@ -253,6 +269,7 @@ class TestGenerateYaml:
 # Safe name tests
 # ---------------------------------------------------------------------------
 
+
 class TestSafeName:
     def test_simple(self) -> None:
         assert _safe_name("mylib") == "mylib"
@@ -271,19 +288,22 @@ class TestSafeName:
 # LLM classification tests (mocked)
 # ---------------------------------------------------------------------------
 
+
 class TestClassifyWithLlm:
     def test_valid_json_response(self, workspace: Path) -> None:
         fp = collect_fingerprint(workspace / "mylib")
         mock_response = MagicMock()
-        mock_response.content = json.dumps({
-            "project_type": "python",
-            "skip": False,
-            "skip_reason": None,
-            "has_tests": True,
-            "test_command": "python3 -m pytest -q",
-            "lint_tool_preset": "ruff",
-            "cc_max": 10,
-        })
+        mock_response.content = json.dumps(
+            {
+                "project_type": "python",
+                "skip": False,
+                "skip_reason": None,
+                "has_tests": True,
+                "test_command": "python3 -m pytest -q",
+                "lint_tool_preset": "ruff",
+                "cc_max": 10,
+            }
+        )
 
         with patch("pyqual.llm.LLM") as MockLLM:
             MockLLM.return_value.complete.return_value = mock_response
@@ -297,7 +317,9 @@ class TestClassifyWithLlm:
     def test_markdown_fenced_json(self, workspace: Path) -> None:
         fp = collect_fingerprint(workspace / "mylib")
         mock_response = MagicMock()
-        mock_response.content = '```json\n{"project_type": "python", "skip": false, "has_tests": true}\n```'
+        mock_response.content = (
+            '```json\n{"project_type": "python", "skip": false, "has_tests": true}\n```'
+        )
 
         with patch("pyqual.llm.LLM") as MockLLM:
             MockLLM.return_value.complete.return_value = mock_response
@@ -321,6 +343,7 @@ class TestClassifyWithLlm:
 # ---------------------------------------------------------------------------
 # Bulk init orchestrator tests
 # ---------------------------------------------------------------------------
+
 
 class TestBulkInit:
     def test_dry_run_creates_nothing(self, workspace: Path) -> None:
@@ -381,12 +404,22 @@ class TestBulkInit:
 
     def test_hidden_dirs_ignored(self, workspace: Path) -> None:
         result = bulk_init(workspace, use_llm=False, dry_run=True)
-        all_names = result.created + result.skipped_existing + [n for n, _ in result.skipped_nonproject]
+        all_names = (
+            result.created
+            + result.skipped_existing
+            + [n for n, _ in result.skipped_nonproject]
+        )
         assert ".cache" not in all_names
 
     def test_total_count(self, workspace: Path) -> None:
         result = bulk_init(workspace, use_llm=False, dry_run=True)
-        expected = len([d for d in workspace.iterdir() if d.is_dir() and not d.name.startswith(".")])
+        expected = len(
+            [
+                d
+                for d in workspace.iterdir()
+                if d.is_dir() and not d.name.startswith(".")
+            ]
+        )
         assert result.total == expected
 
     def test_generated_yaml_is_valid(self, workspace: Path) -> None:
@@ -410,6 +443,7 @@ class TestBulkInit:
 # ---------------------------------------------------------------------------
 # Schema tests
 # ---------------------------------------------------------------------------
+
 
 class TestSchema:
     def test_schema_is_valid_json_schema(self) -> None:

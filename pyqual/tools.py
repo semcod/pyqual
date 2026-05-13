@@ -54,6 +54,7 @@ USER_TOOLS_FILE = "pyqual.tools.json"
 # Tool preset definition
 # ---------------------------------------------------------------------------
 
+
 @dataclass(frozen=True)
 class ToolPreset:
     """Definition of a built-in tool invocation preset."""
@@ -135,6 +136,7 @@ _BUILTIN_NAMES: frozenset[str] = frozenset(TOOL_PRESETS.keys())
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
+
 
 def get_preset(name: str) -> Optional[ToolPreset]:
     """Look up a tool preset by name (case-insensitive)."""
@@ -222,9 +224,11 @@ def dump_presets_json(names: Optional[list[str]] = None) -> str:
     Useful for ``pyqual tools --json`` or generating a starter
     ``pyqual.tools.json`` file.
     """
-    presets = TOOL_PRESETS if names is None else {
-        k: v for k, v in TOOL_PRESETS.items() if k in names
-    }
+    presets = (
+        TOOL_PRESETS
+        if names is None
+        else {k: v for k, v in TOOL_PRESETS.items() if k in names}
+    )
     return json.dumps(
         {k: preset_to_dict(v) for k, v in sorted(presets.items())},
         indent=2,
@@ -281,9 +285,14 @@ def load_entry_point_presets() -> int:
     count = 0
     try:
         from importlib.metadata import entry_points
+
         eps = entry_points()
         # Python 3.12+ returns SelectableGroups, older returns dict
-        group = eps.select(group="pyqual.tools") if hasattr(eps, "select") else eps.get("pyqual.tools", [])
+        group = (
+            eps.select(group="pyqual.tools")
+            if hasattr(eps, "select")
+            else eps.get("pyqual.tools", [])
+        )
         for ep in group:
             try:
                 obj = ep.load()
@@ -296,7 +305,11 @@ def load_entry_point_presets() -> int:
                         register_preset(ep.name, result)
                         count += 1
                 else:
-                    log.warning("entry_point '%s': expected ToolPreset, got %s", ep.name, type(obj).__name__)
+                    log.warning(
+                        "entry_point '%s': expected ToolPreset, got %s",
+                        ep.name,
+                        type(obj).__name__,
+                    )
             except Exception as exc:
                 log.warning("Failed to load entry_point '%s': %s", ep.name, exc)
     except Exception as exc:

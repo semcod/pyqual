@@ -8,7 +8,6 @@ from typing import Any
 
 from pyqual.constants import (
     DEFAULT_MCP_PORT,
-    PYQUAL_DIR,
 )
 from pyqual.plugins._base import MetricCollector, PluginMetadata, PluginRegistry
 
@@ -16,6 +15,7 @@ from pyqual.plugins._base import MetricCollector, PluginMetadata, PluginRegistry
 # =============================================================================
 # LLM & AI Benchmarking Collectors
 # =============================================================================
+
 
 @PluginRegistry.register
 class LLMBenchCollector(MetricCollector):
@@ -103,10 +103,14 @@ stages:
                 faith = data.get("faithfulness") or data.get("faithfulness_score")
                 if faith:
                     result["faithfulness_score"] = float(faith)
-                hall_rate = data.get("hallucination_rate") or data.get("hallucination_pct")
+                hall_rate = data.get("hallucination_rate") or data.get(
+                    "hallucination_pct"
+                )
                 if hall_rate:
                     result["hallucination_rate"] = float(hall_rate)
-                token_eff = data.get("token_efficiency") or data.get("prompt_token_efficiency")
+                token_eff = data.get("token_efficiency") or data.get(
+                    "prompt_token_efficiency"
+                )
                 if token_eff:
                     result["prompt_token_efficiency"] = float(token_eff)
                 cos_sim = data.get("cosine_similarity") or data.get("similarity")
@@ -120,6 +124,7 @@ stages:
 # =============================================================================
 # Compliance & Supply Chain Collectors
 # =============================================================================
+
 
 @PluginRegistry.register
 class SBOMCollector(MetricCollector):
@@ -163,6 +168,7 @@ stages:
 # =============================================================================
 # Internationalization & Accessibility Collectors
 # =============================================================================
+
 
 @PluginRegistry.register
 class I18nCollector(MetricCollector):
@@ -240,6 +246,7 @@ stages:
 # Repository Health Collectors
 # =============================================================================
 
+
 @PluginRegistry.register
 class RepoMetricsCollector(MetricCollector):
     """Advanced repository health metrics (bus factor, diversity)."""
@@ -275,7 +282,9 @@ stages:
                     freq = data.get("commit_frequency") or data.get("commits_per_week")
                     if freq:
                         result["commit_frequency"] = float(freq)
-                    diversity = data.get("contributor_diversity") or data.get("diversity_index")
+                    diversity = data.get("contributor_diversity") or data.get(
+                        "diversity_index"
+                    )
                     if diversity:
                         result["contributor_diversity"] = float(diversity)
                 except (json.JSONDecodeError, TypeError):
@@ -286,6 +295,7 @@ stages:
 # =============================================================================
 # MCP/LLM Fix Workflow Collectors
 # =============================================================================
+
 
 @PluginRegistry.register
 class LlxMcpFixCollector(MetricCollector):
@@ -346,7 +356,9 @@ env:
             return None
         return float(sum(1 for line in value.splitlines() if line.strip()))
 
-    def _collect_analysis_metrics(self, result: dict[str, float], analysis: Any) -> None:
+    def _collect_analysis_metrics(
+        self, result: dict[str, float], analysis: Any
+    ) -> None:
         if not isinstance(analysis, dict):
             return
         metrics = analysis.get("metrics")

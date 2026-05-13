@@ -2,7 +2,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from pyqual.bulk_init import ProjectFingerprint, _classify_heuristic, collect_fingerprint
+from pyqual.bulk_init import (
+    ProjectFingerprint,
+    _classify_heuristic,
+    collect_fingerprint,
+)
 
 
 class TestClassifyHeuristic:

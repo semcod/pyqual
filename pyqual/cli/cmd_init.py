@@ -1,5 +1,4 @@
-"""Init and profiles commands.
-"""
+"""Init and profiles commands."""
 
 from __future__ import annotations
 
@@ -15,7 +14,12 @@ from rich.table import Table
 @app.command()
 def init(
     path: Path = typer.Argument(Path("."), help="Project directory"),
-    profile: str | None = typer.Option(None, "--profile", "-p", help="Use a built-in profile (e.g. python, python-full, ci, lint-only, security). See 'pyqual profiles'."),
+    profile: str | None = typer.Option(
+        None,
+        "--profile",
+        "-p",
+        help="Use a built-in profile (e.g. python, python-full, ci, lint-only, security). See 'pyqual profiles'.",
+    ),
 ) -> None:
     """Create pyqual.yaml with sensible defaults.
 
@@ -33,6 +37,7 @@ def init(
 
     if profile:
         from pyqual.profiles import get_profile, list_profiles
+
         prof = get_profile(profile)
         if prof is None:
             console.print(f"[red]Unknown profile '{profile}'.[/red]")
@@ -42,7 +47,7 @@ def init(
 pipeline:
   profile: {profile}
 
-  # Override metrics (profile defaults: {', '.join(f'{k}={v}' for k, v in prof.metrics.items())}):
+  # Override metrics (profile defaults: {", ".join(f"{k}={v}" for k, v in prof.metrics.items())}):
   # metrics:
   #   coverage_min: 55
 
@@ -87,4 +92,6 @@ def profiles() -> None:
         table.add_row(name, prof.description, stage_names, gate_names)
 
     console.print(table)
-    console.print("\n[dim]Usage: set 'profile: <name>' in pyqual.yaml under pipeline:[/dim]")
+    console.print(
+        "\n[dim]Usage: set 'profile: <name>' in pyqual.yaml under pipeline:[/dim]"
+    )

@@ -24,13 +24,21 @@ from pyqual.cli import (
 )
 
 # Backward-compatible re-exports for tests and external code
-from pyqual.cli.cmd_mcp import run_llx_fix_workflow, run_llx_refactor_workflow, run_llx_mcp_service
-from pyqual.cli.cmd_tickets import sync_todo_tickets, sync_github_tickets, sync_all_tickets
+from pyqual.cli.cmd_mcp import (
+    run_llx_fix_workflow,
+    run_llx_refactor_workflow,
+    run_llx_mcp_service,
+)
+from pyqual.cli.cmd_tickets import (
+    sync_todo_tickets,
+    sync_github_tickets,
+    sync_all_tickets,
+)
 from pyqual.pipeline import Pipeline
 
 __all__ = [
     "app",
-    "console", 
+    "console",
     "stderr_console",
     "setup_logging",
     # Re-exports for backward compatibility

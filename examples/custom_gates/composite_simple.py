@@ -3,6 +3,7 @@
 
 Uses pyqual.gates.CompositeGateSet - new in pyqual 0.1.x
 """
+
 import json
 import tempfile
 from pathlib import Path
@@ -29,7 +30,11 @@ gates = [
     GateConfig(metric="cc", operator="le", threshold=CC_THRESHOLD),
     GateConfig(metric="ruff_errors", operator="le", threshold=RUFF_ERRORS_THRESHOLD),
 ]
-weights = {"coverage": WEIGHT_COVERAGE, "cc": WEIGHT_CC, "ruff_errors": WEIGHT_RUFF_ERRORS}
+weights = {
+    "coverage": WEIGHT_COVERAGE,
+    "cc": WEIGHT_CC,
+    "ruff_errors": WEIGHT_RUFF_ERRORS,
+}
 
 # Create composite gate set with pass threshold
 composite = CompositeGateSet(gates, weights, pass_threshold=PASS_THRESHOLD)
@@ -39,20 +44,20 @@ with tempfile.TemporaryDirectory() as tmpdir:
     p = Path(tmpdir)
     pyqual_dir = p / ".pyqual"
     pyqual_dir.mkdir()
-    
+
     # Simulate metrics
     (pyqual_dir / "coverage.json").write_text(
         json.dumps({"totals": {"percent_covered": 88.5}})
     )
     (pyqual_dir / "ruff.json").write_text(json.dumps([{"code": "E501"}] * 3))
-    
+
     project_dir = p / "project"
     project_dir.mkdir()
     (project_dir / "analysis.toon.yaml").write_text("SUMMARY:\n  CC̄=3.2\n")
-    
+
     # Run composite check
     result = composite.check_composite(p)
-    
+
     print(f"Composite Score: {result.score:.1f}/100")
     print(f"Pass Threshold: {result.pass_threshold:.1f}")
     print(f"Result: {'✅ PASS' if result.passed else '❌ FAIL'}")

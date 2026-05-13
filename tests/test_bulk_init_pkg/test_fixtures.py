@@ -19,13 +19,22 @@ def workspace(tmp_path: Path) -> Path:
 
     node = tmp_path / "webapp"
     node.mkdir()
-    (node / "package.json").write_text(json.dumps({"name": "webapp", "scripts": {"test": "jest", "lint": "eslint .", "build": "tsc"}}))
+    (node / "package.json").write_text(
+        json.dumps(
+            {
+                "name": "webapp",
+                "scripts": {"test": "jest", "lint": "eslint .", "build": "tsc"},
+            }
+        )
+    )
     (node / "src").mkdir()
     (node / "src" / "index.ts").write_text("console.log('hi');\n")
 
     php = tmp_path / "api-server"
     php.mkdir()
-    (php / "composer.json").write_text(json.dumps({"name": "vendor/api-server", "scripts": {"test": "phpunit"}}))
+    (php / "composer.json").write_text(
+        json.dumps({"name": "vendor/api-server", "scripts": {"test": "phpunit"}})
+    )
     (php / "index.php").write_text("<?php echo 'ok'; ?>\n")
 
     mk = tmp_path / "infra"

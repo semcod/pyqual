@@ -5,9 +5,8 @@ from __future__ import annotations
 import json
 import tempfile
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
-import pytest
 
 from pyqual._gate_collectors import _from_runtime_errors
 from pyqual.config import PyqualConfig, StageConfig
@@ -23,7 +22,7 @@ class TestRuntimeErrorCollection:
         """Test that failed stages create runtime_errors.json."""
         with tempfile.TemporaryDirectory() as tmpdir:
             workdir = Path(tmpdir)
-            
+
             # Create a minimal config
             config = PyqualConfig(
                 name="test",
@@ -31,9 +30,9 @@ class TestRuntimeErrorCollection:
                 gates=[],
                 loop=Mock(max_iterations=1),
             )
-            
+
             pipeline = Pipeline(config, workdir=workdir)
-            
+
             # Create a failed stage result
             stage = StageConfig(name="test_stage", run="false")
             result = StageResult(
@@ -45,14 +44,14 @@ class TestRuntimeErrorCollection:
                 duration=0.5,
                 command="false",
             )
-            
+
             # Capture the error
             pipeline._capture_runtime_error(stage, result)
-            
+
             # Verify file was created
             errors_file = workdir / RUNTIME_ERRORS_FILE
             assert errors_file.exists()
-            
+
             # Verify content
             errors = json.loads(errors_file.read_text())
             assert isinstance(errors, list)
@@ -74,7 +73,7 @@ class TestRuntimeErrorCollection:
                 loop=Mock(max_iterations=1),
             )
             pipeline = Pipeline(config, workdir=workdir)
-            
+
             # Create 105 errors
             for i in range(105):
                 stage = StageConfig(name=f"stage_{i}", run="false")
@@ -88,7 +87,7 @@ class TestRuntimeErrorCollection:
                     command="false",
                 )
                 pipeline._capture_runtime_error(stage, result)
-            
+
             # Verify only last 100 errors are kept
             errors_file = workdir / RUNTIME_ERRORS_FILE
             errors = json.loads(errors_file.read_text())
@@ -107,7 +106,7 @@ class TestRuntimeErrorCollection:
                 loop=Mock(max_iterations=1),
             )
             pipeline = Pipeline(config, workdir=workdir)
-            
+
             test_cases = [
                 (124, "timeout", "timeout"),
                 (127, "command not found", "command_not_found"),
@@ -118,7 +117,7 @@ class TestRuntimeErrorCollection:
                 (1, "AssertionError: Test failed", "assertion_failed"),
                 (1, "Unknown error occurred", "unknown"),
             ]
-            
+
             for rc, stderr, expected_type in test_cases:
                 stage = StageConfig(name="test", run="false")
                 result = StageResult(
@@ -130,7 +129,7 @@ class TestRuntimeErrorCollection:
                     duration=0.1,
                     command="false",
                 )
-                
+
                 error_type = pipeline._classify_error(result)
                 assert error_type == expected_type, f"RC={rc}, stderr={stderr!r}"
 
@@ -145,7 +144,7 @@ class TestRuntimeErrorCollection:
                 loop=Mock(max_iterations=1),
             )
             pipeline = Pipeline(config, workdir=workdir)
-            
+
             # Test with traceback
             result = StageResult(
                 name="test",
@@ -156,16 +155,16 @@ class TestRuntimeErrorCollection:
                 duration=0.1,
                 command="false",
             )
-            
+
             message = pipeline._extract_error_message(result)
             # Should extract either the traceback line or the ValueError line
             assert "Traceback" in message or "ValueError" in message
-            
+
             # Test with simple error
             result.stderr = "ERROR: Something went wrong"
             message = pipeline._extract_error_message(result)
             assert message == "ERROR: Something went wrong"
-            
+
             # Test with empty stderr
             result.stderr = ""
             result.stdout = "Command output\nFinal line: error occurred"
@@ -178,7 +177,7 @@ class TestRuntimeErrorCollection:
             workdir = Path(tmpdir)
             pyqual_dir = workdir / ".pyqual"
             pyqual_dir.mkdir()
-            
+
             # Create test runtime errors
             errors = [
                 {
@@ -218,12 +217,12 @@ class TestRuntimeErrorCollection:
                     "stderr_tail": "",
                 },
             ]
-            
+
             (pyqual_dir / "runtime_errors.json").write_text(json.dumps(errors))
-            
+
             # Test without mocking datetime - just check basic metrics work
             metrics = _from_runtime_errors(workdir)
-            
+
             assert metrics["runtime_errors"] == 3.0
             assert metrics["runtime_test_failed"] == 2.0
             assert metrics["runtime_syntax_error"] == 1.0
@@ -234,24 +233,22 @@ class TestRuntimeErrorCollection:
         """Test that runtime errors are captured during actual pipeline execution."""
         with tempfile.TemporaryDirectory() as tmpdir:
             workdir = Path(tmpdir)
-            
+
             # Create a config with a failing stage
             config = PyqualConfig(
                 name="test",
-                stages=[
-                    StageConfig(name="failing_stage", run="false")
-                ],
+                stages=[StageConfig(name="failing_stage", run="false")],
                 gates=[],
                 loop=Mock(max_iterations=1),
             )
-            
+
             pipeline = Pipeline(config, workdir=workdir)
             result = pipeline.run(dry_run=False)
-            
+
             # Verify error was captured
             errors_file = workdir / RUNTIME_ERRORS_FILE
             assert errors_file.exists()
-            
+
             errors = json.loads(errors_file.read_text())
             assert len(errors) == 1
             assert errors[0]["stage"] == "failing_stage"
@@ -261,19 +258,17 @@ class TestRuntimeErrorCollection:
         """Test that successful stages don't create runtime errors."""
         with tempfile.TemporaryDirectory() as tmpdir:
             workdir = Path(tmpdir)
-            
+
             config = PyqualConfig(
                 name="test",
-                stages=[
-                    StageConfig(name="success_stage", run="true")
-                ],
+                stages=[StageConfig(name="success_stage", run="true")],
                 gates=[],
                 loop=Mock(max_iterations=1),
             )
-            
+
             pipeline = Pipeline(config, workdir=workdir)
             pipeline.run(dry_run=False)
-            
+
             # Verify no errors file was created
             errors_file = workdir / RUNTIME_ERRORS_FILE
             assert not errors_file.exists()
@@ -310,19 +305,21 @@ class TestRuntimeErrorCollection:
         """Test that skipped stages don't create runtime errors."""
         with tempfile.TemporaryDirectory() as tmpdir:
             workdir = Path(tmpdir)
-            
+
             config = PyqualConfig(
                 name="test",
                 stages=[
-                    StageConfig(name="skipped_stage", run="nonexistent_cmd", optional=True)
+                    StageConfig(
+                        name="skipped_stage", run="nonexistent_cmd", optional=True
+                    )
                 ],
                 gates=[],
                 loop=Mock(max_iterations=1),
             )
-            
+
             pipeline = Pipeline(config, workdir=workdir)
             pipeline.run(dry_run=False)
-            
+
             # Verify no errors file was created
             errors_file = workdir / RUNTIME_ERRORS_FILE
             assert not errors_file.exists()

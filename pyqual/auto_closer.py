@@ -26,14 +26,15 @@ def get_changed_files() -> set[str]:
         # Check last commit
         res = subprocess.run(
             ["git", "diff", "--name-only", "HEAD~1", "HEAD"],
-            capture_output=True, text=True, timeout=5
+            capture_output=True,
+            text=True,
+            timeout=5,
         )
         files = set(res.stdout.splitlines())
-        
+
         # Also check current changes
         res = subprocess.run(
-            ["git", "status", "--porcelain"],
-            capture_output=True, text=True, timeout=5
+            ["git", "status", "--porcelain"], capture_output=True, text=True, timeout=5
         )
         for line in res.stdout.splitlines():
             if len(line) > 3:
@@ -48,14 +49,15 @@ def get_diff_content() -> str:
     try:
         res = subprocess.run(
             ["git", "diff", "HEAD~1", "HEAD"],
-            capture_output=True, text=True, timeout=10
+            capture_output=True,
+            text=True,
+            timeout=10,
         )
         diff = res.stdout
-        
+
         # Also append current uncommitted changes
         res = subprocess.run(
-            ["git", "diff"],
-            capture_output=True, text=True, timeout=10
+            ["git", "diff"], capture_output=True, text=True, timeout=10
         )
         diff += f"\n{res.stdout}"
         return diff
@@ -67,8 +69,9 @@ def evaluate_with_llm(title: str, description: str, diff: str) -> str:
     """Use LLM to evaluate the implementation quality."""
     try:
         from pyqual.llm import get_llm
+
         llm = get_llm()
-        
+
         prompt = f"""Evaluate the following code changes for task: "{title}"
 Description: {description}
 
@@ -84,7 +87,7 @@ Specifically, comment on:
 3. Completeness of the fix.
 
 Format your response as a GitHub-style markdown block."""
-        
+
         response = llm.complete(prompt, system="You are a senior code reviewer.")
         return response.content
     except Exception as e:
@@ -115,11 +118,20 @@ def _close_github_issue(reporter, issue_num: int) -> bool:
     if reporter.token:
         env["GH_TOKEN"] = reporter.token
     close_result = subprocess.run(
-        ["gh", "issue", "close", str(issue_num),
-         "--repo", reporter.repo,
-         "--comment", "Auto-closed: All quality gates passed"],
-        capture_output=True, text=True, timeout=30,
-        env=env
+        [
+            "gh",
+            "issue",
+            "close",
+            str(issue_num),
+            "--repo",
+            reporter.repo,
+            "--comment",
+            "Auto-closed: All quality gates passed",
+        ],
+        capture_output=True,
+        text=True,
+        timeout=30,
+        env=env,
     )
     if close_result.returncode == 0:
         print(f"    ✅ Closed issue #{issue_num}")
@@ -128,7 +140,9 @@ def _close_github_issue(reporter, issue_num: int) -> bool:
     return False
 
 
-def _process_ticket(ticket, store, reporter, diff_content: str, completion_rate: float) -> bool:
+def _process_ticket(
+    ticket, store, reporter, diff_content: str, completion_rate: float
+) -> bool:
     """Process a single ticket for closure. Returns True if closed."""
     print(f"  ✓ Evaluating {ticket.id}: {ticket.title}")
 
@@ -155,6 +169,7 @@ def _process_ticket(ticket, store, reporter, diff_content: str, completion_rate:
 
     # Mark as done locally
     from planfile.core.models import TicketStatus
+
     store.update_ticket(ticket.id, status=TicketStatus.done)
     return True
 
@@ -182,7 +197,9 @@ def main():
     completion_rate = (passed / total) * 100 if total > 0 else 0
 
     if status != "pass":
-        print(f"❌ Quality gates status: {status} ({completion_rate:.1f}% passed). Skipping task closure.")
+        print(
+            f"❌ Quality gates status: {status} ({completion_rate:.1f}% passed). Skipping task closure."
+        )
         return
 
     print(f"✅ Quality gates passed ({completion_rate:.1f}%)! Processing tickets...")

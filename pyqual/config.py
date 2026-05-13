@@ -40,6 +40,7 @@ def _normalize_env_values(env: Optional[dict[str, Any]]) -> dict[str, str]:
             normalized[str(key)] = str(value)
     return normalized
 
+
 _STAGE_WHEN_DEFAULTS: dict[str, str] = STAGE_WHEN_DEFAULTS
 """Smart defaults for ``when:`` based on stage name.
 
@@ -51,14 +52,17 @@ If the stage name is not in this dict, the default is ``"always"``.
 @dataclass
 class StageConfig:
     """Single pipeline stage."""
+
     name: str
     run: str = ""
-    tool: str = ""            # built-in tool preset (e.g. "ruff", "pytest")
-    optional: bool = False    # skip silently when tool binary is missing
-    when: str = ""            # auto-inferred from name if empty; see _STAGE_WHEN_DEFAULTS
+    tool: str = ""  # built-in tool preset (e.g. "ruff", "pytest")
+    optional: bool = False  # skip silently when tool binary is missing
+    when: str = ""  # auto-inferred from name if empty; see _STAGE_WHEN_DEFAULTS
     timeout: int = DEFAULT_STAGE_TIMEOUT
     capture_output: bool = True
-    exclude: list[str] = field(default_factory=list)  # extra --exclude args appended to tool command
+    exclude: list[str] = field(
+        default_factory=list
+    )  # extra --exclude args appended to tool command
 
     def __post_init__(self) -> None:
         if not self.when:
@@ -68,6 +72,7 @@ class StageConfig:
 @dataclass
 class GateConfig:
     """Single quality gate threshold."""
+
     metric: str
     operator: str  # le, ge, lt, gt, eq
     threshold: float
@@ -86,14 +91,18 @@ class GateConfig:
 @dataclass
 class LoopConfig:
     """Loop iteration settings."""
+
     max_iterations: int = 3
     on_fail: str = "report"  # report | create_ticket | block
-    ticket_backends: list[str] = field(default_factory=lambda: ["markdown"])  # markdown | github | all
+    ticket_backends: list[str] = field(
+        default_factory=lambda: ["markdown"]
+    )  # markdown | github | all
 
 
 @dataclass
 class PyqualConfig:
     """Full pyqual.yaml configuration."""
+
     name: str = "default"
     stages: list[StageConfig] = field(default_factory=list)
     gates: list[GateConfig] = field(default_factory=list)
@@ -113,7 +122,9 @@ class PyqualConfig:
     @property
     def llm_model(self) -> str:
         """Get LLM model from env or config."""
-        return self.env.get("LLM_MODEL") or os.getenv("LLM_MODEL", "openrouter/qwen/qwen3-coder-next")
+        return self.env.get("LLM_MODEL") or os.getenv(
+            "LLM_MODEL", "openrouter/qwen/qwen3-coder-next"
+        )
 
     @classmethod
     def _parse(cls, raw: dict[str, Any]) -> "PyqualConfig":
@@ -135,6 +146,7 @@ class PyqualConfig:
         profile_env: dict[str, Any] = {}
         if profile_name:
             from pyqual.profiles import get_profile, list_profiles
+
             profile = get_profile(profile_name)
             if profile is None:
                 raise ValueError(
@@ -153,16 +165,15 @@ class PyqualConfig:
 
         # Metrics: profile defaults merged with user overrides
         merged_metrics = {**profile_metrics, **(pipeline.get("metrics") or {})}
-        gates = [
-            GateConfig.from_dict(k, v)
-            for k, v in merged_metrics.items()
-        ]
+        gates = [GateConfig.from_dict(k, v) for k, v in merged_metrics.items()]
 
         # Loop: profile defaults merged with user overrides
         merged_loop = {**profile_loop, **(pipeline.get("loop") or {})}
         if merged_loop:
             _loop_fields = {f.name for f in LoopConfig.__dataclass_fields__.values()}
-            loop = LoopConfig(**{k: v for k, v in merged_loop.items() if k in _loop_fields})
+            loop = LoopConfig(
+                **{k: v for k, v in merged_loop.items() if k in _loop_fields}
+            )
         else:
             loop = LoopConfig()
 

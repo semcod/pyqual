@@ -56,10 +56,15 @@ def _collect_top_level_entries(project_dir: Path, fp: ProjectFingerprint) -> Non
 def _collect_manifests(project_dir: Path, fp: ProjectFingerprint) -> None:
     """Collect project manifest files."""
     manifest_names = [
-        "pyproject.toml", "setup.py", "setup.cfg",
-        "package.json", "composer.json",
-        "Cargo.toml", "go.mod",
-        "Makefile", "Taskfile.yml",
+        "pyproject.toml",
+        "setup.py",
+        "setup.cfg",
+        "package.json",
+        "composer.json",
+        "Cargo.toml",
+        "go.mod",
+        "Makefile",
+        "Taskfile.yml",
     ]
     for manifest_name in manifest_names:
         if (project_dir / manifest_name).exists():
@@ -125,6 +130,7 @@ def _collect_pyproject_metadata(project_dir: Path, fp: ProjectFingerprint) -> No
     except ImportError:
         try:
             import importlib as _il
+
             tomllib = _il.import_module("tomli")  # type: ignore[assignment]
         except ImportError:
             tomllib = None  # type: ignore[assignment]
@@ -134,8 +140,12 @@ def _collect_pyproject_metadata(project_dir: Path, fp: ProjectFingerprint) -> No
         data = tomllib.loads(pyproject.read_text(errors="ignore"))
         bs = data.get("build-system", {}).get("requires", [])
         fp.pyproject_build_system = bs[0] if bs else None
-        dev_deps = data.get("project", {}).get("optional-dependencies", {}).get("dev", [])
-        fp.pyproject_test_deps = [d for d in dev_deps if "pytest" in d.lower() or "test" in d.lower()]
+        dev_deps = (
+            data.get("project", {}).get("optional-dependencies", {}).get("dev", [])
+        )
+        fp.pyproject_test_deps = [
+            d for d in dev_deps if "pytest" in d.lower() or "test" in d.lower()
+        ]
     except Exception:
         pass
 
@@ -158,7 +168,9 @@ def collect_fingerprint(project_dir: Path) -> ProjectFingerprint:
     _collect_top_level_entries(project_dir, fp)
     _collect_manifests(project_dir, fp)
     fp.has_pyqual_yaml = (project_dir / "pyqual.yaml").exists()
-    fp.has_dockerfile = (project_dir / "Dockerfile").exists() or (project_dir / "docker-compose.yml").exists()
+    fp.has_dockerfile = (project_dir / "Dockerfile").exists() or (
+        project_dir / "docker-compose.yml"
+    ).exists()
     fp.file_extensions = _collect_file_extensions(project_dir)
     fp.node_scripts = _collect_json_scripts(project_dir, "package.json")
     fp.composer_scripts = _collect_json_scripts(project_dir, "composer.json")

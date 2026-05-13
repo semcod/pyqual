@@ -149,9 +149,14 @@ def _build_llm_prompt(fp: ProjectFingerprint) -> str:
     fp_dict = asdict(fp)
     # Trim large fields
     if len(fp_dict.get("readme_excerpt", "")) > README_EXCERPT_MAX_CHARS:
-        fp_dict["readme_excerpt"] = f"{fp_dict['readme_excerpt'][:README_EXCERPT_MAX_CHARS]}..."
+        fp_dict["readme_excerpt"] = (
+            f"{fp_dict['readme_excerpt'][:README_EXCERPT_MAX_CHARS]}..."
+        )
     if len(fp_dict.get("top_level_files", [])) > TOP_LEVEL_FILES_MAX:
-        fp_dict["top_level_files"] = [*fp_dict["top_level_files"][:TOP_LEVEL_FILES_MAX], "..."]
+        fp_dict["top_level_files"] = [
+            *fp_dict["top_level_files"][:TOP_LEVEL_FILES_MAX],
+            "...",
+        ]
 
     return (
         f"## Project fingerprint\n\n"
@@ -163,7 +168,9 @@ def _build_llm_prompt(fp: ProjectFingerprint) -> str:
     )
 
 
-def classify_with_llm(fp: ProjectFingerprint, model: str | None = None) -> ProjectConfig:
+def classify_with_llm(
+    fp: ProjectFingerprint, model: str | None = None
+) -> ProjectConfig:
     """Send fingerprint to LLM, parse structured response."""
     from pyqual.llm import LLM
 
@@ -234,7 +241,11 @@ _MANIFEST_CLASSIFIERS = [
 
 def _classify_python(fp: ProjectFingerprint) -> ProjectConfig:
     """Classify Python project."""
-    test_cmd = "python3 -m pytest -q" if fp.has_tests_dir else "python3 -m pytest -q --co 2>/dev/null || true"
+    test_cmd = (
+        "python3 -m pytest -q"
+        if fp.has_tests_dir
+        else "python3 -m pytest -q --co 2>/dev/null || true"
+    )
     return ProjectConfig(
         project_type="python",
         has_tests=fp.has_tests_dir,
@@ -245,7 +256,11 @@ def _classify_python(fp: ProjectFingerprint) -> ProjectConfig:
 
 def _classify_node(fp: ProjectFingerprint) -> ProjectConfig:
     """Classify Node.js/TypeScript project."""
-    ptype = "typescript" if ".ts" in fp.file_extensions or ".tsx" in fp.file_extensions else "node"
+    ptype = (
+        "typescript"
+        if ".ts" in fp.file_extensions or ".tsx" in fp.file_extensions
+        else "node"
+    )
     return ProjectConfig(
         project_type=ptype,
         has_tests="test" in fp.node_scripts,
@@ -329,6 +344,7 @@ def _classify_heuristic(fp: ProjectFingerprint) -> ProjectConfig:
 # YAML generation
 # ---------------------------------------------------------------------------
 
+
 def _safe_name(name: str) -> str:
     """Convert project name to a safe identifier for tool names."""
     return re.sub(r"[^a-z0-9]", "_", name.lower()).strip("_")
@@ -365,7 +381,9 @@ def generate_pyqual_yaml(project_name: str, cfg: ProjectConfig) -> str:
     lines.append(f"    - name: vallm_{sn}")
     lines.append("      binary: vallm")
     lines.append("      command: >-")
-    lines.append("        vallm batch {workdir} --recursive --format toon --output ./project")
+    lines.append(
+        "        vallm batch {workdir} --recursive --format toon --output ./project"
+    )
     lines.append(f"        --exclude {excludes_comma}")
     lines.append('      output: ""')
     lines.append("      allow_failure: false")
@@ -444,6 +462,7 @@ def generate_pyqual_yaml(project_name: str, cfg: ProjectConfig) -> str:
 # Bulk init orchestrator
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class BulkInitResult:
     """Summary of a bulk-init run."""
@@ -455,7 +474,12 @@ class BulkInitResult:
 
     @property
     def total(self) -> int:
-        return len(self.created) + len(self.skipped_existing) + len(self.skipped_nonproject) + len(self.errors)
+        return (
+            len(self.created)
+            + len(self.skipped_existing)
+            + len(self.skipped_nonproject)
+            + len(self.errors)
+        )
 
 
 def _validate_yaml_content(yaml_content: str, project_name: str) -> None:
@@ -475,15 +499,19 @@ def _write_pyqual_yaml(project_dir: Path, yaml_content: str) -> None:
     (project_dir / ".pyqual").mkdir(exist_ok=True)
 
 
-def _classify_project(fp: ProjectFingerprint, use_llm: bool, model: str | None, project_name: str) -> ProjectConfig:
+def _classify_project(
+    fp: ProjectFingerprint, use_llm: bool, model: str | None, project_name: str
+) -> ProjectConfig:
     """Classify project using LLM or heuristic fallback."""
     if not use_llm:
         return _classify_heuristic(fp)
-    
+
     try:
         return classify_with_llm(fp, model=model)
     except Exception as exc:
-        logger.warning("LLM classification failed for %s, using heuristic: %s", project_name, exc)
+        logger.warning(
+            "LLM classification failed for %s, using heuristic: %s", project_name, exc
+        )
         return _classify_heuristic(fp)
 
 
@@ -513,8 +541,7 @@ def bulk_init(
     result = BulkInitResult()
 
     subdirs = sorted(
-        d for d in root.iterdir()
-        if d.is_dir() and not d.name.startswith(".")
+        d for d in root.iterdir() if d.is_dir() and not d.name.startswith(".")
     )
 
     for project_dir in subdirs:

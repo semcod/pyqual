@@ -27,7 +27,11 @@ def plugin_list(plugins: dict[str, object], tag: str | None) -> None:
         )
         return
 
-    title = f"Available Plugins ({len(plugins)} total)" if not tag else f"Plugins with tag '{tag}' ({len(plugins)})"
+    title = (
+        f"Available Plugins ({len(plugins)} total)"
+        if not tag
+        else f"Plugins with tag '{tag}' ({len(plugins)})"
+    )
     table = Table(title=title)
     table.add_column("Name")
     table.add_column("Description")
@@ -35,8 +39,17 @@ def plugin_list(plugins: dict[str, object], tag: str | None) -> None:
     table.add_column("Tags")
 
     for plugin_name, meta in sorted(plugins.items()):
-        tags = ", ".join(getattr(meta, "tags", [])[:3]) if getattr(meta, "tags", None) else ""
-        table.add_row(plugin_name, getattr(meta, "description", "")[:MAX_DESCRIPTION_LENGTH], getattr(meta, "version", ""), tags)
+        tags = (
+            ", ".join(getattr(meta, "tags", [])[:3])
+            if getattr(meta, "tags", None)
+            else ""
+        )
+        table.add_row(
+            plugin_name,
+            getattr(meta, "description", "")[:MAX_DESCRIPTION_LENGTH],
+            getattr(meta, "version", ""),
+            tags,
+        )
 
     console.print(table)
 
@@ -44,7 +57,9 @@ def plugin_list(plugins: dict[str, object], tag: str | None) -> None:
 def plugin_search(plugins: dict[str, object], query: str) -> None:
     """Search plugins by name, description, or tags."""
     if not query:
-        console.print("[red]Search query required. Usage: pyqual plugin search <query>[/red]")
+        console.print(
+            "[red]Search query required. Usage: pyqual plugin search <query>[/red]"
+        )
         raise typer.Exit(1)
 
     results = {}
@@ -69,8 +84,14 @@ def plugin_search(plugins: dict[str, object], query: str) -> None:
     table.add_column("Tags")
 
     for plugin_name, meta in sorted(results.items()):
-        tags = ", ".join(getattr(meta, "tags", [])[:3]) if getattr(meta, "tags", None) else ""
-        table.add_row(plugin_name, getattr(meta, "description", "")[:MAX_DESCRIPTION_LENGTH], tags)
+        tags = (
+            ", ".join(getattr(meta, "tags", [])[:3])
+            if getattr(meta, "tags", None)
+            else ""
+        )
+        table.add_row(
+            plugin_name, getattr(meta, "description", "")[:MAX_DESCRIPTION_LENGTH], tags
+        )
 
     console.print(table)
 
@@ -78,7 +99,9 @@ def plugin_search(plugins: dict[str, object], query: str) -> None:
 def plugin_info(name: str | None, workdir: Path) -> None:
     """Show detailed info and configuration example for a plugin."""
     if not name:
-        console.print("[red]Plugin name required. Usage: pyqual plugin info <name>[/red]")
+        console.print(
+            "[red]Plugin name required. Usage: pyqual plugin info <name>[/red]"
+        )
         raise typer.Exit(1)
 
     meta = get_available_plugins().get(name)
@@ -101,7 +124,9 @@ def plugin_info(name: str | None, workdir: Path) -> None:
 def plugin_add(name: str | None, workdir: Path) -> None:
     """Add a plugin's configuration snippet to pyqual.yaml."""
     if not name:
-        console.print("[red]Plugin name required. Usage: pyqual plugin add <name>[/red]")
+        console.print(
+            "[red]Plugin name required. Usage: pyqual plugin add <name>[/red]"
+        )
         raise typer.Exit(1)
 
     meta = get_available_plugins().get(name)
@@ -133,7 +158,9 @@ def plugin_add(name: str | None, workdir: Path) -> None:
 def plugin_remove(name: str | None, workdir: Path) -> None:
     """Remove a plugin's configuration block from pyqual.yaml."""
     if not name:
-        console.print("[red]Plugin name required. Usage: pyqual plugin remove <name>[/red]")
+        console.print(
+            "[red]Plugin name required. Usage: pyqual plugin remove <name>[/red]"
+        )
         raise typer.Exit(1)
 
     config_path = workdir / "pyqual.yaml"
@@ -160,7 +187,9 @@ def plugin_remove(name: str | None, workdir: Path) -> None:
             new_lines.append(line)
 
     config_path.write_text("\n".join(new_lines))
-    console.print(f"[green]Removed {name} plugin configuration from pyqual.yaml[/green]")
+    console.print(
+        f"[green]Removed {name} plugin configuration from pyqual.yaml[/green]"
+    )
 
 
 def plugin_validate(plugins: dict[str, object], workdir: Path) -> None:
@@ -171,17 +200,23 @@ def plugin_validate(plugins: dict[str, object], workdir: Path) -> None:
         raise typer.Exit(1)
 
     existing = config_path.read_text()
-    found_plugins = [plugin_name for plugin_name in plugins if f"# {plugin_name} plugin" in existing]
+    found_plugins = [
+        plugin_name for plugin_name in plugins if f"# {plugin_name} plugin" in existing
+    ]
 
     console.print("[bold]Validation Results[/bold]")
-    console.print(f"Found {len(found_plugins)} configured plugins: {', '.join(found_plugins)}")
+    console.print(
+        f"Found {len(found_plugins)} configured plugins: {', '.join(found_plugins)}"
+    )
 
     available = set(plugins.keys())
     configured = set(found_plugins)
     missing = available - configured
 
     if missing:
-        console.print(f"\n[yellow]Available but not configured:[/yellow] {', '.join(sorted(missing))}")
+        console.print(
+            f"\n[yellow]Available but not configured:[/yellow] {', '.join(sorted(missing))}"
+        )
 
     console.print("\n[green]✓ Configuration is valid[/green]")
 

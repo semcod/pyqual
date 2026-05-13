@@ -14,7 +14,9 @@ def test_build_badges_pass() -> None:
 
 def test_build_badges_fail() -> None:
     metrics = {"cc": 25.0, "coverage": 30.0}
-    line = build_badges(metrics, gates_passed=False, gates_passed_count=0, gates_total=2)
+    line = build_badges(
+        metrics, gates_passed=False, gates_passed_count=0, gates_total=2
+    )
     assert "pyqual-fail-red" in line
 
 
@@ -35,8 +37,13 @@ def test_build_badges_with_project_meta() -> None:
         "human_hours": 10.5,
         "model": "openrouter/qwen/qwen3-coder-next",
     }
-    block = build_badges(metrics, gates_passed=True, project_meta=meta,
-                         gates_passed_count=2, gates_total=2)
+    block = build_badges(
+        metrics,
+        gates_passed=True,
+        project_meta=meta,
+        gates_passed_count=2,
+        gates_total=2,
+    )
     lines = block.split("\n")
     assert len(lines) == 2
     assert "version" in lines[0].lower() or "Version" in lines[0]
@@ -51,6 +58,7 @@ def test_build_badges_with_project_meta() -> None:
 
 def test_build_badges_gates_ratio() -> None:
     metrics = {"cc": 5.0}
-    block = build_badges(metrics, gates_passed=False,
-                         gates_passed_count=1, gates_total=3)
+    block = build_badges(
+        metrics, gates_passed=False, gates_passed_count=1, gates_total=3
+    )
     assert "1%2F3" in block or "1/3" in block

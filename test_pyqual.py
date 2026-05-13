@@ -22,7 +22,6 @@ CONSTANT_90 = 90.0
 CONSTANT_92 = 92.5
 
 
-
 def test_default_yaml_parses() -> None:
     """Default pyqual.yaml should parse without errors."""
     raw = yaml.safe_load(PyqualConfig.default_yaml())
@@ -89,7 +88,9 @@ def test_gate_set_from_vallm():
         (p / "validation_toon.yaml").write_text(
             "SUMMARY:\n  scanned: 100  passed: 85 (85.0%)  warnings: 5"
         )
-        gs = GateSet([GateConfig(metric="vallm_pass", operator="ge", threshold=CONSTANT_80)])
+        gs = GateSet(
+            [GateConfig(metric="vallm_pass", operator="ge", threshold=CONSTANT_80)]
+        )
         results = gs.check_all(p)
         assert results[0].passed is True
         assert results[0].value == CONSTANT_85
@@ -104,7 +105,9 @@ def test_gate_set_from_coverage():
         (pyqual_dir / "coverage.json").write_text(
             json.dumps({"totals": {"percent_covered": CONSTANT_92}})
         )
-        gs = GateSet([GateConfig(metric="coverage", operator="ge", threshold=CONSTANT_80)])
+        gs = GateSet(
+            [GateConfig(metric="coverage", operator="ge", threshold=CONSTANT_80)]
+        )
         results = gs.check_all(p)
         assert results[0].passed is True
         assert results[0].value == CONSTANT_92
@@ -372,6 +375,7 @@ pipeline:
 def test_stage_rejects_unknown_tool() -> None:
     """StageConfig rejects unknown tool preset names at parse time."""
     import yaml
+
     raw = yaml.safe_load("""\
 pipeline:
   name: bad-tool
@@ -394,6 +398,7 @@ def test_pipeline_writes_nfo_sqlite_log() -> None:
     import json as json_mod
     import sqlite3
     import ast
+
     with tempfile.TemporaryDirectory() as tmpdir:
         p = Path(tmpdir)
         (p / ".pyqual").mkdir()
@@ -430,7 +435,9 @@ pipeline:
         rows = conn.execute("SELECT * FROM pipeline_logs ORDER BY rowid").fetchall()
         conn.close()
 
-        assert len(rows) >= CONSTANT_3, f"Expected ≥CONSTANT_3 log entries, got {len(rows)}"
+        assert len(rows) >= CONSTANT_3, (
+            f"Expected ≥CONSTANT_3 log entries, got {len(rows)}"
+        )
 
         events = [r["function_name"] for r in rows]
         assert "pipeline_start" in events
@@ -455,9 +462,15 @@ pipeline:
 def test_stage_result_preserves_original_returncode() -> None:
     """StageResult.original_returncode preserves the raw exit code."""
     from pyqual.pipeline import StageResult
+
     result = StageResult(
-        name="lint", returncode=0, stdout="", stderr="",
-        duration=1.0, original_returncode=1, command="ruff check .",
+        name="lint",
+        returncode=0,
+        stdout="",
+        stderr="",
+        duration=1.0,
+        original_returncode=1,
+        command="ruff check .",
         tool="ruff",
     )
     assert result.passed is True  # normalized rc=0
@@ -467,7 +480,10 @@ def test_stage_result_preserves_original_returncode() -> None:
 def test_default_tools_json_loads_all_presets() -> None:
     """Built-in default_tools.json loads and populates TOOL_PRESETS."""
     from pyqual.tools import TOOL_PRESETS, _BUILTIN_NAMES
-    assert len(TOOL_PRESETS) >= CONSTANT_20, f"Expected >=CONSTANT_20 presets, got {len(TOOL_PRESETS)}"
+
+    assert len(TOOL_PRESETS) >= CONSTANT_20, (
+        f"Expected >=CONSTANT_20 presets, got {len(TOOL_PRESETS)}"
+    )
     assert "ruff" in TOOL_PRESETS
     assert "pytest" in TOOL_PRESETS
     assert "report" in TOOL_PRESETS
@@ -477,12 +493,18 @@ def test_default_tools_json_loads_all_presets() -> None:
 def test_preset_from_dict() -> None:
     """_preset_from_dict creates ToolPreset from JSON dict."""
     from pyqual.tools import _preset_from_dict
+
     d = {"binary": "echo", "command": "echo {workdir}", "output": ".pyqual/out.json"}
     p = _preset_from_dict(d)
     assert p.binary == "echo"
     assert p.allow_failure is True  # default
 
-    d2 = {"binary": "pytest", "command": "pytest -q", "output": "", "allow_failure": False}
+    d2 = {
+        "binary": "pytest",
+        "command": "pytest -q",
+        "output": "",
+        "allow_failure": False,
+    }
     p2 = _preset_from_dict(d2)
     assert p2.allow_failure is False
 
@@ -494,18 +516,22 @@ def test_load_user_tools_from_json() -> None:
 
     with tempfile.TemporaryDirectory() as td:
         user_file = Path(td) / "pyqual.tools.json"
-        user_file.write_text(json.dumps({
-            "_test_user_tool": {
-                "binary": "echo",
-                "command": "echo user {workdir}",
-                "output": ".pyqual/user.json"
-            },
-            "ruff": {
-                "binary": "ruff",
-                "command": "ruff check {workdir} --fix --output-format=json",
-                "output": ".pyqual/ruff.json"
-            }
-        }))
+        user_file.write_text(
+            json.dumps(
+                {
+                    "_test_user_tool": {
+                        "binary": "echo",
+                        "command": "echo user {workdir}",
+                        "output": ".pyqual/user.json",
+                    },
+                    "ruff": {
+                        "binary": "ruff",
+                        "command": "ruff check {workdir} --fix --output-format=json",
+                        "output": ".pyqual/ruff.json",
+                    },
+                }
+            )
+        )
         # Save original ruff preset
         original_ruff = TOOL_PRESETS.get("ruff")
         try:
@@ -533,6 +559,7 @@ def test_dump_presets_json() -> None:
     """dump_presets_json() produces valid JSON with all presets."""
     import json as json_mod
     from pyqual.tools import dump_presets_json
+
     output = dump_presets_json()
     data = json_mod.loads(output)
     assert isinstance(data, dict)
@@ -570,7 +597,9 @@ def test_register_custom_preset() -> None:
             assert "already registered" in str(e)
 
         # Allow override
-        preset2 = ToolPreset(binary="cat", command="cat {workdir}", output="", allow_failure=False)
+        preset2 = ToolPreset(
+            binary="cat", command="cat {workdir}", output="", allow_failure=False
+        )
         register_preset(name, preset2, override=True)
         assert get_preset(name).binary == "cat"
     finally:

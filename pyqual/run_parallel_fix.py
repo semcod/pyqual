@@ -19,18 +19,20 @@ from pathlib import Path
 from .fix_tools import get_available_tools, ToolResult
 
 
-def get_todo_batch(todo_path: Path, max_items: int) -> tuple[list[tuple[str, str]], int]:
+def get_todo_batch(
+    todo_path: Path, max_items: int
+) -> tuple[list[tuple[str, str]], int]:
     """Get up to max_items unchecked TODO items and total pending count.
-    
+
     Returns: (batch_items, total_pending)
     batch_items: list of (full_line, item_text) tuples
     """
     if not todo_path.exists():
         return [], 0
-    
+
     content = todo_path.read_text()
     lines = content.splitlines()
-    
+
     pending_items = []
     for line in lines:
         stripped = line.strip()
@@ -38,39 +40,42 @@ def get_todo_batch(todo_path: Path, max_items: int) -> tuple[list[tuple[str, str
             item_text = stripped[6:].strip()
             if item_text:
                 pending_items.append((line, item_text))
-    
+
     total_pending = len(pending_items)
     batch = pending_items[:max_items]
-    
+
     return batch, total_pending
 
 
 def mark_completed_todos(todo_path: Path, changed_files: list[str]) -> int:
     """Mark TODO items as completed if their file was modified.
-    
+
     Returns number of items marked as completed.
     """
     if not todo_path.exists() or not changed_files:
         return 0
-    
+
     content = todo_path.read_text()
     lines = content.splitlines()
     completed = 0
-    
+
     changed_set = set(changed_files)
     changed_basenames = {Path(f).name for f in changed_files}
-    
+
     new_lines = []
     for line in lines:
         if line.strip().startswith("- [ ]"):
             item_text = line.strip()[6:]
-            
+
             file_match = None
             if ":" in item_text:
                 potential_file = item_text.split(":")[0].strip()
-                if potential_file in changed_set or Path(potential_file).name in changed_basenames:
+                if (
+                    potential_file in changed_set
+                    or Path(potential_file).name in changed_basenames
+                ):
                     file_match = potential_file
-            
+
             if file_match:
                 new_line = line.replace("- [ ]", "- [x]", 1)
                 new_lines.append(new_line)
@@ -80,11 +85,11 @@ def mark_completed_todos(todo_path: Path, changed_files: list[str]) -> int:
                 new_lines.append(line)
         else:
             new_lines.append(line)
-    
+
     if completed > 0:
         todo_path.write_text("\n".join(new_lines) + "\n")
         print(f"\nUpdated TODO.md: {completed} items marked as completed")
-    
+
     return completed
 
 
@@ -92,7 +97,7 @@ def run_tool(name: str, command: str, workdir: Path, timeout: int) -> ToolResult
     """Run a single fix tool and return results."""
     start = time.monotonic()
     print(f"[{name}] Starting...")
-    
+
     try:
         proc = subprocess.run(
             command,
@@ -105,9 +110,9 @@ def run_tool(name: str, command: str, workdir: Path, timeout: int) -> ToolResult
         )
         duration = time.monotonic() - start
         success = proc.returncode == 0
-        
+
         print(f"[{name}] {'✓ Done' if success else '✗ Failed'} ({duration:.1f}s)")
-        
+
         return ToolResult(
             name=name,
             success=success,
@@ -143,20 +148,28 @@ def run_tool(name: str, command: str, workdir: Path, timeout: int) -> ToolResult
 def git_commit_and_push(workdir: Path, completed_count: int) -> bool:
     """Commit changes and push to origin. Returns True if pushed."""
     print("\n📦 Committing changes...")
-    
+
     subprocess.run(["git", "add", "-A"], cwd=workdir, capture_output=True)
-    
+
     commit_result = subprocess.run(
-        ["git", "commit", "-m", f"fix: TODO batch ({completed_count} items) [pyqual auto]"],
+        [
+            "git",
+            "commit",
+            "-m",
+            f"fix: TODO batch ({completed_count} items) [pyqual auto]",
+        ],
         cwd=workdir,
         capture_output=True,
         text=True,
     )
-    
-    if commit_result.returncode != 0 and "nothing to commit" not in commit_result.stdout.lower():
+
+    if (
+        commit_result.returncode != 0
+        and "nothing to commit" not in commit_result.stdout.lower()
+    ):
         print(f"✗ Commit failed: {commit_result.stderr[:100]}")
         return False
-    
+
     print("📤 Pushing to origin...")
     push_result = subprocess.run(
         ["git", "push", "origin", "HEAD"],
@@ -164,7 +177,7 @@ def git_commit_and_push(workdir: Path, completed_count: int) -> bool:
         capture_output=True,
         text=True,
     )
-    
+
     if push_result.returncode == 0:
         print("✓ Pushed successfully")
         return True
@@ -187,24 +200,28 @@ Examples:
 Environment:
   PYQUAL_MAX_TODOS    Default max items per cycle (default: 5, env: PYQUAL_MAX_TODOS)
   LLM_MODEL          LLM model for fix tools (default: openrouter/qwen/qwen3-coder-next)
-        """
+        """,
     )
     parser.add_argument(
-        "--max", "--max-items", "-m",
+        "--max",
+        "--max-items",
+        "-m",
         type=int,
         dest="max_items",
         default=int(os.environ.get("PYQUAL_MAX_TODOS", 5)),
-        help="Maximum TODO items to process per cycle (default: 5, env: PYQUAL_MAX_TODOS)"
+        help="Maximum TODO items to process per cycle (default: 5, env: PYQUAL_MAX_TODOS)",
     )
     parser.add_argument(
-        "--dry-run", "-n",
+        "--dry-run",
+        "-n",
         action="store_true",
-        help="Show what would be done without running tools"
+        help="Show what would be done without running tools",
     )
     parser.add_argument(
-        "--skip-claude", "-C",
+        "--skip-claude",
+        "-C",
         action="store_true",
-        help="Skip Claude Code tool (useful when rate-limited)"
+        help="Skip Claude Code tool (useful when rate-limited)",
     )
     return parser.parse_args()
 
@@ -223,7 +240,9 @@ def _check_git_changes(workdir: Path) -> list[str]:
             parts = line.split()
             if len(parts) >= 2:
                 filename = parts[-1]
-                if not filename.endswith(('.db', '.jsonl')) and not filename.startswith('.aider'):
+                if not filename.endswith((".db", ".jsonl")) and not filename.startswith(
+                    ".aider"
+                ):
                     changed_files.append(filename)
     return changed_files
 
@@ -298,7 +317,9 @@ def _print_cycle_completion(remaining: int, max_items: int) -> None:
     """Print cycle completion message."""
     if remaining > 0:
         print(f"\n🔄 Cycle complete. {remaining} items remaining for next cycle.")
-        print(f"   Run again: pyqual run (will process next {min(max_items, remaining)} items)")
+        print(
+            f"   Run again: pyqual run (will process next {min(max_items, remaining)} items)"
+        )
     else:
         print("\n✅ All TODO items processed!")
 
@@ -322,7 +343,9 @@ def _run_tools_parallel(
     results = []
     with ThreadPoolExecutor(max_workers=len(tool_configs)) as executor:
         futures = {
-            executor.submit(run_tool, cfg["name"], cfg["command"], workdir, cfg["timeout"]): cfg["name"]
+            executor.submit(
+                run_tool, cfg["name"], cfg["command"], workdir, cfg["timeout"]
+            ): cfg["name"]
             for cfg in tool_configs
         }
         for future in as_completed(futures):
@@ -333,40 +356,44 @@ def _run_tools_parallel(
 def main() -> int:
     """Run parallel fix on TODO.md items - configurable batch size with git push."""
     args = parse_args()
-    
+
     workdir = Path.cwd()
     todo_path = workdir / "TODO.md"
-    
+
     if not todo_path.exists():
         print("No TODO.md found — skipping")
         return 0
-    
+
     batch_items, total_pending = get_todo_batch(todo_path, args.max_items)
-    
+
     if not batch_items:
         print("No pending TODO items — skipping")
         return 0
-    
-    print(f"Processing {len(batch_items)}/{total_pending} TODO items (max {args.max_items} per cycle)")
+
+    print(
+        f"Processing {len(batch_items)}/{total_pending} TODO items (max {args.max_items} per cycle)"
+    )
     for i, (_, text) in enumerate(batch_items, 1):
         print(f"  {i}. {text[:60]}{'...' if len(text) > 60 else ''}")
-    
+
     batch_file = _setup_batch(workdir, batch_items)
     print(f"\nCreated batch file: {batch_file}")
-    
+
     llm_model = os.environ.get("LLM_MODEL")
-    tools = get_available_tools(str(batch_file), len(batch_items), llm_model, skip_claude=args.skip_claude)
-    
+    tools = get_available_tools(
+        str(batch_file), len(batch_items), llm_model, skip_claude=args.skip_claude
+    )
+
     if not tools:
         print("\nNo fix tools available — skipping")
         batch_file.unlink()
         return 0
-    
+
     print(f"\nRunning {len(tools)} tool(s) in parallel...")
     start_time = time.monotonic()
-    
+
     tool_configs = [tool.to_config() for tool in tools]
-    
+
     if args.dry_run:
         print("\n[DRY RUN] Would execute:")
         for cfg in tool_configs:
@@ -374,25 +401,31 @@ def main() -> int:
         print("\n[DRY RUN] Skipping actual execution")
         batch_file.unlink()
         return 0
-    
+
     results = _run_tools_parallel(tool_configs, workdir)
     total_duration = time.monotonic() - start_time
-    
+
     changed_files = _check_git_changes(workdir)
     completed_count = mark_completed_todos(todo_path, changed_files)
-    
+
     pushed = git_commit_and_push(workdir, completed_count) if changed_files else False
-    
+
     batch_file.unlink()
-    
+
     _print_yaml_results(
-        results, changed_files, total_pending, completed_count,
-        args.max_items, len(batch_items), total_duration, pushed
+        results,
+        changed_files,
+        total_pending,
+        completed_count,
+        args.max_items,
+        len(batch_items),
+        total_duration,
+        pushed,
     )
-    
+
     remaining = total_pending - completed_count
     _print_cycle_completion(remaining, args.max_items)
-    
+
     failed = sum(1 for r in results if not r.success)
     return 0 if failed == 0 else 1
 

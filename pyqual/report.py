@@ -55,22 +55,113 @@ BADGE_END = "<!-- pyqual:badges:end -->"
 
 # Quality metric badges: (metric_key, label, color_fn, format_fn)
 _QUALITY_BADGE_DEFS: list[tuple[str, str, Any, Any]] = [
-    ("cc", "CC̄", lambda v: "brightgreen" if v <= BADGE_THRESHOLD_CC_LOW else "green" if v <= BADGE_THRESHOLD_CC_MED else "orange" if v <= BADGE_THRESHOLD_CC_HIGH else "red", lambda v: f"{v:.1f}"),
-    ("coverage", "coverage", lambda v: "brightgreen" if v >= BADGE_THRESHOLD_EXCELLENT else "green" if v >= BADGE_THRESHOLD_GOOD else "orange" if v >= BADGE_THRESHOLD_POOR else "red", lambda v: f"{v:.0f}%25"),
-    ("vallm_pass", "vallm", lambda v: "brightgreen" if v >= BADGE_THRESHOLD_PASS else "green" if v >= CONSTANT_70 else "orange" if v >= BADGE_THRESHOLD_WARN else "red", lambda v: f"{v:.0f}%25"),
-    ("critical", "critical", lambda v: "brightgreen" if v == 0 else "red", lambda v: f"{v:.0f}"),
-    ("error_count", "errors", lambda v: "brightgreen" if v == 0 else "orange" if v <= CONSTANT_5 else "red", lambda v: f"{v:.0f}"),
-    ("maintainability_index", "maintainability", lambda v: "brightgreen" if v >= BADGE_THRESHOLD_EXCELLENT else "green" if v >= BADGE_THRESHOLD_GOOD else "orange" if v >= BADGE_THRESHOLD_POOR else "red", lambda v: f"{v:.0f}"),
-    ("ruff_errors", "ruff", lambda v: "brightgreen" if v == 0 else "orange" if v <= 10 else "red", lambda v: f"{v:.0f}"),
-    ("mypy_errors", "mypy", lambda v: "brightgreen" if v == 0 else "orange" if v <= CONSTANT_5 else "red", lambda v: f"{v:.0f}"),
-    ("bandit_high", "bandit", lambda v: "brightgreen" if v == 0 else "red", lambda v: f"{v:.0f}%20high"),
-    ("docstring_coverage", "docstrings", lambda v: "brightgreen" if v >= BADGE_THRESHOLD_EXCELLENT else "green" if v >= BADGE_THRESHOLD_GOOD else "orange" if v >= BADGE_THRESHOLD_POOR else "red", lambda v: f"{v:.0f}%25"),
+    (
+        "cc",
+        "CC̄",
+        lambda v: (
+            "brightgreen"
+            if v <= BADGE_THRESHOLD_CC_LOW
+            else "green"
+            if v <= BADGE_THRESHOLD_CC_MED
+            else "orange"
+            if v <= BADGE_THRESHOLD_CC_HIGH
+            else "red"
+        ),
+        lambda v: f"{v:.1f}",
+    ),
+    (
+        "coverage",
+        "coverage",
+        lambda v: (
+            "brightgreen"
+            if v >= BADGE_THRESHOLD_EXCELLENT
+            else "green"
+            if v >= BADGE_THRESHOLD_GOOD
+            else "orange"
+            if v >= BADGE_THRESHOLD_POOR
+            else "red"
+        ),
+        lambda v: f"{v:.0f}%25",
+    ),
+    (
+        "vallm_pass",
+        "vallm",
+        lambda v: (
+            "brightgreen"
+            if v >= BADGE_THRESHOLD_PASS
+            else "green"
+            if v >= CONSTANT_70
+            else "orange"
+            if v >= BADGE_THRESHOLD_WARN
+            else "red"
+        ),
+        lambda v: f"{v:.0f}%25",
+    ),
+    (
+        "critical",
+        "critical",
+        lambda v: "brightgreen" if v == 0 else "red",
+        lambda v: f"{v:.0f}",
+    ),
+    (
+        "error_count",
+        "errors",
+        lambda v: "brightgreen" if v == 0 else "orange" if v <= CONSTANT_5 else "red",
+        lambda v: f"{v:.0f}",
+    ),
+    (
+        "maintainability_index",
+        "maintainability",
+        lambda v: (
+            "brightgreen"
+            if v >= BADGE_THRESHOLD_EXCELLENT
+            else "green"
+            if v >= BADGE_THRESHOLD_GOOD
+            else "orange"
+            if v >= BADGE_THRESHOLD_POOR
+            else "red"
+        ),
+        lambda v: f"{v:.0f}",
+    ),
+    (
+        "ruff_errors",
+        "ruff",
+        lambda v: "brightgreen" if v == 0 else "orange" if v <= 10 else "red",
+        lambda v: f"{v:.0f}",
+    ),
+    (
+        "mypy_errors",
+        "mypy",
+        lambda v: "brightgreen" if v == 0 else "orange" if v <= CONSTANT_5 else "red",
+        lambda v: f"{v:.0f}",
+    ),
+    (
+        "bandit_high",
+        "bandit",
+        lambda v: "brightgreen" if v == 0 else "red",
+        lambda v: f"{v:.0f}%20high",
+    ),
+    (
+        "docstring_coverage",
+        "docstrings",
+        lambda v: (
+            "brightgreen"
+            if v >= BADGE_THRESHOLD_EXCELLENT
+            else "green"
+            if v >= BADGE_THRESHOLD_GOOD
+            else "orange"
+            if v >= BADGE_THRESHOLD_POOR
+            else "red"
+        ),
+        lambda v: f"{v:.0f}%25",
+    ),
 ]
 
 
 # ---------------------------------------------------------------------------
 # Project metadata collection
 # ---------------------------------------------------------------------------
+
 
 def _read_pyproject(workdir: Path) -> dict[str, Any]:
     """Read pyproject.toml and return the parsed dict (or empty)."""
@@ -118,7 +209,9 @@ def _read_git_commit_count(workdir: Path) -> int | None:
     try:
         result = subprocess.run(
             ["git", "rev-list", "--count", "HEAD"],
-            capture_output=True, text=True, cwd=str(workdir),
+            capture_output=True,
+            text=True,
+            cwd=str(workdir),
             timeout=10,
         )
         if result.returncode == 0:
@@ -130,11 +223,11 @@ def _read_git_commit_count(workdir: Path) -> int | None:
 
 _COST_FIELD_MAP = [
     # (source_keys,          target_key,      cast)
-    (("total_cost", "cost_usd"),     "ai_cost",      float),
-    (("total_commits", "ai_commits"), "ai_commits",  int),
-    (("human_time", "human_hours"),   "human_hours",  float),
-    (("human_cost",),                 "human_cost",   float),
-    (("model",),                      "model",        str),
+    (("total_cost", "cost_usd"), "ai_cost", float),
+    (("total_commits", "ai_commits"), "ai_commits", int),
+    (("human_time", "human_hours"), "human_hours", float),
+    (("human_cost",), "human_cost", float),
+    (("model",), "model", str),
 ]
 
 
@@ -165,15 +258,27 @@ def _read_costs_package(workdir: Path) -> dict[str, Any]:
         return {}
 
     try:
-        all_commits = parse_commits(str(workdir), max_count=MAX_500, ai_only=False, full_history=True)
-        ai_indicators = ["🤖", "ai:", "[ai]", "(ai)", "automat", "cascade", "claude", "gpt", "llm"]
+        all_commits = parse_commits(
+            str(workdir), max_count=MAX_500, ai_only=False, full_history=True
+        )
+        ai_indicators = [
+            "🤖",
+            "ai:",
+            "[ai]",
+            "(ai)",
+            "automat",
+            "cascade",
+            "claude",
+            "gpt",
+            "llm",
+        ]
         ai_commits = [
-            c for c in all_commits
-            if any(ind in c[1].lower() for ind in ai_indicators)
+            c for c in all_commits if any(ind in c[1].lower() for ind in ai_indicators)
         ]
         total_cost = max(len(ai_commits) * 0.15, 0.01) if ai_commits else 0.0
 
         from collections import defaultdict
+
         daily: dict[str, dict[str, list]] = defaultdict(lambda: defaultdict(list))
         for c in all_commits:
             try:
@@ -259,6 +364,7 @@ def collect_project_metadata(workdir: Path, config: PyqualConfig) -> dict[str, A
 # Metric collection (reuse GateSet internals)
 # ---------------------------------------------------------------------------
 
+
 def collect_all_metrics(workdir: Path) -> dict[str, float]:
     """Collect all available metrics from .pyqual/ and project/ artifacts."""
     from pyqual._gate_collectors import _COLLECTORS
@@ -269,6 +375,7 @@ def collect_all_metrics(workdir: Path) -> dict[str, float]:
 
     try:
         from pyqual.plugins import PluginRegistry
+
         for plugin_class in PluginRegistry.list_plugins():
             try:
                 metrics.update(plugin_class().collect(workdir))
@@ -282,6 +389,7 @@ def collect_all_metrics(workdir: Path) -> dict[str, float]:
 # ---------------------------------------------------------------------------
 # Gate evaluation
 # ---------------------------------------------------------------------------
+
 
 def evaluate_gates(config: PyqualConfig, workdir: Path) -> list[dict[str, Any]]:
     """Evaluate all configured gates and return structured results."""
@@ -302,6 +410,7 @@ def evaluate_gates(config: PyqualConfig, workdir: Path) -> list[dict[str, Any]]:
 # ---------------------------------------------------------------------------
 # YAML report generation
 # ---------------------------------------------------------------------------
+
 
 def generate_report(
     config: PyqualConfig,
@@ -335,13 +444,16 @@ def generate_report(
 
     out_path = output or (workdir / REPORT_FILE)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(yaml.dump(report, default_flow_style=False, allow_unicode=True, sort_keys=False))
+    out_path.write_text(
+        yaml.dump(report, default_flow_style=False, allow_unicode=True, sort_keys=False)
+    )
     return report
 
 
 # ---------------------------------------------------------------------------
 # Badge generation
 # ---------------------------------------------------------------------------
+
 
 def _badge_url(label: str, value: str, color: str) -> str:
     """Build a shields.io static badge URL."""
@@ -376,7 +488,15 @@ def _build_project_badges(meta: dict[str, Any]) -> str:
     ai_cost = meta.get("ai_cost")
     ai_commits = meta.get("ai_commits")
     if ai_cost is not None:
-        cost_color = "brightgreen" if ai_cost < 1 else "green" if ai_cost < CONSTANT_5 else "orange" if ai_cost < 10 else "red"
+        cost_color = (
+            "brightgreen"
+            if ai_cost < 1
+            else "green"
+            if ai_cost < CONSTANT_5
+            else "orange"
+            if ai_cost < 10
+            else "red"
+        )
         label = "AI Cost"
         value = f"${ai_cost:.2f}" + (f" ({ai_commits} commits)" if ai_commits else "")
         url = _badge_url(label, value, cost_color)
@@ -398,8 +518,12 @@ def _build_project_badges(meta: dict[str, Any]) -> str:
     return " ".join(badges)
 
 
-def _build_quality_badges(metrics: dict[str, float], gates_passed: bool,
-                          gates_passed_count: int = 0, gates_total: int = 0) -> str:
+def _build_quality_badges(
+    metrics: dict[str, float],
+    gates_passed: bool,
+    gates_passed_count: int = 0,
+    gates_total: int = 0,
+) -> str:
     """Build quality-metric badge line (pyqual status, gates, CC, coverage, etc.)."""
     badges: list[str] = []
 
@@ -412,7 +536,15 @@ def _build_quality_badges(metrics: dict[str, float], gates_passed: bool,
     # Gates ratio badge
     if gates_total > 0:
         ratio = gates_passed_count / gates_total
-        color = "brightgreen" if ratio == 1.0 else "green" if ratio >= 0.8 else "orange" if ratio >= 0.5 else "red"
+        color = (
+            "brightgreen"
+            if ratio == 1.0
+            else "green"
+            if ratio >= 0.8
+            else "orange"
+            if ratio >= 0.5
+            else "red"
+        )
         url = _badge_url("gates", f"{gates_passed_count}/{gates_total}", color)
         badges.append(f"![gates]({url})")
 
@@ -428,9 +560,13 @@ def _build_quality_badges(metrics: dict[str, float], gates_passed: bool,
     return " ".join(badges)
 
 
-def build_badges(metrics: dict[str, float], gates_passed: bool,
-                 project_meta: dict[str, Any] | None = None,
-                 gates_passed_count: int = 0, gates_total: int = 0) -> str:
+def build_badges(
+    metrics: dict[str, float],
+    gates_passed: bool,
+    project_meta: dict[str, Any] | None = None,
+    gates_passed_count: int = 0,
+    gates_total: int = 0,
+) -> str:
     """Build full badge block: project info line + quality metrics line."""
     lines: list[str] = []
 
@@ -441,7 +577,9 @@ def build_badges(metrics: dict[str, float], gates_passed: bool,
             lines.append(project_line)
 
     # Line 2: quality metric badges (pyqual status, gates, CC, coverage, etc.)
-    quality_line = _build_quality_badges(metrics, gates_passed, gates_passed_count, gates_total)
+    quality_line = _build_quality_badges(
+        metrics, gates_passed, gates_passed_count, gates_total
+    )
     if quality_line:
         lines.append(quality_line)
 
@@ -451,6 +589,7 @@ def build_badges(metrics: dict[str, float], gates_passed: bool,
 # ---------------------------------------------------------------------------
 # README badge update
 # ---------------------------------------------------------------------------
+
 
 def _replace_badges_in_text(text: str, badge_line: str) -> str:
     """Replace or insert badge block in a raw README string (no file I/O)."""
@@ -492,8 +631,9 @@ def update_readme_badges(
         return False
 
     text = readme_path.read_text()
-    badge_line = build_badges(metrics, gates_passed, project_meta,
-                              gates_passed_count, gates_total)
+    badge_line = build_badges(
+        metrics, gates_passed, project_meta, gates_passed_count, gates_total
+    )
     block = f"{BADGE_START}\n{badge_line}\n{BADGE_END}"
 
     # Case 1: markers already present — replace the block
@@ -527,6 +667,7 @@ def update_readme_badges(
 # Main entry point
 # ---------------------------------------------------------------------------
 
+
 def run(
     workdir: Path = Path("."),
     config_path: Path | None = None,
@@ -554,13 +695,19 @@ def run(
     report_path = workdir / REPORT_FILE
     passed = report["pyqual_report"]["gates"]["passed"]
     total = report["pyqual_report"]["gates"]["total"]
-    print(f"pyqual report: {report_path} ({passed}/{total} gates, {len(metrics)} metrics)")
+    print(
+        f"pyqual report: {report_path} ({passed}/{total} gates, {len(metrics)} metrics)"
+    )
 
     # 2. Update README badges
     if readme.exists():
         changed = update_readme_badges(
-            readme, metrics, all_passed, project_meta,
-            gates_passed_count, gates_total,
+            readme,
+            metrics,
+            all_passed,
+            project_meta,
+            gates_passed_count,
+            gates_total,
         )
         if changed:
             print(f"pyqual report: updated badges in {readme}")
@@ -576,16 +723,27 @@ def run(
 # CLI entry (python -m pyqual.report)
 # ---------------------------------------------------------------------------
 
+
 def main() -> None:
     import argparse
 
-    parser = argparse.ArgumentParser(description="Generate pyqual metrics report and update README badges")
-    parser.add_argument("-w", "--workdir", type=Path, default=Path("."), help="Working directory")
-    parser.add_argument("-c", "--config", type=Path, default=None, help="Config file path")
-    parser.add_argument("-r", "--readme", type=Path, default=None, help="README file path")
+    parser = argparse.ArgumentParser(
+        description="Generate pyqual metrics report and update README badges"
+    )
+    parser.add_argument(
+        "-w", "--workdir", type=Path, default=Path("."), help="Working directory"
+    )
+    parser.add_argument(
+        "-c", "--config", type=Path, default=None, help="Config file path"
+    )
+    parser.add_argument(
+        "-r", "--readme", type=Path, default=None, help="README file path"
+    )
     args = parser.parse_args()
 
-    sys.exit(run(workdir=args.workdir, config_path=args.config, readme_path=args.readme))
+    sys.exit(
+        run(workdir=args.workdir, config_path=args.config, readme_path=args.readme)
+    )
 
 
 if __name__ == "__main__":

@@ -20,11 +20,12 @@ from pathlib import Path
 
 from pyqual.plugins._base import MetricCollector, PluginMetadata, PluginRegistry
 
+
 # Auto-discover and import all plugins from subdirectories
 def _discover_plugins() -> None:
     """Automatically discover and import all plugins from subdirectories."""
     package_dir = Path(__file__).parent
-    
+
     for _, name, ispkg in pkgutil.iter_modules([str(package_dir)]):
         if ispkg and not name.startswith("_"):
             try:
@@ -33,7 +34,9 @@ def _discover_plugins() -> None:
             except Exception as e:
                 # Log but don't crash if a plugin fails to load
                 import warnings
+
                 warnings.warn(f"Failed to load plugin '{name}': {e}", RuntimeWarning)
+
 
 # Import built-in collectors from plugins package
 from pyqual.plugins.builtin import (  # noqa: E402
@@ -68,10 +71,7 @@ __all__ = [
 
 def get_available_plugins() -> dict[str, PluginMetadata]:
     """Get metadata for all available built-in plugins."""
-    return {
-        name: plugin.metadata
-        for name, plugin in PluginRegistry._plugins.items()
-    }
+    return {name: plugin.metadata for name, plugin in PluginRegistry._plugins.items()}
 
 
 def install_plugin_config(name: str, workdir: Path = Path(".")) -> str:

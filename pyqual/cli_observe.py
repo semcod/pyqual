@@ -6,7 +6,6 @@ Register all three commands by calling ``register_observe_commands(app)``.
 
 import json
 from pathlib import Path
-from typing import Annotated
 
 import typer
 from rich.console import Console
@@ -65,8 +64,12 @@ def _output_human_logs(entries: list[dict], show_output: bool) -> None:
             _print_stage_output(_lc, entry)
 
     _lc.print(f"\n[dim]Log DB: {db_path}[/dim]")
-    _lc.print("[dim]Tip: pyqual logs --stage fix --output   # see llx prompts/output[/dim]")
-    _lc.print("[dim]Tip: pyqual history --prompts            # see full LLX fix prompts[/dim]")
+    _lc.print(
+        "[dim]Tip: pyqual logs --stage fix --output   # see llx prompts/output[/dim]"
+    )
+    _lc.print(
+        "[dim]Tip: pyqual history --prompts            # see full LLX fix prompts[/dim]"
+    )
 
 
 def _print_stage_output(console: Console, entry: dict) -> None:
@@ -95,7 +98,9 @@ def _logs_impl(
     global db_path  # For _output_human_logs tips
     db_path = Path(workdir) / PIPELINE_DB
     if not db_path.exists():
-        _console.print("[yellow]No pipeline log found. Run 'pyqual run' first.[/yellow]")
+        _console.print(
+            "[yellow]No pipeline log found. Run 'pyqual run' first.[/yellow]"
+        )
         raise typer.Exit(1)
 
     if sql:
@@ -153,12 +158,16 @@ def _watch_impl(
             _time.sleep(interval)
             last_db_count = _poll_pipeline_db(db_path, last_db_count, show_output, _wc)
             if show_prompts:
-                last_history_lines = _poll_history_file(history_path, last_history_lines, _wc)
+                last_history_lines = _poll_history_file(
+                    history_path, last_history_lines, _wc
+                )
     except KeyboardInterrupt:
         _wc.print("\n[dim]watch stopped.[/dim]")
 
 
-def _poll_pipeline_db(db_path: Path, last_count: int, show_output: bool, console: Console) -> int:
+def _poll_pipeline_db(
+    db_path: Path, last_count: int, show_output: bool, console: Console
+) -> int:
     """Poll pipeline.db for new entries and print them."""
     if not db_path.exists():
         return last_count
@@ -168,7 +177,9 @@ def _poll_pipeline_db(db_path: Path, last_count: int, show_output: bool, console
             new_entries = entries[last_count:]
             for entry in new_entries:
                 ts, event_name, name, status_col, details = _format_log_entry_row(entry)
-                console.print(f"  {ts}  [bold]{event_name:<14}[/bold] {name:<20} {status_col:<8} {details}")
+                console.print(
+                    f"  {ts}  [bold]{event_name:<14}[/bold] {name:<20} {status_col:<8} {details}"
+                )
                 if show_output and entry.get("_function_name") == "stage_done":
                     stdout = entry.get("stdout_tail", "")
                     stderr = entry.get("stderr_tail", "")
@@ -207,7 +218,9 @@ def _poll_history_file(history_path: Path, last_lines: int, console: Console) ->
                         for pline in prompt.splitlines()[:20]:
                             console.print(f"    [dim]{pline}[/dim]")
                         if len(prompt.splitlines()) > 20:
-                            console.print(f"    [dim]... ({len(prompt.splitlines())} lines total)[/dim]")
+                            console.print(
+                                f"    [dim]... ({len(prompt.splitlines())} lines total)[/dim]"
+                            )
                 except json.JSONDecodeError:
                     continue
         return len(lines)
@@ -226,7 +239,9 @@ def _history_impl(
     history_path = Path(workdir) / LLX_HISTORY_FILE
     if not history_path.exists():
         _console.print("[yellow]No fix history found.[/yellow]")
-        _console.print("[dim]Run 'pyqual run' with a fix stage to start recording history.[/dim]")
+        _console.print(
+            "[dim]Run 'pyqual run' with a fix stage to start recording history.[/dim]"
+        )
         raise typer.Exit(1)
 
     entries = _load_history_entries(history_path)
@@ -303,9 +318,16 @@ def _print_history_prompts(entries: list[dict]) -> None:
         prompt = entry.get("prompt", "")
         if prompt:
             ts = entry.get("timestamp", "")[:19].replace("T", " ")
-            _console.print(f"\n[bold]── Run {i+1} ({ts}) ──[/bold]")
-            _console.print(Syntax(prompt, "text", theme="monokai", background_color="default",
-                                 word_wrap=True))
+            _console.print(f"\n[bold]── Run {i + 1} ({ts}) ──[/bold]")
+            _console.print(
+                Syntax(
+                    prompt,
+                    "text",
+                    theme="monokai",
+                    background_color="default",
+                    word_wrap=True,
+                )
+            )
 
 
 def _print_history_stdout(entries: list[dict]) -> None:
@@ -315,19 +337,30 @@ def _print_history_stdout(entries: list[dict]) -> None:
         stdout = entry.get("stdout_tail", "")
         if stdout:
             ts = entry.get("timestamp", "")[:19].replace("T", " ")
-            _console.print(f"\n[bold]── Stdout {i+1} ({ts}) ──[/bold]")
-            _console.print(Syntax(stdout, "text", theme="monokai", background_color="default",
-                                 word_wrap=True))
+            _console.print(f"\n[bold]── Stdout {i + 1} ({ts}) ──[/bold]")
+            _console.print(
+                Syntax(
+                    stdout,
+                    "text",
+                    theme="monokai",
+                    background_color="default",
+                    word_wrap=True,
+                )
+            )
 
 
 def _print_history_summary(entries: list[dict], history_path: Path) -> None:
     """Print summary of history entries."""
     total = len(entries)
     passed = sum(1 for e in entries if e.get("ok") is True or e.get("success") is True)
-    failed = sum(1 for e in entries if e.get("ok") is False or e.get("success") is False)
+    failed = sum(
+        1 for e in entries if e.get("ok") is False or e.get("success") is False
+    )
     models = set(e.get("model", "") for e in entries if e.get("model"))
-    _console.print(f"\n[bold]Summary:[/bold] {total} runs, {passed} passed, {failed} failed"
-                   f" | Models: {', '.join(sorted(models)) or '?'}")
+    _console.print(
+        f"\n[bold]Summary:[/bold] {total} runs, {passed} passed, {failed} failed"
+        f" | Models: {', '.join(sorted(models)) or '?'}"
+    )
     _console.print(f"[dim]History: {history_path}[/dim]")
 
 
@@ -337,13 +370,30 @@ def register_observe_commands(app: typer.Typer) -> None:
     @app.command()
     def logs(
         workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
-        tail: int = typer.Option(0, "--tail", "-n", help="Show last N entries (0 = all)."),
-        level: str = typer.Option("", "--level", "-l", help="Filter by event type (stage_done, gate_check, pipeline_start, pipeline_end)."),
-        stage: str = typer.Option("", "--stage", help="Filter by stage name (e.g. fix, validate)."),
-        failed: bool = typer.Option(False, "--failed", "-f", help="Show only failed stages/gates."),
-        show_output: bool = typer.Option(False, "--output", "-o", help="Show captured stdout/stderr for each stage."),
-        json_output: bool = typer.Option(False, "--json", "-j", help="Raw JSON lines (for LLM/llx consumption)."),
-        sql: str = typer.Option("", "--sql", help="Run raw SQL query against pipeline.db (advanced)."),
+        tail: int = typer.Option(
+            0, "--tail", "-n", help="Show last N entries (0 = all)."
+        ),
+        level: str = typer.Option(
+            "",
+            "--level",
+            "-l",
+            help="Filter by event type (stage_done, gate_check, pipeline_start, pipeline_end).",
+        ),
+        stage: str = typer.Option(
+            "", "--stage", help="Filter by stage name (e.g. fix, validate)."
+        ),
+        failed: bool = typer.Option(
+            False, "--failed", "-f", help="Show only failed stages/gates."
+        ),
+        show_output: bool = typer.Option(
+            False, "--output", "-o", help="Show captured stdout/stderr for each stage."
+        ),
+        json_output: bool = typer.Option(
+            False, "--json", "-j", help="Raw JSON lines (for LLM/llx consumption)."
+        ),
+        sql: str = typer.Option(
+            "", "--sql", help="Run raw SQL query against pipeline.db (advanced)."
+        ),
     ) -> None:
         """View structured pipeline logs from .pyqual/pipeline.db (nfo SQLite)."""
         _logs_impl(workdir, tail, level, stage, failed, show_output, json_output, sql)
@@ -351,9 +401,15 @@ def register_observe_commands(app: typer.Typer) -> None:
     @app.command()
     def watch(
         workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
-        interval: float = typer.Option(1.0, "--interval", "-i", help="Poll interval in seconds."),
-        show_output: bool = typer.Option(False, "--output", "-o", help="Show captured stdout/stderr."),
-        show_prompts: bool = typer.Option(False, "--prompts", "-p", help="Show LLX fix prompts as they appear."),
+        interval: float = typer.Option(
+            1.0, "--interval", "-i", help="Poll interval in seconds."
+        ),
+        show_output: bool = typer.Option(
+            False, "--output", "-o", help="Show captured stdout/stderr."
+        ),
+        show_prompts: bool = typer.Option(
+            False, "--prompts", "-p", help="Show LLX fix prompts as they appear."
+        ),
     ) -> None:
         """Live-tail pipeline logs while 'pyqual run' executes in another terminal."""
         _watch_impl(workdir, interval, show_output, show_prompts)
@@ -361,10 +417,18 @@ def register_observe_commands(app: typer.Typer) -> None:
     @app.command()
     def history(
         workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
-        tail: int = typer.Option(0, "--tail", "-n", help="Show last N fix runs (0 = all)."),
-        prompts: bool = typer.Option(False, "--prompts", "-p", help="Show full LLX prompts."),
-        json_output: bool = typer.Option(False, "--json", "-j", help="Output raw JSON lines."),
-        verbose: bool = typer.Option(False, "--verbose", "-v", help="Show stdout/aider output."),
+        tail: int = typer.Option(
+            0, "--tail", "-n", help="Show last N fix runs (0 = all)."
+        ),
+        prompts: bool = typer.Option(
+            False, "--prompts", "-p", help="Show full LLX prompts."
+        ),
+        json_output: bool = typer.Option(
+            False, "--json", "-j", help="Output raw JSON lines."
+        ),
+        verbose: bool = typer.Option(
+            False, "--verbose", "-v", help="Show stdout/aider output."
+        ),
     ) -> None:
         """View history of LLX/LLM fix runs from .pyqual/llx_history.jsonl.
 

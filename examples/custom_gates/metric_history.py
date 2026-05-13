@@ -81,8 +81,15 @@ def detect_regressions(
     analysis: dict[str, dict] = {}
 
     # Metrics where higher is better
-    higher_better = {"coverage", "vallm_pass", "health_score", "pylint_score",
-                     "perf_rps", "docstring_coverage", "maintainability_index"}
+    higher_better = {
+        "coverage",
+        "vallm_pass",
+        "health_score",
+        "pylint_score",
+        "perf_rps",
+        "docstring_coverage",
+        "maintainability_index",
+    }
 
     all_keys = set(prev_metrics.keys()) | set(curr_metrics.keys())
     for key in sorted(all_keys):
@@ -95,10 +102,18 @@ def detect_regressions(
 
         if key in higher_better:
             regressed = delta < -tolerance
-            trend = "improving" if delta > tolerance else ("degrading" if delta < -tolerance else "stable")
+            trend = (
+                "improving"
+                if delta > tolerance
+                else ("degrading" if delta < -tolerance else "stable")
+            )
         else:
             regressed = delta > tolerance
-            trend = "improving" if delta < -tolerance else ("degrading" if delta > tolerance else "stable")
+            trend = (
+                "improving"
+                if delta < -tolerance
+                else ("degrading" if delta > tolerance else "stable")
+            )
 
         analysis[key] = {
             "prev": prev,
@@ -119,7 +134,7 @@ def print_trend_report(analysis: dict[str, dict]) -> bool:
 
     any_regression = False
     for metric, info in analysis.items():
-        delta_str = f"+{info['delta']}" if info['delta'] >= 0 else str(info['delta'])
+        delta_str = f"+{info['delta']}" if info["delta"] >= 0 else str(info["delta"])
 
         if info["trend"] == "improving":
             icon = "📈"
@@ -129,7 +144,9 @@ def print_trend_report(analysis: dict[str, dict]) -> bool:
             icon = "➡️"
 
         regr = " ⚠️  REGRESSION" if info["regressed"] else ""
-        print(f"  {icon} {metric}: {info['prev']:.1f} → {info['curr']:.1f} ({delta_str}){regr}")
+        print(
+            f"  {icon} {metric}: {info['prev']:.1f} → {info['curr']:.1f} ({delta_str}){regr}"
+        )
 
         if info["regressed"]:
             any_regression = True

@@ -81,7 +81,7 @@ stages:
         try:
             data = json.loads(bandit_path.read_text())
             results = data.get("results", [])
-            
+
             result["security_bandit_high"] = float(
                 len([r for r in results if r.get("issue_severity") == "HIGH"])
             )
@@ -114,7 +114,7 @@ stages:
                 vulnerabilities = data.get("vulnerabilities", [])
             else:
                 vulnerabilities = data if isinstance(data, list) else []
-            
+
             result["security_vuln_critical"] = float(
                 len([v for v in vulnerabilities if self._get_severity(v) == "CRITICAL"])
             )
@@ -122,7 +122,13 @@ stages:
                 len([v for v in vulnerabilities if self._get_severity(v) == "HIGH"])
             )
             result["security_vuln_moderate"] = float(
-                len([v for v in vulnerabilities if self._get_severity(v) in ("MODERATE", "MEDIUM")])
+                len(
+                    [
+                        v
+                        for v in vulnerabilities
+                        if self._get_severity(v) in ("MODERATE", "MEDIUM")
+                    ]
+                )
             )
         except (json.JSONDecodeError, TypeError):
             result["security_vuln_critical"] = 0.0
@@ -185,24 +191,26 @@ def run_bandit_check(
     cwd: Path | None = None,
 ) -> dict[str, Any]:
     """Run bandit security check on Python code.
-    
+
     Args:
         paths: List of paths to scan (defaults to ["."])
         severity: Minimum severity to report (low/medium/high)
         cwd: Working directory
-        
+
     Returns:
         Dict with scan results
     """
     paths = paths or ["."]
-    
+
     cmd = [
-        "bandit", "-r",
+        "bandit",
+        "-r",
         *paths,
-        "-f", "json",
+        "-f",
+        "json",
         "-ll" if severity == "low" else "-lll" if severity == "high" else "-ll",
     ]
-    
+
     try:
         result = subprocess.run(
             cmd,
@@ -211,7 +219,7 @@ def run_bandit_check(
             text=True,
             timeout=300,
         )
-        
+
         if result.returncode in (0, 1):  # 0 = no issues, 1 = issues found
             try:
                 data = json.loads(result.stdout) if result.stdout else {}
@@ -251,19 +259,19 @@ def run_pip_audit(
     cwd: Path | None = None,
 ) -> dict[str, Any]:
     """Run pip-audit to check for known vulnerabilities.
-    
+
     Args:
         output_format: Output format (json/markdown)
         cwd: Working directory
-        
+
     Returns:
         Dict with audit results
     """
     cmd = ["pip-audit"]
-    
+
     if output_format == "json":
         cmd.extend(["--format=json"])
-    
+
     try:
         result = subprocess.run(
             cmd,
@@ -272,19 +280,23 @@ def run_pip_audit(
             text=True,
             timeout=120,
         )
-        
+
         if result.returncode in (0, 1):  # 0 = no vulns, 1 = vulns found
             if output_format == "json" and result.stdout:
                 try:
                     data = json.loads(result.stdout)
                     return {
                         "success": True,
-                        "vulnerabilities": data if isinstance(data, list) else data.get("vulnerabilities", []),
-                        "dependencies_scanned": len(data) if isinstance(data, list) else 0,
+                        "vulnerabilities": data
+                        if isinstance(data, list)
+                        else data.get("vulnerabilities", []),
+                        "dependencies_scanned": len(data)
+                        if isinstance(data, list)
+                        else 0,
                     }
                 except json.JSONDecodeError:
                     pass
-            
+
             return {
                 "success": True,
                 "vulnerabilities": [],
@@ -316,23 +328,23 @@ def run_detect_secrets(
     cwd: Path | None = None,
 ) -> dict[str, Any]:
     """Run detect-secrets to find potential secrets.
-    
+
     Args:
         baseline_file: Path to baseline file for comparison
         all_files: Scan all files (not just staged)
         cwd: Working directory
-        
+
     Returns:
         Dict with scan results
     """
     cmd = ["detect-secrets", "scan"]
-    
+
     if all_files:
         cmd.append("--all-files")
-    
+
     if baseline_file:
         cmd.extend(["--baseline", baseline_file])
-    
+
     try:
         result = subprocess.run(
             cmd,
@@ -341,13 +353,13 @@ def run_detect_secrets(
             text=True,
             timeout=180,
         )
-        
+
         if result.returncode == 0:
             try:
                 data = json.loads(result.stdout)
                 findings = data.get("results", {})
                 total = sum(len(v) for v in findings.values() if isinstance(v, list))
-                
+
                 return {
                     "success": True,
                     "findings": findings,
@@ -364,7 +376,8 @@ def run_detect_secrets(
         else:
             return {
                 "success": False,
-                "error": result.stderr or f"detect-secrets exit code: {result.returncode}",
+                "error": result.stderr
+                or f"detect-secrets exit code: {result.returncode}",
                 "findings": {},
                 "total_findings": 0,
             }
@@ -386,21 +399,21 @@ def run_detect_secrets(
 
 def security_summary(workdir: Path | None = None) -> dict[str, Any]:
     """Generate comprehensive security summary.
-    
+
     Returns aggregated metrics from all security tools.
     """
     workdir = workdir or Path.cwd()
-    
+
     collector = SecurityCollector()
     metrics = collector.collect(workdir)
-    
+
     total_issues = (
         metrics.get("security_bandit_high", 0)
         + metrics.get("security_vuln_critical", 0)
         + metrics.get("security_vuln_high", 0)
         + metrics.get("security_secrets_found", 0)
     )
-    
+
     return {
         "success": True,
         "metrics": metrics,

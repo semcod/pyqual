@@ -1,5 +1,4 @@
-"""Info commands: doctor, tools.
-"""
+"""Info commands: doctor, tools."""
 
 from __future__ import annotations
 
@@ -19,7 +18,11 @@ if TYPE_CHECKING:
 def doctor() -> None:
     """Check availability of external tools used by pyqual collectors."""
     tools = [
-        ("docker", "Container runtime for the llx MCP service", "Install Docker Engine"),
+        (
+            "docker",
+            "Container runtime for the llx MCP service",
+            "Install Docker Engine",
+        ),
         ("bandit", "Security scanner", "pip install bandit"),
         ("pip-audit", "Dependency vulnerability scanner", "pip install pip-audit"),
         ("trufflehog", "Secret scanner", "brew install trufflehog"),
@@ -58,8 +61,12 @@ def doctor() -> None:
 
     if available < len(tools):
         console.print("\n[yellow]Install missing tools to enable all metrics:[/yellow]")
-        console.print("  pip install bandit pip-audit mypy ruff pylint flake8 radon interrogate vulture")
-        console.print("  # For secret scanning, install trufflehog or gitleaks separately")
+        console.print(
+            "  pip install bandit pip-audit mypy ruff pylint flake8 radon interrogate vulture"
+        )
+        console.print(
+            "  # For secret scanning, install trufflehog or gitleaks separately"
+        )
 
 
 @app.command()

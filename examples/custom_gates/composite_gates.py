@@ -56,7 +56,10 @@ def compute_composite_score(metrics: dict[str, float]) -> float:
     if "cc" in metrics:
         # CC: lower is better. CC=1 → 100, CC≥CC_TARGET → 0
         cc = metrics["cc"]
-        score = max(MIN_SCORE, MAX_SCORE - ((cc - CC_BASELINE) / (CC_TARGET - CC_BASELINE)) * MAX_SCORE)
+        score = max(
+            MIN_SCORE,
+            MAX_SCORE - ((cc - CC_BASELINE) / (CC_TARGET - CC_BASELINE)) * MAX_SCORE,
+        )
         components.append((WEIGHT_COMPLEXITY, score))
 
     if "ruff_errors" in metrics:
@@ -68,7 +71,11 @@ def compute_composite_score(metrics: dict[str, float]) -> float:
     if "bandit_high" in metrics:
         # Security: 0 high issues → 100, any → penalty
         high = metrics["bandit_high"]
-        score = MAX_SCORE if high == 0 else max(MIN_SCORE, MAX_SCORE - high * SECURITY_HIGH_PENALTY)
+        score = (
+            MAX_SCORE
+            if high == 0
+            else max(MIN_SCORE, MAX_SCORE - high * SECURITY_HIGH_PENALTY)
+        )
         components.append((WEIGHT_SECURITY, score))
 
     if not components:
@@ -86,7 +93,9 @@ def run_composite_check(workdir: Path) -> bool:
         GateConfig(metric="coverage", operator="ge", threshold=COVERAGE_GATE_THRESHOLD),
         GateConfig(metric="cc", operator="le", threshold=CC_GATE_THRESHOLD),
         GateConfig(metric="ruff_errors", operator="le", threshold=LINT_GATE_THRESHOLD),
-        GateConfig(metric="bandit_high", operator="le", threshold=SECURITY_GATE_THRESHOLD),
+        GateConfig(
+            metric="bandit_high", operator="le", threshold=SECURITY_GATE_THRESHOLD
+        ),
     ]
 
     gate_set = GateSet(gate_configs)
@@ -108,7 +117,9 @@ def run_composite_check(workdir: Path) -> bool:
     print("-" * 60)
     composite_passed = composite >= COMPOSITE_PASS_THRESHOLD
     icon = "✅" if composite_passed else "❌"
-    print(f"  {icon} composite_score: {composite} (threshold: {COMPOSITE_PASS_THRESHOLD})")
+    print(
+        f"  {icon} composite_score: {composite} (threshold: {COMPOSITE_PASS_THRESHOLD})"
+    )
     print("=" * 60)
 
     all_individual = all(r.passed for r in results)

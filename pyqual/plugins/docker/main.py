@@ -71,7 +71,7 @@ stages:
 
         try:
             data = json.loads(trivy_path.read_text())
-            
+
             # Handle different trivy output formats
             if isinstance(data, list):
                 # Direct results array
@@ -94,7 +94,7 @@ stages:
         high = len([v for v in vulns if v.get("Severity") == "HIGH"])
         medium = len([v for v in vulns if v.get("Severity") == "MEDIUM"])
         low = len([v for v in vulns if v.get("Severity") == "LOW"])
-        
+
         result["docker_vuln_critical"] = float(critical)
         result["docker_vuln_high"] = float(high)
         result["docker_vuln_medium"] = float(medium)
@@ -117,7 +117,7 @@ stages:
 
         try:
             data = json.loads(hadolint_path.read_text())
-            
+
             if isinstance(data, list):
                 errors = len([i for i in data if i.get("level") == "error"])
                 warnings = len([i for i in data if i.get("level") == "warning"])
@@ -130,7 +130,7 @@ stages:
             else:
                 errors = 0
                 warnings = 0
-                
+
             result["docker_hadolint_errors"] = float(errors)
             result["docker_hadolint_warnings"] = float(warnings)
         except (json.JSONDecodeError, TypeError):
@@ -148,11 +148,15 @@ stages:
         try:
             data = json.loads(grype_path.read_text())
             matches = data.get("matches", [])
-            
-            critical = len([m for m in matches if self._get_grype_severity(m) == "Critical"])
+
+            critical = len(
+                [m for m in matches if self._get_grype_severity(m) == "Critical"]
+            )
             high = len([m for m in matches if self._get_grype_severity(m) == "High"])
-            medium = len([m for m in matches if self._get_grype_severity(m) == "Medium"])
-            
+            medium = len(
+                [m for m in matches if self._get_grype_severity(m) == "Medium"]
+            )
+
             result["docker_grype_critical"] = float(critical)
             result["docker_grype_high"] = float(high)
             result["docker_grype_medium"] = float(medium)
@@ -179,7 +183,9 @@ stages:
             data = json.loads(image_info_path.read_text())
             size_bytes = data.get("Size", 0)
             result["docker_image_size_mb"] = round(size_bytes / (1024 * 1024), 2)
-            result["docker_layer_count"] = float(len(data.get("RootFS", {}).get("Layers", [])))
+            result["docker_layer_count"] = float(
+                len(data.get("RootFS", {}).get("Layers", []))
+            )
         except (json.JSONDecodeError, TypeError):
             result["docker_image_size_mb"] = 0.0
             result["docker_layer_count"] = 0.0
@@ -194,16 +200,16 @@ def run_hadolint(
     cwd: Path | None = None,
 ) -> dict[str, Any]:
     """Run hadolint on a Dockerfile.
-    
+
     Args:
         dockerfile: Path to Dockerfile
         cwd: Working directory
-        
+
     Returns:
         Dict with lint results
     """
     cmd = ["hadolint", dockerfile, "--format", "json"]
-    
+
     try:
         result = subprocess.run(
             cmd,
@@ -212,16 +218,16 @@ def run_hadolint(
             text=True,
             timeout=60,
         )
-        
+
         # hadolint returns exit code 1 if issues found
         try:
             issues = json.loads(result.stdout) if result.stdout else []
         except json.JSONDecodeError:
             issues = []
-        
+
         errors = len([i for i in issues if i.get("level") == "error"])
         warnings = len([i for i in issues if i.get("level") == "warning"])
-        
+
         return {
             "success": True,
             "issues": issues,
@@ -255,17 +261,25 @@ def run_trivy_scan(
     cwd: Path | None = None,
 ) -> dict[str, Any]:
     """Run trivy vulnerability scan on a Docker image.
-    
+
     Args:
         image: Docker image name/tag
         output_format: Output format
         cwd: Working directory
-        
+
     Returns:
         Dict with scan results
     """
-    cmd = ["trivy", "image", "--format", output_format, "-o", ".pyqual/trivy.json", image]
-    
+    cmd = [
+        "trivy",
+        "image",
+        "--format",
+        output_format,
+        "-o",
+        ".pyqual/trivy.json",
+        image,
+    ]
+
     try:
         result = subprocess.run(
             cmd,
@@ -274,12 +288,12 @@ def run_trivy_scan(
             text=True,
             timeout=300,
         )
-        
+
         # Read the output file
         output_path = (cwd or Path.cwd()) / ".pyqual" / "trivy.json"
         if output_path.exists():
             data = json.loads(output_path.read_text())
-            
+
             # Count vulnerabilities
             if isinstance(data, list):
                 vulns = data
@@ -288,10 +302,10 @@ def run_trivy_scan(
                 vulns = []
                 for r in results:
                     vulns.extend(r.get("Vulnerabilities", []))
-            
+
             critical = len([v for v in vulns if v.get("Severity") == "CRITICAL"])
             high = len([v for v in vulns if v.get("Severity") == "HIGH"])
-            
+
             return {
                 "success": result.returncode == 0 or (critical == 0 and high == 0),
                 "vulnerabilities": vulns,
@@ -330,16 +344,16 @@ def run_trivy_scan(
 
 def get_image_info(image: str, cwd: Path | None = None) -> dict[str, Any]:
     """Get Docker image information.
-    
+
     Args:
         image: Docker image name
         cwd: Working directory
-        
+
     Returns:
         Dict with image details
     """
     cmd = ["docker", "inspect", image]
-    
+
     try:
         result = subprocess.run(
             cmd,
@@ -348,14 +362,14 @@ def get_image_info(image: str, cwd: Path | None = None) -> dict[str, Any]:
             text=True,
             timeout=30,
         )
-        
+
         if result.returncode == 0:
             data = json.loads(result.stdout)
             if data and len(data) > 0:
                 info = data[0]
                 size_bytes = info.get("Size", 0)
                 layers = info.get("RootFS", {}).get("Layers", [])
-                
+
                 return {
                     "success": True,
                     "size_bytes": size_bytes,
@@ -364,7 +378,7 @@ def get_image_info(image: str, cwd: Path | None = None) -> dict[str, Any]:
                     "architecture": info.get("Architecture", "unknown"),
                     "os": info.get("Os", "unknown"),
                 }
-        
+
         return {
             "success": False,
             "error": f"Docker inspect failed: {result.stderr}",
@@ -393,12 +407,12 @@ def docker_security_check(
     cwd: Path | None = None,
 ) -> dict[str, Any]:
     """Run comprehensive Docker security check.
-    
+
     Args:
         image: Docker image to scan (optional)
         dockerfile: Dockerfile to lint
         cwd: Working directory
-        
+
     Returns:
         Dict with combined security results
     """
@@ -409,19 +423,19 @@ def docker_security_check(
         "image_info": None,
         "is_secure": True,
     }
-    
+
     # Lint Dockerfile
     if (cwd or Path.cwd() / dockerfile).exists():
         results["lint"] = run_hadolint(dockerfile, cwd)
         if results["lint"] and not results["lint"].get("is_valid", True):
             results["is_secure"] = False
-    
+
     # Scan image if provided
     if image:
         results["image_scan"] = run_trivy_scan(image, cwd=cwd)
         if results["image_scan"] and not results["image_scan"].get("is_secure", True):
             results["is_secure"] = False
-        
+
         results["image_info"] = get_image_info(image, cwd=cwd)
-    
+
     return results

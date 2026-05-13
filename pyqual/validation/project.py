@@ -41,15 +41,24 @@ def detect_project_facts(workdir: Path) -> dict[str, Any]:
 
     # Available tools on PATH
     available_tools = []
-    for tool in ["pytest", "ruff", "mypy", "code2llm", "vallm", "prefact",
-                 "bandit", "pip-audit", "trufflehog", "coverage"]:
+    for tool in [
+        "pytest",
+        "ruff",
+        "mypy",
+        "code2llm",
+        "vallm",
+        "prefact",
+        "bandit",
+        "pip-audit",
+        "trufflehog",
+        "coverage",
+    ]:
         if shutil.which(tool):
             available_tools.append(tool)
     facts["available_tools"] = available_tools
 
     # Test framework hints
-    has_tests = any(f.name.startswith("test_") or f.name == "tests"
-                    for f in files)
+    has_tests = any(f.name.startswith("test_") or f.name == "tests" for f in files)
     facts["has_tests"] = has_tests
 
     # Existing pyqual.yaml

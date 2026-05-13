@@ -21,6 +21,7 @@ from pyqual.validation import (
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _make_config(tmp_path: Path, content: str) -> Path:
     p = tmp_path / "pyqual.yaml"
     p.write_text(content)
@@ -50,31 +51,45 @@ pipeline:
 # EC namespace
 # ---------------------------------------------------------------------------
 
+
 class TestEC:
     def test_all_config_codes_start_with_prefix(self) -> None:
-        config_codes = [v for k, v in vars(EC).items()
-                        if not k.startswith("_") and k.startswith("CONFIG")]
+        config_codes = [
+            v
+            for k, v in vars(EC).items()
+            if not k.startswith("_") and k.startswith("CONFIG")
+        ]
         assert all(c.startswith("E_PYQUAL_CONFIG_") for c in config_codes)
 
     def test_all_env_codes_start_with_prefix(self) -> None:
-        env_codes = [v for k, v in vars(EC).items()
-                     if not k.startswith("_") and k.startswith("ENV")]
+        env_codes = [
+            v
+            for k, v in vars(EC).items()
+            if not k.startswith("_") and k.startswith("ENV")
+        ]
         assert all(c.startswith("E_PYQUAL_ENV_") for c in env_codes)
 
     def test_all_project_codes_start_with_prefix(self) -> None:
-        proj_codes = [v for k, v in vars(EC).items()
-                      if not k.startswith("_") and k.startswith("PROJECT")]
+        proj_codes = [
+            v
+            for k, v in vars(EC).items()
+            if not k.startswith("_") and k.startswith("PROJECT")
+        ]
         assert all(c.startswith("E_PYQUAL_PROJECT_") for c in proj_codes)
 
     def test_all_lllm_codes_start_with_prefix(self) -> None:
-        llm_codes = [v for k, v in vars(EC).items()
-                     if not k.startswith("_") and k.startswith("LLM")]
+        llm_codes = [
+            v
+            for k, v in vars(EC).items()
+            if not k.startswith("_") and k.startswith("LLM")
+        ]
         assert all(c.startswith("E_PYQUAL_LLM_") for c in llm_codes)
 
 
 # ---------------------------------------------------------------------------
 # error_domain()
 # ---------------------------------------------------------------------------
+
 
 class TestErrorDomain:
     def test_config_domain(self) -> None:
@@ -102,6 +117,7 @@ class TestErrorDomain:
 # ---------------------------------------------------------------------------
 # StageFailure classifier
 # ---------------------------------------------------------------------------
+
 
 class TestStageFailure:
     def _f(self, stderr="", stdout="", rc=1, is_fix=False, timed_out=False):
@@ -177,6 +193,7 @@ class TestStageFailure:
 # ---------------------------------------------------------------------------
 # validate_config()
 # ---------------------------------------------------------------------------
+
 
 class TestValidateConfig:
     def test_missing_file(self, tmp_path: Path) -> None:
@@ -311,8 +328,11 @@ pipeline:
         p = _make_config(tmp_path, VALID_NO_METRICS)
         result = validate_config(p)
         assert result.ok
-        assert any(i.code == EC.ENV_NO_GATES for i in result.issues
-                   if i.severity == Severity.INFO)
+        assert any(
+            i.code == EC.ENV_NO_GATES
+            for i in result.issues
+            if i.severity == Severity.INFO
+        )
 
     def test_known_metrics_pass(self, tmp_path: Path) -> None:
         yaml = """\
@@ -344,6 +364,7 @@ pipeline:
 # ValidationResult helpers
 # ---------------------------------------------------------------------------
 
+
 class TestValidationResult:
     def test_ok_with_no_issues(self) -> None:
         r = ValidationResult()
@@ -370,6 +391,7 @@ class TestValidationResult:
 # ---------------------------------------------------------------------------
 # detect_project_facts()
 # ---------------------------------------------------------------------------
+
 
 class TestDetectProjectFacts:
     def test_returns_dict_with_workdir(self, tmp_path: Path) -> None:

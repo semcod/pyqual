@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import json
 import subprocess
-from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -27,7 +26,14 @@ class DepsCollector(MetricCollector):
         name="deps",
         description="Dependency management: outdated packages, dependency tree, requirements validation",
         version="1.0.0",
-        tags=["dependencies", "outdated", "packages", "pip", "requirements", "licenses"],
+        tags=[
+            "dependencies",
+            "outdated",
+            "packages",
+            "pip",
+            "requirements",
+            "licenses",
+        ],
         config_example="""
 metrics:
   deps_outdated_max: 10             # Max outdated packages
@@ -72,23 +78,23 @@ stages:
 
         try:
             data = json.loads(outdated_path.read_text())
-            
+
             if isinstance(data, list):
                 outdated = data
             elif isinstance(data, dict):
                 outdated = data.get("packages", [])
             else:
                 outdated = []
-            
+
             # Count total outdated
             result["deps_outdated_count"] = float(len(outdated))
-            
+
             # Count major version outdated
             major_outdated = 0
             for pkg in outdated:
                 current = pkg.get("version", "0.0.0")
                 latest = pkg.get("latest_version", "0.0.0")
-                
+
                 try:
                     current_major = int(current.split(".")[0])
                     latest_major = int(latest.split(".")[0])
@@ -96,9 +102,9 @@ stages:
                         major_outdated += 1
                 except (ValueError, IndexError):
                     pass
-            
+
             result["deps_outdated_major"] = float(major_outdated)
-            
+
         except (json.JSONDecodeError, TypeError):
             result["deps_outdated_count"] = 0.0
             result["deps_outdated_major"] = 0.0
@@ -114,27 +120,34 @@ stages:
 
         try:
             data = json.loads(deptree_path.read_text())
-            
+
             if isinstance(data, list):
                 packages = data
             elif isinstance(data, dict):
                 packages = data.get("packages", [])
             else:
                 packages = []
-            
-            direct = len([p for p in packages if p.get("required_by") is None or len(p.get("required_by", [])) == 0])
-            
+
+            direct = len(
+                [
+                    p
+                    for p in packages
+                    if p.get("required_by") is None
+                    or len(p.get("required_by", [])) == 0
+                ]
+            )
+
             # Count transitive (has required_by but not top level)
             transitive = 0
             for pkg in packages:
                 req_by = pkg.get("required_by", [])
                 if req_by and len(req_by) > 0:
                     transitive += 1
-            
+
             result["deps_direct_count"] = float(direct)
             result["deps_transitive_count"] = float(transitive)
             result["deps_total_count"] = float(len(packages))
-            
+
         except (json.JSONDecodeError, TypeError):
             result["deps_direct_count"] = 0.0
             result["deps_transitive_count"] = 0.0
@@ -147,23 +160,31 @@ stages:
         if req_json_path.exists():
             try:
                 data = json.loads(req_json_path.read_text())
-                result["deps_missing_reqs"] = float(data.get("missing_from_requirements", 0))
+                result["deps_missing_reqs"] = float(
+                    data.get("missing_from_requirements", 0)
+                )
                 result["deps_pins_incomplete"] = float(data.get("unpinned_packages", 0))
                 return
             except (json.JSONDecodeError, TypeError):
                 pass
-        
+
         # Check if requirements.txt exists and parse directly
         req_path = workdir / "requirements.txt"
         if req_path.exists():
             try:
                 content = req_path.read_text()
-                lines = [l.strip() for l in content.split("\n") if l.strip() and not l.startswith("#")]
-                
+                lines = [
+                    l.strip()
+                    for l in content.split("\n")
+                    if l.strip() and not l.startswith("#")
+                ]
+
                 # Count pinned vs unpinned
-                pinned = sum(1 for l in lines if "==" in l or ">=" in l or "<=" in l or "~=" in l)
+                pinned = sum(
+                    1 for l in lines if "==" in l or ">=" in l or "<=" in l or "~=" in l
+                )
                 unpinned = len(lines) - pinned
-                
+
                 result["deps_requirements_entries"] = float(len(lines))
                 result["deps_pins_incomplete"] = float(unpinned)
                 result["deps_missing_reqs"] = 0.0  # Cannot determine without pip
@@ -186,27 +207,39 @@ stages:
 
         try:
             data = json.loads(licenses_path.read_text())
-            
+
             if isinstance(data, list):
                 packages = data
             elif isinstance(data, dict):
                 packages = data.get("packages", [])
             else:
                 packages = []
-            
+
             # Count unknown licenses
-            unknown = len([p for p in packages if not p.get("license") or p.get("license") in ["UNKNOWN", "", None]])
-            
+            unknown = len(
+                [
+                    p
+                    for p in packages
+                    if not p.get("license") or p.get("license") in ["UNKNOWN", "", None]
+                ]
+            )
+
             # Count restrictive licenses
             restrictive_keywords = ["GPL", "AGPL", "SSPL", "proprietary", "commercial"]
-            restrictive = len([
-                p for p in packages
-                if any(kw in str(p.get("license", "")).upper() for kw in restrictive_keywords)
-            ])
-            
+            restrictive = len(
+                [
+                    p
+                    for p in packages
+                    if any(
+                        kw in str(p.get("license", "")).upper()
+                        for kw in restrictive_keywords
+                    )
+                ]
+            )
+
             result["deps_licenses_unknown"] = float(unknown)
             result["deps_licenses_restrictive"] = float(restrictive)
-            
+
         except (json.JSONDecodeError, TypeError):
             result["deps_licenses_unknown"] = 0.0
             result["deps_licenses_restrictive"] = 0.0
@@ -218,15 +251,15 @@ stages:
 
 def get_outdated_packages(cwd: Path | None = None) -> dict[str, Any]:
     """Get list of outdated packages.
-    
+
     Args:
         cwd: Working directory
-        
+
     Returns:
         Dict with outdated packages list
     """
     cmd = ["pip", "list", "--outdated", "--format=json"]
-    
+
     try:
         result = subprocess.run(
             cmd,
@@ -235,30 +268,30 @@ def get_outdated_packages(cwd: Path | None = None) -> dict[str, Any]:
             text=True,
             timeout=60,
         )
-        
+
         if result.returncode == 0:
             try:
                 packages = json.loads(result.stdout)
-                
+
                 # Categorize by severity
                 major_outdated = []
                 minor_outdated = []
-                
+
                 for pkg in packages:
                     current = pkg.get("version", "0.0.0")
                     latest = pkg.get("latest_version", "0.0.0")
-                    
+
                     try:
                         current_parts = current.split(".")
                         latest_parts = latest.split(".")
-                        
+
                         if int(latest_parts[0]) > int(current_parts[0]):
                             major_outdated.append(pkg)
                         else:
                             minor_outdated.append(pkg)
                     except (ValueError, IndexError):
                         minor_outdated.append(pkg)
-                
+
                 return {
                     "success": True,
                     "total": len(packages),
@@ -299,15 +332,15 @@ def get_outdated_packages(cwd: Path | None = None) -> dict[str, Any]:
 
 def get_dependency_tree(cwd: Path | None = None) -> dict[str, Any]:
     """Get dependency tree using pipdeptree.
-    
+
     Args:
         cwd: Working directory
-        
+
     Returns:
         Dict with dependency tree
     """
     cmd = ["pipdeptree", "--json"]
-    
+
     try:
         result = subprocess.run(
             cmd,
@@ -316,14 +349,14 @@ def get_dependency_tree(cwd: Path | None = None) -> dict[str, Any]:
             text=True,
             timeout=120,
         )
-        
+
         if result.returncode == 0:
             try:
                 packages = json.loads(result.stdout)
-                
+
                 direct = [p for p in packages if not p.get("required_by")]
                 transitive = [p for p in packages if p.get("required_by")]
-                
+
                 return {
                     "success": True,
                     "total_packages": len(packages),
@@ -367,16 +400,16 @@ def check_requirements(
     cwd: Path | None = None,
 ) -> dict[str, Any]:
     """Check requirements file for issues.
-    
+
     Args:
         req_file: Path to requirements file
         cwd: Working directory
-        
+
     Returns:
         Dict with requirements check results
     """
     req_path = (cwd or Path.cwd()) / req_file
-    
+
     if not req_path.exists():
         return {
             "success": False,
@@ -385,10 +418,14 @@ def check_requirements(
             "entries": 0,
             "unpinned_packages": 0,
         }
-    
+
     try:
         content = req_path.read_text()
-        lines = [l.strip() for l in content.split("\n") if l.strip() and not l.startswith("#")]
+        lines = [
+            l.strip()
+            for l in content.split("\n")
+            if l.strip() and not l.startswith("#")
+        ]
 
         unpinned = []
         for line in lines:
@@ -396,7 +433,7 @@ def check_requirements(
                 continue
             if not _is_pinned_req(line):
                 unpinned.append(line.split("#")[0].split(";")[0].strip())
-        
+
         return {
             "success": True,
             "exists": True,
@@ -417,43 +454,45 @@ def check_requirements(
 
 def deps_health_check(cwd: Path | None = None) -> dict[str, Any]:
     """Run comprehensive dependency health check.
-    
+
     Returns aggregated metrics from all dependency checks.
     """
     cwd = cwd or Path.cwd()
-    
+
     outdated = get_outdated_packages(cwd)
     tree = get_dependency_tree(cwd)
     reqs = check_requirements(cwd=cwd)
-    
+
     # Collect metrics
     collector = DepsCollector()
     metrics = collector.collect(cwd)
-    
+
     # Determine health status
     is_healthy = (
         not outdated.get("has_major_outdated", False)
         and reqs.get("is_fully_pinned", True)
         and metrics.get("deps_licenses_unknown", 0) < 5
     )
-    
+
     recommendations = []
-    
+
     if outdated.get("has_major_outdated", False):
         count = outdated.get("major_outdated", 0)
         recommendations.append(f"Update {count} packages with major version updates")
-    
+
     if not reqs.get("is_fully_pinned", True):
         count = reqs.get("unpinned_packages", 0)
-        recommendations.append(f"Pin {count} packages in requirements.txt for reproducible builds")
-    
+        recommendations.append(
+            f"Pin {count} packages in requirements.txt for reproducible builds"
+        )
+
     if metrics.get("deps_licenses_unknown", 0) > 0:
         count = int(metrics.get("deps_licenses_unknown", 0))
         recommendations.append(f"Review {count} packages with unknown licenses")
-    
+
     if tree.get("transitive_count", 0) > 50:
         recommendations.append("Consider reducing transitive dependencies")
-    
+
     return {
         "success": True,
         "metrics": metrics,

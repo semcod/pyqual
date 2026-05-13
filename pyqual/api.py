@@ -50,16 +50,18 @@ __all__ = [
 ]
 
 
-def load_config(path: str | Path = "pyqual.yaml", workdir: str | Path = ".") -> PyqualConfig:
+def load_config(
+    path: str | Path = "pyqual.yaml", workdir: str | Path = "."
+) -> PyqualConfig:
     """Load pyqual configuration from YAML file.
-    
+
     Args:
         path: Path to pyqual.yaml (relative to workdir)
         workdir: Working directory for resolving relative paths
-        
+
     Returns:
         Parsed and validated PyqualConfig object
-        
+
     Raises:
         FileNotFoundError: If config file doesn't exist
         ValueError: If config is invalid
@@ -72,6 +74,7 @@ def load_config(path: str | Path = "pyqual.yaml", workdir: str | Path = ".") -> 
 def validate_config(config: PyqualConfig) -> list[str]:
     """Validate configuration and return list of errors (empty if valid)."""
     from pyqual.validation import validate_config as _validate
+
     errors = _validate(config)
     return [str(e) for e in errors]
 
@@ -79,24 +82,24 @@ def validate_config(config: PyqualConfig) -> list[str]:
 def create_default_config(
     path: str | Path = "pyqual.yaml",
     profile: str | None = None,
-    workdir: str | Path = "."
+    workdir: str | Path = ".",
 ) -> Path:
     """Create a default pyqual.yaml config file.
-    
+
     Args:
         path: Where to create the config file
         profile: Optional profile name (python, python-full, ci, lint-only, security)
         workdir: Working directory
-        
+
     Returns:
         Path to created config file
     """
     from pyqual.profiles import get_profile
-    
+
     target = Path(workdir) / path
     if target.exists():
         raise FileExistsError(f"Config already exists: {target}")
-    
+
     if profile:
         content = get_profile(profile)
     else:
@@ -110,7 +113,7 @@ def create_default_config(
       tool: pytest
       optional: true
 """
-    
+
     target.write_text(content)
     log.info("Created default config at %s", target)
     return target
@@ -127,17 +130,17 @@ def run(
     stream_output: bool = False,
 ) -> PipelineResult:
     """Run a quality pipeline with the given configuration.
-    
+
     Args:
         config: Pipeline configuration object
         workdir: Working directory for the pipeline
         dry_run: If True, don't actually execute commands
         on_stage_start: Callback when stage starts
         on_stage_done: Callback when stage completes
-        on_iteration_start: Callback when iteration starts  
+        on_iteration_start: Callback when iteration starts
         on_iteration_done: Callback when iteration completes
         stream_output: If True, stream output in real-time
-        
+
     Returns:
         PipelineResult with all iteration results
     """
@@ -160,16 +163,16 @@ def run_pipeline(
     **kwargs: Any,
 ) -> PipelineResult:
     """Run pipeline from config file path (convenience function).
-    
+
     Args:
         config_path: Path to pyqual.yaml
         workdir: Working directory
         dry_run: If True, don't actually execute
         **kwargs: Additional arguments passed to run()
-        
+
     Returns:
         PipelineResult
-        
+
     Example:
         >>> result = api.run_pipeline("pyqual.yaml", workdir="/path/to/project")
         >>> if result.final_passed:
@@ -181,11 +184,11 @@ def run_pipeline(
 
 def check_gates(config: PyqualConfig, workdir: str | Path = ".") -> list[GateResult]:
     """Check quality gates without running pipeline.
-    
+
     Args:
         config: Pipeline configuration
         workdir: Working directory
-        
+
     Returns:
         List of gate results
     """
@@ -193,13 +196,15 @@ def check_gates(config: PyqualConfig, workdir: str | Path = ".") -> list[GateRes
     return gate_set.check_all(Path(workdir))
 
 
-def dry_run(config_path: str | Path = "pyqual.yaml", workdir: str | Path = ".") -> PipelineResult:
+def dry_run(
+    config_path: str | Path = "pyqual.yaml", workdir: str | Path = "."
+) -> PipelineResult:
     """Simulate pipeline execution without running commands.
-    
+
     Args:
         config_path: Path to pyqual.yaml
         workdir: Working directory
-        
+
     Returns:
         PipelineResult showing what would be executed
     """
@@ -215,7 +220,7 @@ def run_stage(
     env: dict[str, str] | None = None,
 ) -> dict[str, Any]:
     """Run a single stage/command directly.
-    
+
     Args:
         stage_name: Name of the stage (for logging)
         command: Shell command to run (either command or tool required)
@@ -223,13 +228,13 @@ def run_stage(
         workdir: Working directory
         timeout: Timeout in seconds (0 = no timeout)
         env: Additional environment variables
-        
+
     Returns:
         Dict with returncode, stdout, stderr, duration, passed
-        
+
     Raises:
         ValueError: If neither command nor tool is provided
-        
+
     Example:
         >>> result = api.run_stage("test", tool="pytest", workdir=".")
         >>> if result["passed"]:
@@ -237,9 +242,9 @@ def run_stage(
     """
     import time
     from pyqual.constants import TIMEOUT_EXIT_CODE
-    
+
     workdir_path = Path(workdir).resolve()
-    
+
     if tool:
         preset = get_preset(tool)
         if not preset:
@@ -247,11 +252,11 @@ def run_stage(
         command = preset.shell_command(str(workdir_path))
     elif not command:
         raise ValueError("Either command or tool must be provided")
-    
+
     log.info("Running stage '%s': %s", stage_name, command)
-    
+
     env_vars = {**dict(subprocess.os.environ), **(env or {})}
-    
+
     start = time.monotonic()
     try:
         effective_timeout = timeout if timeout > 0 else None
@@ -301,17 +306,17 @@ def run_stage(
 
 def get_tool_command(tool_name: str, workdir: str | Path = ".") -> str:
     """Get the shell command for a built-in tool preset.
-    
+
     Args:
         tool_name: Tool preset name (e.g. "pytest", "ruff", "mypy")
         workdir: Working directory
-        
+
     Returns:
         Shell command string
-        
+
     Raises:
         ValueError: If tool preset not found
-        
+
     Example:
         >>> cmd = api.get_tool_command("pytest")
         >>> print(cmd)  # "pytest --cov-report=json:.pyqual/coverage.json -q"
@@ -324,10 +329,10 @@ def get_tool_command(tool_name: str, workdir: str | Path = ".") -> str:
 
 def format_result_summary(result: PipelineResult) -> str:
     """Format pipeline result as human-readable summary.
-    
+
     Args:
         result: Pipeline result object
-        
+
     Returns:
         Formatted summary string
     """
@@ -337,40 +342,41 @@ def format_result_summary(result: PipelineResult) -> str:
         f"Total Duration: {result.total_duration:.1f}s",
         "",
     ]
-    
+
     for i, iteration in enumerate(result.iterations, 1):
         lines.append(f"Iteration {i}:")
         for stage in iteration.stages:
             status = "✓" if stage.passed else "✗"
             skip_mark = " (skipped)" if stage.skipped else ""
             lines.append(f"  {status} {stage.name}: {stage.duration:.1f}s{skip_mark}")
-        
+
         if iteration.gates:
-            lines.append(f"  Gates:")
+            lines.append("  Gates:")
             for gate in iteration.gates:
                 status = "✓" if gate.passed else "✗"
-                lines.append(f"    {status} {gate.metric}: {gate.value} {gate.operator} {gate.threshold}")
+                lines.append(
+                    f"    {status} {gate.metric}: {gate.value} {gate.operator} {gate.threshold}"
+                )
         lines.append("")
-    
+
     return "\n".join(lines)
 
 
 def export_results_json(
-    result: PipelineResult,
-    output_path: str | Path = ".pyqual/results.json"
+    result: PipelineResult, output_path: str | Path = ".pyqual/results.json"
 ) -> Path:
     """Export pipeline results to JSON file.
-    
+
     Args:
         result: Pipeline result object
         output_path: Where to write the JSON file
-        
+
     Returns:
         Path to written file
     """
     path = Path(output_path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    
+
     data = {
         "final_passed": result.final_passed,
         "iteration_count": result.iteration_count,
@@ -406,7 +412,7 @@ def export_results_json(
             for it in result.iterations
         ],
     }
-    
+
     path.write_text(json.dumps(data, indent=2, default=str))
     log.info("Exported results to %s", path)
     return path
@@ -414,7 +420,7 @@ def export_results_json(
 
 class ShellHelper:
     """Shell helper utilities for external tool integration."""
-    
+
     @staticmethod
     def run(
         command: str,
@@ -425,7 +431,7 @@ class ShellHelper:
         check: bool = False,
     ) -> subprocess.CompletedProcess:
         """Run a shell command with proper error handling.
-        
+
         Args:
             command: Shell command to run
             cwd: Working directory
@@ -433,12 +439,12 @@ class ShellHelper:
             timeout: Timeout in seconds
             env: Additional environment variables
             check: If True, raise CalledProcessError on non-zero exit
-            
+
         Returns:
             CompletedProcess instance
         """
         env_vars = {**dict(subprocess.os.environ), **(env or {})}
-        
+
         return subprocess.run(
             command,
             shell=True,
@@ -450,7 +456,7 @@ class ShellHelper:
             check=check,
             stdin=subprocess.DEVNULL,
         )
-    
+
     @staticmethod
     def check(
         command: str,
@@ -459,13 +465,13 @@ class ShellHelper:
         env: dict[str, str] | None = None,
     ) -> bool:
         """Check if a command succeeds (returns True) or fails (returns False).
-        
+
         Args:
             command: Shell command to run
             cwd: Working directory
             timeout: Timeout in seconds
             env: Additional environment variables
-            
+
         Returns:
             True if command exits with code 0, False otherwise
         """
@@ -474,7 +480,7 @@ class ShellHelper:
             return result.returncode == 0
         except Exception:
             return False
-    
+
     @staticmethod
     def output(
         command: str,
@@ -483,13 +489,13 @@ class ShellHelper:
         env: dict[str, str] | None = None,
     ) -> str:
         """Run command and return stdout as string.
-        
+
         Args:
             command: Shell command to run
             cwd: Working directory
             timeout: Timeout in seconds
             env: Additional environment variables
-            
+
         Returns:
             stdout string (empty if command fails)
         """
@@ -506,16 +512,16 @@ shell = ShellHelper()
 
 def shell_check(command: str, **kwargs: Any) -> bool:
     """Check if a shell command succeeds.
-    
+
     Convenience function for quick command checks.
-    
+
     Args:
         command: Shell command to run
         **kwargs: Additional arguments passed to ShellHelper.check()
-        
+
     Returns:
         True if command succeeds
-        
+
     Example:
         >>> if api.shell_check("which python"):
         ...     print("Python is available")

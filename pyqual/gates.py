@@ -11,6 +11,7 @@ from pyqual.config import GateConfig
 @dataclass
 class GateResult:
     """Result of a single gate check."""
+
     metric: str
     value: float | None
     threshold: float
@@ -29,6 +30,7 @@ class GateResult:
 @dataclass
 class Gate:
     """Single quality gate with metric extraction."""
+
     config: GateConfig
 
     def check(self, metrics: dict[str, float]) -> GateResult:
@@ -36,9 +38,12 @@ class Gate:
         value = metrics.get(self.config.metric)
         if value is None:
             return GateResult(
-                metric=self.config.metric, value=None,
-                threshold=self.config.threshold, operator=self.config.operator,
-                passed=False, source="metric not found",
+                metric=self.config.metric,
+                value=None,
+                threshold=self.config.threshold,
+                operator=self.config.operator,
+                passed=False,
+                source="metric not found",
             )
         ops = {
             "le": lambda v, t: v <= t,
@@ -49,8 +54,10 @@ class Gate:
         }
         check_fn = ops.get(self.config.operator, ops["le"])
         return GateResult(
-            metric=self.config.metric, value=value,
-            threshold=self.config.threshold, operator=self.config.operator,
+            metric=self.config.metric,
+            value=value,
+            threshold=self.config.threshold,
+            operator=self.config.operator,
             passed=check_fn(value, self.config.threshold),
         )
 
@@ -81,7 +88,7 @@ class GateSet:
 
     def completion_percentage(self, workdir: Path = Path(".")) -> float:
         """Calculate ticket completion percentage based on passed gates.
-        
+
         Returns percentage (0-100) indicating how complete the ticket is.
         Each gate contributes equally to the total score.
         """
@@ -111,7 +118,7 @@ class GateSet:
 
 class CompositeGateSet(GateSet):
     """Weighted composite quality scoring from multiple gates.
-    
+
     Example:
         gates = [
             GateConfig(metric="coverage", operator="ge", threshold=80),
@@ -119,36 +126,36 @@ class CompositeGateSet(GateSet):
         ]
         weights = {"coverage": 0.6, "cc": 0.4}
         composite = CompositeGateSet(gates, weights, pass_threshold=75.0)
-        
+
         result = composite.check_composite(Path("."))
         print(f"Score: {result.score:.1f} - {'PASS' if result.passed else 'FAIL'}")
     """
-    
+
     def __init__(
-        self, 
-        configs: list[GateConfig], 
+        self,
+        configs: list[GateConfig],
         weights: dict[str, float] | None = None,
         pass_threshold: float = 75.0,
     ):
         super().__init__(configs)
         self.weights = weights or {}
         self.pass_threshold = pass_threshold
-    
+
     def compute_score(self, metrics: dict[str, float]) -> float:
         """Compute weighted quality score (0-100) from available metrics.
-        
+
         Missing metrics are excluded from weighting (weights re-normalized).
         """
         components: list[tuple[float, float]] = []
-        
+
         for gate in self.gates:
             metric_name = gate.config.metric
             if metric_name not in metrics:
                 continue
-                
+
             value = metrics[metric_name]
             weight = self.weights.get(metric_name, 1.0)
-            
+
             # Convert to 0-100 score based on gate operator
             if gate.config.operator in ("le", "lt"):  # Lower is better
                 threshold = gate.config.threshold
@@ -164,31 +171,31 @@ class CompositeGateSet(GateSet):
                 else:
                     # Linear: at 0, score = 0
                     score = max(0.0, value / threshold * 100.0)
-            
+
             components.append((weight, score))
-        
+
         if not components:
             return 0.0
-        
+
         total_weight = sum(w for w, _ in components)
         weighted_sum = sum(w * s for w, s in components)
         return round(weighted_sum / total_weight, 2)
-    
+
     def check_composite(self, workdir: Path = Path(".")) -> "CompositeResult":
         """Check all individual gates + compute composite score."""
         from dataclasses import dataclass
-        
+
         @dataclass
         class CompositeResult:
             score: float
             passed: bool
             individual: list[GateResult]
             pass_threshold: float
-        
+
         metrics = self._collect_metrics(workdir)
         individual = self.check_all(workdir)
         score = self.compute_score(metrics)
-        
+
         return CompositeResult(
             score=score,
             passed=score >= self.pass_threshold,

@@ -16,7 +16,7 @@ from pyqual.plugins import MetricCollector, PluginMetadata, PluginRegistry
 @PluginRegistry.register
 class ExampleCollector(MetricCollector):
     """Example collector showing plugin structure.
-    
+
     This demonstrates how to create a custom metric collector.
     """
 
@@ -39,7 +39,7 @@ stages:
     def collect(self, workdir: Path) -> dict[str, float]:
         """Collect metrics from .pyqual/example.json artifact."""
         result: dict[str, float] = {}
-        
+
         example_path = workdir / ".pyqual" / "example.json"
         if example_path.exists():
             try:
@@ -49,7 +49,7 @@ stages:
                     result["example_metric"] = float(metric)
             except (json.JSONDecodeError, TypeError):
                 pass
-        
+
         return result
 
     def get_config_example(self) -> str:

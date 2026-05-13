@@ -21,7 +21,13 @@ class CodeHealthCollector(MetricCollector):
         name="code_health",
         description="Code health: radon MI, vulture dead code, pyroma packaging, interrogate docs",
         version="1.0.0",
-        tags=["code-health", "maintainability", "dead-code", "packaging", "documentation"],
+        tags=[
+            "code-health",
+            "maintainability",
+            "dead-code",
+            "packaging",
+            "documentation",
+        ],
         config_example="""
 metrics:
   maintainability_index_min: 70.0    # Minimum radon maintainability index
@@ -47,12 +53,12 @@ stages:
     def collect(self, workdir: Path) -> dict[str, float]:
         """Collect code health metrics."""
         result: dict[str, float] = {}
-        
+
         self._collect_radon(workdir, result)
         self._collect_vulture(workdir, result)
         self._collect_pyroma(workdir, result)
         self._collect_interrogate(workdir, result)
-        
+
         return result
 
     def _collect_radon(self, workdir: Path, result: dict[str, float]) -> None:
@@ -60,12 +66,13 @@ stages:
         p = workdir / ".pyqual" / "radon.json"
         if not p.exists():
             return
-            
+
         try:
             data = json.loads(p.read_text())
             if isinstance(data, dict):
                 scores = [
-                    float(v["mi"]) for v in data.values()
+                    float(v["mi"])
+                    for v in data.values()
                     if isinstance(v, dict) and "mi" in v
                 ]
                 if not scores:
@@ -77,7 +84,9 @@ stages:
                         if isinstance(entry, dict) and "mi" in entry
                     ]
                 if scores:
-                    result["maintainability_index"] = round(sum(scores) / len(scores), 2)
+                    result["maintainability_index"] = round(
+                        sum(scores) / len(scores), 2
+                    )
         except (json.JSONDecodeError, TypeError, KeyError, ValueError):
             pass
 
@@ -87,7 +96,7 @@ stages:
         if not p.exists():
             result["unused_count"] = 0.0
             return
-            
+
         try:
             data = json.loads(p.read_text())
             if isinstance(data, list):
@@ -100,7 +109,7 @@ stages:
         p = workdir / ".pyqual" / "pyroma.json"
         if not p.exists():
             return
-            
+
         try:
             data = json.loads(p.read_text())
             score = data.get("score")
@@ -119,7 +128,7 @@ stages:
         p = workdir / ".pyqual" / "interrogate.json"
         if not p.exists():
             return
-            
+
         try:
             data = json.loads(p.read_text())
             coverage = data.get("coverage")
@@ -127,7 +136,7 @@ stages:
                 coverage = data.get("percent_covered")
             if coverage is not None:
                 result["docstring_coverage"] = float(coverage)
-            
+
             total = data.get("total") or data.get("total_objects")
             documented = data.get("documented") or data.get("documented_objects")
             if total and documented is not None:
@@ -142,12 +151,13 @@ def code_health_summary(workdir: Path | None = None) -> dict[str, Any]:
     workdir = workdir or Path.cwd()
     collector = CodeHealthCollector()
     metrics = collector.collect(workdir)
-    
+
     issues = sum(
-        1 for k, v in metrics.items()
+        1
+        for k, v in metrics.items()
         if k in ("unused_count", "docstring_missing") and v > 0
     )
-    
+
     return {
         "success": True,
         "metrics": metrics,

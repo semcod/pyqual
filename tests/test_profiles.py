@@ -31,8 +31,9 @@ class TestProfileRegistry:
             assert prof.stages, f"Profile {name} has no stages"
             for stage in prof.stages:
                 assert "name" in stage, f"Profile {name}: stage missing name"
-                assert "tool" in stage or "run" in stage, \
+                assert "tool" in stage or "run" in stage, (
                     f"Profile {name}: stage {stage['name']} has neither tool nor run"
+                )
 
 
 class TestProfileConfig:

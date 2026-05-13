@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -41,12 +40,16 @@ class TestAttackCollector:
         # Create mock artifact
         artifact = tmp_path / ".pyqual" / "attack_check.json"
         artifact.parent.mkdir(parents=True, exist_ok=True)
-        artifact.write_text(json.dumps({
-            "conflicts_detected": 2,
-            "branches_behind": 5,
-            "can_fast_forward": False,
-            "success": True,
-        }))
+        artifact.write_text(
+            json.dumps(
+                {
+                    "conflicts_detected": 2,
+                    "branches_behind": 5,
+                    "can_fast_forward": False,
+                    "success": True,
+                }
+            )
+        )
 
         result = collector.collect(tmp_path)
 
@@ -62,12 +65,16 @@ class TestAttackCollector:
         # Create mock artifact
         artifact = tmp_path / ".pyqual" / "attack_merge.json"
         artifact.parent.mkdir(parents=True, exist_ok=True)
-        artifact.write_text(json.dumps({
-            "success": True,
-            "conflicts_resolved": 3,
-            "strategy": "theirs",
-            "files_changed": 10,
-        }))
+        artifact.write_text(
+            json.dumps(
+                {
+                    "success": True,
+                    "conflicts_resolved": 3,
+                    "strategy": "theirs",
+                    "files_changed": 10,
+                }
+            )
+        )
 
         result = collector.collect(tmp_path)
 
@@ -120,7 +127,9 @@ class TestAttackMerge:
             MagicMock(returncode=0, stdout=".git"),  # rev-parse
             MagicMock(returncode=0, stdout="feature"),  # current branch
             MagicMock(returncode=0, stdout="fetch done"),  # fetch
-            MagicMock(returncode=0, stdout="changed: file.txt\nchanged: other.py"),  # merge-tree
+            MagicMock(
+                returncode=0, stdout="changed: file.txt\nchanged: other.py"
+            ),  # merge-tree
         ]
 
         result = attack_merge(strategy="theirs", cwd=tmp_path, dry_run=True)
@@ -145,10 +154,7 @@ class TestAutoMergePR:
     @patch("subprocess.run")
     def test_pr_merge_failure(self, mock_run, tmp_path: Path):
         """Test PR merge failure."""
-        mock_run.return_value = MagicMock(
-            returncode=1,
-            stderr="Pull request not found"
-        )
+        mock_run.return_value = MagicMock(returncode=1, stderr="Pull request not found")
 
         result = auto_merge_pr(pr_number=999, cwd=tmp_path)
 

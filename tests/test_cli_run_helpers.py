@@ -4,20 +4,16 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
 
 from pyqual.cli_run_helpers import (
     build_run_summary,
     count_todo_items,
-    enrich_from_artifacts,
     extract_bandit_stage_summary,
-    extract_code2llm_stage_summary,
     extract_fix_stage_summary,
     extract_lint_stage_summary,
     extract_mypy_stage_summary,
     extract_prefact_stage_summary,
     extract_pytest_stage_summary,
-    extract_stage_summary,
     extract_validation_stage_summary,
     format_run_summary,
     get_last_error_line,
@@ -195,7 +191,12 @@ class TestBuildRunSummary:
             "iterations": [
                 {
                     "stages": [
-                        {"name": "prefact", "status": "passed", "tickets": 5, "tickets_completed": 3}
+                        {
+                            "name": "prefact",
+                            "status": "passed",
+                            "tickets": 5,
+                            "tickets_completed": 3,
+                        }
                     ]
                 }
             ]
@@ -210,7 +211,12 @@ class TestBuildRunSummary:
             "iterations": [
                 {
                     "stages": [
-                        {"name": "fix", "status": "passed", "files_changed": 2, "failed": 0}
+                        {
+                            "name": "fix",
+                            "status": "passed",
+                            "files_changed": 2,
+                            "failed": 0,
+                        }
                     ]
                 }
             ]
@@ -224,7 +230,12 @@ class TestBuildRunSummary:
             "iterations": [
                 {
                     "stages": [
-                        {"name": "repair", "status": "passed", "files_changed": 4, "failed": 0}
+                        {
+                            "name": "repair",
+                            "status": "passed",
+                            "files_changed": 4,
+                            "failed": 0,
+                        }
                     ]
                 }
             ]
@@ -238,7 +249,12 @@ class TestBuildRunSummary:
             "iterations": [
                 {
                     "stages": [
-                        {"name": "publish", "status": "failed", "rc": 2, "stderr": "make: *** [Makefile:129: publish] Error 1"},
+                        {
+                            "name": "publish",
+                            "status": "failed",
+                            "rc": 2,
+                            "stderr": "make: *** [Makefile:129: publish] Error 1",
+                        },
                         {"name": "push", "status": "passed"},
                     ]
                 }
@@ -254,13 +270,20 @@ class TestBuildRunSummary:
             "iterations": [
                 {
                     "stages": [
-                        {"name": "deploy", "status": "failed", "rc": 1, "stderr": "deployment failed"},
+                        {
+                            "name": "deploy",
+                            "status": "failed",
+                            "rc": 1,
+                            "stderr": "deployment failed",
+                        },
                     ]
                 }
             ]
         }
         summary = build_run_summary(report)
-        assert summary["delivery_failures"] == ["deploy failed (rc=1): deployment failed"]
+        assert summary["delivery_failures"] == [
+            "deploy failed (rc=1): deployment failed"
+        ]
 
 
 class TestFormatRunSummary:
@@ -277,7 +300,12 @@ class TestFormatRunSummary:
         assert "Fix" in text
 
     def test_includes_delivery_failures(self) -> None:
-        summary = {"delivery_failures": ["publish failed (rc=2): make: *** Error 1", "deploy failed (rc=1): deployment failed"]}
+        summary = {
+            "delivery_failures": [
+                "publish failed (rc=2): make: *** Error 1",
+                "deploy failed (rc=1): deployment failed",
+            ]
+        }
         text = format_run_summary(summary)
         assert "Delivery" in text
         assert "publish failed" in text

@@ -19,7 +19,7 @@ from typing import NoReturn
 
 def _print_result(result: "ValidationResult", verbose: bool = False) -> None:
     """Print human-readable validation results."""
-    from pyqual.validation import EC, Severity
+    from pyqual.validation import Severity
 
     errors = [i for i in result.issues if i.severity == Severity.ERROR]
     warnings = [i for i in result.issues if i.severity == Severity.WARNING]
@@ -43,7 +43,9 @@ def _print_result(result: "ValidationResult", verbose: bool = False) -> None:
         print(f"ℹ️  [{i.code}] {i.message}")
 
     if verbose:
-        print(f"\nSummary: {len(errors)} error(s), {len(warnings)} warning(s), {len(infos)} info(s)")
+        print(
+            f"\nSummary: {len(errors)} error(s), {len(warnings)} warning(s), {len(infos)} info(s)"
+        )
 
 
 def main(args: list[str] | None = None) -> NoReturn:
@@ -72,14 +74,15 @@ def main(args: list[str] | None = None) -> NoReturn:
         help="Validate current version instead of the post-bump version",
     )
     parser.add_argument(
-        "-v", "--verbose",
+        "-v",
+        "--verbose",
         action="store_true",
         help="Print verbose output",
     )
     parsed = parser.parse_args(args)
 
     try:
-        from pyqual.validation import validate_release_state, ValidationResult
+        from pyqual.validation import validate_release_state
 
         result = validate_release_state(
             workdir=Path(parsed.workdir).resolve(),

@@ -1,5 +1,4 @@
-"""Plugin management command.
-"""
+"""Plugin management command."""
 
 from __future__ import annotations
 
@@ -8,7 +7,7 @@ from typing import TYPE_CHECKING
 
 import typer
 
-from pyqual.cli.main import app, console
+from pyqual.cli.main import app
 from pyqual.plugins import get_available_plugins
 
 if TYPE_CHECKING:
@@ -17,16 +16,26 @@ if TYPE_CHECKING:
 
 @app.command()
 def plugin(
-    action: str = typer.Argument(..., help="Action: list, add, remove, info, search, validate"),
+    action: str = typer.Argument(
+        ..., help="Action: list, add, remove, info, search, validate"
+    ),
     name: str | None = typer.Argument(None, help="Plugin name (for add/remove/info)"),
     workdir: Path = typer.Option(Path("."), "--workdir", "-w"),
-    tag: str | None = typer.Option(None, "--tag", "-t", help="Filter by tag (for list/search)"),
+    tag: str | None = typer.Option(
+        None, "--tag", "-t", help="Filter by tag (for list/search)"
+    ),
 ) -> None:
     """Manage pyqual plugins - add, remove, search metric collectors."""
     from pyqual.plugins.cli_helpers import (
-        plugin_add, plugin_info, plugin_list, plugin_remove,
-        plugin_search, plugin_unknown_action, plugin_validate,
+        plugin_add,
+        plugin_info,
+        plugin_list,
+        plugin_remove,
+        plugin_search,
+        plugin_unknown_action,
+        plugin_validate,
     )
+
     plugins = get_available_plugins()
     if action == "list":
         plugin_list(plugins, tag)

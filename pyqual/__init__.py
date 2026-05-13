@@ -51,9 +51,23 @@ from pyqual.plugins.git import (
 )
 
 try:
-    from llx.llm import DEFAULT_MAX_TOKENS, LLM, LLMResponse, get_api_key, get_llm, get_llm_model
+    from llx.llm import (
+        DEFAULT_MAX_TOKENS,
+        LLM,
+        LLMResponse,
+        get_api_key,
+        get_llm,
+        get_llm_model,
+    )
 except Exception:  # pragma: no cover - llx is optional in some environments
-    from pyqual.llm import DEFAULT_MAX_TOKENS, LLM, LLMResponse, get_api_key, get_llm, get_llm_model
+    from pyqual.llm import (
+        DEFAULT_MAX_TOKENS,
+        LLM,
+        LLMResponse,
+        get_api_key,
+        get_llm,
+        get_llm_model,
+    )
 
 try:
     from pyqual.integrations.llx_mcp import (

@@ -24,6 +24,7 @@ def count_todo_items(todo_path: Path) -> int:
 # Stage output → metric extraction
 # ---------------------------------------------------------------------------
 
+
 def extract_pytest_stage_summary(name: str, text: str) -> dict[str, Any]:
     lower = name.lower()
     if not any(kw in lower for kw in ("test", "pytest", "check")):
@@ -102,7 +103,9 @@ def extract_fix_stage_summary(name: str, text: str) -> dict[str, Any]:
     if not m2:
         m2 = re.search(r"Applied\s+(\d+)\s+changes?", text, re.IGNORECASE)
     if not m2:
-        m2 = re.search(r"(\d+)\s+file[s]?\s+(?:updated|modified|rewritten)", text, re.IGNORECASE)
+        m2 = re.search(
+            r"(\d+)\s+file[s]?\s+(?:updated|modified|rewritten)", text, re.IGNORECASE
+        )
     if m2:
         out["files_changed"] = int(m2.group(1))
     else:
@@ -110,7 +113,11 @@ def extract_fix_stage_summary(name: str, text: str) -> dict[str, Any]:
         if changed_files:
             out["files_changed"] = len(changed_files)
         else:
-            m3 = re.search(r"(Applied|No changes|Updated|Modified|Fixed)[^\n]*", text, re.IGNORECASE)
+            m3 = re.search(
+                r"(Applied|No changes|Updated|Modified|Fixed)[^\n]*",
+                text,
+                re.IGNORECASE,
+            )
             if m3:
                 raw = m3.group(0)[:80]
                 out["fix_status"] = re.sub(r"[^\x20-\x7e]", "", raw).strip()
@@ -139,6 +146,7 @@ def extract_bandit_stage_summary(text: str) -> dict[str, Any]:
 # Composite stage summary
 # ---------------------------------------------------------------------------
 
+
 def extract_stage_summary(name: str, stdout: str, stderr: str) -> dict[str, str]:
     """Extract key metrics from stage output as YAML-ready key: value pairs."""
     text = f"{stdout or ''}\n{stderr or ''}"
@@ -157,6 +165,7 @@ def extract_stage_summary(name: str, stdout: str, stderr: str) -> dict[str, str]
 # ---------------------------------------------------------------------------
 # Artifact enrichment
 # ---------------------------------------------------------------------------
+
 
 def _enrich_analysis(workdir: Path, stages: list[dict[str, Any]]) -> None:
     """Enrich analyze/code2llm stage from analysis.toon.yaml header."""
@@ -202,7 +211,9 @@ def _enrich_todo(workdir: Path, stages: list[dict[str, Any]]) -> None:
     if not todo.exists():
         return
     head = todo.read_text(errors="replace")[:TODO_HEAD_CHARS]
-    m_t = re.search(r"\*?\*?Total issues:\*?\*?\s*(\d+)\s*active(?:,\s*(\d+)\s*completed)?", head)
+    m_t = re.search(
+        r"\*?\*?Total issues:\*?\*?\s*(\d+)\s*active(?:,\s*(\d+)\s*completed)?", head
+    )
     if not m_t:
         return
     for sd in stages:
@@ -223,6 +234,7 @@ def enrich_from_artifacts(workdir: Path, stages: list[dict[str, Any]]) -> None:
 # Run summary building
 # ---------------------------------------------------------------------------
 
+
 def infer_fix_result(stage: dict[str, Any]) -> str:
     files_changed = stage.get("files_changed")
     if isinstance(files_changed, (int, float)):
@@ -233,7 +245,10 @@ def infer_fix_result(stage: dict[str, Any]) -> str:
         return "unknown"
     if "no changes" in status or "no change" in status:
         return "no_changes"
-    if any(token in status for token in ("applied", "changed", "updated", "modified", "fixed")):
+    if any(
+        token in status
+        for token in ("applied", "changed", "updated", "modified", "fixed")
+    ):
         return "changed"
     return "unknown"
 
@@ -250,7 +265,9 @@ def _extract_todo_summary(stages: list[dict[str, Any]]) -> dict[str, Any]:
         result["todo_active"] = int(tickets)
     if isinstance(tickets_completed, (int, float)):
         result["todo_completed"] = int(tickets_completed)
-    if isinstance(tickets, (int, float)) and isinstance(tickets_completed, (int, float)):
+    if isinstance(tickets, (int, float)) and isinstance(
+        tickets_completed, (int, float)
+    ):
         result["todo_total"] = int(tickets) + int(tickets_completed)
     return result
 
@@ -260,8 +277,10 @@ def _extract_fix_summary(stages: list[dict[str, Any]]) -> dict[str, Any]:
     result: dict[str, Any] = {}
     fix_stage = next(
         (
-            s for s in stages
-            if is_fix_stage_name(str(s.get("name", ""))) and s.get("status") != "skipped"
+            s
+            for s in stages
+            if is_fix_stage_name(str(s.get("name", "")))
+            and s.get("status") != "skipped"
         ),
         None,
     )
@@ -405,13 +424,33 @@ def get_last_error_line(text: str) -> str:
     if not text:
         return ""
     noise_prefixes = (
-        "Using .gitignore", "Excluded ", "✓ ", "Results saved",
-        "Processing ", "Scanning ", "Checking ", "Loading ", "Collecting ",
+        "Using .gitignore",
+        "Excluded ",
+        "✓ ",
+        "Results saved",
+        "Processing ",
+        "Scanning ",
+        "Checking ",
+        "Loading ",
+        "Collecting ",
     )
-    error_kws = ("error", "fail", "assert", "exception", "traceback",
-                 "critical", "syntax", "invalid", "cannot", "no module")
-    clean = [ln.strip() for ln in text.splitlines()
-             if ln.strip() and not any(ln.strip().startswith(p) for p in noise_prefixes)]
+    error_kws = (
+        "error",
+        "fail",
+        "assert",
+        "exception",
+        "traceback",
+        "critical",
+        "syntax",
+        "invalid",
+        "cannot",
+        "no module",
+    )
+    clean = [
+        ln.strip()
+        for ln in text.splitlines()
+        if ln.strip() and not any(ln.strip().startswith(p) for p in noise_prefixes)
+    ]
     err_lines = [ln for ln in clean if any(kw in ln.lower() for kw in error_kws)]
     if err_lines:
         return err_lines[-1][:STAGE_OUTPUT_MAX_CHARS]

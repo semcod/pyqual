@@ -13,6 +13,7 @@ def _load_sync_integration():
     """Try to load planfile integration, return None if not available."""
     try:
         from planfile.cli.cmd.cmd_sync import sync_integration
+
         return sync_integration
     except ImportError:
         return None
@@ -54,16 +55,16 @@ def sync_planfile_tickets(
                     "Neither planfile python package nor planfile binary found. "
                     "Please install planfile to enable ticket syncing."
                 )
-            
+
             cmd = [planfile_bin, "sync", integration_name, str(workdir)]
             cmd.extend(["--direction", direction])
             if dry_run:
                 cmd.append("--dry-run")
-            
+
             # Print standard echo just like pyqual does
             if index == 0:
                 print(f"🔄 Syncing via planfile CLI ({integration_name})...")
-                
+
             subprocess.run(cmd, check=True)
 
 
@@ -82,7 +83,9 @@ def sync_github_tickets(
     direction: str = "both",
 ) -> None:
     """Sync GitHub issues through planfile's GitHub backend."""
-    sync_planfile_tickets("github", workdir=workdir, dry_run=dry_run, direction=direction)
+    sync_planfile_tickets(
+        "github", workdir=workdir, dry_run=dry_run, direction=direction
+    )
 
 
 def sync_all_tickets(
@@ -134,7 +137,9 @@ def sync_from_gates(
         sync_all_tickets(workdir=workdir, dry_run=dry_run, direction="from")
     else:
         for backend in backends:
-            sync_planfile_tickets(backend, workdir=workdir, dry_run=dry_run, direction="from")
+            sync_planfile_tickets(
+                backend, workdir=workdir, dry_run=dry_run, direction="from"
+            )
 
     return {
         "synced": True,
@@ -144,21 +149,23 @@ def sync_from_gates(
     }
 
 
-def create_planfile_tickets_from_ruff(workdir: Path = Path("."), max_items: int = 5) -> int:
+def create_planfile_tickets_from_ruff(
+    workdir: Path = Path("."), max_items: int = 5
+) -> int:
     """Extract ruff issues and directly execute 'planfile ticket create' for each.
-    
+
     This delivers direct-to-storage persistence bypasses intermediate format drift.
     """
     import json
     import subprocess
     import shutil
-    
+
     ruff_path = workdir / ".pyqual" / "ruff.json"
     if not ruff_path.exists():
         ruff_path = workdir / "ruff.json"
     if not ruff_path.exists():
         return 0
-        
+
     planfile_bin = shutil.which("planfile")
     if not planfile_bin:
         return 0
@@ -168,21 +175,25 @@ def create_planfile_tickets_from_ruff(workdir: Path = Path("."), max_items: int 
             data = json.load(f)
     except Exception:
         return 0
-        
+
     if not isinstance(data, list) or not data:
         return 0
-        
+
     # Sort and limit
-    data.sort(key=lambda x: (x.get("filename", ""), x.get("location", {}).get("row", 0)))
-    
+    data.sort(
+        key=lambda x: (x.get("filename", ""), x.get("location", {}).get("row", 0))
+    )
+
     count = 0
     seen = set()
-    
+
     # Get existing ticket names to prevent duplicates (simple check)
     try:
         list_proc = subprocess.run(
-            [planfile_bin, "ticket", "list", "--format", "json"], 
-            capture_output=True, text=True, cwd=str(workdir)
+            [planfile_bin, "ticket", "list", "--format", "json"],
+            capture_output=True,
+            text=True,
+            cwd=str(workdir),
         )
         existing_titles = ""
         if list_proc.returncode == 0:
@@ -193,42 +204,42 @@ def create_planfile_tickets_from_ruff(workdir: Path = Path("."), max_items: int 
     for violation in data:
         if count >= max_items:
             break
-            
+
         filename = violation.get("filename", "unknown")
         code = violation.get("code", "LINT")
         msg = violation.get("message", "Lint failure")
         line = violation.get("location", {}).get("row", "?")
-        
+
         key = f"{filename}:{code}"
         if key in seen:
             continue
         seen.add(key)
-        
+
         # Build descriptive title
         basename = filename.split("/")[-1]
         title = f"Fix {code} in {basename}"
-        
+
         if title.lower() in existing_titles:
             continue
-            
+
         description = f"{msg} at {filename}:{line}"
-        
+
         # Try to create using Python API to enrich with autonomous executor properties
         created_via_api = False
         try:
             from planfile import Planfile
             from planfile.core.models.ticket import TicketExecutor, TicketExecution
-            
+
             pf = Planfile(project_path=str(workdir))
             # Define fully-autonomous executor to fix without any manual interaction!
             auto_executor = TicketExecutor(
-                kind="shell", 
-                mode="automatic", 
-                handler=f".venv/bin/ruff check --fix {filename}"
+                kind="shell",
+                mode="automatic",
+                handler=f".venv/bin/ruff check --fix {filename}",
             )
             # Mark as immediately ready for queue processor
             auto_execution = TicketExecution(state="ready")
-            
+
             pf.create_ticket(
                 name=title,
                 description=description,
@@ -236,29 +247,37 @@ def create_planfile_tickets_from_ruff(workdir: Path = Path("."), max_items: int 
                 labels=["ruff", "auto-generated", "autonomous"],
                 files=[filename],
                 executor=auto_executor,
-                execution=auto_execution
+                execution=auto_execution,
             )
             created_via_api = True
             count += 1
         except ImportError:
-            pass # Fallback to CLI below
+            pass  # Fallback to CLI below
         except Exception:
-            pass # Fallback to CLI below
+            pass  # Fallback to CLI below
 
         if not created_via_api:
             cmd = [
-                planfile_bin, "ticket", "create", title,
-                "--label", "ruff",
-                "--label", "auto-generated",
-                "--description", description,
-                "--source", "pyqual",
-                "--files", filename
+                planfile_bin,
+                "ticket",
+                "create",
+                title,
+                "--label",
+                "ruff",
+                "--label",
+                "auto-generated",
+                "--description",
+                description,
+                "--source",
+                "pyqual",
+                "--files",
+                filename,
             ]
-            
+
             try:
                 subprocess.run(cmd, check=True, capture_output=True, cwd=str(workdir))
                 count += 1
             except subprocess.CalledProcessError:
                 pass
-                
+
     return count

@@ -64,7 +64,9 @@ def _parse_pyproject_fallback(path: Path) -> dict[str, Any]:
     if poetry_match and not result["project"].get("name"):
         result["project"]["name"] = poetry_match.group(1)
 
-    poetry_version = re.search(r'^\s*version\s*=\s*["\']([^"\']+)["\']', text, re.MULTILINE)
+    poetry_version = re.search(
+        r'^\s*version\s*=\s*["\']([^"\']+)["\']', text, re.MULTILINE
+    )
     if poetry_version and not result["project"].get("version"):
         result["project"]["version"] = poetry_version.group(1)
 
@@ -106,7 +108,11 @@ def _read_project_metadata(workdir: Path) -> dict[str, Optional[str]]:
         }
 
     package_name_str = str(package_name) if package_name else None
-    module_version = _read_package_init_version(workdir, package_name_str) if package_name_str else None
+    module_version = (
+        _read_package_init_version(workdir, package_name_str)
+        if package_name_str
+        else None
+    )
 
     return {
         "package_name": package_name_str,
@@ -170,7 +176,9 @@ def _check_git_state(git: dict, result: ValidationResult) -> None:
             files = git.get(key, [])
             if isinstance(files, list) and files:
                 dirty_parts.append(f"{len(files)} {label}")
-        detail = ", ".join(dirty_parts) if dirty_parts else "working tree contains changes"
+        detail = (
+            ", ".join(dirty_parts) if dirty_parts else "working tree contains changes"
+        )
         result.add(
             Severity.ERROR,
             EC.RELEASE_GIT_DIRTY,

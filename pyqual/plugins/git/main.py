@@ -11,7 +11,7 @@ import re
 import shutil
 import subprocess
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 from pyqual.plugins import MetricCollector, PluginMetadata, PluginRegistry
 
@@ -19,7 +19,6 @@ CONSTANT_3 = 3
 CONSTANT_5 = 5
 CONSTANT_50 = 50
 CONSTANT_127 = 127
-
 
 
 def _count_by_severity(secrets: list[dict[str, Any]]) -> dict[str, int]:
@@ -118,52 +117,69 @@ stages:
 
         return result
 
-    def _collect_scan_metrics(self, result: dict[str, float], data: dict[str, Any]) -> None:
+    def _collect_scan_metrics(
+        self, result: dict[str, float], data: dict[str, Any]
+    ) -> None:
         """Extract metrics from secret scan results."""
         secrets = data.get("secrets_found", [])
         if isinstance(secrets, list):
             result["git_secrets_found"] = float(len(secrets))
-            
+
             # Count by severity using helper
             severity_counts = _count_by_severity(secrets)
             result["git_secrets_critical"] = float(severity_counts["CRITICAL"])
             result["git_secrets_high"] = float(severity_counts["HIGH"])
             result["git_secrets_medium"] = float(severity_counts["MEDIUM"])
             result["git_secrets_low"] = float(severity_counts["LOW"])
-        
+
         # Scanners used
         scanners = data.get("scanners_used", [])
         if isinstance(scanners, list):
             result["git_scanners_used"] = float(len(scanners))
-        
+
         # Files scanned
         files_scanned = data.get("total_files_scanned", 0)
         result["git_files_scanned"] = float(files_scanned)
-        
+
         # Success (no secrets found)
         success = data.get("success", True)
         result["git_scan_success"] = 1.0 if success else 0.0
 
-    def _collect_preflight_metrics(self, result: dict[str, float], data: dict[str, Any]) -> None:
+    def _collect_preflight_metrics(
+        self, result: dict[str, float], data: dict[str, Any]
+    ) -> None:
         """Extract metrics from pre-flight check results."""
         result["git_preflight_can_push"] = 1.0 if data.get("can_push", True) else 0.0
-        
+
         # Blockers and warnings
         blockers = data.get("blockers", [])
         warnings = data.get("warnings", [])
-        result["git_preflight_blockers"] = float(len(blockers)) if isinstance(blockers, list) else 0.0
-        result["git_preflight_warnings"] = float(len(warnings)) if isinstance(warnings, list) else 0.0
-        
+        result["git_preflight_blockers"] = (
+            float(len(blockers)) if isinstance(blockers, list) else 0.0
+        )
+        result["git_preflight_warnings"] = (
+            float(len(warnings)) if isinstance(warnings, list) else 0.0
+        )
+
         # Secrets scan from preflight
         secrets_scan = data.get("secrets_scan", {})
         if secrets_scan:
             secrets = secrets_scan.get("secrets_found", [])
-            result["git_preflight_secrets_found"] = float(len(secrets)) if isinstance(secrets, list) else 0.0
+            result["git_preflight_secrets_found"] = (
+                float(len(secrets)) if isinstance(secrets, list) else 0.0
+            )
 
-    def _collect_status_metrics(self, result: dict[str, float], data: dict[str, Any]) -> None:
+    def _collect_status_metrics(
+        self, result: dict[str, float], data: dict[str, Any]
+    ) -> None:
         """Extract metrics from git status output."""
         # Count files by status
-        for key in ["uncommitted_files", "unstaged_files", "staged_files", "untracked_files"]:
+        for key in [
+            "uncommitted_files",
+            "unstaged_files",
+            "staged_files",
+            "untracked_files",
+        ]:
             files = data.get(key, [])
             result[f"git_{key}"] = float(len(files)) if isinstance(files, list) else 0.0
 
@@ -174,25 +190,35 @@ stages:
         # Is clean working directory
         result["git_is_clean"] = 1.0 if data.get("is_clean", False) else 0.0
 
-    def _collect_push_metrics(self, result: dict[str, float], data: dict[str, Any]) -> None:
+    def _collect_push_metrics(
+        self, result: dict[str, float], data: dict[str, Any]
+    ) -> None:
         """Extract metrics from git push output."""
         result["git_push_success"] = 1.0 if data.get("success", False) else 0.0
-        result["git_push_protection_violation"] = 1.0 if data.get("push_protection_violation", False) else 0.0
+        result["git_push_protection_violation"] = (
+            1.0 if data.get("push_protection_violation", False) else 0.0
+        )
 
         # Error count
         errors = data.get("errors", [])
-        result["git_push_errors"] = float(len(errors)) if isinstance(errors, list) else 0.0
+        result["git_push_errors"] = (
+            float(len(errors)) if isinstance(errors, list) else 0.0
+        )
 
         # Commits pushed
         result["git_commits_pushed"] = float(data.get("commits_pushed", 0) or 0)
 
-    def _collect_commit_metrics(self, result: dict[str, float], data: dict[str, Any]) -> None:
+    def _collect_commit_metrics(
+        self, result: dict[str, float], data: dict[str, Any]
+    ) -> None:
         """Extract metrics from git commit output."""
         result["git_commit_success"] = 1.0 if data.get("success", False) else 0.0
 
         # Files committed
         files = data.get("files_committed", [])
-        result["git_files_committed"] = float(len(files)) if isinstance(files, list) else 0.0
+        result["git_files_committed"] = (
+            float(len(files)) if isinstance(files, list) else 0.0
+        )
 
         # Commit created
         result["git_commit_created"] = 1.0 if data.get("commit_hash") else 0.0
@@ -244,7 +270,7 @@ def _parse_branch_line(line: str, result: dict[str, Any]) -> None:
     result["branch"] = branch_info.split("...")[0]
     if "[" not in branch_info:
         return
-    ahead_behind = branch_info[branch_info.find("[") + 1: branch_info.find("]")] 
+    ahead_behind = branch_info[branch_info.find("[") + 1 : branch_info.find("]")]
     ahead_match = re.search(r"ahead\s+(\d+)", ahead_behind)
     if ahead_match:
         result["ahead"] = int(ahead_match.group(1))
@@ -565,12 +591,10 @@ SECRET_PATTERNS = {
         r"gh[pousr]_[A-Za-z0-9_]{36,}|github_pat_[A-Za-z0-9_]{22,}|ghu_[A-Za-z0-9]{36}"
     ),
     "github_oauth": re.compile(r"[0-9a-f]{40}"),  # Legacy OAuth
-    
     # AWS
     "aws_access_key": re.compile(r"AKIA[0-9A-Z]{16}"),
     "aws_secret_key": re.compile(r"[0-9a-zA-Z/+]{40}"),
     "aws_session_token": re.compile(r"FwoGZXIvYXdzE[A-Za-z0-9/+=]{100,}"),
-    
     # Generic API Keys
     "api_key_generic": re.compile(
         r"api[_-]?key[\s]*[=:]+[\s]*['\"]?[a-z0-9]{32,}['\"]?",
@@ -580,13 +604,9 @@ SECRET_PATTERNS = {
         r"api[_-]?secret[\s]*[=:]+[\s]*['\"]?[a-z0-9]{32,}['\"]?",
         re.IGNORECASE,
     ),
-    
     # Private Keys
-    "private_key": re.compile(
-        r"-----BEGIN (RSA |DSA |EC |OPENSSH )?PRIVATE KEY-----"
-    ),
+    "private_key": re.compile(r"-----BEGIN (RSA |DSA |EC |OPENSSH )?PRIVATE KEY-----"),
     "ssh_key": re.compile(r"ssh-(rsa|dss|ed25519) [A-Za-z0-9+/]{200,}"),
-    
     # Database URLs with credentials
     "postgres_url": re.compile(
         r"postgres(ql)?://[^:]+:[^@]+@[^/]+",
@@ -600,17 +620,13 @@ SECRET_PATTERNS = {
         r"mongodb(\+srv)?://[^:]+:[^@]+@[^/]+",
         re.IGNORECASE,
     ),
-    
     # JWT Tokens
     "jwt_token": re.compile(r"eyJ[A-Za-z0-9_-]*\.eyJ[A-Za-z0-9_-]*\.[A-Za-z0-9_-]*"),
-    
     # Slack
     "slack_token": re.compile(r"xox[baprs]-[0-9]{10,13}-[0-9]{10,13}[a-zA-Z0-9-]*"),
-    
     # Stripe
     "stripe_key": re.compile(r"sk_live_[0-9a-zA-Z]{24,}"),
     "stripe_test_key": re.compile(r"sk_test_[0-9a-zA-Z]{24,}"),
-    
     # Generic high-entropy strings (potential secrets)
     "high_entropy": re.compile(r"[a-zA-Z0-9_\-]{40,}"),
 }
@@ -654,14 +670,16 @@ def scan_for_secrets(
             result["error"] = status.get("error", "Failed to get git status")
             return result
         paths = status.get("staged_files", []) + status.get("unstaged_files", [])
-    
+
     if not paths:
         return result  # No files to scan
 
     result["total_files_scanned"] = len(paths)
     workdir = cwd or Path(".")
     _run_enabled_scanners(
-        paths, workdir, result,
+        paths,
+        workdir,
+        result,
         use_trufflehog=use_trufflehog,
         use_gitleaks=use_gitleaks,
         use_patterns=use_patterns,
@@ -700,22 +718,22 @@ def _run_enabled_scanners(
 def _scan_with_trufflehog(paths: list[str], cwd: Path) -> dict[str, Any]:
     """Run trufflehog filesystem scan on specific paths."""
     result = {"findings": []}
-    
+
     for path in paths:
         file_path = cwd / path
         if not file_path.exists():
             continue
-            
+
         # Run trufflehog on single file
         cmd_result = run_git_command(
             ["trufflehog", "filesystem", "--json", str(file_path)],
             cwd=cwd,
             check=False,
         )
-        
+
         if cmd_result.returncode != 0 and not cmd_result.stdout:
             continue
-            
+
         # Parse JSON lines output
         for line in cmd_result.stdout.strip().split("\n"):
             if not line:
@@ -724,39 +742,44 @@ def _scan_with_trufflehog(paths: list[str], cwd: Path) -> dict[str, Any]:
                 data = json.loads(line)
                 finding = {
                     "file": path,
-                    "line": data.get("SourceMetadata", {}).get("Data", {}).get("Filesystem", {}).get("line", 0),
+                    "line": data.get("SourceMetadata", {})
+                    .get("Data", {})
+                    .get("Filesystem", {})
+                    .get("line", 0),
                     "type": data.get("DetectorName", "unknown"),
                     "provider": data.get("DetectorName", "unknown"),
-                    "raw": data.get("Raw", "")[:CONSTANT_50] + "..." if len(data.get("Raw", "")) > CONSTANT_50 else data.get("Raw", ""),
+                    "raw": data.get("Raw", "")[:CONSTANT_50] + "..."
+                    if len(data.get("Raw", "")) > CONSTANT_50
+                    else data.get("Raw", ""),
                     "scanner": "trufflehog",
                     "severity": "HIGH" if data.get("Verified") else "MEDIUM",
                 }
                 result["findings"].append(finding)
             except json.JSONDecodeError:
                 continue
-    
+
     return result
 
 
 def _scan_with_gitleaks(paths: list[str], cwd: Path) -> dict[str, Any]:
     """Run gitleaks detect on specific paths."""
     result = {"findings": []}
-    
+
     for path in paths:
         file_path = cwd / path
         if not file_path.exists():
             continue
-            
+
         # Run gitleaks on single file
         cmd_result = run_git_command(
             ["gitleaks", "detect", "--source", str(file_path), "--verbose", "--no-git"],
             cwd=cwd,
             check=False,
         )
-        
+
         # gitleaks exits with error code when findings detected
         output = cmd_result.stdout + cmd_result.stderr
-        
+
         # Parse findings from output
         for line in output.split("\n"):
             # Look for lines like: "Found: AWS Access Key..."
@@ -775,27 +798,27 @@ def _scan_with_gitleaks(paths: list[str], cwd: Path) -> dict[str, Any]:
                         "severity": "HIGH",
                     }
                     result["findings"].append(finding)
-    
+
     return result
 
 
 def _scan_with_patterns(paths: list[str], cwd: Path) -> dict[str, Any]:
     """Scan files using built-in regex patterns."""
     result = {"findings": []}
-    
+
     for path in paths:
         file_path = cwd / path
         if not file_path.exists():
             continue
-            
+
         # Skip binary files
         try:
             content = file_path.read_text(encoding="utf-8", errors="ignore")
         except (IOError, OSError):
             continue
-        
+
         lines = content.split("\n")
-        
+
         for line_num, line in enumerate(lines, 1):
             for pattern_name, pattern in SECRET_PATTERNS.items():
                 matches = pattern.findall(line)
@@ -803,18 +826,20 @@ def _scan_with_patterns(paths: list[str], cwd: Path) -> dict[str, Any]:
                     # Skip obvious false positives
                     if _is_likely_false_positive(match, pattern_name, line):
                         continue
-                    
+
                     finding = {
                         "file": path,
                         "line": line_num,
                         "type": pattern_name,
                         "provider": _get_provider_for_pattern(pattern_name),
-                        "raw": match[:CONSTANT_50] + "..." if len(match) > CONSTANT_50 else match,
+                        "raw": match[:CONSTANT_50] + "..."
+                        if len(match) > CONSTANT_50
+                        else match,
                         "scanner": "builtin_patterns",
                         "severity": _get_severity_for_pattern(pattern_name),
                     }
                     result["findings"].append(finding)
-    
+
     return result
 
 
@@ -822,25 +847,36 @@ def _is_likely_false_positive(match: str, pattern_name: str, line: str) -> bool:
     """Check if a match is likely a false positive."""
     # Skip placeholder/example values
     placeholders = [
-        "example", "placeholder", "dummy", "fake", "test", "sample",
-        "your_key_here", "xxx", "<", ">", "${", "{{", "{%",
+        "example",
+        "placeholder",
+        "dummy",
+        "fake",
+        "test",
+        "sample",
+        "your_key_here",
+        "xxx",
+        "<",
+        ">",
+        "${",
+        "{{",
+        "{%",
     ]
     match_lower = match.lower()
     if any(p in match_lower for p in placeholders):
         return True
-    
+
     # Skip hex color codes (40 chars looks like AWS secret but it's a color)
     if pattern_name == "aws_secret_key" and re.match(r"^[0-9a-fA-F]{40}$", match):
         # Check if it's in a CSS-like context
         if "color" in line.lower() or "background" in line.lower():
             return True
-    
+
     # Skip hash values (SHA, MD5)
     if pattern_name == "high_entropy":
         # If surrounded by quotes and looks like a hash
         if re.match(r"^[0-9a-fA-F]{40}$", match):
             return True
-    
+
     return False
 
 
@@ -951,14 +987,20 @@ def preflight_push_check(
     return result
 
 
-def _classify_secret_findings(secrets: list[dict[str, Any]], result: dict[str, Any]) -> None:
+def _classify_secret_findings(
+    secrets: list[dict[str, Any]], result: dict[str, Any]
+) -> None:
     """Add blocker/warning messages to result based on secret severity."""
     critical = [s for s in secrets if s.get("severity") == "CRITICAL"]
     high = [s for s in secrets if s.get("severity") == "HIGH"]
     if critical:
-        result["blockers"].append(f"Found {len(critical)} CRITICAL secret(s) - push blocked")
+        result["blockers"].append(
+            f"Found {len(critical)} CRITICAL secret(s) - push blocked"
+        )
     if high:
-        result["warnings"].append(f"Found {len(high)} HIGH severity potential secret(s)")
+        result["warnings"].append(
+            f"Found {len(high)} HIGH severity potential secret(s)"
+        )
     for finding in secrets[:CONSTANT_5]:
         sev = finding.get("severity", "MEDIUM")
         msg = f"  [{sev}] {finding.get('type', 'unknown')} in {finding.get('file', 'unknown')}:{finding.get('line', 0)}"

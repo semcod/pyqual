@@ -58,9 +58,28 @@ stages:
     # Required documentation files
     REQUIRED_FILES = {
         "readme": ["README.md", "README.rst", "README.txt", "README"],
-        "license": ["LICENSE", "LICENSE.txt", "LICENSE.md", "LICENSE.rst", "COPYING", "COPYING.md"],
-        "contributing": ["CONTRIBUTING.md", "CONTRIBUTING.rst", "CONTRIBUTING.txt", "CONTRIBUTING"],
-        "changelog": ["CHANGELOG.md", "CHANGELOG.rst", "HISTORY.md", "HISTORY.rst", "CHANGES.md", "NEWS.md"],
+        "license": [
+            "LICENSE",
+            "LICENSE.txt",
+            "LICENSE.md",
+            "LICENSE.rst",
+            "COPYING",
+            "COPYING.md",
+        ],
+        "contributing": [
+            "CONTRIBUTING.md",
+            "CONTRIBUTING.rst",
+            "CONTRIBUTING.txt",
+            "CONTRIBUTING",
+        ],
+        "changelog": [
+            "CHANGELOG.md",
+            "CHANGELOG.rst",
+            "HISTORY.md",
+            "HISTORY.rst",
+            "CHANGES.md",
+            "NEWS.md",
+        ],
         "code_of_conduct": ["CODE_OF_CONDUCT.md", "CODE_OF_CONDUCT.rst"],
         "security": ["SECURITY.md", "SECURITY.rst"],
     }
@@ -123,7 +142,14 @@ stages:
         text = path.read_text()
         result: dict[str, Any] = {"project": {}}
         # Basic field extraction
-        for key in ("name", "version", "description", "readme", "license", "requires-python"):
+        for key in (
+            "name",
+            "version",
+            "description",
+            "readme",
+            "license",
+            "requires-python",
+        ):
             m = re.search(rf'^\s*{key}\s*=\s*"([^"]+)"', text, re.MULTILINE)
             if m:
                 result["project"][key] = m.group(1)
@@ -139,7 +165,14 @@ stages:
         proj = pyproject.get("project", {})
 
         # Count required fields
-        required_fields = ["name", "version", "description", "readme", "license", "requires-python"]
+        required_fields = [
+            "name",
+            "version",
+            "description",
+            "readme",
+            "license",
+            "requires-python",
+        ]
         present = sum(1 for f in required_fields if proj.get(f))
         result["pyproject_fields"] = float(present)
         result["pyproject_completeness"] = (present / len(required_fields)) * 100
@@ -186,7 +219,9 @@ stages:
                 result[f"readme_has_{section_name}"] = 0.0
 
         result["readme_sections_found"] = float(sections_found)
-        result["readme_completeness"] = (sections_found / len(self.README_SECTIONS)) * 100
+        result["readme_completeness"] = (
+            sections_found / len(self.README_SECTIONS)
+        ) * 100
 
         # Analyze badges
         badges_found = 0
@@ -198,7 +233,9 @@ stages:
                 result[f"readme_badge_{badge_type}"] = 0.0
 
         result["readme_badges_count"] = float(badges_found)
-        result["readme_badges_coverage"] = (badges_found / len(self.BADGE_PATTERNS)) * 100
+        result["readme_badges_coverage"] = (
+            badges_found / len(self.BADGE_PATTERNS)
+        ) * 100
 
         # Content length metrics
         lines = len(content.splitlines())
@@ -210,7 +247,9 @@ stages:
         result["readme_has_code_examples"] = 1.0 if has_code_blocks else 0.0
 
         # Installation instructions
-        has_install = re.search(r"(pip install|poetry add|conda install|setup.py)", content, re.IGNORECASE)
+        has_install = re.search(
+            r"(pip install|poetry add|conda install|setup.py)", content, re.IGNORECASE
+        )
         result["readme_has_install"] = 1.0 if has_install else 0.0
 
         return result
@@ -224,8 +263,14 @@ stages:
             docs_path = next(p for p in docs_paths if p.exists())
             result.update(self._read_docs_details(docs_path))
         else:
-            result.update({"docs_files_count": 0.0, "docs_has_index": 0.0,
-                           "docs_has_api": 0.0, "docs_has_config": 0.0})
+            result.update(
+                {
+                    "docs_files_count": 0.0,
+                    "docs_has_index": 0.0,
+                    "docs_has_api": 0.0,
+                    "docs_has_config": 0.0,
+                }
+            )
         return result
 
     def _read_docs_details(self, docs_path: Path) -> dict[str, float]:
@@ -235,9 +280,15 @@ stages:
             + list(docs_path.rglob("*.rst"))
             + list(docs_path.rglob("*.txt"))
         )
-        has_index = any(f.name.lower().startswith(("index", "readme", "home")) for f in doc_files)
-        has_api = any("api" in f.name.lower() or "reference" in f.name.lower() for f in doc_files)
-        has_conf = any((docs_path / f).exists() for f in ["conf.py", "mkdocs.yml", "mkdocs.yaml"])
+        has_index = any(
+            f.name.lower().startswith(("index", "readme", "home")) for f in doc_files
+        )
+        has_api = any(
+            "api" in f.name.lower() or "reference" in f.name.lower() for f in doc_files
+        )
+        has_conf = any(
+            (docs_path / f).exists() for f in ["conf.py", "mkdocs.yml", "mkdocs.yaml"]
+        )
         return {
             "docs_files_count": float(len(doc_files)),
             "docs_has_index": 1.0 if has_index else 0.0,
@@ -257,7 +308,9 @@ stages:
                 required_count += 1
 
         result["doc_required_files_count"] = float(required_count)
-        result["doc_required_files_pct"] = (required_count / len(self.REQUIRED_FILES)) * 100
+        result["doc_required_files_pct"] = (
+            required_count / len(self.REQUIRED_FILES)
+        ) * 100
 
         return result
 

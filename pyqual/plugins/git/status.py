@@ -16,7 +16,7 @@ def _parse_branch_line(line: str, result: dict[str, Any]) -> None:
     result["branch"] = branch_info.split("...")[0]
     if "[" not in branch_info:
         return
-    ahead_behind = branch_info[branch_info.find("[") + 1: branch_info.find("]")] 
+    ahead_behind = branch_info[branch_info.find("[") + 1 : branch_info.find("]")]
     ahead_match = re.search(r"ahead\s+(\d+)", ahead_behind)
     if ahead_match:
         result["ahead"] = int(ahead_match.group(1))

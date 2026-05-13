@@ -1,6 +1,11 @@
 from __future__ import annotations
 
-from pyqual.report import BADGE_END, BADGE_START, _read_costs_data, _replace_badges_in_text
+from pyqual.report import (
+    BADGE_END,
+    BADGE_START,
+    _read_costs_data,
+    _replace_badges_in_text,
+)
 
 
 def test_read_costs_data_missing_file() -> None:

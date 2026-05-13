@@ -22,37 +22,46 @@ from pyqual.bulk_run import (
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def workspace(tmp_path: Path) -> Path:
     """Create a workspace with projects that have pyqual.yaml."""
     # Project with valid pyqual.yaml
     p1 = tmp_path / "alpha"
     p1.mkdir()
-    (p1 / "pyqual.yaml").write_text(yaml.dump({
-        "pipeline": {
-            "name": "alpha-quality",
-            "metrics": {"cc_max": 15},
-            "stages": [
-                {"name": "lint", "run": "echo lint ok"},
-                {"name": "test", "run": "echo test ok"},
-            ],
-            "loop": {"max_iterations": 2, "on_fail": "report"},
-        }
-    }))
+    (p1 / "pyqual.yaml").write_text(
+        yaml.dump(
+            {
+                "pipeline": {
+                    "name": "alpha-quality",
+                    "metrics": {"cc_max": 15},
+                    "stages": [
+                        {"name": "lint", "run": "echo lint ok"},
+                        {"name": "test", "run": "echo test ok"},
+                    ],
+                    "loop": {"max_iterations": 2, "on_fail": "report"},
+                }
+            }
+        )
+    )
 
     # Another project
     p2 = tmp_path / "beta"
     p2.mkdir()
-    (p2 / "pyqual.yaml").write_text(yaml.dump({
-        "pipeline": {
-            "name": "beta-quality",
-            "metrics": {"cc_max": 10},
-            "stages": [
-                {"name": "check", "run": "echo check ok"},
-            ],
-            "loop": {"max_iterations": 3, "on_fail": "report"},
-        }
-    }))
+    (p2 / "pyqual.yaml").write_text(
+        yaml.dump(
+            {
+                "pipeline": {
+                    "name": "beta-quality",
+                    "metrics": {"cc_max": 10},
+                    "stages": [
+                        {"name": "check", "run": "echo check ok"},
+                    ],
+                    "loop": {"max_iterations": 3, "on_fail": "report"},
+                }
+            }
+        )
+    )
 
     # Directory without pyqual.yaml (should be ignored)
     p3 = tmp_path / "no-config"
@@ -70,6 +79,7 @@ def workspace(tmp_path: Path) -> Path:
 # ---------------------------------------------------------------------------
 # Discover tests
 # ---------------------------------------------------------------------------
+
 
 class TestDiscoverProjects:
     def test_finds_projects_with_pyqual_yaml(self, workspace: Path) -> None:
@@ -102,6 +112,7 @@ class TestDiscoverProjects:
 # ---------------------------------------------------------------------------
 # Output parser tests
 # ---------------------------------------------------------------------------
+
 
 class TestParseOutputLine:
     def test_parse_iteration(self) -> None:
@@ -182,15 +193,21 @@ class TestParseOutputLine:
 # ProjectRunState tests
 # ---------------------------------------------------------------------------
 
+
 class TestProjectRunState:
     def test_progress_pct_zero_when_queued(self) -> None:
         s = ProjectRunState(name="t", path=Path("/tmp"))
         assert s.progress_pct == 0
 
     def test_progress_pct_mid_run(self) -> None:
-        s = ProjectRunState(name="t", path=Path("/tmp"),
-                            stages_total=4, max_iterations=2,
-                            iteration=1, stages_done=2)
+        s = ProjectRunState(
+            name="t",
+            path=Path("/tmp"),
+            stages_total=4,
+            max_iterations=2,
+            iteration=1,
+            stages_done=2,
+        )
         assert s.progress_pct == 25  # 2 of 8 total
 
     def test_elapsed_zero_when_not_started(self) -> None:
@@ -198,14 +215,17 @@ class TestProjectRunState:
         assert s.elapsed == 0.0
 
     def test_elapsed_fixed_when_finished(self) -> None:
-        s = ProjectRunState(name="t", path=Path("/tmp"),
-                            status=RunStatus.PASSED, duration=5.5,
-                            start_time=time.monotonic() - 10)
+        s = ProjectRunState(
+            name="t",
+            path=Path("/tmp"),
+            status=RunStatus.PASSED,
+            duration=5.5,
+            start_time=time.monotonic() - 10,
+        )
         assert s.elapsed == 5.5
 
     def test_gates_label(self) -> None:
-        s = ProjectRunState(name="t", path=Path("/tmp"),
-                            gates_passed=2, gates_total=3)
+        s = ProjectRunState(name="t", path=Path("/tmp"), gates_passed=2, gates_total=3)
         assert s.gates_label == "2/3"
 
     def test_gates_label_empty_when_no_gates(self) -> None:
@@ -217,13 +237,22 @@ class TestProjectRunState:
 # Dashboard table tests
 # ---------------------------------------------------------------------------
 
+
 class TestBuildDashboardTable:
     def test_builds_table_with_correct_columns(self) -> None:
         states = [
-            ProjectRunState(name="a", path=Path("/a"), status=RunStatus.PASSED, duration=1.0),
-            ProjectRunState(name="b", path=Path("/b"), status=RunStatus.RUNNING,
-                            start_time=time.monotonic(), iteration=1,
-                            current_stage="test", max_iterations=3),
+            ProjectRunState(
+                name="a", path=Path("/a"), status=RunStatus.PASSED, duration=1.0
+            ),
+            ProjectRunState(
+                name="b",
+                path=Path("/b"),
+                status=RunStatus.RUNNING,
+                start_time=time.monotonic(),
+                iteration=1,
+                current_stage="test",
+                max_iterations=3,
+            ),
             ProjectRunState(name="c", path=Path("/c"), status=RunStatus.QUEUED),
         ]
         table = build_dashboard_table(states)
@@ -245,8 +274,12 @@ class TestBuildDashboardTable:
         states = [
             ProjectRunState(name="a", path=Path("/a"), status=RunStatus.PASSED),
             ProjectRunState(name="b", path=Path("/b"), status=RunStatus.FAILED),
-            ProjectRunState(name="c", path=Path("/c"), status=RunStatus.RUNNING,
-                            start_time=time.monotonic()),
+            ProjectRunState(
+                name="c",
+                path=Path("/c"),
+                status=RunStatus.RUNNING,
+                start_time=time.monotonic(),
+            ),
         ]
         table = build_dashboard_table(states)
         assert "pass:1" in table.title
@@ -257,6 +290,7 @@ class TestBuildDashboardTable:
 # ---------------------------------------------------------------------------
 # Bulk run integration (with mock subprocess)
 # ---------------------------------------------------------------------------
+
 
 class TestBulkRun:
     def test_skips_missing_pyqual_cmd(self, workspace: Path) -> None:
@@ -286,7 +320,12 @@ class TestBulkRun:
             parallel=2,
             pyqual_cmd="nonexistent_pyqual_binary_xyz",
         )
-        total = len(result.passed) + len(result.failed) + len(result.errors) + len(result.skipped)
+        total = (
+            len(result.passed)
+            + len(result.failed)
+            + len(result.errors)
+            + len(result.skipped)
+        )
         assert total == 2  # alpha + beta (no-config has no pyqual.yaml)
 
     def test_live_callback_called(self, workspace: Path) -> None:
@@ -308,13 +347,16 @@ class TestBulkRun:
 # RunStatus tests
 # ---------------------------------------------------------------------------
 
+
 class TestRunStatus:
     def test_all_statuses_have_icon(self) -> None:
         from pyqual.bulk_run import STATUS_ICON
+
         for status in RunStatus:
             assert status in STATUS_ICON
 
     def test_all_statuses_have_style(self) -> None:
         from pyqual.bulk_run import STATUS_STYLE
+
         for status in RunStatus:
             assert status in STATUS_STYLE

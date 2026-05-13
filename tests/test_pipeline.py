@@ -6,13 +6,16 @@ from pathlib import Path
 from pyqual.config import PyqualConfig
 from pyqual.pipeline import Pipeline
 
+
 def test_pipeline_writes_nfo_sqlite_log() -> None:
     """Pipeline run writes structured log to .pyqual/pipeline.db via nfo."""
     with tempfile.TemporaryDirectory() as tmpdir:
         p = Path(tmpdir)
         (p / ".pyqual").mkdir()
         (p / "analysis_toon.yaml").write_text("CC̄=2.0 critical=0")
-        (p / "validation_toon.yaml").write_text("SUMMARY:\n  scanned: 100  passed: 95 (95.0%)")
+        (p / "validation_toon.yaml").write_text(
+            "SUMMARY:\n  scanned: 100  passed: 95 (95.0%)"
+        )
         (p / ".pyqual" / "coverage.json").write_text(
             json_mod.dumps({"totals": {"percent_covered": 90.0}})
         )

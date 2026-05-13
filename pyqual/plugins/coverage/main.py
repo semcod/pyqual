@@ -36,30 +36,30 @@ stages:
     def collect(self, workdir: Path) -> dict[str, float]:
         """Collect coverage metrics from coverage.json."""
         result: dict[str, float] = {}
-        
+
         cov_path = workdir / ".pyqual" / "coverage.json"
         if not cov_path.exists():
             cov_path = workdir / "coverage.json"
-        
+
         if cov_path.exists():
             try:
                 data = json.loads(cov_path.read_text())
                 totals = data.get("totals", {})
-                
+
                 # Line coverage
                 total_pct = totals.get("percent_covered")
                 if total_pct is not None:
                     result["coverage"] = float(total_pct)
-                
+
                 # Branch coverage
                 num_branches = totals.get("num_branches")
                 covered_branches = totals.get("covered_branches")
                 if num_branches and covered_branches is not None and num_branches > 0:
                     result["coverage_branch"] = (covered_branches / num_branches) * 100
-                    
+
             except (json.JSONDecodeError, TypeError, KeyError):
                 pass
-        
+
         return result
 
 
@@ -68,7 +68,7 @@ def coverage_summary(workdir: Path | None = None) -> dict[str, Any]:
     workdir = workdir or Path.cwd()
     collector = CoverageCollector()
     metrics = collector.collect(workdir)
-    
+
     return {
         "success": True,
         "metrics": metrics,

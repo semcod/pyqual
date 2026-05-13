@@ -70,7 +70,9 @@ class CodeHealthCollector(MetricCollector):
         # Compute weighted score (0–100)
         debt_score = max(0.0, 100.0 - (tech_debt / MAX_ACCEPTABLE_DEBT_HOURS) * 100.0)
         todo_score = max(0.0, 100.0 - (todo_count / MAX_ACCEPTABLE_TODOS) * 100.0)
-        dead_score = max(0.0, 100.0 - (dead_code_pct / MAX_ACCEPTABLE_DEAD_CODE_PCT) * 100.0)
+        dead_score = max(
+            0.0, 100.0 - (dead_code_pct / MAX_ACCEPTABLE_DEAD_CODE_PCT) * 100.0
+        )
         test_score = min(100.0, test_ratio * 100.0)  # 1.0 ratio = 100%
 
         health = (

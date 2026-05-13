@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import logging
 from dataclasses import dataclass, field
 from typing import Any
@@ -35,11 +34,36 @@ class ProjectConfig:
 # ---------------------------------------------------------------------------
 
 _DATA_EXTENSIONS = {
-    ".md", ".rst", ".txt", ".csv", ".json", ".yaml", ".yml", ".xml",
-    ".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".ico",
-    ".wav", ".mp3", ".mp4", ".pdf", ".toon", ".log", ".bak",
-    ".iml", ".ini", ".cfg", ".conf", ".lock", ".toml",
-    ".html", ".css",
+    ".md",
+    ".rst",
+    ".txt",
+    ".csv",
+    ".json",
+    ".yaml",
+    ".yml",
+    ".xml",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".svg",
+    ".webp",
+    ".ico",
+    ".wav",
+    ".mp3",
+    ".mp4",
+    ".pdf",
+    ".toon",
+    ".log",
+    ".bak",
+    ".iml",
+    ".ini",
+    ".cfg",
+    ".conf",
+    ".lock",
+    ".toml",
+    ".html",
+    ".css",
 }
 
 _SKIP_NAMES = {"venv", ".venv", "node_modules", "__pycache__", "dist", "build"}

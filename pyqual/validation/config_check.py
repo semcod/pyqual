@@ -5,7 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from pyqual.constants import CONFIG_READ_MAX_CHARS
 from pyqual.validation.errors import EC, Severity
 from pyqual.validation.schema import (
     KNOWN_METRICS,
@@ -36,7 +35,12 @@ def _get_issue_severity(issue: Any, try_fix: bool) -> tuple[Severity, str]:
         if issue.can_fix and try_fix:
             return Severity.WARNING, f"Auto-fixed: {issue.error_type.value}"
         if sev == Severity.ERROR:
-            return sev, issue.fixed if issue.can_fix else f"Fix at line {issue.line}, col {issue.column}"
+            return (
+                sev,
+                issue.fixed
+                if issue.can_fix
+                else f"Fix at line {issue.line}, col {issue.column}",
+            )
         return sev, f"Style: {issue.error_type.value} at line {issue.line}"
 
     # Default handling
@@ -60,9 +64,12 @@ def _load_yaml_config(
         try_fix: If True, attempt to auto-fix syntax errors
     """
     if not config_path.exists():
-        result.add(Severity.ERROR, EC.CONFIG_NOT_FOUND,
-                   f"pyqual.yaml not found: {config_path}",
-                   suggestion="Run 'pyqual init' to create one.")
+        result.add(
+            Severity.ERROR,
+            EC.CONFIG_NOT_FOUND,
+            f"pyqual.yaml not found: {config_path}",
+            suggestion="Run 'pyqual init' to create one.",
+        )
         return None
 
     content = config_path.read_text()
@@ -85,37 +92,52 @@ def _load_yaml_config(
     # Try to parse with PyYAML
     try:
         import yaml
+
         raw = yaml.safe_load(content)
     except Exception as exc:
-        result.add(Severity.ERROR, EC.CONFIG_YAML_PARSE,
-                   f"YAML parse error: {exc}",
-                   suggestion="Fix the YAML syntax in pyqual.yaml or run 'pyqual validate --fix' to auto-repair.")
+        result.add(
+            Severity.ERROR,
+            EC.CONFIG_YAML_PARSE,
+            f"YAML parse error: {exc}",
+            suggestion="Fix the YAML syntax in pyqual.yaml or run 'pyqual validate --fix' to auto-repair.",
+        )
         return None
 
     if not isinstance(raw, dict):
-        result.add(Severity.ERROR, EC.CONFIG_YAML_EMPTY,
-                   "pyqual.yaml is empty or not a mapping.",
-                   suggestion="Run 'pyqual init' to regenerate a valid config.")
+        result.add(
+            Severity.ERROR,
+            EC.CONFIG_YAML_EMPTY,
+            "pyqual.yaml is empty or not a mapping.",
+            suggestion="Run 'pyqual init' to regenerate a valid config.",
+        )
         return None
 
     return raw
 
 
-def _load_tool_registry(pipeline: dict[str, Any], result: ValidationResult) -> tuple[bool, Any, Any]:
+def _load_tool_registry(
+    pipeline: dict[str, Any], result: ValidationResult
+) -> tuple[bool, Any, Any]:
     """Load tool registry and return (success, get_preset, list_presets)."""
     try:
         from pyqual.tools import (
-            get_preset, list_presets,
-            load_entry_point_presets, register_custom_tools_from_yaml,
+            get_preset,
+            list_presets,
+            load_entry_point_presets,
+            register_custom_tools_from_yaml,
         )
+
         load_entry_point_presets()
         custom_tools = pipeline.get("custom_tools", [])
         if custom_tools:
             register_custom_tools_from_yaml(custom_tools)
         return True, get_preset, list_presets
     except Exception as exc:
-        result.add(Severity.ERROR, EC.CONFIG_REGISTRY_ERROR,
-                   f"Failed to load tool registry: {exc}")
+        result.add(
+            Severity.ERROR,
+            EC.CONFIG_REGISTRY_ERROR,
+            f"Failed to load tool registry: {exc}",
+        )
         return False, None, None
 
 
@@ -133,17 +155,23 @@ def _validate_stage(
     optional = s.get("optional", False)
 
     if not run and not tool:
-        result.add(Severity.ERROR, EC.CONFIG_STAGE_NO_CMD,
-                   f"Stage '{name}' has neither 'run' nor 'tool'.",
-                   stage=name,
-                   suggestion=f"Add 'run: <command>' or 'tool: <preset>' to stage '{name}'.")
+        result.add(
+            Severity.ERROR,
+            EC.CONFIG_STAGE_NO_CMD,
+            f"Stage '{name}' has neither 'run' nor 'tool'.",
+            stage=name,
+            suggestion=f"Add 'run: <command>' or 'tool: <preset>' to stage '{name}'.",
+        )
         return
 
     if run and tool:
-        result.add(Severity.ERROR, EC.CONFIG_STAGE_BOTH_CMDS,
-                   f"Stage '{name}' has both 'run' and 'tool' — use one only.",
-                   stage=name,
-                   suggestion=f"Remove either 'run' or 'tool' from stage '{name}'.")
+        result.add(
+            Severity.ERROR,
+            EC.CONFIG_STAGE_BOTH_CMDS,
+            f"Stage '{name}' has both 'run' and 'tool' — use one only.",
+            stage=name,
+            suggestion=f"Remove either 'run' or 'tool' from stage '{name}'.",
+        )
         return
 
     if tool:
@@ -151,18 +179,26 @@ def _validate_stage(
         if preset is None:
             top = ", ".join(list_presets()[:8])
             available = f"{top}…"
-            result.add(Severity.ERROR, EC.CONFIG_UNKNOWN_PRESET,
-                       f"Stage '{name}': unknown tool preset '{tool}'.",
-                       stage=name,
-                       suggestion=f"Available presets: {available}. Use 'run:' for custom commands.")
+            result.add(
+                Severity.ERROR,
+                EC.CONFIG_UNKNOWN_PRESET,
+                f"Stage '{name}': unknown tool preset '{tool}'.",
+                stage=name,
+                suggestion=f"Available presets: {available}. Use 'run:' for custom commands.",
+            )
         elif not preset.is_available():
             sev = Severity.WARNING if optional else Severity.ERROR
             code = EC.ENV_TOOL_MISSING_OPT if optional else EC.ENV_TOOL_MISSING
-            install_hint = f"Install '{preset.binary}' or add 'optional: true' to skip silently."
-            result.add(sev, code,
-                       f"Stage '{name}': tool '{tool}' binary '{preset.binary}' not found on PATH.",
-                       stage=name,
-                       suggestion=install_hint)
+            install_hint = (
+                f"Install '{preset.binary}' or add 'optional: true' to skip silently."
+            )
+            result.add(
+                sev,
+                code,
+                f"Stage '{name}': tool '{tool}' binary '{preset.binary}' not found on PATH.",
+                stage=name,
+                suggestion=install_hint,
+            )
 
 
 def _validate_gate(
@@ -174,18 +210,24 @@ def _validate_gate(
     result.gates_checked += 1
     base_metric = _resolve_gate_metric(gate_key)
     if base_metric not in KNOWN_METRICS:
-        result.add(Severity.WARNING, EC.ENV_UNKNOWN_METRIC,
-                   f"Gate '{gate_key}': metric '{base_metric}' is not produced by any built-in collector.",
-                   suggestion=(
-                       f"Known metrics: {', '.join(sorted(KNOWN_METRICS)[:10])}… "
-                       "Custom metrics require a plugin or custom stage writing to .pyqual/."
-                   ))
+        result.add(
+            Severity.WARNING,
+            EC.ENV_UNKNOWN_METRIC,
+            f"Gate '{gate_key}': metric '{base_metric}' is not produced by any built-in collector.",
+            suggestion=(
+                f"Known metrics: {', '.join(sorted(KNOWN_METRICS)[:10])}… "
+                "Custom metrics require a plugin or custom stage writing to .pyqual/."
+            ),
+        )
     try:
         float(threshold)
     except (TypeError, ValueError):
-        result.add(Severity.ERROR, EC.CONFIG_BAD_THRESHOLD,
-                   f"Gate '{gate_key}': threshold '{threshold}' is not a number.",
-                   suggestion=f"Fix '{gate_key}:' to a numeric value, e.g. '{gate_key}: 80'.")
+        result.add(
+            Severity.ERROR,
+            EC.CONFIG_BAD_THRESHOLD,
+            f"Gate '{gate_key}': threshold '{threshold}' is not a number.",
+            suggestion=f"Fix '{gate_key}:' to a numeric value, e.g. '{gate_key}: 80'.",
+        )
 
 
 def _validate_loop_config(loop_raw: dict[str, Any], result: ValidationResult) -> None:
@@ -193,19 +235,26 @@ def _validate_loop_config(loop_raw: dict[str, Any], result: ValidationResult) ->
     max_iter = loop_raw.get("max_iterations", 3)
     on_fail = loop_raw.get("on_fail", "report")
     if not isinstance(max_iter, int) or max_iter < 1:
-        result.add(Severity.ERROR, EC.CONFIG_BAD_ITERATIONS,
-                   f"loop.max_iterations must be a positive integer, got: {max_iter!r}.",
-                   suggestion="Set 'max_iterations: 3' (or any positive integer).")
+        result.add(
+            Severity.ERROR,
+            EC.CONFIG_BAD_ITERATIONS,
+            f"loop.max_iterations must be a positive integer, got: {max_iter!r}.",
+            suggestion="Set 'max_iterations: 3' (or any positive integer).",
+        )
     valid_on_fail = {"report", "create_ticket", "block"}
     if on_fail not in valid_on_fail:
-        result.add(Severity.WARNING, EC.CONFIG_UNKNOWN_ON_FAIL,
-                   f"loop.on_fail '{on_fail}' is not a known value.",
-                   suggestion=f"Use one of: {', '.join(sorted(valid_on_fail))}.")
+        result.add(
+            Severity.WARNING,
+            EC.CONFIG_UNKNOWN_ON_FAIL,
+            f"loop.on_fail '{on_fail}' is not a known value.",
+            suggestion=f"Use one of: {', '.join(sorted(valid_on_fail))}.",
+        )
 
 
 # ---------------------------------------------------------------------------
 # Main validation function
 # ---------------------------------------------------------------------------
+
 
 def validate_config(config_path: Path, try_fix: bool = False) -> ValidationResult:
     """Validate a pyqual.yaml file and return structured issues.
@@ -234,9 +283,12 @@ def validate_config(config_path: Path, try_fix: bool = False) -> ValidationResul
     # --- Stages ---
     stages_raw = pipeline.get("stages", [])
     if not stages_raw:
-        result.add(Severity.WARNING, EC.ENV_NO_STAGES,
-                   "No stages defined — pipeline will only check gates.",
-                   suggestion="Add at least one stage with 'tool:' or 'run:'.")
+        result.add(
+            Severity.WARNING,
+            EC.ENV_NO_STAGES,
+            "No stages defined — pipeline will only check gates.",
+            suggestion="Add at least one stage with 'tool:' or 'run:'.",
+        )
 
     for s in stages_raw:
         _validate_stage(s, result, get_preset, list_presets)
@@ -244,9 +296,12 @@ def validate_config(config_path: Path, try_fix: bool = False) -> ValidationResul
     # --- Metrics / gates ---
     metrics_raw = pipeline.get("metrics") or {}
     if not metrics_raw:
-        result.add(Severity.INFO, EC.ENV_NO_GATES,
-                   "No quality gates defined — pipeline will always pass after one iteration.",
-                   suggestion="Add 'metrics:' with thresholds like 'coverage_min: 80'.")
+        result.add(
+            Severity.INFO,
+            EC.ENV_NO_GATES,
+            "No quality gates defined — pipeline will always pass after one iteration.",
+            suggestion="Add 'metrics:' with thresholds like 'coverage_min: 80'.",
+        )
 
     for gate_key, threshold in metrics_raw.items():
         _validate_gate(gate_key, threshold, result)
