@@ -2,12 +2,21 @@
 
 app {
   name: pyqual;
-  version: 0.1.145;
+  version: 0.1.149;
+  description: "Declarative quality gate loops for AI-assisted development";
+  license: Apache-2.0;
+  authors: "Tom Sapletta <tom@sapletta.com>";
+  keywords: "AI, CI/CD, quality-gates, LLM, pipeline, devtools";
 }
 
 dependencies {
   runtime: "pyyaml>=6.0, typer>=0.12, rich>=13.0, litellm>=1.0, python-dotenv>=1.0, nfo>=0.2.13";
-  dev: "pytest>=8.0, pytest-cov>=5.0, goal>=2.1.0, costs>=0.1.20, pfix>=0.1.60, tox>=4.0.0";
+  analysis: "code2llm, vallm, redup";
+  costs: costs;
+  dev: "pytest>=8.0, pytest-cov>=5.0, goal>=2.1.218, costs>=0.1.20, pfix>=0.1.60, tox>=4.0.0";
+  llx: llx>=0.1.75;
+  mcp: "llx>=0.1.75, mcp>=1.0, uvicorn>=0.29";
+  all: "llx>=0.1.75, code2llm, vallm, redup, costs";
 }
 
 interface[type="api"] {
@@ -19,7 +28,7 @@ interface[type="cli"] {
   framework: argparse;
 }
 interface[type="cli"] page[name="pyqual"] {
-
+  entry: pyqual.cli:app;
 }
 
 workflow[name="install"] {
@@ -249,6 +258,14 @@ print('Generated SUMR.json')
 " 2>/dev/null || echo 'Python generation failed, using fallback';
 }
 
+tests {
+  import: testql-scenarios/**/*.testql.toon.yaml;
+}
+
+env_vars {
+  keys: OPENROUTER_API_KEY, LLM_MODEL, PFIX_MODEL, PFIX_AUTO_APPLY, PFIX_AUTO_INSTALL_DEPS, PFIX_AUTO_RESTART, PFIX_MAX_RETRIES, PFIX_DRY_RUN, PFIX_ENABLED, PFIX_GIT_COMMIT, PFIX_GIT_PREFIX, PFIX_CREATE_BACKUPS;
+}
+
 deploy {
   target: docker;
 }
@@ -256,5 +273,9 @@ deploy {
 environment[name="local"] {
   runtime: docker-compose;
   env_file: .env;
+  template_file: .env.example;
   python_version: >=3.9;
+  vars: LLM_MODEL, OPENROUTER_API_KEY, PFIX_AUTO_APPLY, PFIX_AUTO_INSTALL_DEPS, PFIX_AUTO_RESTART, PFIX_CREATE_BACKUPS, PFIX_DRY_RUN, PFIX_ENABLED, PFIX_GIT_COMMIT, PFIX_GIT_PREFIX, PFIX_MAX_RETRIES, PFIX_MODEL;
+  runtime_llm: OPENROUTER_API_KEY;
+  runtime_pfix: PFIX_AUTO_APPLY, PFIX_AUTO_INSTALL_DEPS, PFIX_AUTO_RESTART, PFIX_CREATE_BACKUPS, PFIX_DRY_RUN, PFIX_ENABLED, PFIX_GIT_COMMIT, PFIX_GIT_PREFIX, PFIX_MAX_RETRIES, PFIX_MODEL;
 }
