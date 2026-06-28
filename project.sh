@@ -43,6 +43,12 @@ $VENV/bin/sumr .
 
 pip install -U goal
 $PIP install goal --upgrade --quiet
-$VENV/bin/goal -a
+#$VENV/bin/goal -a
 
-./tree.sh
+if [ -x "./tree.sh" ]; then
+    bash ./tree.sh
+elif command -v tree >/dev/null 2>&1; then
+    tree -L 2
+else
+    echo "Skipping tree snapshot: ./tree.sh not found and 'tree' is not installed."
+fi

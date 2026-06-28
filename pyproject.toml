@@ -44,12 +44,12 @@ packages = ["pyqual", "pyqual.integrations"]
 pyqual = ["default_tools.json"]
 
 [tool.costs]
-model = "openrouter/x-ai/grok-code-fast-1"
+model = "openrouter/deep/deep-v4-pro"
 all_commits = true
 
 [tool.pfix]
 # Self-healing Python configuration
-model = "openrouter/x-ai/grok-code-fast-1"
+model = "openrouter/deep/deep-v4-pro"
 auto_apply = true
 auto_install_deps = true
 auto_restart = false
