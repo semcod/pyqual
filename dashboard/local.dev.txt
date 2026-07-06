@@ -1,0 +1,8 @@
+# local.dev.txt — locally developed dependencies of this project (generated 2026-07-04)
+# by ~/github/local.dev.sh — DO NOT EDIT; see ~/github/local.dev.md
+# project: pyqual-dashboard 1.0.0 (js) at /home/tom/github/semcod/pyqual/dashboard
+# deps declared: 23 | with local source: 0
+
+## LOCAL DEPS: none — all dependencies are external
+
+## EXTERNAL DEPS (no local source, 23): @heroicons/react, @testing-library/jest-dom, @testing-library/react, @testing-library/user-event, @types/react, @types/react-dom, @vitejs/plugin-react, @vitest/coverage-c8, @vitest/ui, autoprefixer, clsx, date-fns, gh-pages, jsdom, postcss, react, react-dom, react-router-dom, recharts, tailwindcss, typescript, vite, vitest

@@ -116,6 +116,16 @@ class GateSet:
         return metrics
 
 
+@dataclass
+class CompositeResult:
+    """Result of a composite (weighted) gate evaluation."""
+
+    score: float
+    passed: bool
+    individual: list[GateResult]
+    pass_threshold: float
+
+
 class CompositeGateSet(GateSet):
     """Weighted composite quality scoring from multiple gates.
 
@@ -181,17 +191,8 @@ class CompositeGateSet(GateSet):
         weighted_sum = sum(w * s for w, s in components)
         return round(weighted_sum / total_weight, 2)
 
-    def check_composite(self, workdir: Path = Path(".")) -> "CompositeResult":
+    def check_composite(self, workdir: Path = Path(".")) -> CompositeResult:
         """Check all individual gates + compute composite score."""
-        from dataclasses import dataclass
-
-        @dataclass
-        class CompositeResult:
-            score: float
-            passed: bool
-            individual: list[GateResult]
-            pass_threshold: float
-
         metrics = self._collect_metrics(workdir)
         individual = self.check_all(workdir)
         score = self.compute_score(metrics)

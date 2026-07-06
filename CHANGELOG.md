@@ -132,6 +132,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fix: apply automated TODO batch fixes [pyqual auto]
 - chore: sync version to 0.1.137
 
+## [0.1.151] - 2026-07-06
+
+### Docs
+- Update README.md
+
+### Other
+- Update .cursor/mcp.json
+- Update .gitignore
+- Update .nlp2dsl/environment.doql.less
+- Update .nlp2dsl/registry/environment.doql.less
+- Update dashboard/local.dev.txt
+- Update koru.yaml
+- Update local.dev.txt
+
 ## [0.1.150] - 2026-06-29
 
 ### Docs

@@ -1,5 +1,5 @@
 # goal.yaml - Goal configuration file
-# Generated: 2026-03-29 14:37:31
+# Generated: 2026-07-06 11:54:09
 # Documentation: https://github.com/wronai/goal#configuration
 #
 # This file configures Goal's behavior for:
@@ -22,6 +22,7 @@ versioning:
   files:
   - VERSION
   - pyproject.toml:version
+  - dashboard/package.json:version
   - pyqual/__init__.py:__version__
   bump_rules:
     patch: 10
@@ -37,7 +38,7 @@ git:
       medium: '{type}({domain}): {action} {entities}'
       low: '{type}({domain}): update {file_count} files (+{added}/-{deleted})'
     domain_mapping:
-      pyqual/*.py: core
+      goal/*.py: core
       src/*.py: core
       lib/*.py: core
       app/*.py: app
@@ -57,6 +58,7 @@ git:
       .gitlab-ci.yml: ci
       Dockerfile: docker
       docker-compose.yml: docker
+      pyqual/*.py: core
     benefit_keywords:
       config: better configuration management
       cli: improved CLI experience
@@ -220,6 +222,20 @@ git:
     enabled: true
     prefix: v
     format: '{prefix}{version}'
+publishing:
+  enabled: true
+  registries:
+  - pypi
+  dry_run: false
+  fallback:
+    github_release:
+      enabled: true
+      owner: ''
+      repo: ''
+      repo_map: {}
+      token_env: GITHUB_TOKEN
+      skip_pypi_retries_on_block: true
+      asset_glob: dist/*
 strategies:
   python:
     test: pytest tests/ -v
@@ -255,16 +271,12 @@ registries:
 hooks:
   pre_commit: ''
   post_commit: ''
-  pre_push: |
-    # Automated quality pipeline - runs before every push
-    echo "🚀 Running automated quality check..."
-    pyqual run --config pyqual.yaml --max-iterations 3 || {
-      echo "⚠️  Quality gates failed - attempting auto-fix..."
-      # Second attempt with explicit fix stage
-      pyqual run --config pyqual.yaml --max-iterations 2 --only fix,prefact || true
-    }
-    # Continue push even if pyqual had issues (non-blocking)
-    echo "✅ Pre-push quality check complete"
+  pre_push: "# Automated quality pipeline - runs before every push\necho \"\U0001F680\
+    \ Running automated quality check...\"\npyqual run --config pyqual.yaml --max-iterations\
+    \ 3 || {\n  echo \"⚠️  Quality gates failed - attempting auto-fix...\"\n  # Second\
+    \ attempt with explicit fix stage\n  pyqual run --config pyqual.yaml --max-iterations\
+    \ 2 --only fix,prefact || true\n}\n# Continue push even if pyqual had issues (non-blocking)\n\
+    echo \"✅ Pre-push quality check complete\"\n"
   post_push: ''
 advanced:
   auto_update_config: true
@@ -315,14 +327,15 @@ advanced:
     - pk_test_[a-zA-Z0-9]{24}
     - sk_live_[a-zA-Z0-9]{24}
     - sk_test_[a-zA-Z0-9]{24}
-    - CS:^[A-Z][A-Z0-9_]{5,}=[a-zA-Z0-9_-]{20,}
-    - Bearer\s+[a-zA-Z0-9_-]{20,}
-    - Token\s+[a-zA-Z0-9_-]{20,}
     - '-----BEGIN\s+(RSA\s+)?PRIVATE\s+KEY-----'
     - '-----BEGIN\s+EC\s+PRIVATE\s+KEY-----'
     - '-----BEGIN\s+OPENSSH\s+PRIVATE\s+KEY-----'
     - '-----BEGIN\s+DSA\s+PRIVATE\s+KEY-----'
-    - CS:^[A-Z][A-Z0-9_]+=[a-zA-Z0-9_-]{20,}
+    - sk-or-v1-(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])[a-zA-Z0-9_-]{32,}
+    - CS:^[A-Z][A-Z0-9_]*(?:API|KEY|TOKEN|SECRET|AUTH|PASS|PWD|CREDENTIAL|ACCESS)[A-Z0-9_]*=(?=(?:.*[a-z]))(?=.*[A-Z])(?=.*[0-9])[a-zA-Z0-9_-]{20,}
+    - \bBearer\s+(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])[a-zA-Z0-9_-]{32,}\b
+    - \bToken\s+(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])[a-zA-Z0-9_-]{32,}\b
+    - '-----BEGIN\s+(?:RSA\s+)?PRIVATE\s+KEY-----'
   recovery:
     enabled: true
     auto_offer: true
