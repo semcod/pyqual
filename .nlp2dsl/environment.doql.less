@@ -1,7 +1,7 @@
 // DOQL system map — pyqual
 // role: LLM-generated schema (SystemMapIR → DOQL)
 // format: nlp2dsl.system_map.v1
-// generated: 2026-07-07T19:07:17.349876+00:00
+// generated: 2026-07-07T19:25:48.053747+00:00
 
 environment[name="pyqual"] {
   ENV2LLM_CONTEXT: "/home/tom/github/semcod/pyqual/.nlp2dsl/registry/environment.doql.less";
@@ -9,7 +9,7 @@ environment[name="pyqual"] {
   LLM_MODEL: "openrouter/openai/gpt-5-mini";
   NLP2DSL_DOQL_CONTEXT: "/home/tom/github/semcod/pyqual/.nlp2dsl/registry/environment.doql.less";
   OPENROUTER_API_KEY: "sk-o…c905";
-  generated_at: "2026-07-07T19:07:15.348876+00:00";
+  generated_at: "2026-07-07T19:25:46.067786+00:00";
 }
 
 data {
@@ -98,7 +98,7 @@ host {
   status: "available";
   cron_available: true;
   cron_taskinity_installed: true;
-  probed_at: "2026-07-07T19:07:17.121786+00:00";
+  probed_at: "2026-07-07T19:25:47.828772+00:00";
   monitor_log_path: "/tmp/taskinity-monitor.log";
   capabilities_available: "docker,playwright,curl,crontab,openrouter,agent_http_any,www_8788,www_health,docker_containers,processes,ports";
   capabilities_missing: "cli_uri,cli_uri3,cli_hypervisor,cli_touri,cli_uri2flow,cli_nl2uri,adb,uia,agent_http_8101,agents";
@@ -794,7 +794,7 @@ host_process[0] {
   pid: 2841;
   ppid: 1;
   status: "Ssl";
-  elapsed: "1-11:03:08";
+  elapsed: "1-11:21:39";
   command: "python3";
   args: "/usr/bin/python3 -m uvicorn orchestrator:app --host 0.0.0.0 --port 8000 --log-level info";
 }
@@ -803,7 +803,7 @@ host_process[1] {
   pid: 3057;
   ppid: 1;
   status: "Ssl";
-  elapsed: "1-11:03:05";
+  elapsed: "1-11:21:35";
   command: "dockerd";
   args: "/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock";
 }
@@ -812,7 +812,7 @@ host_process[2] {
   pid: 12489;
   ppid: 12437;
   status: "Ss";
-  elapsed: "1-11:02:50";
+  elapsed: "1-11:21:21";
   command: "sh";
   args: "sh -c uvicorn api.main:app --host 0.0.0.0 --port ${MODULE_PORT:-8000}";
 }
@@ -821,7 +821,7 @@ host_process[3] {
   pid: 13240;
   ppid: 12876;
   status: "Ss";
-  elapsed: "1-11:02:50";
+  elapsed: "1-11:21:20";
   command: "uvicorn";
   args: "/usr/local/bin/python3.11 /usr/local/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000";
 }
@@ -830,7 +830,7 @@ host_process[4] {
   pid: 13318;
   ppid: 13012;
   status: "Ssl";
-  elapsed: "1-11:02:50";
+  elapsed: "1-11:21:20";
   command: "uvicorn";
   args: "/app/.venv/bin/python /app/.venv/bin/uvicorn agents.system.hypervisor_dashboard.main:app --host 0.0.0.0 --port 8788";
 }
@@ -839,7 +839,7 @@ host_process[5] {
   pid: 13335;
   ppid: 13079;
   status: "Ss";
-  elapsed: "1-11:02:50";
+  elapsed: "1-11:21:20";
   command: "uvicorn";
   args: "/usr/local/bin/python3.11 /usr/local/bin/uvicorn worker:app --host 0.0.0.0 --port 8000";
 }
@@ -848,7 +848,7 @@ host_process[6] {
   pid: 13403;
   ppid: 13081;
   status: "Ss";
-  elapsed: "1-11:02:50";
+  elapsed: "1-11:21:20";
   command: "docker-init";
   args: "/sbin/docker-init -- /usr/bin/buildkitd-entrypoint --allow-insecure-entitlement=network.host";
 }
@@ -857,7 +857,7 @@ host_process[7] {
   pid: 13526;
   ppid: 13113;
   status: "Ssl";
-  elapsed: "1-11:02:49";
+  elapsed: "1-11:21:20";
   command: "uvicorn";
   args: "/usr/local/bin/python3.12 /usr/local/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000";
 }
@@ -866,7 +866,7 @@ host_process[8] {
   pid: 13650;
   ppid: 13500;
   status: "Ss";
-  elapsed: "1-11:02:49";
+  elapsed: "1-11:21:20";
   command: "uvicorn";
   args: "/usr/local/bin/python3.12 /usr/local/bin/uvicorn app.main:app --host 0.0.0.0 --port 8020";
 }
@@ -875,7 +875,7 @@ host_process[9] {
   pid: 13781;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:49";
+  elapsed: "1-11:21:20";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 8120 -container-ip 172.18.0.2 -container-port 8120 -use-listen-fd";
 }
@@ -884,7 +884,7 @@ host_process[10] {
   pid: 13793;
   ppid: 13283;
   status: "Ssl";
-  elapsed: "1-11:02:49";
+  elapsed: "1-11:21:20";
   command: "uvicorn";
   args: "/usr/local/bin/python3.11 /usr/local/bin/uvicorn server:app --host 0.0.0.0 --port 8090";
 }
@@ -893,7 +893,7 @@ host_process[11] {
   pid: 13801;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:49";
+  elapsed: "1-11:21:20";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 8120 -container-ip 172.18.0.2 -container-port 8120 -use-listen-fd";
 }
@@ -902,7 +902,7 @@ host_process[12] {
   pid: 14527;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:49";
+  elapsed: "1-11:21:20";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 8090 -container-ip 172.24.0.3 -container-port 8090 -use-listen-fd";
 }
@@ -911,7 +911,7 @@ host_process[13] {
   pid: 14536;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:49";
+  elapsed: "1-11:21:20";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 8090 -container-ip 172.24.0.3 -container-port 8090 -use-listen-fd";
 }
@@ -920,7 +920,7 @@ host_process[14] {
   pid: 14774;
   ppid: 13731;
   status: "Ss";
-  elapsed: "1-11:02:49";
+  elapsed: "1-11:21:20";
   command: "sh";
   args: "sh -c uvicorn api.main:app --host 0.0.0.0 --port ${MODULE_PORT:-8000}";
 }
@@ -929,7 +929,7 @@ host_process[15] {
   pid: 14784;
   ppid: 13253;
   status: "Ss";
-  elapsed: "1-11:02:49";
+  elapsed: "1-11:21:20";
   command: "sh";
   args: "sh -c uvicorn api.main:app --host 0.0.0.0 --port ${MODULE_PORT:-8000}";
 }
@@ -938,7 +938,7 @@ host_process[16] {
   pid: 14827;
   ppid: 14037;
   status: "Ss";
-  elapsed: "1-11:02:49";
+  elapsed: "1-11:21:20";
   command: "docker-init";
   args: "/sbin/docker-init -- /bin/sh -c uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers ${API_WORKERS:-1}";
 }
@@ -947,7 +947,7 @@ host_process[17] {
   pid: 14851;
   ppid: 13885;
   status: "Ssl";
-  elapsed: "1-11:02:49";
+  elapsed: "1-11:21:20";
   command: "uvicorn";
   args: "/usr/local/bin/python3.12 /usr/local/bin/uvicorn main:app --host 0.0.0.0 --port 8080";
 }
@@ -956,7 +956,7 @@ host_process[18] {
   pid: 14995;
   ppid: 13688;
   status: "Ssl";
-  elapsed: "1-11:02:49";
+  elapsed: "1-11:21:20";
   command: "uvicorn";
   args: "/usr/local/bin/python3.11 /usr/local/bin/uvicorn server:app --host 0.0.0.0 --port 8080 --log-level info";
 }
@@ -965,7 +965,7 @@ host_process[19] {
   pid: 15059;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:49";
+  elapsed: "1-11:21:20";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 5434 -container-ip 172.24.0.2 -container-port 5432 -use-listen-fd";
 }
@@ -974,7 +974,7 @@ host_process[20] {
   pid: 15079;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:49";
+  elapsed: "1-11:21:20";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 5434 -container-ip 172.24.0.2 -container-port 5432 -use-listen-fd";
 }
@@ -983,7 +983,7 @@ host_process[21] {
   pid: 15332;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:49";
+  elapsed: "1-11:21:19";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 8300 -container-ip 172.21.0.2 -container-port 8300 -use-listen-fd";
 }
@@ -992,7 +992,7 @@ host_process[22] {
   pid: 15340;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:49";
+  elapsed: "1-11:21:19";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 8300 -container-ip 172.21.0.2 -container-port 8300 -use-listen-fd";
 }
@@ -1001,7 +1001,7 @@ host_process[23] {
   pid: 15377;
   ppid: 14665;
   status: "Ssl";
-  elapsed: "1-11:02:49";
+  elapsed: "1-11:21:19";
   command: "uvicorn";
   args: "/usr/local/bin/python3.11 /usr/local/bin/uvicorn gh2mcp.server:app --host 0.0.0.0 --port 8079";
 }
@@ -1010,7 +1010,7 @@ host_process[24] {
   pid: 15378;
   ppid: 14255;
   status: "Ssl";
-  elapsed: "1-11:02:49";
+  elapsed: "1-11:21:19";
   command: "uvicorn";
   args: "/usr/local/bin/python3.11 /usr/local/bin/uvicorn server:app --host 0.0.0.0 --port 8000";
 }
@@ -1019,7 +1019,7 @@ host_process[25] {
   pid: 15454;
   ppid: 12489;
   status: "S";
-  elapsed: "1-11:02:49";
+  elapsed: "1-11:21:19";
   command: "uvicorn";
   args: "/usr/local/bin/python3.11 /usr/local/bin/uvicorn api.main:app --host 0.0.0.0 --port 8300";
 }
@@ -1028,7 +1028,7 @@ host_process[26] {
   pid: 15504;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:49";
+  elapsed: "1-11:21:19";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 8005 -container-ip 192.168.32.2 -container-port 8000 -use-listen-fd";
 }
@@ -1037,7 +1037,7 @@ host_process[27] {
   pid: 15512;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:49";
+  elapsed: "1-11:21:19";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 8005 -container-ip 192.168.32.2 -container-port 8000 -use-listen-fd";
 }
@@ -1046,7 +1046,7 @@ host_process[28] {
   pid: 15545;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:49";
+  elapsed: "1-11:21:19";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 4000 -container-ip 172.24.0.4 -container-port 4000 -use-listen-fd";
 }
@@ -1055,7 +1055,7 @@ host_process[29] {
   pid: 15566;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:48";
+  elapsed: "1-11:21:19";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 4000 -container-ip 172.24.0.4 -container-port 4000 -use-listen-fd";
 }
@@ -1064,7 +1064,7 @@ host_process[30] {
   pid: 15578;
   ppid: 14336;
   status: "Ssl";
-  elapsed: "1-11:02:48";
+  elapsed: "1-11:21:19";
   command: "uvicorn";
   args: "/usr/local/bin/python3.11 /usr/local/bin/uvicorn server:app --host 0.0.0.0 --port 8090";
 }
@@ -1073,7 +1073,7 @@ host_process[31] {
   pid: 15594;
   ppid: 14633;
   status: "Ssl";
-  elapsed: "1-11:02:48";
+  elapsed: "1-11:21:19";
   command: "uvicorn";
   args: "/usr/local/bin/python3.12 /usr/local/bin/uvicorn redsl.api:app --host 0.0.0.0 --port 8000";
 }
@@ -1082,7 +1082,7 @@ host_process[32] {
   pid: 15694;
   ppid: 14249;
   status: "Ss";
-  elapsed: "1-11:02:48";
+  elapsed: "1-11:21:19";
   command: "sh";
   args: "sh -c uvicorn api.main:app --host 0.0.0.0 --port ${MODULE_PORT:-8000}";
 }
@@ -1091,7 +1091,7 @@ host_process[33] {
   pid: 15719;
   ppid: 15157;
   status: "Ss";
-  elapsed: "1-11:02:48";
+  elapsed: "1-11:21:19";
   command: "docker-init";
   args: "/sbin/docker-init -- /bin/sh -c uvicorn app.main_service_id_pilot:app --host 0.0.0.0 --port 8000 --workers 1";
 }
@@ -1100,7 +1100,7 @@ host_process[34] {
   pid: 15720;
   ppid: 15231;
   status: "Ss";
-  elapsed: "1-11:02:48";
+  elapsed: "1-11:21:19";
   command: "docker-init";
   args: "/sbin/docker-init -- /bin/sh -c uvicorn app.main_service_manager_pilot:app --host 0.0.0.0 --port 8000 --workers 1";
 }
@@ -1109,7 +1109,7 @@ host_process[35] {
   pid: 15721;
   ppid: 14675;
   status: "Ssl";
-  elapsed: "1-11:02:48";
+  elapsed: "1-11:21:19";
   command: "uvicorn";
   args: "/usr/local/bin/python3.11 /usr/local/bin/uvicorn server:app --host 0.0.0.0 --port 9000";
 }
@@ -1118,7 +1118,7 @@ host_process[36] {
   pid: 15819;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:48";
+  elapsed: "1-11:21:19";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 8004 -container-ip 172.27.0.3 -container-port 8000 -use-listen-fd";
 }
@@ -1127,7 +1127,7 @@ host_process[37] {
   pid: 15825;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:48";
+  elapsed: "1-11:21:19";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 8004 -container-ip 172.27.0.3 -container-port 8000 -use-listen-fd";
 }
@@ -1136,7 +1136,7 @@ host_process[38] {
   pid: 16101;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:48";
+  elapsed: "1-11:21:18";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 8010 -container-ip 172.27.0.4 -container-port 8000 -use-listen-fd";
 }
@@ -1145,7 +1145,7 @@ host_process[39] {
   pid: 16111;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:48";
+  elapsed: "1-11:21:18";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 8010 -container-ip 172.27.0.4 -container-port 8000 -use-listen-fd";
 }
@@ -1154,7 +1154,7 @@ host_process[40] {
   pid: 16220;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:47";
+  elapsed: "1-11:21:18";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 8093 -container-ip 172.31.0.2 -container-port 8090 -use-listen-fd";
 }
@@ -1163,7 +1163,7 @@ host_process[41] {
   pid: 16227;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:47";
+  elapsed: "1-11:21:18";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 8093 -container-ip 172.31.0.2 -container-port 8090 -use-listen-fd";
 }
@@ -1172,7 +1172,7 @@ host_process[42] {
   pid: 16343;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:47";
+  elapsed: "1-11:21:18";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 18002 -container-ip 172.23.0.2 -container-port 80 -use-listen-fd";
 }
@@ -1181,7 +1181,7 @@ host_process[43] {
   pid: 16353;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:47";
+  elapsed: "1-11:21:18";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 18002 -container-ip 172.23.0.2 -container-port 80 -use-listen-fd";
 }
@@ -1190,7 +1190,7 @@ host_process[44] {
   pid: 16477;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:47";
+  elapsed: "1-11:21:18";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 8079 -container-ip 172.30.0.3 -container-port 8079 -use-listen-fd";
 }
@@ -1199,7 +1199,7 @@ host_process[45] {
   pid: 16489;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:47";
+  elapsed: "1-11:21:18";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 8079 -container-ip 172.30.0.3 -container-port 8079 -use-listen-fd";
 }
@@ -1208,7 +1208,7 @@ host_process[46] {
   pid: 16645;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:47";
+  elapsed: "1-11:21:17";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 8302 -container-ip 172.21.0.3 -container-port 8302 -use-listen-fd";
 }
@@ -1217,7 +1217,7 @@ host_process[47] {
   pid: 16654;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:47";
+  elapsed: "1-11:21:17";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 8302 -container-ip 172.21.0.3 -container-port 8302 -use-listen-fd";
 }
@@ -1226,7 +1226,7 @@ host_process[48] {
   pid: 16706;
   ppid: 14774;
   status: "S";
-  elapsed: "1-11:02:47";
+  elapsed: "1-11:21:17";
   command: "uvicorn";
   args: "/usr/local/bin/python3.11 /usr/local/bin/uvicorn api.main:app --host 0.0.0.0 --port 8302";
 }
@@ -1235,7 +1235,7 @@ host_process[49] {
   pid: 16712;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:47";
+  elapsed: "1-11:21:17";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 8070 -container-ip 172.27.0.5 -container-port 8020 -use-listen-fd";
 }
@@ -1244,7 +1244,7 @@ host_process[50] {
   pid: 16717;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:47";
+  elapsed: "1-11:21:17";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 8070 -container-ip 172.27.0.5 -container-port 8020 -use-listen-fd";
 }
@@ -1253,7 +1253,7 @@ host_process[51] {
   pid: 16796;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:46";
+  elapsed: "1-11:21:17";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 8301 -container-ip 172.21.0.4 -container-port 8301 -use-listen-fd";
 }
@@ -1262,7 +1262,7 @@ host_process[52] {
   pid: 16808;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:46";
+  elapsed: "1-11:21:17";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 8301 -container-ip 172.21.0.4 -container-port 8301 -use-listen-fd";
 }
@@ -1271,7 +1271,7 @@ host_process[53] {
   pid: 16844;
   ppid: 14784;
   status: "S";
-  elapsed: "1-11:02:46";
+  elapsed: "1-11:21:17";
   command: "uvicorn";
   args: "/usr/local/bin/python3.11 /usr/local/bin/uvicorn api.main:app --host 0.0.0.0 --port 8301";
 }
@@ -1280,7 +1280,7 @@ host_process[54] {
   pid: 16869;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:46";
+  elapsed: "1-11:21:17";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 6379 -container-ip 192.168.96.2 -container-port 6379 -use-listen-fd";
 }
@@ -1289,7 +1289,7 @@ host_process[55] {
   pid: 16877;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:46";
+  elapsed: "1-11:21:17";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 6379 -container-ip 192.168.96.2 -container-port 6379 -use-listen-fd";
 }
@@ -1298,7 +1298,7 @@ host_process[56] {
   pid: 16894;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:46";
+  elapsed: "1-11:21:17";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 8001 -container-ip 192.168.96.2 -container-port 8001 -use-listen-fd";
 }
@@ -1307,7 +1307,7 @@ host_process[57] {
   pid: 16903;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:46";
+  elapsed: "1-11:21:17";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 8001 -container-ip 192.168.96.2 -container-port 8001 -use-listen-fd";
 }
@@ -1316,7 +1316,7 @@ host_process[58] {
   pid: 16940;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:46";
+  elapsed: "1-11:21:17";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 2525 -container-ip 172.24.0.8 -container-port 2525 -use-listen-fd";
 }
@@ -1325,7 +1325,7 @@ host_process[59] {
   pid: 16949;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:46";
+  elapsed: "1-11:21:17";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 2525 -container-ip 172.24.0.8 -container-port 2525 -use-listen-fd";
 }
@@ -1334,7 +1334,7 @@ host_process[60] {
   pid: 17128;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:46";
+  elapsed: "1-11:21:17";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 18090 -container-ip 172.23.0.5 -container-port 80 -use-listen-fd";
 }
@@ -1343,7 +1343,7 @@ host_process[61] {
   pid: 17139;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:46";
+  elapsed: "1-11:21:17";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 18090 -container-ip 172.23.0.5 -container-port 80 -use-listen-fd";
 }
@@ -1352,7 +1352,7 @@ host_process[62] {
   pid: 17285;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:46";
+  elapsed: "1-11:21:17";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 8080 -container-ip 192.168.16.2 -container-port 80 -use-listen-fd";
 }
@@ -1361,7 +1361,7 @@ host_process[63] {
   pid: 17293;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:46";
+  elapsed: "1-11:21:16";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 8080 -container-ip 192.168.16.2 -container-port 80 -use-listen-fd";
 }
@@ -1370,7 +1370,7 @@ host_process[64] {
   pid: 17421;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:46";
+  elapsed: "1-11:21:16";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 18080 -container-ip 172.23.0.3 -container-port 8080 -use-listen-fd";
 }
@@ -1379,7 +1379,7 @@ host_process[65] {
   pid: 17428;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:46";
+  elapsed: "1-11:21:16";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 18080 -container-ip 172.23.0.3 -container-port 8080 -use-listen-fd";
 }
@@ -1388,7 +1388,7 @@ host_process[66] {
   pid: 17588;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:46";
+  elapsed: "1-11:21:16";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 18000 -container-ip 172.23.0.4 -container-port 80 -use-listen-fd";
 }
@@ -1397,7 +1397,7 @@ host_process[67] {
   pid: 17598;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:46";
+  elapsed: "1-11:21:16";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 18000 -container-ip 172.23.0.4 -container-port 80 -use-listen-fd";
 }
@@ -1406,7 +1406,7 @@ host_process[68] {
   pid: 17814;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:45";
+  elapsed: "1-11:21:16";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 80 -container-ip 172.22.0.5 -container-port 80 -use-listen-fd";
 }
@@ -1415,7 +1415,7 @@ host_process[69] {
   pid: 17829;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:45";
+  elapsed: "1-11:21:16";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 80 -container-ip 172.22.0.5 -container-port 80 -use-listen-fd";
 }
@@ -1424,7 +1424,7 @@ host_process[70] {
   pid: 17877;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:45";
+  elapsed: "1-11:21:16";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 443 -container-ip 172.22.0.5 -container-port 443 -use-listen-fd";
 }
@@ -1433,7 +1433,7 @@ host_process[71] {
   pid: 17894;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:45";
+  elapsed: "1-11:21:16";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 443 -container-ip 172.22.0.5 -container-port 443 -use-listen-fd";
 }
@@ -1442,7 +1442,7 @@ host_process[72] {
   pid: 18007;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:45";
+  elapsed: "1-11:21:16";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 8303 -container-ip 172.21.0.5 -container-port 8303 -use-listen-fd";
 }
@@ -1451,7 +1451,7 @@ host_process[73] {
   pid: 18015;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:45";
+  elapsed: "1-11:21:16";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 8303 -container-ip 172.21.0.5 -container-port 8303 -use-listen-fd";
 }
@@ -1460,7 +1460,7 @@ host_process[74] {
   pid: 18052;
   ppid: 15694;
   status: "S";
-  elapsed: "1-11:02:45";
+  elapsed: "1-11:21:16";
   command: "uvicorn";
   args: "/usr/local/bin/python3.11 /usr/local/bin/uvicorn api.main:app --host 0.0.0.0 --port 8303";
 }
@@ -1469,7 +1469,7 @@ host_process[75] {
   pid: 18070;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:45";
+  elapsed: "1-11:21:16";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 8101 -container-ip 172.18.0.7 -container-port 8000 -use-listen-fd";
 }
@@ -1478,7 +1478,7 @@ host_process[76] {
   pid: 18078;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:45";
+  elapsed: "1-11:21:16";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 8101 -container-ip 172.18.0.7 -container-port 8000 -use-listen-fd";
 }
@@ -1487,7 +1487,7 @@ host_process[77] {
   pid: 18118;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:45";
+  elapsed: "1-11:21:16";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 18001 -container-ip 172.23.0.6 -container-port 8000 -use-listen-fd";
 }
@@ -1496,7 +1496,7 @@ host_process[78] {
   pid: 18125;
   ppid: 3057;
   status: "Sl";
-  elapsed: "1-11:02:45";
+  elapsed: "1-11:21:16";
   command: "docker-proxy";
   args: "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 18001 -container-ip 172.23.0.6 -container-port 8000 -use-listen-fd";
 }
@@ -1505,7 +1505,7 @@ host_process[79] {
   pid: 18128;
   ppid: 14827;
   status: "S";
-  elapsed: "1-11:02:45";
+  elapsed: "1-11:21:16";
   command: "sh";
   args: "/bin/sh -c uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers ${API_WORKERS:-1}";
 }
@@ -1515,7 +1515,7 @@ host_container[0] {
   name: "cybermysz-app";
   image: "cybermysz-local-app";
   state: "running";
-  status: "Up 3 hours";
+  status: "Up 4 hours";
   ports: "80/tcp";
   project: "cybermysz-local";
   service: "app";
@@ -1526,7 +1526,7 @@ host_container[1] {
   name: "cybermysz-traefik";
   image: "traefik:v3.2";
   state: "running";
-  status: "Up 3 hours";
+  status: "Up 4 hours";
   ports: "0.0.0.0:9080->80/tcp, [::]:9080->80/tcp, 0.0.0.0:9443->443/tcp, [::]:9443->443/tcp";
   project: "cybermysz-local";
   service: "traefik";
@@ -1537,7 +1537,7 @@ host_container[2] {
   name: "cybermysz-mailpit";
   image: "axllent/mailpit:v1.21";
   state: "running";
-  status: "Up 3 hours (healthy)";
+  status: "Up 4 hours (healthy)";
   ports: "0.0.0.0:1025->1025/tcp, [::]:1025->1025/tcp, 0.0.0.0:8025->8025/tcp, [::]:8025->8025/tcp, 1110/tcp";
   project: "cybermysz-local";
   service: "mailpit";
@@ -1702,7 +1702,7 @@ host_container[17] {
   name: "proxym";
   image: "proxym-proxy";
   state: "restarting";
-  status: "Restarting (1) 45 seconds ago";
+  status: "Restarting (1) 56 seconds ago";
   project: "proxym";
   service: "proxy";
 }
@@ -1920,7 +1920,7 @@ host_container[37] {
   name: "nexu";
   image: "localhost/nexu-saas:latest";
   state: "restarting";
-  status: "Restarting (1) 6 seconds ago";
+  status: "Restarting (1) 33 seconds ago";
   project: "repact";
   service: "nexu";
 }
@@ -2067,7 +2067,7 @@ host_container[51] {
   name: "platform-gen-handlebars";
   image: "dbos-gen-handlebars";
   state: "restarting";
-  status: "Restarting (1) 8 seconds ago";
+  status: "Restarting (1) 33 seconds ago";
   project: "dbos";
   service: "gen-handlebars";
 }
@@ -2142,7 +2142,7 @@ host_container[58] {
   name: "platform-cdn";
   image: "nginx:alpine";
   state: "restarting";
-  status: "Restarting (1) 39 seconds ago";
+  status: "Restarting (1) 43 seconds ago";
   project: "dbos";
   service: "nginx-cdn";
 }
