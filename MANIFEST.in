@@ -1,0 +1,11 @@
+global-exclude *.bak
+exclude .aider.chat.history.md
+exclude .aider.input.history
+exclude local.dev.txt
+prune .assistant
+prune .cursor
+prune .nlp2dsl
+prune .planfile_analysis
+prune .pyqual
+prune .taskill
+prune code2llm_output
