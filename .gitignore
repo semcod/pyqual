@@ -226,3 +226,12 @@ __marimo__/
 .nlp2dsl/
 .planfile_analysis/
 .taskill/
+
+# Local ticket worktrees and private recovery state
+/.worktrees/
+/.subactor/leases/
+/.subactor/sessions/
+/.subactor/recovery/
+/.subactor/receipts/
+/.subactor/cache/
+/.subactor/snapshots/
