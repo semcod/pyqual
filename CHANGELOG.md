@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Fix wheel package discovery so the `pyqual` console entry point includes its
+  CLI, validation, plugin, bulk and other runtime subpackages, without shipping
+  source backup files or local analysis/history artifacts.
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
@@ -1562,4 +1568,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update gates.py
 - Update pipeline.py
 - Update project.sh
-

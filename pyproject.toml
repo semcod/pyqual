@@ -37,11 +37,14 @@ all = ["llx>=0.1.75", "code2llm", "vallm", "redup", "costs"]
 [project.scripts]
 pyqual = "pyqual.cli:app"
 
-[tool.setuptools]
-packages = ["pyqual", "pyqual.integrations"]
+[tool.setuptools.packages.find]
+include = ["pyqual*"]
 
 [tool.setuptools.package-data]
 pyqual = ["default_tools.json"]
+
+[tool.setuptools.exclude-package-data]
+"*" = ["*.bak"]
 
 [tool.costs]
 model = "openrouter/deep/deep-v4-pro"
