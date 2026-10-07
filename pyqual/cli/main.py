@@ -21,6 +21,16 @@ console = Console()
 stderr_console = Console(stderr=True)
 
 
+@app.callback()
+def _main_callback() -> None:
+    try:
+        from pyqual.autoupdate import check_for_updates
+        check_for_updates("pyqual")
+    except Exception:
+        pass
+
+
+
 @app.command("tune")
 def tune_thresholds_cmd(
     aggressive: bool = typer.Option(
