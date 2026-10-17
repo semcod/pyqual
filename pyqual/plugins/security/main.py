@@ -109,7 +109,8 @@ stages:
             return
 
         try:
-            data = json.loads(audit_path.read_text())
+            with audit_path.open("r", encoding="utf-8") as handle:
+                data = json.loads(handle.read(1_048_576))
             if isinstance(data, dict):
                 vulnerabilities = data.get("vulnerabilities", [])
             else:

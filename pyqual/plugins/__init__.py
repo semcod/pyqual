@@ -81,4 +81,6 @@ def install_plugin_config(name: str, workdir: Path = Path(".")) -> str:
         raise ValueError(f"Unknown plugin: {name}")
 
     instance = plugin_class()
+    if hasattr(instance, "workdir"):
+        instance.workdir = workdir
     return instance.get_config_example()

@@ -1,0 +1,23 @@
+{
+  "ticket": "ticket-073",
+  "summary": "Fix PERF-AUDIT findings and adopt Wellmanifest baseline standards",
+  "allowedPaths": [
+    ".aider.conf.yml",
+    ".cursor/rules/new-project-standard.mdc",
+    ".github/copilot-instructions.md",
+    ".github/workflows/**",
+    ".gitignore",
+    ".governance/**",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    "project/ticket-073/**",
+    "pyqual/**"
+  ],
+  "forbiddenPaths": [
+    ".env",
+    "secrets/**"
+  ],
+  "authorization": "SESSION_EXECUTION_AUTHORIZATION",
+  "outcome": "All 380 tests pass, 0 PERF-AUDIT findings, and Wellmanifest baseline standards adopted."
+}

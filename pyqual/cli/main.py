@@ -249,6 +249,7 @@ def setup_logging(verbose: bool, workdir: Path = Path(".")) -> None:
     logger = logging.getLogger("pyqual")
     logger.setLevel(logging.DEBUG)
     logger.handlers.clear()
+    setattr(logger, "workdir", str(workdir))
 
     if verbose:
         handler = logging.StreamHandler()

@@ -219,7 +219,7 @@ jobs:
         
         # Read pyqual output
         log_file = Path(".pyqual/pyqual_output.log")
-        logs = log_file.read_text() if log_file.exists() else "No logs available"
+        logs = log_file.open(encoding="utf-8", errors="replace").read(262144) if log_file.exists() else "No logs available"
         
         # Determine failure stage from logs
         stage = "unknown"
@@ -328,7 +328,7 @@ jobs:
             sys.exit(0)
         
         log_file = Path(".pyqual/pyqual_output.log")
-        logs = log_file.read_text() if log_file.exists() else "No logs available"
+        logs = log_file.open(encoding="utf-8", errors="replace").read(262144) if log_file.exists() else "No logs available"
         
         body = "## ❌ Pyqual failed to process this issue\n\n"
         body += "The automated fix attempt failed. Please check the issue details and try again.\n\n"
@@ -400,7 +400,7 @@ jobs:
         
         # Parse pyqual output for a simple success signal.
         log_file = Path(".pyqual/pyqual_output.log")
-        pyqual_output = log_file.read_text() if log_file.exists() else ""
+        pyqual_output = log_file.open(encoding="utf-8", errors="replace").read(262144) if log_file.exists() else ""
 
         # Check if all gates passed.
         all_gates_passed = "all_gates_passed: true" in pyqual_output or "result: all_gates_passed" in pyqual_output
@@ -519,7 +519,7 @@ jobs:
         
         # Parse pyqual output for metrics
         log_file = Path(".pyqual/pyqual_output.log")
-        pyqual_output = log_file.read_text() if log_file.exists() else ""
+        pyqual_output = log_file.open(encoding="utf-8", errors="replace").read(262144) if log_file.exists() else ""
         
         # Check if all gates passed
         all_gates_passed = "all_gates_passed: true" in pyqual_output or "result: all_gates_passed" in pyqual_output
