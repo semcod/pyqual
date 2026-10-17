@@ -261,7 +261,7 @@ def _detect_colon_issues(lines: list[str]) -> list[YamlSyntaxIssue]:
                             original=line,
                             fixed=fixed,
                             can_fix=True,
-                            context=_get_context(lines, i),
+                            context=_get_context(lines, i, context_size=2),
                         )
                     )
 

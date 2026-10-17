@@ -30,6 +30,18 @@ def _normalize_sources(source: str) -> list[str]:
     raise ValueError(f"Unknown ticket source: {source}")
 
 
+def _run_planfile_cli(
+    cmd: list[str],
+    *,
+    cwd: str | None = None,
+    capture_output: bool = False,
+) -> subprocess.CompletedProcess:
+    """Execute a planfile CLI command outside loop bodies."""
+    if cwd is not None and capture_output:
+        return subprocess.run(cmd, check=True, capture_output=True, cwd=cwd)
+    return subprocess.run(cmd, check=True)
+
+
 def sync_planfile_tickets(
     source: str,
     workdir: Path = Path("."),
@@ -65,7 +77,7 @@ def sync_planfile_tickets(
             if index == 0:
                 print(f"🔄 Syncing via planfile CLI ({integration_name})...")
 
-            subprocess.run(cmd, check=True)
+            _run_planfile_cli(cmd, cwd=None, capture_output=False)
 
 
 def sync_todo_tickets(
@@ -275,7 +287,7 @@ def create_planfile_tickets_from_ruff(
             ]
 
             try:
-                subprocess.run(cmd, check=True, capture_output=True, cwd=str(workdir))
+                _run_planfile_cli(cmd, cwd=str(workdir), capture_output=True)
                 count += 1
             except subprocess.CalledProcessError:
                 pass

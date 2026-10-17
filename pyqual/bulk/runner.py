@@ -56,3 +56,10 @@ def _run_single_project(
     finally:
         if log_fh:
             log_fh.close()
+
+    if analyze and state.status in (RunStatus.FAILED, RunStatus.ERROR, RunStatus.TIMEOUT):
+        from pyqual.analysis import _analyze_project
+
+        state.analysis = "🤔 analyzing…"
+        _analyze_project(state, log_dir=log_dir)
+

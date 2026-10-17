@@ -953,6 +953,8 @@ def preflight_push_check(
         "warnings": [],
         "secrets_scan": {},
         "dry_run": dry_run,
+        "remote": remote,
+        "branch": branch,
     }
 
     workdir = cwd or Path(".")
@@ -963,6 +965,9 @@ def preflight_push_check(
         result["can_push"] = False
         result["blockers"].append(f"Git error: {status.get('error')}")
         return result
+
+    if result["branch"] is None:
+        result["branch"] = status.get("branch")
 
     # Check for uncommitted changes
     if status["uncommitted_files"]:
