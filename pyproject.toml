@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyqual"
-version = "0.1.151"
+version = "0.1.152"
 description = "Declarative quality gate loops for AI-assisted development"
 readme = "README.md"
-license = "Apache-2.0"
+license = {text = "Apache-2.0"}
 requires-python = ">=3.9"
 authors = [{name = "Tom Sapletta", email = "tom@sapletta.com"}]
 keywords = ["AI", "CI/CD", "quality-gates", "LLM", "pipeline", "devtools"]
